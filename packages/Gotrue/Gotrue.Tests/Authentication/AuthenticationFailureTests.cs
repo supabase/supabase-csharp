@@ -32,10 +32,13 @@ public class AuthenticationFailureTests : AuthClientFixture
     }
 
     [TestMethod]
-    public async Task SignUp_ShouldThrowUserBadEmailAddress_GivenInvalidEmail()
+    public async Task SignUp_ShouldSurfaceTheServerErrorCode_GivenInvalidEmail()
     {
         var signUp = () => this.Client.SignUp("not a real email address", Password);
-        await this.VerifyRejected(signUp, UserBadEmailAddress);
+        var exception = await signUp.Should().ThrowAsync<GotrueException>();
+        exception.Which.ErrorCode.Should().Be("validation_failed",
+            "GoTrue rejects a malformed email with the generic validation_failed code, which the SDK surfaces verbatim rather than guessing a finer reason from the message text");
+        this.StateChanges.Should().BeEmpty();
     }
 
     [TestMethod]

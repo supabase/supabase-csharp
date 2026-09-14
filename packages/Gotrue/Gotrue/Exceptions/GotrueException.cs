@@ -54,12 +54,20 @@ namespace Supabase.Gotrue.Exceptions
 		public int StatusCode { get; internal set; }
 
 		/// <summary>
-		/// Adds the best-effort reason for the failure 
+		/// The machine-readable error code returned by the GoTrue server (the response body's
+		/// <c>error_code</c> field), for example <c>invalid_credentials</c> or <c>user_already_exists</c>.
+		/// Null when the server did not return one. Prefer this over <see cref="Reason"/> when you need
+		/// to branch on a specific server error, since it is stable and locale-independent.
+		/// </summary>
+		public string? ErrorCode { get; internal set; }
+
+		/// <summary>
+		/// Adds the best-effort reason for the failure
 		/// </summary>
 		public void AddReason()
 		{
+			ErrorCode = FailureHint.ParseErrorCode(Content);
 			Reason = FailureHint.DetectReason(this);
-			//Debug.WriteLine(Content);
 		}
 
 		/// <summary>

@@ -1,9 +1,12 @@
+using System.Collections.Generic;
+using System.Text.Json;
 using static Supabase.Gotrue.Exceptions.FailureHint.Reason;
 
 namespace Supabase.Gotrue.Exceptions;
 
 /// <summary>
-/// Maps Supabase server errors to hints based on the status code and the contents of the error message.
+/// Maps Supabase server errors to hints from the machine-readable <c>error_code</c> the GoTrue server
+/// returns, falling back to the HTTP status code for responses that carry no classifiable body.
 /// </summary>
 public static class FailureHint
 {
@@ -125,41 +128,75 @@ public static class FailureHint
     }
 
     /// <summary>
-    /// Detects the reason for the error based on the status code and the contents of the error message.
+    /// The GoTrue server has returned a machine-readable <c>error_code</c> in every error body since
+    /// early 2024. This maps the codes we recognise onto a <see cref="Reason"/>; anything absent here
+    /// (including generic codes such as <c>validation_failed</c>) resolves to <see cref="Reason.Unknown"/>,
+    /// with the raw code still available on <see cref="GotrueException.ErrorCode"/>.
+    /// </summary>
+    private static readonly IReadOnlyDictionary<string, Reason> ReasonByErrorCode = new Dictionary<string, Reason>
+    {
+        ["invalid_credentials"] = UserBadLogin,
+        ["email_not_confirmed"] = UserEmailNotConfirmed,
+        ["email_address_invalid"] = UserBadEmailAddress,
+        ["refresh_token_not_found"] = InvalidRefreshToken,
+        ["refresh_token_already_used"] = InvalidRefreshToken,
+        ["user_already_exists"] = UserAlreadyRegistered,
+        ["email_exists"] = UserAlreadyRegistered,
+        ["phone_exists"] = UserAlreadyRegistered,
+        ["weak_password"] = UserBadPassword,
+        ["over_request_rate_limit"] = UserTooManyRequests,
+        ["over_email_send_rate_limit"] = UserTooManyRequests,
+        ["over_sms_send_rate_limit"] = UserTooManyRequests,
+        ["bad_jwt"] = AdminTokenRequired,
+        ["no_authorization"] = AdminTokenRequired,
+        ["not_admin"] = AdminTokenRequired,
+        ["sso_provider_not_found"] = SsoProviderNotFound,
+        ["mfa_verification_failed"] = MfaChallengeUnverified,
+        ["mfa_verification_rejected"] = MfaChallengeUnverified,
+        ["mfa_challenge_expired"] = MfaChallengeUnverified,
+    };
+
+    /// <summary>
+    /// Reads the machine-readable <c>error_code</c> from a GoTrue error body. Returns null for bodies
+    /// that are missing, not JSON (gateway/Cloudflare pages), or that carry no <c>error_code</c> field.
+    /// </summary>
+    /// <param name="content">The raw error response body.</param>
+    public static string? ParseErrorCode(string? content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return null;
+
+        try
+        {
+            using var document = JsonDocument.Parse(content);
+            if (document.RootElement.ValueKind != JsonValueKind.Object)
+                return null;
+
+            return document.RootElement.TryGetProperty("error_code", out var errorCode) && errorCode.ValueKind == JsonValueKind.String
+                ? errorCode.GetString()
+                : null;
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Detects the reason for the error from the server's machine-readable <c>error_code</c>, falling back
+    /// to the HTTP status code for responses that carry no classifiable body (rate limiting, and gateway
+    /// or Cloudflare errors served as HTML rather than JSON).
     /// </summary>
     /// <param name="gte"></param>
     /// <returns></returns>
     public static Reason DetectReason(GotrueException gte)
     {
-        if (gte.Content == null)
-            return Unknown;
+        var errorCode = gte.ErrorCode ?? ParseErrorCode(gte.Content);
+        if (errorCode != null && ReasonByErrorCode.TryGetValue(errorCode, out var reasonFromCode))
+            return reasonFromCode;
 
         return gte.StatusCode switch
         {
-            400 when gte.Content.Contains("Invalid login") => UserBadLogin,
-            400 when gte.Content.Contains("Email not confirmed") => UserEmailNotConfirmed,
-            // Gotrue rejects refresh tokens on two paths: malformed tokens fail format validation
-            // ("Refresh token is not valid", validation_failed) before lookup, while well-formed
-            // unknown tokens return "Invalid Refresh Token" (refresh_token_not_found).
-            400 when gte.Content.Contains("Invalid Refresh Token") => InvalidRefreshToken,
-            400 when gte.Content.Contains("refresh_token_not_found") => InvalidRefreshToken,
-            400 when gte.Content.Contains("Refresh token is not valid") => InvalidRefreshToken,
-            400 when gte.Content.Contains("Phone") => UserBadPhoneNumber,
-            400 when gte.Content.Contains("phone") => UserBadPhoneNumber,
-            400 when gte.Content.Contains("Email") => UserBadEmailAddress,
-            400 when gte.Content.Contains("email") => UserBadEmailAddress,
-            400 when gte.Content.Contains("provide") => UserMissingInformation,
-            401 when gte.Content.Contains("This endpoint requires a Bearer token") => AdminTokenRequired,
-            403 when gte.Content.Contains("Invalid token") => AdminTokenRequired,
-            403 when gte.Content.Contains("invalid JWT") => AdminTokenRequired,
-            404 when gte.Content.Contains("No SSO provider assigned for this domain") => SsoDomainNotFound,
-            404 when gte.Content.Contains("No such SSO provider") => SsoProviderNotFound,
-            422 when gte.Content.Contains("User already registered") => UserAlreadyRegistered,
-            422 when gte.Content.Contains("A user with this email address has already been registered") => UserAlreadyRegistered,
-            422 when gte.Content.Contains("Phone") && gte.Content.Contains("Email") => UserBadMultiple,
-            422 when gte.Content.Contains("email") && gte.Content.Contains("password") => UserBadMultiple,
-            422 when gte.Content.Contains("Password") => UserBadPassword,
-            422 when gte.Content.Contains("password") => UserBadPassword,
             429 => UserTooManyRequests,
             502 or 503 or 504 => NetworkError,
             520 or 521 or 522 or 523 or 524 or 530 => CloudflareNetworkError,
