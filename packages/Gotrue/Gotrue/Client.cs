@@ -712,7 +712,7 @@ public class Client : IGotrueClient<User, Session>
                 await this.RefreshToken();
                 return this.CurrentSession;
             }
-            catch (GotrueException e) when (e.Reason is InvalidRefreshToken)
+            catch (GotrueException e) when (IsDefinitiveRefreshRejection(e))
             {
                 // RefreshToken destroyed the session, unless it was replaced mid-flight.
                 activity.SetFailure(e);
@@ -785,7 +785,7 @@ public class Client : IGotrueClient<User, Session>
             this.SetCurrentSession(result);
             await this.NotifyAuthStateChangeAsync(TokenRefreshed).ConfigureAwait(false);
         }
-        catch (GotrueException ex) when (ex.Reason is InvalidRefreshToken)
+        catch (GotrueException ex) when (IsDefinitiveRefreshRejection(ex))
         {
             activity.SetFailure(ex);
             await this.ClearRejectedSessionAsync(refreshToken).ConfigureAwait(false);
@@ -861,7 +861,7 @@ public class Client : IGotrueClient<User, Session>
             }
             await this.NotifyAuthStateChangeAsync(TokenRefreshed).ConfigureAwait(false);
         }
-        catch (GotrueException ex) when (ex.Reason is InvalidRefreshToken)
+        catch (GotrueException ex) when (IsDefinitiveRefreshRejection(ex))
         {
             activity.SetFailure(ex);
             await this.ClearRejectedSessionAsync(refreshToken).ConfigureAwait(false);
@@ -1148,6 +1148,12 @@ public class Client : IGotrueClient<User, Session>
             await this.NotifyAuthStateChangeAsync(stateChanged, cancellationToken).ConfigureAwait(false);
         }
     }
+
+    // A refresh the server answers with a client error (4xx other than rate limiting) will never succeed
+    // with that token, so the session it belonged to is definitively rejected. Transient failures -
+    // offline, network, 5xx, rate limiting - keep the session so the next refresh can retry.
+    private static bool IsDefinitiveRefreshRejection(GotrueException ex) =>
+        ex.StatusCode is >= 400 and < 500 and not 429;
 
     // Only signs out the session the token belonged to.
     private async Task ClearRejectedSessionAsync(string refreshToken)
