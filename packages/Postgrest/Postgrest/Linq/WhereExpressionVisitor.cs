@@ -182,8 +182,9 @@ internal class WhereExpressionVisitor : ExpressionVisitor
             Expression.AndAlso(Expression.Not(node.Test), node.IfFalse)));
 
     /// <summary>
-    /// Handles a boolean column used directly as a predicate (i.e. `x => x.IsActive`, or negated via
-    /// <see cref="VisitUnary"/> `x => !x.IsActive`), translating it into a `column.eq.true` filter.
+    /// Handles a boolean column used directly as a predicate (i.e. `x => x.IsActive`, its nullable
+    /// `x => x.IsActive!.Value` form, or negated via <see cref="VisitUnary"/> `x => !x.IsActive`),
+    /// translating it into a `column.eq.true` filter.
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
@@ -192,7 +193,9 @@ internal class WhereExpressionVisitor : ExpressionVisitor
         if (node.Type != typeof(bool) || !this.ContainsParameter(node))
             return base.VisitMember(node);
 
-        this.Filter = new QueryFilter(this.GetColumnFromMemberExpression(node), Operator.Equals, true);
+        var column = this.ResolveColumn(node) ?? throw new ArgumentException(
+            $"Expression: '{node}' is expected to be property with a ColumnAttribute or PrimaryKeyAttribute");
+        this.Filter = new QueryFilter(column, Operator.Equals, true);
         return node;
     }
 
