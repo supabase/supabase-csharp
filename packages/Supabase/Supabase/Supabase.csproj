@@ -16,8 +16,8 @@
         <Summary>A C# implementation of the Supabase client</Summary>
         <PackageTags>supabase</PackageTags>
         <!-- x-release-please-start-version -->
-        <ReleaseVersion>8.1.0</ReleaseVersion>
-        <PackageVersion>8.1.0</PackageVersion>
+        <ReleaseVersion>8.1.1</ReleaseVersion>
+        <PackageVersion>8.1.1</PackageVersion>
         <!-- x-release-please-end -->
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -27,7 +27,7 @@
     </PropertyGroup>
    
     <PropertyGroup Condition=" '$(Version)' == '' ">
-        <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.1.0</VersionPrefix> <!-- x-release-please-version -->
+        <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.1.1</VersionPrefix> <!-- x-release-please-version -->
         <Version Condition=" '$(Version)' == '' ">$(VersionPrefix)</Version>
     </PropertyGroup>
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">

@@ -1,5 +1,17 @@
 # Changelog
 
+## [8.1.1](https://github.com/supabase/supabase-csharp/compare/v8.1.0...v8.1.1) (2026-09-14)
+
+
+### Bug Fixes
+
+* **gotrue:** keep the user from a sign-up awaiting confirmation ([#426](https://github.com/supabase/supabase-csharp/issues/426)) ([fd6fd5f](https://github.com/supabase/supabase-csharp/commit/fd6fd5f7bd2bc7bfb7846c6a422dc311512c5a70))
+* **gotrue:** stop copying the user token into apikey header ([#425](https://github.com/supabase/supabase-csharp/issues/425)) ([854920d](https://github.com/supabase/supabase-csharp/commit/854920de8cd6963b7f78db2939d392585969ad4f))
+* **postgrest:** keep the test of a ternary in Where filters ([#422](https://github.com/supabase/supabase-csharp/issues/422)) ([f4fc450](https://github.com/supabase/supabase-csharp/commit/f4fc450feec4b452c84a515fe7ba1b9a47001255))
+* **postgrest:** resolve nullable Value comparisons to mapped columns ([#430](https://github.com/supabase/supabase-csharp/issues/430)) ([a3c50b0](https://github.com/supabase/supabase-csharp/commit/a3c50b0f3e97cdbc5da003947f9f7ce095160a10))
+* **postgrest:** stop duplicating the package id in X-Client-Info ([#418](https://github.com/supabase/supabase-csharp/issues/418)) ([6c734dc](https://github.com/supabase/supabase-csharp/commit/6c734dcca7b57b4f8dbe5ae81220fe408e3d578d))
+* **storage:** forward metadata and custom headers in UploadToSignedUrl ([#423](https://github.com/supabase/supabase-csharp/issues/423)) ([e04bc03](https://github.com/supabase/supabase-csharp/commit/e04bc03e3d586e0d57875bdfc868c6bb8eb20a8a))
+
 ## [8.1.0](https://github.com/supabase-community/supabase-csharp/compare/v8.0.0...v8.1.0) (2026-09-07)
 
 
