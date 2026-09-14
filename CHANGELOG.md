@@ -1,5 +1,12 @@
 # Changelog
 
+## [8.1.2](https://github.com/supabase/supabase-csharp/compare/v8.1.1...v8.1.2) (2026-09-14)
+
+
+### Bug Fixes
+
+* **release:** replace automatic changes on master with PRs, fix repository owner after organization change ([#433](https://github.com/supabase/supabase-csharp/issues/433)) ([296b165](https://github.com/supabase/supabase-csharp/commit/296b165392cdaaa97159d918c96d97f7c954d531))
+
 ## [8.1.1](https://github.com/supabase/supabase-csharp/compare/v8.1.0...v8.1.1) (2026-09-14)
 
 

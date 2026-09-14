@@ -13,8 +13,8 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>supabase, core</PackageTags>
 		<!-- x-release-please-start-version -->
-		<PackageVersion>8.1.1</PackageVersion>
-		<ReleaseVersion>8.1.1</ReleaseVersion>
+		<PackageVersion>8.1.2</PackageVersion>
+		<ReleaseVersion>8.1.2</ReleaseVersion>
 		<!-- x-release-please-end -->
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
