@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -164,6 +165,43 @@ public class LinqQueryTests
         var record = updated.Models[0];
         record.BooleanValue.Should().Be(!original.BooleanValue);
         record.IntValue.Should().Be(original.IntValue + 1);
+    }
+
+    [TestMethod]
+    public async Task Set_ShouldClearOnlyTheMatchingRowsJsonColumn_GivenNull()
+    {
+        var client = LocalStack.Client();
+        var targetUsername = $"set-null-{Guid.NewGuid():N}";
+        var neighborUsername = $"{targetUsername}-neighbor";
+        await client.Table<UserWithJsonData>().Insert(new List<UserWithJsonData>
+        {
+            new() { Username = targetUsername, Data = new JsonObject { ["value"] = "target" } },
+            new() { Username = neighborUsername, Data = new JsonObject { ["value"] = "neighbor" } }
+        });
+
+        try
+        {
+            var updated = await client.Table<UserWithJsonData>()
+                .Where(user => user.Username == targetUsername)
+                .Set(user => user.Data!, null)
+                .Update(new QueryOptions { Returning = QueryOptions.ReturnType.Representation });
+            updated.Models.Should().ContainSingle().Which.Data.Should().BeNull();
+
+            var cleared = await client.Table<UserWithJsonData>()
+                .Where(user => user.Username == targetUsername)
+                .Filter("data", Operator.Is, "null").Single();
+            cleared.Should().NotBeNull();
+
+            var neighbor = await client.Table<UserWithJsonData>()
+                .Where(user => user.Username == neighborUsername).Single();
+            neighbor.Should().NotBeNull();
+            neighbor!.Data!["value"]!.GetValue<string>().Should().Be("neighbor");
+        }
+        finally
+        {
+            await client.Table<UserWithJsonData>()
+                .Where(user => user.Username == targetUsername || user.Username == neighborUsername).Delete();
+        }
     }
 
     [TestMethod]
