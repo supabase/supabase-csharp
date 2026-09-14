@@ -4,7 +4,7 @@
   "project": "Sample/Sample.csproj",
   "testProject": "Sample.Tests/Sample.Tests.csproj",
   "warnings": { "total": 0, "byCode": {} },
-  "coverage": { "line": 100.0 },
+  "coverage": { "hermeticLine": 100.0 },
   "e2eHealthUrl": "http://127.0.0.1:51738/",
   "updated": "2026-08-18T00:00:00Z"
 }

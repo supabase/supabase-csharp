@@ -1,5 +1,81 @@
 # Changelog
 
+## [8.1.0](https://github.com/supabase-community/supabase-csharp/compare/v8.0.0...v8.1.0) (2026-09-07)
+
+
+### Features
+
+* **functions:** stream edge function responses ([#417](https://github.com/supabase-community/supabase-csharp/issues/417)) ([649d922](https://github.com/supabase-community/supabase-csharp/commit/649d92254ab8405d4b47287bf2d62632b827d2c6))
+* **realtime:** add `enabled` flag for opt-in initial presence sync ([#407](https://github.com/supabase-community/supabase-csharp/issues/407)) ([ecb6b11](https://github.com/supabase-community/supabase-csharp/commit/ecb6b11546dc97e1979e71b07fed5e572987d028))
+
+
+### Bug Fixes
+
+* **postgrest:** keep '!' and unary minus on captured values in Where filters ([#414](https://github.com/supabase-community/supabase-csharp/issues/414)) ([0edc5d9](https://github.com/supabase-community/supabase-csharp/commit/0edc5d96a91e300ad8f22bfe6873f6ccb4317c30))
+* **postgrest:** write int arrays as json arrays and reject bad literals with JsonException ([#408](https://github.com/supabase-community/supabase-csharp/issues/408)) ([e479c9e](https://github.com/supabase-community/supabase-csharp/commit/e479c9e65d2be03753da22b75cd8843e08a508ee))
+
+## [8.0.0](https://github.com/supabase-community/supabase-csharp/compare/v7.4.0...v8.0.0) (2026-09-03)
+
+
+### ⚠ BREAKING CHANGES
+
+* **gotrue:** stop sending OAuth state to /authorize ([#388](https://github.com/supabase-community/supabase-csharp/issues/388))
+* **realtime:** throw exception when updating postgres_changes after channel joins ([#385](https://github.com/supabase-community/supabase-csharp/issues/385))
+* **postgrest:** throw on multi-row Single() result instead of returning null ([#346](https://github.com/supabase-community/supabase-csharp/issues/346))
+* **gotrue:** add retry/backoff and injectable HttpClient support ([#371](https://github.com/supabase-community/supabase-csharp/issues/371))
+* **supabase:** migrate from Newtonsoft.Json to System.Text.Json ([#360](https://github.com/supabase-community/supabase-csharp/issues/360))
+* **realtime:** migrate from Newtonsoft.Json to System.Text.Json
+* **postgrest:** migrate from Newtonsoft.Json to System.Text.Json
+* **storage:** migrate from Newtonsoft.Json to System.Text.Json ([#358](https://github.com/supabase-community/supabase-csharp/issues/358))
+* **gotrue:** migrate from Newtonsoft.Json to System.Text.Json ([#357](https://github.com/supabase-community/supabase-csharp/issues/357))
+* **functions:** migrate from Newtonsoft.Json to System.Text.Json ([#356](https://github.com/supabase-community/supabase-csharp/issues/356))
+* packages now target netstandard2.1 instead of netstandard2.0. .NET Framework consumers (netstandard2.0 is its ceiling) and pre-netstandard2.1 runtimes (Mono <6.4, older Xamarin/Unity) can no longer reference these packages and must move to a netstandard2.1-capable target (.NET Core 3.0+/.NET 5+).
+* **postgrest:** IPostgrestTable.Delete(QueryOptions?, CancellationToken) and its Table implementation now return Task<ModeledResponse> instead of Task. await table.Delete() is unaffected; code that assigns the result to Task or captures the method group must be recompiled/adjusted.
+
+### Features
+
+* **core:** add retry/backoff plumbing for injectable HttpClient support ([#367](https://github.com/supabase-community/supabase-csharp/issues/367)) ([eda8d8d](https://github.com/supabase-community/supabase-csharp/commit/eda8d8d3458469369b78fe2d5148e0d588acbd6e))
+* **dependency-injection:** add Supabase.Extensions.DependencyInjection package ([#387](https://github.com/supabase-community/supabase-csharp/issues/387)) ([a4692ee](https://github.com/supabase-community/supabase-csharp/commit/a4692eecdb1717cbc7279eb9a5500c15e9dc87d2))
+* **functions:** add retry/backoff and injectable HttpClient support ([#370](https://github.com/supabase-community/supabase-csharp/issues/370)) ([21e198a](https://github.com/supabase-community/supabase-csharp/commit/21e198afa5f21638e34476322c3867917277e01f))
+* **functions:** migrate from Newtonsoft.Json to System.Text.Json ([#356](https://github.com/supabase-community/supabase-csharp/issues/356)) ([3f9780d](https://github.com/supabase-community/supabase-csharp/commit/3f9780dd331626901e297bb3ce1a88399eb86240))
+* **gotrue:** add cloudflare errors code ([#398](https://github.com/supabase-community/supabase-csharp/issues/398)) ([a038165](https://github.com/supabase-community/supabase-csharp/commit/a038165076135e4316e9b71624047cd51048d0ea))
+* **gotrue:** add retry/backoff and injectable HttpClient support ([#371](https://github.com/supabase-community/supabase-csharp/issues/371)) ([74a72d0](https://github.com/supabase-community/supabase-csharp/commit/74a72d0921373ad9375853ebd53bf3d2fc65c93d))
+* **gotrue:** migrate from Newtonsoft.Json to System.Text.Json ([#357](https://github.com/supabase-community/supabase-csharp/issues/357)) ([0d58f45](https://github.com/supabase-community/supabase-csharp/commit/0d58f4581b7e77fd155c4460c698245dd22cb980))
+* **gotrue:** support async session persistence ([#399](https://github.com/supabase-community/supabase-csharp/issues/399)) ([e0d494e](https://github.com/supabase-community/supabase-csharp/commit/e0d494e68e085db8e04d23398442eca0cb917d67))
+* **gotrue:** support soft-delete on admin DeleteUser ([#402](https://github.com/supabase-community/supabase-csharp/issues/402)) ([ed9e5c4](https://github.com/supabase-community/supabase-csharp/commit/ed9e5c4fd921a78b7cf2dcb3573a87df2401af08))
+* **postgrest:** add injectable HttpClient support ([#376](https://github.com/supabase-community/supabase-csharp/issues/376)) ([f6bfa69](https://github.com/supabase-community/supabase-csharp/commit/f6bfa69a19ce72eee2c631d0910aa462fffa0a50))
+* **postgrest:** add opt-in retry option ([#375](https://github.com/supabase-community/supabase-csharp/issues/375)) ([07b6bfe](https://github.com/supabase-community/supabase-csharp/commit/07b6bfea86beb232bae41d1941dfbbde2780b259))
+* **postgrest:** migrate from Newtonsoft.Json to System.Text.Json ([fe5364b](https://github.com/supabase-community/supabase-csharp/commit/fe5364b5598cb48dc73536a409da05162361fd11))
+* **quality-gate:** mark public API shipped after release ([#403](https://github.com/supabase-community/supabase-csharp/issues/403)) ([cd77655](https://github.com/supabase-community/supabase-csharp/commit/cd77655242acfddf6ee75d18c340556171e6523d))
+* **realtime:** add retry/backoff and injectable HttpClient support ([#382](https://github.com/supabase-community/supabase-csharp/issues/382)) ([252a0d0](https://github.com/supabase-community/supabase-csharp/commit/252a0d09caa1d542e03e24d305678cbc9e79cbf7))
+* **realtime:** migrate from Newtonsoft.Json to System.Text.Json ([c6767dc](https://github.com/supabase-community/supabase-csharp/commit/c6767dcdf72196b8bb3e3800857d1998d8f76f4a))
+* **storage:** add retry/backoff and injectable HttpClient support ([#381](https://github.com/supabase-community/supabase-csharp/issues/381)) ([b81b7f7](https://github.com/supabase-community/supabase-csharp/commit/b81b7f7763cfe127b192d3715c1b534e38a7b267))
+* **storage:** expose service error code ([#380](https://github.com/supabase-community/supabase-csharp/issues/380)) ([1da90f9](https://github.com/supabase-community/supabase-csharp/commit/1da90f9ae0435d3e92138cb45d0ffb6d1452c3ba))
+* **storage:** migrate from Newtonsoft.Json to System.Text.Json ([#358](https://github.com/supabase-community/supabase-csharp/issues/358)) ([673970c](https://github.com/supabase-community/supabase-csharp/commit/673970c93da740ddb9ff5dbcd4b87b13167f42ae))
+* **supabase:** add retry/backoff and injectable HttpClient support ([#383](https://github.com/supabase-community/supabase-csharp/issues/383)) ([95946de](https://github.com/supabase-community/supabase-csharp/commit/95946deeeb49a39c3832cbe3b2a01362f6f139d5))
+* **supabase:** migrate from Newtonsoft.Json to System.Text.Json ([#360](https://github.com/supabase-community/supabase-csharp/issues/360)) ([1915bf1](https://github.com/supabase-community/supabase-csharp/commit/1915bf182d00dc446337dee48339b9436016d027))
+* **supabase:** support publishable and secret API keys ([#397](https://github.com/supabase-community/supabase-csharp/issues/397)) ([66a5fd3](https://github.com/supabase-community/supabase-csharp/commit/66a5fd3ef0daf18ff6985199670095af0405e36d))
+
+
+### Bug Fixes
+
+* **gotrue:** keep persisted sessions across restarts and network failures ([#394](https://github.com/supabase-community/supabase-csharp/issues/394)) ([ad25352](https://github.com/supabase-community/supabase-csharp/commit/ad253524aab57815f9f4fdbf9f797efa03546f23))
+* **gotrue:** keep sessions the sign-in and refresh paths do not own ([#405](https://github.com/supabase-community/supabase-csharp/issues/405)) ([18c3882](https://github.com/supabase-community/supabase-csharp/commit/18c3882b7219ebed7cac62679fe67e960c2c1ab4))
+* **gotrue:** resolve provider URL when linking an identity ([#391](https://github.com/supabase-community/supabase-csharp/issues/391)) ([1bb1ef5](https://github.com/supabase-community/supabase-csharp/commit/1bb1ef50a4e8ee15450e0eedec91034e6072d498))
+* **gotrue:** send apikey header on standalone admin/stateless authed calls ([#401](https://github.com/supabase-community/supabase-csharp/issues/401)) ([b1a60c0](https://github.com/supabase-community/supabase-csharp/commit/b1a60c0975b83f9e422f228ca5ca77e8c1740c7c))
+* **gotrue:** stop sending OAuth state to /authorize ([#388](https://github.com/supabase-community/supabase-csharp/issues/388)) ([afa5ff3](https://github.com/supabase-community/supabase-csharp/commit/afa5ff3396f7ab5e0f8b1e44690c9f98273dfc9f))
+* **postgrest:** drop the '.' before nested and/or groups ([#389](https://github.com/supabase-community/supabase-csharp/issues/389)) ([f29bc5b](https://github.com/supabase-community/supabase-csharp/commit/f29bc5b2b6f9829766fef31cb82848fa9ac09805))
+* **postgrest:** return deleted rows from parameterless Delete ([#342](https://github.com/supabase-community/supabase-csharp/issues/342)) ([a7ef38c](https://github.com/supabase-community/supabase-csharp/commit/a7ef38cedd849c7ad0994140b936c7b62b7644e6)), closes [#334](https://github.com/supabase-community/supabase-csharp/issues/334)
+* **postgrest:** throw on multi-row Single() result instead of returning null ([#346](https://github.com/supabase-community/supabase-csharp/issues/346)) ([52985c2](https://github.com/supabase-community/supabase-csharp/commit/52985c27b56071bb6b12ba147779af033dbd9a86))
+* **realtime:** send access_token in channel join frame for RLS-authorized joins ([0cb3de8](https://github.com/supabase-community/supabase-csharp/commit/0cb3de8cb6e7e3fd7b11fc252b6fb282fffbd82c))
+* **realtime:** throw exception when updating postgres_changes after channel joins ([#385](https://github.com/supabase-community/supabase-csharp/issues/385)) ([190b8be](https://github.com/supabase-community/supabase-csharp/commit/190b8be46bc94e05d2171d30a289c85756dcaf40))
+* **storage:** percent-encode object key in CDN purge urls ([#384](https://github.com/supabase-community/supabase-csharp/issues/384)) ([710eb59](https://github.com/supabase-community/supabase-csharp/commit/710eb59fbf994de8a9fe4106e9995b140f03346d))
+
+
+### Build System
+
+* retarget packages to netstandard2.1 ([#344](https://github.com/supabase-community/supabase-csharp/issues/344)) ([41ac485](https://github.com/supabase-community/supabase-csharp/commit/41ac485682af185c12904b451a72b28039b21eaa))
+
 ## [1.6.0](https://github.com/supabase-community/supabase-csharp/compare/v1.5.0...v1.6.0) (2026-08-07)
 
 

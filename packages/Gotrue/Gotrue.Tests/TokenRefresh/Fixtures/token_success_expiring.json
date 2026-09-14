@@ -1,0 +1,10 @@
+{
+  "access_token": "new-access-token",
+  "refresh_token": "new-refresh-token",
+  "token_type": "bearer",
+  "expires_in": 1,
+  "user": {
+    "id": "user-id-123",
+    "aud": "authenticated"
+  }
+}

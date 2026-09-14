@@ -19,14 +19,28 @@ public class ErrorResponseTests
         ErrorResponse.TryParse("Upload failed: gateway error").Should().BeNull();
 
     [TestMethod]
-    public void TryParse_ShouldReadStatusAndMessage_GivenJsonBody()
+    public void TryParse_ShouldReadStatusMessageAndCode_GivenJsonBody()
     {
-        var parsed = ErrorResponse.TryParse("{\"statusCode\":404,\"message\":\"Not found\"}");
+        var parsed = ErrorResponse.TryParse(
+            "{\"statusCode\":\"404\",\"error\":\"not_found\",\"code\":\"NoSuchKey\",\"message\":\"Object not found\"}");
         using (new AssertionScope())
         {
             parsed.Should().NotBeNull();
             parsed!.StatusCode.Should().Be(404);
-            parsed.Message.Should().Be("Not found");
+            parsed.Message.Should().Be("Object not found");
+            parsed.Code.Should().Be("NoSuchKey");
+        }
+    }
+
+    [TestMethod]
+    public void TryParse_ShouldLeaveCodeNull_GivenCodeMissing()
+    {
+        var parsed = ErrorResponse.TryParse(
+            "{\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Object not found\"}");
+        using (new AssertionScope())
+        {
+            parsed.Should().NotBeNull();
+            parsed!.Code.Should().BeNull();
         }
     }
 }

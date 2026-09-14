@@ -2,13 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http;
 using System.Net.WebSockets;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Supabase;
 using Supabase.Functions.Interfaces;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
@@ -32,16 +33,16 @@ namespace Supabase.Tests;
 [TestCategory("Unit")]
 public class SupabaseClientCompositionTests
 {
-    private static Supabase.Client UrlClient(SupabaseOptions options = null) =>
+    private static Supabase.Client UrlClient(SupabaseOptions? options = null) =>
         new("http://localhost", "test-key", options ?? new SupabaseOptions { AutoConnectRealtime = false });
 
     // Builds the umbrella through its DI constructor with substituted children; a test overrides only
     // the collaborator it cares about.
     private static Supabase.Client DiClient(
-        IGotrueClient<User, Session> auth = null,
-        IRealtimeClient<RealtimeSocket, RealtimeChannel> realtime = null,
-        IPostgrestClient postgrest = null,
-        SupabaseOptions options = null) =>
+        IGotrueClient<User, Session>? auth = null,
+        IRealtimeClient<RealtimeSocket, RealtimeChannel>? realtime = null,
+        IPostgrestClient? postgrest = null,
+        SupabaseOptions? options = null) =>
         new(auth ?? Substitute.For<IGotrueClient<User, Session>>(),
             realtime ?? RealtimeSubstitute(),
             Substitute.For<IFunctionsClient>(),
@@ -169,7 +170,7 @@ public class SupabaseClientCompositionTests
         var auth = Substitute.For<IGotrueClient<User, Session>>();
         auth.CurrentSession.Returns(new Session { AccessToken = "signed-in-token" });
         var client = DiClient(realtime: realtime);
-        IGotrueClient<User, Session>.AuthEventHandler captured = null;
+        IGotrueClient<User, Session>.AuthEventHandler? captured = null;
         auth.When(a => a.AddStateChangedListener(Arg.Any<IGotrueClient<User, Session>.AuthEventHandler>()))
             .Do(call => captured = call.Arg<IGotrueClient<User, Session>.AuthEventHandler>());
         client.Auth = auth;
@@ -188,7 +189,7 @@ public class SupabaseClientCompositionTests
             new Dictionary<string, RealtimeChannel>()));
         var auth = Substitute.For<IGotrueClient<User, Session>>();
         var client = DiClient(realtime: realtime);
-        IGotrueClient<User, Session>.AuthEventHandler captured = null;
+        IGotrueClient<User, Session>.AuthEventHandler? captured = null;
         auth.When(a => a.AddStateChangedListener(Arg.Any<IGotrueClient<User, Session>.AuthEventHandler>()))
             .Do(call => captured = call.Arg<IGotrueClient<User, Session>.AuthEventHandler>());
         client.Auth = auth;
@@ -206,6 +207,46 @@ public class SupabaseClientCompositionTests
         await client.InitializeAsync();
         await auth.Received().RetrieveSessionAsync();
         await realtime.Received().ConnectAsync();
+    }
+
+    [TestMethod]
+    public async Task SupabaseClient_ShouldRestoreThePersistedSessionBeforeRefreshingIt_GivenInitialize()
+    {
+        var auth = Substitute.For<IGotrueClient<User, Session>>();
+        await DiClient(auth: auth).InitializeAsync();
+        Received.InOrder(() =>
+        {
+            auth.LoadSessionAsync();
+            auth.RetrieveSessionAsync();
+        });
+    }
+
+    [TestMethod]
+    public async Task SupabaseClient_ShouldNotReloadTheSession_GivenOneAlreadySet()
+    {
+        var auth = Substitute.For<IGotrueClient<User, Session>>();
+        auth.CurrentSession.Returns(new Session { AccessToken = "an-access-token", RefreshToken = "a-refresh-token" });
+        await DiClient(auth: auth).InitializeAsync();
+        await auth.DidNotReceive().LoadSessionAsync();
+    }
+
+    [TestMethod]
+    public async Task SupabaseClient_ShouldKeepThePersistedSession_GivenAnOfflineStart()
+    {
+        var persistence = Substitute.For<IGotrueSessionPersistence<Session>>();
+        persistence.LoadSessionAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult<Session?>(new Session { AccessToken = "an-access-token", RefreshToken = "a-refresh-token", ExpiresIn = 3600 }));
+        var client = new Supabase.Client("http://localhost", "a-key",
+            new SupabaseOptions
+            {
+                AutoConnectRealtime = false,
+                SessionHandler = persistence,
+                HttpClient = new HttpClient(new UnreachableHandler()),
+            });
+        await client.InitializeAsync();
+        client.Auth.CurrentSession.Should().NotBeNull("an unreachable auth server must not sign the user out");
+        await persistence.DidNotReceive().DestroySessionAsync(Arg.Any<CancellationToken>());
+        client.Auth.Shutdown();
     }
 
     [TestMethod]
@@ -266,10 +307,7 @@ public class SupabaseClientCompositionTests
     }
 
     [TestMethod]
-    public void SupabaseClient_ShouldExposeAdminAuthClient_GivenServiceKey()
-    {
-        UrlClient().AdminAuth("service-key").Should().NotBeNull();
-    }
+    public void SupabaseClient_ShouldExposeAdminAuthClient_GivenServiceKey() => UrlClient().AdminAuth("service-key").Should().NotBeNull();
 
     [TestMethod]
     public void SupabaseClient_ShouldPreferSessionTokenOverApiKey_GivenActiveSession()
@@ -281,6 +319,91 @@ public class SupabaseClientCompositionTests
         client.Postgrest.GetHeaders!().Should().ContainKey("Authorization")
             .WhoseValue.Should().Be("Bearer session-token",
                 "an active session's access token must take precedence over the api key as the bearer");
+    }
+
+    private static Supabase.Client NewKeyClient(string key) =>
+        new("http://localhost", key, new SupabaseOptions { AutoConnectRealtime = false });
+
+    [TestMethod]
+    [DataRow("sb_publishable_abc123")]
+    [DataRow("sb_secret_abc123")]
+    public void SupabaseClient_ShouldOmitBearerOnFunctionsPath_GivenNewFormatKeyAndNoSession(string key)
+    {
+        var headers = NewKeyClient(key).Functions.GetHeaders!();
+        using (new AssertionScope())
+        {
+            headers.Should().ContainKey("apiKey").WhoseValue.Should().Be(key);
+            headers.Should().NotContainKey("Authorization",
+                "an opaque (non-JWT) key must not be sent as a Bearer token to the Edge Functions gateway");
+        }
+    }
+
+    [TestMethod]
+    public void SupabaseClient_ShouldStillSendKeyAsBearerOnDatabasePath_GivenNewFormatKeyAndNoSession()
+    {
+        // Database/Storage/Realtime/auth keep the key on both headers — the gateway accepts it because
+        // the Bearer value exactly equals the apikey value. Only the Functions path is special-cased.
+        NewKeyClient("sb_publishable_abc123").Postgrest.GetHeaders!().Should().ContainKey("Authorization")
+            .WhoseValue.Should().Be("Bearer sb_publishable_abc123");
+    }
+
+    [TestMethod]
+    public void SupabaseClient_ShouldUseSessionTokenOnFunctionsPath_GivenNewFormatKeyAndActiveSession()
+    {
+        var client = NewKeyClient("sb_publishable_abc123");
+        var auth = Substitute.For<IGotrueClient<User, Session>>();
+        auth.CurrentSession.Returns(new Session { AccessToken = "session-token" });
+        client.Auth = auth;
+        client.Functions.GetHeaders!().Should().ContainKey("Authorization")
+            .WhoseValue.Should().Be("Bearer session-token",
+                "with a session the user's access token is a valid JWT bearer even on the Functions path");
+    }
+
+    [TestMethod]
+    public void SupabaseClient_ShouldSendKeyAsBearerOnFunctionsPath_GivenLegacyKeyAndNoSession()
+    {
+        NewKeyClient("legacy-jwt-key").Functions.GetHeaders!().Should().ContainKey("Authorization")
+            .WhoseValue.Should().Be("Bearer legacy-jwt-key",
+                "legacy JWT keys are unchanged — they are still sent as the Bearer stand-in");
+    }
+
+    [TestMethod]
+    public void SupabaseClient_ShouldPreferDeveloperAuthorizationOnFunctionsPath_GivenNewFormatKey()
+    {
+        var options = new SupabaseOptions
+        {
+            AutoConnectRealtime = false,
+            Headers = { ["Authorization"] = "Bearer developer-token" }
+        };
+        new Supabase.Client("http://localhost", "sb_publishable_abc123", options).Functions.GetHeaders!()
+            .Should().ContainKey("Authorization").WhoseValue.Should().Be("Bearer developer-token",
+                "an explicit Authorization header must win even when the key is a new-format key");
+    }
+
+    [TestMethod]
+    public void SupabaseClient_ShouldWarnOnUnrecognizedApiKeyFormat()
+    {
+        var listener = new CapturingTraceListener();
+        System.Diagnostics.Trace.Listeners.Add(listener);
+        try
+        {
+            // Unique subtype so the once-per-subtype guard doesn't swallow the warning if another
+            // test already exercised a shared prefix.
+            _ = NewKeyClient("sb_zzztest_abc123");
+            listener.Messages.Should().Contain(m => m.Contains("sb_zzztest_"),
+                "an unrecognized sb_ key subtype must produce a one-time warning");
+        }
+        finally
+        {
+            System.Diagnostics.Trace.Listeners.Remove(listener);
+        }
+    }
+
+    private sealed class CapturingTraceListener : System.Diagnostics.TraceListener
+    {
+        public List<string> Messages { get; } = new();
+        public override void Write(string? message) => this.Messages.Add(message ?? string.Empty);
+        public override void WriteLine(string? message) => this.Messages.Add(message ?? string.Empty);
     }
 
     [TestMethod]
@@ -299,5 +422,11 @@ public class SupabaseClientCompositionTests
         var client = DiClient(realtime: previous);
         client.Realtime = Substitute.For<IRealtimeClient<RealtimeSocket, RealtimeChannel>>();
         previous.Received().Disconnect(Arg.Any<WebSocketCloseStatus>(), Arg.Any<string>());
+    }
+
+    private sealed class UnreachableHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) =>
+            throw new HttpRequestException("connection refused");
     }
 }

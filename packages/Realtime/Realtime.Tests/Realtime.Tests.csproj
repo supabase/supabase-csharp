@@ -36,6 +36,7 @@
 	<ItemGroup Condition="'$(STRYKER_MUTATION)' == 'true'">
 		<Compile Remove="Connection\ClientConnectionTests.cs" />
 		<Compile Remove="Channels\ChannelSubscriptionTests.cs" />
+		<Compile Remove="Channels\PrivateChannelAuthorizationTests.cs" />
 		<Compile Remove="Channels\ChannelMessagingTests.cs" />
 		<Compile Remove="PostgresChanges\PostgresChangesDeliveryTests.cs" />
 		<Compile Remove="Broadcast\BroadcastRelayTests.cs" />

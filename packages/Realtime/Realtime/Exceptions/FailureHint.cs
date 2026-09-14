@@ -1,4 +1,3 @@
-using System;
 using Websocket.Client;
 
 namespace Supabase.Realtime.Exceptions;
@@ -48,6 +47,11 @@ public static class FailureHint
         /// If seen, please open an issue.
         /// </summary>
         ConnectionStale,
+
+        /// <summary>
+        /// Cannot make changes after subscribe
+        /// </summary>
+        StateInvalid,
     }
 
     /// <summary>
@@ -63,7 +67,7 @@ public static class FailureHint
             DisconnectionType.NoMessageReceived => Reason.ConnectionStale,
             DisconnectionType.Lost => Reason.ConnectionLost,
             DisconnectionType.ByServer => Reason.Unknown,
-            _ => Reason.Unknown
+            _ => Reason.Unknown,
         };
     }
 }

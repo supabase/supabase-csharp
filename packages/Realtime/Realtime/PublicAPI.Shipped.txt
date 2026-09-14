@@ -24,13 +24,13 @@ Supabase.Realtime.Broadcast.BroadcastOptions.ReplayOptions.ReplayOptions() -> vo
 Supabase.Realtime.Broadcast.BroadcastOptions.ReplayOptions.Since.get -> long
 Supabase.Realtime.Broadcast.BroadcastOptions.ReplayOptions.Since.set -> void
 Supabase.Realtime.Channel.ChannelOptions
-Supabase.Realtime.Channel.ChannelOptions.ChannelOptions(Supabase.Realtime.ClientOptions! clientOptions, System.Func<string?>! retrieveAccessToken, Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.Channel.ChannelOptions.ChannelOptions(Supabase.Realtime.ClientOptions! clientOptions, System.Func<string?>! retrieveAccessToken, System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.Channel.ChannelOptions.ClientOptions.get -> Supabase.Realtime.ClientOptions!
 Supabase.Realtime.Channel.ChannelOptions.IsPrivate.get -> bool
 Supabase.Realtime.Channel.ChannelOptions.Parameters.get -> System.Collections.Generic.Dictionary<string!, string!>?
 Supabase.Realtime.Channel.ChannelOptions.Parameters.set -> void
 Supabase.Realtime.Channel.ChannelOptions.RetrieveAccessToken.get -> System.Func<string?>!
-Supabase.Realtime.Channel.ChannelOptions.SerializerSettings.get -> Newtonsoft.Json.JsonSerializerSettings!
+Supabase.Realtime.Channel.ChannelOptions.SerializerSettings.get -> System.Text.Json.JsonSerializerOptions!
 Supabase.Realtime.Channel.Push
 Supabase.Realtime.Channel.Push.AddMessageReceivedHandler(Supabase.Realtime.Interfaces.IRealtimePush<Supabase.Realtime.RealtimeChannel!, Supabase.Realtime.Socket.SocketResponse!>.MessageEventHandler! handler) -> void
 Supabase.Realtime.Channel.Push.Channel.get -> Supabase.Realtime.RealtimeChannel!
@@ -64,7 +64,7 @@ Supabase.Realtime.Client.Options.get -> Supabase.Realtime.ClientOptions!
 Supabase.Realtime.Client.Remove(Supabase.Realtime.RealtimeChannel! channel) -> void
 Supabase.Realtime.Client.RemoveDebugHandler(Supabase.Realtime.Interfaces.IRealtimeDebugger.DebugEventHandler! handler) -> void
 Supabase.Realtime.Client.RemoveStateChangedHandler(Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>.SocketStateEventHandler! handler) -> void
-Supabase.Realtime.Client.SerializerSettings.get -> Newtonsoft.Json.JsonSerializerSettings!
+Supabase.Realtime.Client.SerializerSettings.get -> System.Text.Json.JsonSerializerOptions!
 Supabase.Realtime.Client.SetAuth(string! jwt) -> void
 Supabase.Realtime.Client.Socket.get -> Supabase.Realtime.Interfaces.IRealtimeSocket?
 Supabase.Realtime.Client.Subscriptions.get -> System.Collections.ObjectModel.ReadOnlyDictionary<string!, Supabase.Realtime.RealtimeChannel!>!
@@ -89,6 +89,8 @@ Supabase.Realtime.ClientOptions.Timeout.get -> System.TimeSpan
 Supabase.Realtime.ClientOptions.Timeout.set -> void
 Supabase.Realtime.ClientOptions.Transport.get -> string!
 Supabase.Realtime.ClientOptions.Transport.set -> void
+Supabase.Realtime.ClientOptions.WebSocketFactory.get -> Supabase.Realtime.Sockets.IWebSocketFactory?
+Supabase.Realtime.ClientOptions.WebSocketFactory.set -> void
 Supabase.Realtime.Constants
 Supabase.Realtime.Constants.ChannelEventName
 Supabase.Realtime.Constants.ChannelEventName.Broadcast = 0 -> Supabase.Realtime.Constants.ChannelEventName
@@ -132,6 +134,7 @@ Supabase.Realtime.Exceptions.FailureHint.Reason.ConnectionLost = 5 -> Supabase.R
 Supabase.Realtime.Exceptions.FailureHint.Reason.ConnectionStale = 6 -> Supabase.Realtime.Exceptions.FailureHint.Reason
 Supabase.Realtime.Exceptions.FailureHint.Reason.PushTimeout = 1 -> Supabase.Realtime.Exceptions.FailureHint.Reason
 Supabase.Realtime.Exceptions.FailureHint.Reason.SocketError = 4 -> Supabase.Realtime.Exceptions.FailureHint.Reason
+Supabase.Realtime.Exceptions.FailureHint.Reason.StateInvalid = 7 -> Supabase.Realtime.Exceptions.FailureHint.Reason
 Supabase.Realtime.Exceptions.FailureHint.Reason.Unknown = 0 -> Supabase.Realtime.Exceptions.FailureHint.Reason
 Supabase.Realtime.Exceptions.RealtimeException
 Supabase.Realtime.Exceptions.RealtimeException.RealtimeException(string? message) -> void
@@ -172,6 +175,7 @@ Supabase.Realtime.Interfaces.IRealtimeChannel.Push(string! eventName, string? ty
 Supabase.Realtime.Interfaces.IRealtimeChannel.Register(Supabase.Realtime.PostgresChanges.PostgresChangesOptions! postgresChangesOptions) -> Supabase.Realtime.Interfaces.IRealtimeChannel!
 Supabase.Realtime.Interfaces.IRealtimeChannel.Register<TBroadcastResponse>(Supabase.Realtime.Broadcast.BroadcastOptions! options) -> Supabase.Realtime.RealtimeBroadcast<TBroadcastResponse!>!
 Supabase.Realtime.Interfaces.IRealtimeChannel.Register<TBroadcastResponse>(bool broadcastSelf = false, bool broadcastAck = false) -> Supabase.Realtime.RealtimeBroadcast<TBroadcastResponse!>!
+Supabase.Realtime.Interfaces.IRealtimeChannel.Register<TPresenceResponse>(Supabase.Realtime.Presence.PresenceOptions! options) -> Supabase.Realtime.RealtimePresence<TPresenceResponse!>!
 Supabase.Realtime.Interfaces.IRealtimeChannel.Register<TPresenceResponse>(string! presenceKey) -> Supabase.Realtime.RealtimePresence<TPresenceResponse!>!
 Supabase.Realtime.Interfaces.IRealtimeChannel.Rejoin(int timeoutMs = 10000) -> void
 Supabase.Realtime.Interfaces.IRealtimeChannel.RemoveErrorHandler(Supabase.Realtime.Interfaces.IRealtimeChannel.ErrorEventHandler! handler) -> void
@@ -199,7 +203,7 @@ Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Options.get -> S
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Remove(TChannel channel) -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveDebugHandler(Supabase.Realtime.Interfaces.IRealtimeDebugger.DebugEventHandler! handler) -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveStateChangedHandler(Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.SocketStateEventHandler! handler) -> void
-Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.SerializerSettings.get -> Newtonsoft.Json.JsonSerializerSettings!
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.SerializerSettings.get -> System.Text.Json.JsonSerializerOptions!
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.SetAuth(string! jwt) -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Socket.get -> Supabase.Realtime.Interfaces.IRealtimeSocket?
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.SocketStateEventHandler
@@ -326,9 +330,11 @@ Supabase.Realtime.PostgresChanges.PostgresChangesPayload<T>.Ids.get -> System.Co
 Supabase.Realtime.PostgresChanges.PostgresChangesPayload<T>.Ids.set -> void
 Supabase.Realtime.PostgresChanges.PostgresChangesPayload<T>.PostgresChangesPayload() -> void
 Supabase.Realtime.PostgresChanges.PostgresChangesResponse
-Supabase.Realtime.PostgresChanges.PostgresChangesResponse.PostgresChangesResponse(Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.PostgresChanges.PostgresChangesResponse.PostgresChangesResponse() -> void
+Supabase.Realtime.PostgresChanges.PostgresChangesResponse.PostgresChangesResponse(System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.PostgresChanges.PostgresChangesResponse<T>
-Supabase.Realtime.PostgresChanges.PostgresChangesResponse<T>.PostgresChangesResponse(Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.PostgresChanges.PostgresChangesResponse<T>.PostgresChangesResponse() -> void
+Supabase.Realtime.PostgresChanges.PostgresChangesResponse<T>.PostgresChangesResponse(System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.Presence.PresenceDiffPayload<TPresence>
 Supabase.Realtime.Presence.PresenceDiffPayload<TPresence>.Joins.get -> System.Collections.Generic.Dictionary<string!, Supabase.Realtime.Presence.PresenceDiffPayloadMeta<TPresence!>!>?
 Supabase.Realtime.Presence.PresenceDiffPayload<TPresence>.Joins.set -> void
@@ -340,22 +346,25 @@ Supabase.Realtime.Presence.PresenceDiffPayloadMeta<TPresence>.Metas.get -> Syste
 Supabase.Realtime.Presence.PresenceDiffPayloadMeta<TPresence>.Metas.set -> void
 Supabase.Realtime.Presence.PresenceDiffPayloadMeta<TPresence>.PresenceDiffPayloadMeta() -> void
 Supabase.Realtime.Presence.PresenceOptions
+Supabase.Realtime.Presence.PresenceOptions.Enabled.get -> bool
 Supabase.Realtime.Presence.PresenceOptions.PresenceKey.get -> string!
 Supabase.Realtime.Presence.PresenceOptions.PresenceKey.set -> void
 Supabase.Realtime.Presence.PresenceOptions.PresenceOptions(string! presenceKey) -> void
 Supabase.Realtime.Presence.RealtimePresenceDiff<TPresence>
-Supabase.Realtime.Presence.RealtimePresenceDiff<TPresence>.RealtimePresenceDiff(Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.Presence.RealtimePresenceDiff<TPresence>.RealtimePresenceDiff() -> void
+Supabase.Realtime.Presence.RealtimePresenceDiff<TPresence>.RealtimePresenceDiff(System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.Presence.Responses.PresenceStatePayload<TPresence>
 Supabase.Realtime.Presence.Responses.PresenceStatePayload<TPresence>.Metas.get -> System.Collections.Generic.List<TPresence!>?
 Supabase.Realtime.Presence.Responses.PresenceStatePayload<TPresence>.Metas.set -> void
 Supabase.Realtime.Presence.Responses.PresenceStatePayload<TPresence>.PresenceStatePayload() -> void
 Supabase.Realtime.Presence.Responses.PresenceStateSocketResponse<TPresence>
-Supabase.Realtime.Presence.Responses.PresenceStateSocketResponse<TPresence>.PresenceStateSocketResponse(Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.Presence.Responses.PresenceStateSocketResponse<TPresence>.PresenceStateSocketResponse() -> void
+Supabase.Realtime.Presence.Responses.PresenceStateSocketResponse<TPresence>.PresenceStateSocketResponse(System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.AddBroadcastEventHandler(Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler! broadcastEventHandler) -> void
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.ClearBroadcastEventHandlers() -> void
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.Current() -> TBroadcastModel?
-Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.RealtimeBroadcast(Supabase.Realtime.RealtimeChannel! channel, Supabase.Realtime.Broadcast.BroadcastOptions! options, Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.RealtimeBroadcast(Supabase.Realtime.RealtimeChannel! channel, Supabase.Realtime.Broadcast.BroadcastOptions! options, System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.RemoveBroadcastEventHandler(Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler! broadcastEventHandler) -> void
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.Send(string? broadcastEventName, object! payload, int timeoutMs = 10000) -> System.Threading.Tasks.Task<bool>!
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.TriggerReceived(Supabase.Realtime.Socket.SocketResponse! response) -> void
@@ -389,6 +398,7 @@ Supabase.Realtime.RealtimeChannel.RealtimeChannel(Supabase.Realtime.Interfaces.I
 Supabase.Realtime.RealtimeChannel.Register(Supabase.Realtime.PostgresChanges.PostgresChangesOptions! postgresChangesOptions) -> Supabase.Realtime.Interfaces.IRealtimeChannel!
 Supabase.Realtime.RealtimeChannel.Register<TBroadcastResponse>(Supabase.Realtime.Broadcast.BroadcastOptions! options) -> Supabase.Realtime.RealtimeBroadcast<TBroadcastResponse!>!
 Supabase.Realtime.RealtimeChannel.Register<TBroadcastResponse>(bool broadcastSelf = false, bool broadcastAck = false) -> Supabase.Realtime.RealtimeBroadcast<TBroadcastResponse!>!
+Supabase.Realtime.RealtimeChannel.Register<TPresenceResponse>(Supabase.Realtime.Presence.PresenceOptions! options) -> Supabase.Realtime.RealtimePresence<TPresenceResponse!>!
 Supabase.Realtime.RealtimeChannel.Register<TPresenceResponse>(string! presenceKey) -> Supabase.Realtime.RealtimePresence<TPresenceResponse!>!
 Supabase.Realtime.RealtimeChannel.Rejoin(int timeoutMs = 10000) -> void
 Supabase.Realtime.RealtimeChannel.RemoveErrorHandler(Supabase.Realtime.Interfaces.IRealtimeChannel.ErrorEventHandler! handler) -> void
@@ -405,7 +415,7 @@ Supabase.Realtime.RealtimePresence<TPresenceModel>.AddPresenceEventHandler(Supab
 Supabase.Realtime.RealtimePresence<TPresenceModel>.ClearPresenceEventHandlers(Supabase.Realtime.Interfaces.IRealtimePresence.EventType? eventType = null) -> void
 Supabase.Realtime.RealtimePresence<TPresenceModel>.CurrentState.get -> System.Collections.Generic.Dictionary<string!, System.Collections.Generic.List<TPresenceModel!>!>!
 Supabase.Realtime.RealtimePresence<TPresenceModel>.LastState.get -> System.Collections.Generic.Dictionary<string!, System.Collections.Generic.List<TPresenceModel!>!>!
-Supabase.Realtime.RealtimePresence<TPresenceModel>.RealtimePresence(Supabase.Realtime.RealtimeChannel! channel, Supabase.Realtime.Presence.PresenceOptions! options, Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.RealtimePresence<TPresenceModel>.RealtimePresence(Supabase.Realtime.RealtimeChannel! channel, Supabase.Realtime.Presence.PresenceOptions! options, System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.RealtimePresence<TPresenceModel>.RemovePresenceEventHandlers(Supabase.Realtime.Interfaces.IRealtimePresence.EventType eventType, Supabase.Realtime.Interfaces.IRealtimePresence.PresenceEventHandler! handler) -> void
 Supabase.Realtime.RealtimePresence<TPresenceModel>.Track(object? payload, int timeoutMs = 10000) -> System.Threading.Tasks.Task<Supabase.Realtime.Channel.Push!>!
 Supabase.Realtime.RealtimePresence<TPresenceModel>.TriggerDiff(Supabase.Realtime.Socket.SocketResponse! response) -> void
@@ -435,25 +445,25 @@ Supabase.Realtime.RealtimeSocket.RemoveMessageReceivedHandler(Supabase.Realtime.
 Supabase.Realtime.RealtimeSocket.RemoveStateChangedHandler(Supabase.Realtime.Interfaces.IRealtimeSocket.StateEventHandler! handler) -> void
 Supabase.Realtime.RealtimeSocket.ReplyEventName(string! msgRef) -> string!
 Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.EventName.get -> string?
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.EventName.set -> void
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.Filter.get -> string?
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.Filter.set -> void
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.Id.get -> int?
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.Id.set -> void
 Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.PhoenixPostgresChangeResponse() -> void
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.eventName.get -> string?
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.eventName.set -> void
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.filter.get -> string?
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.filter.set -> void
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.id.get -> int?
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.id.set -> void
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.schema.get -> string?
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.schema.set -> void
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.table.get -> string?
-Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.table.set -> void
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.Schema.get -> string?
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.Schema.set -> void
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.Table.get -> string?
+Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse.Table.set -> void
 Supabase.Realtime.Socket.Responses.PhoenixResponse
 Supabase.Realtime.Socket.Responses.PhoenixResponse.PhoenixResponse() -> void
 Supabase.Realtime.Socket.Responses.PhoenixResponse.Response -> Supabase.Realtime.Socket.Responses.PostgresChangeResponse?
 Supabase.Realtime.Socket.Responses.PhoenixResponse.Status -> string?
 Supabase.Realtime.Socket.Responses.PostgresChangeResponse
+Supabase.Realtime.Socket.Responses.PostgresChangeResponse.Change.get -> System.Collections.Generic.List<Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse!>!
+Supabase.Realtime.Socket.Responses.PostgresChangeResponse.Change.set -> void
 Supabase.Realtime.Socket.Responses.PostgresChangeResponse.PostgresChangeResponse() -> void
-Supabase.Realtime.Socket.Responses.PostgresChangeResponse.change.get -> System.Collections.Generic.List<Supabase.Realtime.Socket.Responses.PhoenixPostgresChangeResponse!>!
-Supabase.Realtime.Socket.Responses.PostgresChangeResponse.change.set -> void
 Supabase.Realtime.Socket.SocketOptionsParameters
 Supabase.Realtime.Socket.SocketOptionsParameters.ApiKey.get -> string?
 Supabase.Realtime.Socket.SocketOptionsParameters.ApiKey.set -> void
@@ -480,7 +490,8 @@ Supabase.Realtime.Socket.SocketResponse.Payload.get -> Supabase.Realtime.Socket.
 Supabase.Realtime.Socket.SocketResponse.Payload.set -> void
 Supabase.Realtime.Socket.SocketResponse.Ref.get -> string?
 Supabase.Realtime.Socket.SocketResponse.Ref.set -> void
-Supabase.Realtime.Socket.SocketResponse.SocketResponse(Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.Socket.SocketResponse.SocketResponse() -> void
+Supabase.Realtime.Socket.SocketResponse.SocketResponse(System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.Socket.SocketResponse.Topic.get -> string?
 Supabase.Realtime.Socket.SocketResponse.Topic.set -> void
 Supabase.Realtime.Socket.SocketResponse._event.get -> string?
@@ -488,8 +499,11 @@ Supabase.Realtime.Socket.SocketResponse._event.set -> void
 Supabase.Realtime.Socket.SocketResponse<T>
 Supabase.Realtime.Socket.SocketResponse<T>.Payload.get -> T?
 Supabase.Realtime.Socket.SocketResponse<T>.Payload.set -> void
-Supabase.Realtime.Socket.SocketResponse<T>.SocketResponse(Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> void
+Supabase.Realtime.Socket.SocketResponse<T>.SocketResponse() -> void
+Supabase.Realtime.Socket.SocketResponse<T>.SocketResponse(System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.Socket.SocketResponsePayload
+Supabase.Realtime.Socket.SocketResponsePayload.ActionType.get -> string?
+Supabase.Realtime.Socket.SocketResponsePayload.ActionType.set -> void
 Supabase.Realtime.Socket.SocketResponsePayload.Channel.get -> string?
 Supabase.Realtime.Socket.SocketResponsePayload.Channel.set -> void
 Supabase.Realtime.Socket.SocketResponsePayload.Columns.get -> System.Collections.Generic.List<object!>?
@@ -528,6 +542,8 @@ Supabase.Realtime.Socket.SocketResponsePayload<T>.OldRecord.set -> void
 Supabase.Realtime.Socket.SocketResponsePayload<T>.Record.get -> T?
 Supabase.Realtime.Socket.SocketResponsePayload<T>.Record.set -> void
 Supabase.Realtime.Socket.SocketResponsePayload<T>.SocketResponsePayload() -> void
+Supabase.Realtime.Sockets.IWebSocketFactory
+Supabase.Realtime.Sockets.IWebSocketFactory.Create(System.Uri! uri, System.Func<System.Collections.Generic.Dictionary<string!, string!>!>! headers) -> Websocket.Client.IWebsocketClient!
 const Supabase.Realtime.Constants.ChannelAccessToken = "access_token" -> string!
 const Supabase.Realtime.Constants.ChannelEventBroadcast = "broadcast" -> string!
 const Supabase.Realtime.Constants.ChannelEventJoin = "phx_join" -> string!
@@ -541,26 +557,24 @@ const Supabase.Realtime.Constants.DefaultTimeout = 10000 -> int
 const Supabase.Realtime.Constants.PhoenixStatusError = "error" -> string!
 const Supabase.Realtime.Constants.PhoenixStatusOk = "ok" -> string!
 const Supabase.Realtime.Constants.TransportWebsocket = "websocket" -> string!
-override Supabase.Realtime.Converters.IntArrayConverter.CanConvert(System.Type! objectType) -> bool
-override Supabase.Realtime.Converters.IntArrayConverter.CanRead.get -> bool
-override Supabase.Realtime.Converters.IntArrayConverter.CanWrite.get -> bool
-override Supabase.Realtime.Converters.IntArrayConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object? existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object?
-override Supabase.Realtime.Converters.IntArrayConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object? value, Newtonsoft.Json.JsonSerializer! serializer) -> void
-override Supabase.Realtime.Converters.StringArrayConverter.CanConvert(System.Type! objectType) -> bool
-override Supabase.Realtime.Converters.StringArrayConverter.CanRead.get -> bool
-override Supabase.Realtime.Converters.StringArrayConverter.CanWrite.get -> bool
-override Supabase.Realtime.Converters.StringArrayConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object? existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object?
-override Supabase.Realtime.Converters.StringArrayConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object? value, Newtonsoft.Json.JsonSerializer! serializer) -> void
+override Supabase.Realtime.Converters.IntArrayConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> System.Collections.Generic.List<int>?
+override Supabase.Realtime.Converters.IntArrayConverter.Write(System.Text.Json.Utf8JsonWriter! writer, System.Collections.Generic.List<int>! value, System.Text.Json.JsonSerializerOptions! options) -> void
+override Supabase.Realtime.Converters.StringArrayConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> System.Collections.Generic.List<string!>?
+override Supabase.Realtime.Converters.StringArrayConverter.Write(System.Text.Json.Utf8JsonWriter! writer, System.Collections.Generic.List<string!>! value, System.Text.Json.JsonSerializerOptions! options) -> void
 override Supabase.Realtime.PostgresChanges.PostgresChangesOptions.Equals(object? obj) -> bool
 override Supabase.Realtime.PostgresChanges.PostgresChangesOptions.GetHashCode() -> int
 readonly Supabase.Realtime.ClientOptions.DateTimeStyles -> System.Globalization.DateTimeStyles
 readonly Supabase.Realtime.ClientOptions.Headers -> System.Collections.Generic.Dictionary<string!, string!>!
-static Supabase.Realtime.Channel.ChannelOptions.Private(Supabase.Realtime.ClientOptions! clientOptions, System.Func<string?>! retrieveAccessToken, Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> Supabase.Realtime.Channel.ChannelOptions!
-static Supabase.Realtime.Channel.ChannelOptions.Public(Supabase.Realtime.ClientOptions! clientOptions, System.Func<string?>! retrieveAccessToken, Newtonsoft.Json.JsonSerializerSettings! serializerSettings) -> Supabase.Realtime.Channel.ChannelOptions!
+static Supabase.Realtime.Channel.ChannelOptions.Private(Supabase.Realtime.ClientOptions! clientOptions, System.Func<string?>! retrieveAccessToken, System.Text.Json.JsonSerializerOptions! serializerSettings) -> Supabase.Realtime.Channel.ChannelOptions!
+static Supabase.Realtime.Channel.ChannelOptions.Public(Supabase.Realtime.ClientOptions! clientOptions, System.Func<string?>! retrieveAccessToken, System.Text.Json.JsonSerializerOptions! serializerSettings) -> Supabase.Realtime.Channel.ChannelOptions!
 static Supabase.Realtime.Constants.ChannelEventClose -> string!
 static Supabase.Realtime.Constants.ChannelEventError -> string!
 static Supabase.Realtime.Exceptions.FailureHint.Parse(Websocket.Client.DisconnectionInfo! info) -> Supabase.Realtime.Exceptions.FailureHint.Reason
 static Supabase.Realtime.Exceptions.RealtimeException.FromDisconnectionInfo(Websocket.Client.DisconnectionInfo! info) -> Supabase.Realtime.Exceptions.RealtimeException!
+static Supabase.Realtime.Presence.PresenceOptions.WithPresence(string! presenceKey) -> Supabase.Realtime.Presence.PresenceOptions!
+static Supabase.Realtime.Presence.PresenceOptions.WithTracking(string! presenceKey) -> Supabase.Realtime.Presence.PresenceOptions!
+static Supabase.Realtime.Presence.PresenceOptions.WithoutPresence(string! presenceKey) -> Supabase.Realtime.Presence.PresenceOptions!
+static Supabase.Realtime.Presence.PresenceOptions.WithoutTracking(string! presenceKey) -> Supabase.Realtime.Presence.PresenceOptions!
 virtual Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler.Invoke(Supabase.Realtime.Interfaces.IRealtimeBroadcast! sender, Supabase.Realtime.Models.BaseBroadcast? broadcast) -> void
 virtual Supabase.Realtime.Interfaces.IRealtimeChannel.ErrorEventHandler.Invoke(Supabase.Realtime.Interfaces.IRealtimeChannel! sender, Supabase.Realtime.Exceptions.RealtimeException! exception) -> void
 virtual Supabase.Realtime.Interfaces.IRealtimeChannel.MessageReceivedHandler.Invoke(Supabase.Realtime.Interfaces.IRealtimeChannel! sender, Supabase.Realtime.Socket.SocketResponse! message) -> void

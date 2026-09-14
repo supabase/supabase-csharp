@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +9,7 @@ using Supabase.Core.Extensions;
 using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Socket;
+using Supabase.Realtime.Sockets;
 using Websocket.Client;
 using static Supabase.Realtime.Constants;
 
@@ -58,7 +58,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
     private readonly string endpoint;
     private readonly ClientOptions options;
-    private readonly WebsocketClient connection;
+    private readonly IWebsocketClient connection;
 
     private CancellationTokenSource? heartbeatTokenSource;
 
@@ -83,16 +83,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         if (!options.Headers.ContainsKey("X-Client-Info"))
             options.Headers.Add("X-Client-Info", Core.Util.GetAssemblyVersion(typeof(Client)));
 
-        this.connection = new WebsocketClient(new Uri(this.EndpointUrl), () =>
-        {
-            var socket = new ClientWebSocket();
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Create("BROWSER"))) return socket;
-
-            foreach (var header in this.Headers)
-                socket.Options.SetRequestHeader(header.Key, header.Value);
-
-            return socket;
-        });
+        this.connection = (options.WebSocketFactory ?? DefaultWebSocketFactory.Instance)
+            .Create(new Uri(this.EndpointUrl), () => this.Headers);
     }
 
     void IDisposable.Dispose()

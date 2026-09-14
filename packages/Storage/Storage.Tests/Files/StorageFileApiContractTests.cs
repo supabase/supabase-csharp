@@ -293,6 +293,21 @@ public class StorageFileApiContractTests
     }
 
     [TestMethod]
+    public async Task Download_ShouldSurfaceServiceCode_GivenJsonError()
+    {
+        const string body =
+            "{\"statusCode\":\"404\",\"error\":\"not_found\",\"code\":\"NoSuchKey\",\"message\":\"Object not found\"}";
+        this.Respond($"/storage/v1/object/{Bucket}/missing.bin", "GET", 404, body);
+        var act = () => this.client.From(Bucket).Download("missing.bin", (EventHandler<float>?) null);
+        var exception = (await act.Should().ThrowAsync<SupabaseStorageException>()).Which;
+        using (new AssertionScope())
+        {
+            exception.Code.Should().Be("NoSuchKey");
+            exception.Reason.Should().Be(FailureHint.Reason.NotFound);
+        }
+    }
+
+    [TestMethod]
     public async Task Download_ShouldSendTheCacheNonceInTheQuery_GivenACacheNonce()
     {
         this.server.Given(Request.Create().WithPath($"/storage/v1/object/{Bucket}/a.bin").UsingGet())
@@ -337,6 +352,15 @@ public class StorageFileApiContractTests
     }
 
     [TestMethod]
+    public async Task PurgeCache_ShouldEncodeDelimiters_GivenAKeyWithUrlDelimiters()
+    {
+        this.Respond("/storage/v1/cdn/*", "DELETE", 200, "{\"message\":\"success\"}");
+        await this.client.From(Bucket).PurgeCache("folder/a?b#c.png");
+        this.SingleRequest().AbsoluteUrl.Should().EndWith($"/storage/v1/cdn/{Bucket}/folder/a%3Fb%23c.png",
+            "an unescaped '?' or '#' truncates the key into a query string or fragment");
+    }
+
+    [TestMethod]
     public async Task Upload_ShouldSurfaceStorageException_GivenNonJsonError()
     {
         const string body = "<html><head><title>413 Request Entity Too Large</title></head></html>";
@@ -365,6 +389,62 @@ public class StorageFileApiContractTests
         {
             exception.StatusCode.Should().Be(502);
             exception.Content.Should().Be(body);
+        }
+    }
+
+    [TestMethod]
+    public async Task UploadToSignedUrl_ShouldForwardMetadataAndCustomHeaders_GivenFileOptions()
+    {
+        var signedUrl = new UploadSignedUrl(
+            new Uri($"{this.server.Url}/storage/v1/object/upload/sign/{Bucket}/file.bin?token=abc"),
+            "abc",
+            "file.bin");
+        this.Respond($"/storage/v1/object/upload/sign/{Bucket}/file.bin", "POST", 200, "{\"Key\":\"x\"}");
+        var options = new FileOptions
+        {
+            ContentType = "image/png",
+            Metadata = new Dictionary<string, string> { ["k"] = "v" },
+            Headers = new Dictionary<string, string> { ["x-version"] = "123" }
+        };
+        await this.client.From(Bucket).UploadToSignedUrl(Encoding.UTF8.GetBytes("data"), signedUrl, options, inferContentType: false);
+        var request = this.SingleRequest();
+        using (new AssertionScope())
+        {
+            this.HeaderOf(request, "x-metadata").Should().NotBeNullOrEmpty("metadata must ride the signed-URL upload (issue #252)");
+            this.HeaderOf(request, "x-version").Should().Be("123", "custom headers must merge into the signed-URL upload (issue #252)");
+        }
+    }
+
+    [TestMethod]
+    public async Task UploadToSignedUrlFromDisk_ShouldForwardMetadataAndCustomHeaders_GivenFileOptions()
+    {
+        var signedUrl = new UploadSignedUrl(
+            new Uri($"{this.server.Url}/storage/v1/object/upload/sign/{Bucket}/file.bin?token=abc"),
+            "abc",
+            "file.bin");
+        this.Respond($"/storage/v1/object/upload/sign/{Bucket}/file.bin", "POST", 200, "{\"Key\":\"x\"}");
+        var localPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.bin");
+        await File.WriteAllBytesAsync(localPath, new byte[] { 0x1, 0x2 });
+        try
+        {
+            var options = new FileOptions
+            {
+                ContentType = "image/png",
+                Metadata = new Dictionary<string, string> { ["k"] = "v" },
+                Headers = new Dictionary<string, string> { ["x-version"] = "123" }
+            };
+            await this.client.From(Bucket).UploadToSignedUrl(localPath, signedUrl, options, inferContentType: false);
+            var request = this.SingleRequest();
+            using (new AssertionScope())
+            {
+                this.HeaderOf(request, "x-metadata").Should().NotBeNullOrEmpty("metadata must ride the from-disk signed-URL upload (issue #252)");
+                this.HeaderOf(request, "x-version").Should().Be("123", "custom headers must merge into the from-disk signed-URL upload (issue #252)");
+            }
+        }
+        finally
+        {
+            if (File.Exists(localPath))
+                File.Delete(localPath);
         }
     }
 

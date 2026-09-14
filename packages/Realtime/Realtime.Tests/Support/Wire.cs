@@ -25,6 +25,12 @@ internal static class Wire
     public static ChannelOptions PrivateOptions() =>
         ChannelOptions.Private(new ClientOptions(), () => null, Settings());
 
+    public static ChannelOptions PrivateOptions(string? accessToken) =>
+        ChannelOptions.Private(new ClientOptions(), () => accessToken, Settings());
+
+    public static ChannelOptions PublicOptions(string? accessToken) =>
+        ChannelOptions.Public(new ClientOptions(), () => accessToken, Settings());
+
     public static IRealtimeSocket Socket() => new RealtimeSocket(Endpoint, new ClientOptions());
 
     public static RealtimeChannel Channel(string topic = "realtime:example", ChannelOptions? options = null) =>

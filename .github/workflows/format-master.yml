@@ -1,0 +1,55 @@
+name: Auto-format master
+
+# Runs only on push to master. It exists because build-and-test.yml's
+# PR-time gate runs with --bypass-format (a fork contributor can't always fix a
+# format violation themselves the way an agent can), so master can land a merge
+# with a format violation still in it. This closes that gap: format whatever
+# the merge actually changed, and commit the fix directly.
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format-master:
+    if: github.event.head_commit.author.email != 'github-actions[bot]@users.noreply.github.com'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # format-suggest.sh's --base-ref needs the pushed-from commit to be
+          # present locally to diff against it.
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Apply dotnet format to this push's changed files
+        run: |
+          before="${{ github.event.before }}"
+          # All-zero SHA (new branch) or a commit we don't have (history rewrite):
+          # fall back to the last commit rather than erroring.
+          if [[ "$before" =~ ^0+$ ]] || ! git cat-file -e "$before" 2>/dev/null; then
+            before="HEAD~1"
+          fi
+          ./scripts/quality-gate/format-suggest.sh packages --base-ref "$before"
+
+      - name: Commit and push if anything changed
+        run: |
+          if git status --porcelain -- '*.cs' | grep -q .; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -- '*.cs'
+            git commit -m "chore(format): auto-format after merge"
+            git push origin HEAD:master
+          else
+            echo "nothing to format"
+          fi

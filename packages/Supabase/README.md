@@ -23,7 +23,8 @@ Targets .NET Standard 2.1, so it runs on .NET Core / .NET 5+, Xamarin, MAUI, and
 ## Getting started
 
 Create a project in the [Supabase dashboard](https://app.supabase.com) and grab your project URL and
-public (anon) key from **Settings → API**. Then initialize the client:
+API key from **Settings → API** — a publishable key (`sb_publishable_…`) for client-side use, or the
+legacy public (anon) key. Then initialize the client:
 
 ```csharp
 using Supabase;
@@ -87,9 +88,26 @@ the platform's secure storage. See
 [Authorization with Gotrue](https://github.com/supabase-community/supabase-csharp/wiki/Authorization-with-Gotrue#offline-support)
 in the wiki for a worked example.
 
-> **A note on keys:** some APIs (user administration, bypassing RLS, etc.) require the `service_key`
-> rather than the public/anon key. Never expose a `service_key` in client-side code, and use a
+> **A note on keys:** some APIs (user administration, bypassing RLS, etc.) require an elevated key
+> rather than the public/publishable one. Never expose an elevated key in client-side code, and use a
 > separate client instance for service and user contexts.
+
+### New API keys (publishable / secret)
+
+Supabase is replacing the legacy JWT-based `anon` and `service_role` keys with opaque keys, deprecating
+the legacy keys by the end of 2026. The SDK supports both:
+
+| Key | Prefix | Use in |
+| --- | --- | --- |
+| Publishable | `sb_publishable_…` | Client-side apps, CLIs, scripts — replaces the `anon` key. |
+| Secret | `sb_secret_…` | Server-side only (bypasses RLS) — replaces the `service_role` key. Never ship it in client code. |
+
+Pass either as the `key` argument; no other code changes are required. Because the new keys are not
+JWTs, they must travel on the `apikey` header only — the SDK detects the `sb_publishable_` / `sb_secret_`
+prefixes and, on the Edge Functions path, stops sending the key as an `Authorization: Bearer` token when
+there is no user session (the Functions gateway would otherwise reject it as an invalid JWT). Legacy JWT
+keys are unaffected. See the Supabase guide on
+[migrating to the new API keys](https://supabase.com/docs/guides/getting-started/migrating-to-new-api-keys).
 
 ## Observability (OpenTelemetry)
 

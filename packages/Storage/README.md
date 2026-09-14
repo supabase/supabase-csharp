@@ -77,6 +77,12 @@ var publicUrl = bucket.GetPublicUrl("me.png", null);
 var signedUrl = await bucket.CreateSignedUrl("me.png", 3600);
 ```
 
+## Error handling
+
+Storage failures throw a `SupabaseStorageException`. Use `Code` for the exact service error (for
+example, `NoSuchKey`) and `Reason` for the broader classification. `Code` is `null` when the response
+does not include one. See the [Storage error code reference](https://supabase.com/docs/guides/storage/debugging/error-codes).
+
 ## Observability (OpenTelemetry)
 
 The client emits traces and metrics through `System.Diagnostics`, so you can wire them into

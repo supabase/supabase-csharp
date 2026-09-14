@@ -58,6 +58,19 @@ var options = new Client.InvokeFunctionOptions
 var result = await client.Invoke<MyResponse>("hello-world", token: SUPABASE_ANON_KEY, options);
 ```
 
+### Streaming a response
+
+`InvokeStream` returns successful responses after the headers arrive. `HttpTimeout` and request cancellation
+cover the request and error-body reads. Cancel successful body reads separately and dispose the response when finished.
+
+```csharp
+using var response = await client.InvokeStream("chat", token: SUPABASE_ANON_KEY);
+using var reader = new StreamReader(await response.Content.ReadAsStreamAsync());
+string? line;
+while ((line = await reader.ReadLineAsync()) != null)
+    Console.WriteLine(line);
+```
+
 ## Observability (OpenTelemetry)
 
 The client emits traces and metrics through `System.Diagnostics`, so you can wire them into

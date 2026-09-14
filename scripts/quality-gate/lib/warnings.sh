@@ -1,9 +1,9 @@
-# lib/warnings.sh — the analyzer warning ratchet and the per-package baseline IO.
+# lib/warnings.sh — the analyzer warning baseline and its per-package IO.
 #
 # The per-package baseline holds MEASUREMENTS (warning counts) and the package's
 # own project paths. Repo-wide settings (formatBaseRef, e2eHealthUrl) live in
-# .gate-config.json; a package baseline may override any of them. The ratchet only
-# ever goes DOWN automatically — raising a number means editing the file by hand,
+# .gate-config.json; a package baseline may override any of them. The baseline only
+# ever moves DOWN automatically — raising a number means editing the file by hand,
 # so the increase shows up in code review.
 
 WARN_TOTAL=""
@@ -45,7 +45,7 @@ warn_verdict() {  # warn_verdict <codes-file>
   if (( WARN_TOTAL > base )) || [[ -n "$risen" ]]; then
     echo "FAIL|||warnings ${base}→${WARN_TOTAL}${risen:+ (${risen%; })}"
   elif (( WARN_TOTAL < base )); then
-    echo "PASS|||$WARN_TOTAL < baseline $base — ratcheting baseline down"
+    echo "PASS|||$WARN_TOTAL < baseline $base — lowering baseline"
   else
     echo "PASS|||$WARN_TOTAL, at baseline"
   fi

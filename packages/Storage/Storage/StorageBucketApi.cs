@@ -16,6 +16,10 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     public ClientOptions Options { get; protected set; }
     protected string Url { get; set; }
 
+    private readonly HttpClient requestClient;
+    private readonly HttpClient uploadClient;
+    private readonly HttpClient downloadClient;
+
     private readonly Dictionary<string, string> initializedHeaders;
     private Dictionary<string, string> headers;
     public Dictionary<string, string> Headers
@@ -43,27 +47,34 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// </summary>
     public Func<Dictionary<string, string>>? GetHeaders { get; set; }
 
-    protected StorageBucketApi(string url, ClientOptions? options, Dictionary<string, string>? headers = null) : this(url, headers) => this.Options = options ?? new ClientOptions();
-
-    protected StorageBucketApi(string url, Dictionary<string, string>? headers = null)
+    // Resolves the HttpClients only after Options has settled to its final, caller-supplied value — a
+    // previous version resolved these before a chained-from ctor's `this.Options = options` ran, so a
+    // custom ClientOptions' timeouts/injected clients were silently ignored in favor of a throwaway
+    // default ClientOptions().
+    protected StorageBucketApi(string url, ClientOptions? options, Dictionary<string, string>? headers = null)
     {
         this.Url = url;
-        this.Options ??= new ClientOptions();
+        this.Options = options ?? new ClientOptions();
 
-        // Initializes HttpClients with Timeouts to be Reused [Re: #8](https://github.com/supabase-community/storage-csharp/issues/8)
-        Helpers.Initialize(this.Options);
+        this.requestClient = Helpers.ResolveRequestClient(this.Options);
+        this.uploadClient = Helpers.ResolveUploadClient(this.Options);
+        this.downloadClient = Helpers.ResolveDownloadClient(this.Options);
 
         headers ??= new Dictionary<string, string>();
         this.headers = headers;
         this.initializedHeaders = headers;
     }
 
+    protected StorageBucketApi(string url, Dictionary<string, string>? headers = null)
+        : this(url, (ClientOptions?) null, headers)
+    { }
+
     /// <summary>
     /// Retrieves the details of all Storage buckets within an existing product.
     /// </summary>
     /// <returns></returns>
     public Task<List<Bucket>?> ListBuckets() =>
-         Helpers.MakeRequestAsync<List<Bucket>>(HttpMethod.Get, $"{this.Url}/bucket", null, this.Headers);
+         Helpers.MakeRequestAsync<List<Bucket>>(this.requestClient, this.Options.Retry, HttpMethod.Get, $"{this.Url}/bucket", null, this.Headers);
 
     /// <summary>
     /// Retrieves the details of an existing Storage bucket.
@@ -74,7 +85,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     {
         try
         {
-            var result = await Helpers.MakeRequestAsync<Bucket>(HttpMethod.Get, $"{this.Url}/bucket/{id}", null, this.Headers);
+            var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options.Retry, HttpMethod.Get, $"{this.Url}/bucket/{id}", null, this.Headers);
             return result;
         }
         catch (SupabaseStorageException ex)
@@ -105,7 +116,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
             AllowedMimes = options.AllowedMimes
         };
 
-        var result = await Helpers.MakeRequestAsync<Bucket>(HttpMethod.Post, $"{this.Url}/bucket", data, this.Headers);
+        var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options.Retry, HttpMethod.Post, $"{this.Url}/bucket", data, this.Headers);
 
         return result?.Name!;
     }
@@ -128,7 +139,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
             AllowedMimes = options.AllowedMimes
         };
 
-        var result = await Helpers.MakeRequestAsync<Bucket>(HttpMethod.Put, $"{this.Url}/bucket/{id}", data, this.Headers);
+        var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options.Retry, HttpMethod.Put, $"{this.Url}/bucket/{id}", data, this.Headers);
 
         return result;
     }
@@ -139,7 +150,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// <param name="id"></param>
     /// <returns></returns>
     public Task<GenericResponse?> EmptyBucket(string id) =>
-        Helpers.MakeRequestAsync<GenericResponse>(HttpMethod.Post, $"{this.Url}/bucket/{id}/empty", null, this.Headers);
+        Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Post, $"{this.Url}/bucket/{id}/empty", null, this.Headers);
 
     /// <summary>
     /// Deletes an existing bucket. A bucket can't be deleted with existing objects inside it.
@@ -148,7 +159,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// <param name="id"></param>
     /// <returns></returns>
     public Task<GenericResponse?> DeleteBucket(string id) =>
-        Helpers.MakeRequestAsync<GenericResponse>(HttpMethod.Delete, $"{this.Url}/bucket/{id}", null, this.Headers);
+        Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Delete, $"{this.Url}/bucket/{id}", null, this.Headers);
 
     /// <inheritdoc />
     public Task<GenericResponse?> PurgeBucketCache(
@@ -157,7 +168,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
         CancellationToken cancellationToken = default
     )
     {
-        var url = options.ToPurgeUrl($"{this.Url}/cdn/{id}");
-        return Helpers.MakeRequestAsync<GenericResponse>(HttpMethod.Delete, url, null, this.Headers, cancellationToken);
+        var url = options.ToPurgeUrl($"{this.Url}/cdn/{Helpers.EncodePath(id)}");
+        return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
     }
 }

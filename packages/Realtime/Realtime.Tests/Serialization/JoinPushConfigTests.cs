@@ -56,7 +56,8 @@ public class JoinPushConfigTests
     [TestMethod]
     public void ForPublicChannel_ShouldSerialisePresenceKey_GivenProvided()
     {
-        var config = Config(JoinPush.ForPublicChannel(presenceOptions: new PresenceOptions("client-1")));
+        var config = Config(JoinPush.ForPublicChannel(presenceOptions: PresenceOptions.WithPresence("client-1")));
         config["presence"]!["key"]!.GetValue<string>().Should().Be("client-1");
+        config["presence"]!["enabled"]!.GetValue<bool>().Should().BeTrue();
     }
 }

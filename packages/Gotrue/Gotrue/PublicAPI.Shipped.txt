@@ -5,6 +5,7 @@ Supabase.Gotrue.AdminClient.CreateUser(Supabase.Gotrue.AdminUserAttributes! attr
 Supabase.Gotrue.AdminClient.CreateUser(string! email, string! password, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.AdminClient.DeleteFactor(Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
 Supabase.Gotrue.AdminClient.DeleteUser(string! uid) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.AdminClient.DeleteUser(string! uid, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.AdminClient.GenerateLink(Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.GenerateLinkResponse?>!
 Supabase.Gotrue.AdminClient.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Gotrue.AdminClient.GetHeaders.set -> void
@@ -30,10 +31,12 @@ Supabase.Gotrue.AdminUserAttributes.UserMetadata.get -> System.Collections.Gener
 Supabase.Gotrue.AdminUserAttributes.UserMetadata.set -> void
 Supabase.Gotrue.Api
 Supabase.Gotrue.Api.Api(string! url, System.Collections.Generic.Dictionary<string!, string!>? headers = null) -> void
+Supabase.Gotrue.Api.Api(string! url, System.Collections.Generic.Dictionary<string!, string!>? headers = null, System.Net.Http.HttpClient? httpClient = null, Supabase.Core.Http.RetryOptions? retry = null) -> void
 Supabase.Gotrue.Api.Challenge(string! jwt, Supabase.Gotrue.Mfa.MfaChallengeParams! mfaChallengeParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaChallengeResponse?>!
 Supabase.Gotrue.Api.CreateUser(string! jwt, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Api.DeleteFactor(string! jwt, Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
 Supabase.Gotrue.Api.DeleteUser(string! uid, string! jwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Api.DeleteUser(string! uid, string! jwt, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.Enroll(string! jwt, Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.Api.ExchangeCodeForSession(string! codeVerifier, string! authCode) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.GenerateLink(string! jwt, Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -96,7 +99,9 @@ Supabase.Gotrue.Client.LinkIdentity(Supabase.Gotrue.Constants.Provider provider,
 Supabase.Gotrue.Client.LinkIdentityWithIdToken(Supabase.Gotrue.LinkIdentityWithIdTokenOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Client.ListFactors() -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaListFactorsResponse?>!
 Supabase.Gotrue.Client.LoadSession() -> void
+Supabase.Gotrue.Client.LoadSessionAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Client.NotifyAuthStateChange(Supabase.Gotrue.Constants.AuthState stateChanged) -> void
+Supabase.Gotrue.Client.NotifyAuthStateChangeAsync(Supabase.Gotrue.Constants.AuthState stateChanged, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Client.Online.get -> bool
 Supabase.Gotrue.Client.Online.set -> void
 Supabase.Gotrue.Client.Options.get -> Supabase.Gotrue.ClientOptions!
@@ -144,8 +149,14 @@ Supabase.Gotrue.ClientOptions.ClientOptions() -> void
 Supabase.Gotrue.ClientOptions.DebugRefreshToken.get -> bool
 Supabase.Gotrue.ClientOptions.DebugRefreshToken.set -> void
 Supabase.Gotrue.ClientOptions.Headers -> System.Collections.Generic.Dictionary<string!, string!>!
+Supabase.Gotrue.ClientOptions.HttpClient.get -> System.Net.Http.HttpClient?
+Supabase.Gotrue.ClientOptions.HttpClient.set -> void
 Supabase.Gotrue.ClientOptions.MaximumRefreshWaitTime.get -> int
 Supabase.Gotrue.ClientOptions.MaximumRefreshWaitTime.set -> void
+Supabase.Gotrue.ClientOptions.Proxy.get -> System.Net.IWebProxy?
+Supabase.Gotrue.ClientOptions.Proxy.set -> void
+Supabase.Gotrue.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
+Supabase.Gotrue.ClientOptions.Retry.set -> void
 Supabase.Gotrue.ClientOptions.Url.get -> string!
 Supabase.Gotrue.ClientOptions.Url.set -> void
 Supabase.Gotrue.Constants
@@ -215,10 +226,12 @@ Supabase.Gotrue.Exceptions.FailureHint
 Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.AdminTokenRequired = 13 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.BadSessionUrl = 15 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
+Supabase.Gotrue.Exceptions.FailureHint.Reason.CloudflareNetworkError = 21 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.ExpiredRefreshToken = 12 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidFlowType = 16 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidRefreshToken = 11 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.MfaChallengeUnverified = 19 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
+Supabase.Gotrue.Exceptions.FailureHint.Reason.NetworkError = 20 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.NoSessionFound = 14 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.Offline = 1 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.SsoDomainNotFound = 17 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
@@ -275,6 +288,7 @@ Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateUser(Supabase.Gotrue.
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateUser(string! email, string! password, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteFactor(Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteUser(string! uid) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteUser(string! uid, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GenerateLink(Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.GenerateLinkResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GetUser(string! jwt) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GetUserById(string! userId) -> System.Threading.Tasks.Task<TUser?>!
@@ -288,6 +302,7 @@ Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Challenge(string! jwt, Su
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateUser(string! jwt, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteFactor(string! jwt, Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteUser(string! uid, string! jwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteUser(string! uid, string! jwt, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Enroll(string! jwt, Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ExchangeCodeForSession(string! codeVerifier, string! authCode) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GenerateLink(string! jwt, Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -343,7 +358,9 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.LinkIdentity(Supabase.
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.LinkIdentityWithIdToken(Supabase.Gotrue.LinkIdentityWithIdTokenOptions! options) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ListFactors() -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaListFactorsResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.LoadSession() -> void
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.LoadSessionAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.NotifyAuthStateChange(Supabase.Gotrue.Constants.AuthState stateChanged) -> void
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.NotifyAuthStateChangeAsync(Supabase.Gotrue.Constants.AuthState stateChanged, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Online.get -> bool
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Online.set -> void
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Options.get -> Supabase.Gotrue.ClientOptions!
@@ -382,17 +399,22 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.VerifyOTP(string! phon
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.VerifyTokenHash(string! tokenHash, Supabase.Gotrue.Constants.EmailOtpType type = Supabase.Gotrue.Constants.EmailOtpType.Email) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotruePersistenceListener<TSession>
 Supabase.Gotrue.Interfaces.IGotruePersistenceListener<TSession>.EventHandler(Supabase.Gotrue.Interfaces.IGotrueClient<Supabase.Gotrue.User!, TSession!>! sender, Supabase.Gotrue.Constants.AuthState stateChanged) -> void
+Supabase.Gotrue.Interfaces.IGotruePersistenceListener<TSession>.EventHandlerAsync(Supabase.Gotrue.Interfaces.IGotrueClient<Supabase.Gotrue.User!, TSession!>! sender, Supabase.Gotrue.Constants.AuthState stateChanged, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotruePersistenceListener<TSession>.Persistence.get -> Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<TSession!>!
 Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<TSession>
 Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<TSession>.DestroySession() -> void
+Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<TSession>.DestroySessionAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<TSession>.LoadSession() -> TSession?
+Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<TSession>.LoadSessionAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<TSession>.SaveSession(TSession! session) -> void
+Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<TSession>.SaveSessionAsync(TSession! session, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.Challenge(string! jwt, Supabase.Gotrue.Mfa.MfaChallengeParams! mfaChallengeParams, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaChallengeResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.ChallengeAndVerify(string! jwt, Supabase.Gotrue.Mfa.MfaChallengeAndVerifyParams! mfaChallengeAndVerifyParams, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaVerifyResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.CreateUser(string! serviceRoleToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.AdminUserAttributes! attributes) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.CreateUser(string! serviceRoleToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, string! email, string! password, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.DeleteUser(string! uid, string! serviceRoleToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.DeleteUser(string! uid, string! serviceRoleToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.Enroll(string! jwt, Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.ExchangeCodeForSession(string! codeVerifier, string! authCode, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.GetApi(Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> Supabase.Gotrue.Interfaces.IGotrueApi<TUser!, TSession!>!
@@ -565,7 +587,8 @@ Supabase.Gotrue.NetworkStatus.Client.get -> Supabase.Gotrue.Interfaces.IGotrueCl
 Supabase.Gotrue.NetworkStatus.Client.set -> void
 Supabase.Gotrue.NetworkStatus.NetworkListener
 Supabase.Gotrue.NetworkStatus.NetworkStatus() -> void
-Supabase.Gotrue.NetworkStatus.PingCheck(string! url) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.NetworkStatus.NetworkStatus(System.Net.Http.HttpClient? httpClient = null) -> void
+Supabase.Gotrue.NetworkStatus.PingCheckAsync(string! url) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.NetworkStatus.Ready -> bool
 Supabase.Gotrue.NetworkStatus.RemoveListener(Supabase.Gotrue.NetworkStatus.NetworkListener! listener) -> void
 Supabase.Gotrue.NetworkStatus.StartAsync(string! url) -> System.Threading.Tasks.Task<bool>!
@@ -576,14 +599,13 @@ Supabase.Gotrue.PasswordlessSignInState.PKCEVerifier.set -> void
 Supabase.Gotrue.PasswordlessSignInState.PasswordlessSignInState() -> void
 Supabase.Gotrue.PersistenceListener
 Supabase.Gotrue.PersistenceListener.EventHandler(Supabase.Gotrue.Interfaces.IGotrueClient<Supabase.Gotrue.User!, Supabase.Gotrue.Session!>! sender, Supabase.Gotrue.Constants.AuthState stateChanged) -> void
+Supabase.Gotrue.PersistenceListener.EventHandlerAsync(Supabase.Gotrue.Interfaces.IGotrueClient<Supabase.Gotrue.User!, Supabase.Gotrue.Session!>! sender, Supabase.Gotrue.Constants.AuthState stateChanged, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.PersistenceListener.Persistence.get -> Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<Supabase.Gotrue.Session!>!
 Supabase.Gotrue.PersistenceListener.PersistenceListener(Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<Supabase.Gotrue.Session!>! persistence) -> void
 Supabase.Gotrue.ProviderAuthState
 Supabase.Gotrue.ProviderAuthState.PKCEVerifier.get -> string?
 Supabase.Gotrue.ProviderAuthState.PKCEVerifier.set -> void
 Supabase.Gotrue.ProviderAuthState.ProviderAuthState(System.Uri! uri) -> void
-Supabase.Gotrue.ProviderAuthState.State.get -> string!
-Supabase.Gotrue.ProviderAuthState.State.set -> void
 Supabase.Gotrue.ProviderAuthState.Uri.get -> System.Uri!
 Supabase.Gotrue.ProviderAuthState.Uri.set -> void
 Supabase.Gotrue.ResetPasswordForEmailOptions
@@ -671,8 +693,6 @@ Supabase.Gotrue.SignInOptions.RedirectTo.set -> void
 Supabase.Gotrue.SignInOptions.Scopes.get -> string?
 Supabase.Gotrue.SignInOptions.Scopes.set -> void
 Supabase.Gotrue.SignInOptions.SignInOptions() -> void
-Supabase.Gotrue.SignInOptions.State.get -> string?
-Supabase.Gotrue.SignInOptions.State.set -> void
 Supabase.Gotrue.SignInWithPasswordlessEmailOptions
 Supabase.Gotrue.SignInWithPasswordlessEmailOptions.Email.get -> string!
 Supabase.Gotrue.SignInWithPasswordlessEmailOptions.EmailRedirectTo.get -> string?
@@ -710,6 +730,7 @@ Supabase.Gotrue.StatelessClient.ChallengeAndVerify(string! jwt, Supabase.Gotrue.
 Supabase.Gotrue.StatelessClient.CreateUser(string! serviceRoleToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.AdminUserAttributes! attributes) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.StatelessClient.CreateUser(string! serviceRoleToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, string! email, string! password, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.StatelessClient.DeleteUser(string! uid, string! serviceRoleToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.StatelessClient.DeleteUser(string! uid, string! serviceRoleToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.StatelessClient.Enroll(string! jwt, Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.StatelessClient.ExchangeCodeForSession(string! codeVerifier, string! authCode, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.StatelessClient.GetApi(Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> Supabase.Gotrue.Interfaces.IGotrueApi<Supabase.Gotrue.User!, Supabase.Gotrue.Session!>!
@@ -735,6 +756,12 @@ Supabase.Gotrue.StatelessClient.StatelessClient() -> void
 Supabase.Gotrue.StatelessClient.StatelessClientOptions
 Supabase.Gotrue.StatelessClient.StatelessClientOptions.AllowUnconfirmedUserSessions.get -> bool
 Supabase.Gotrue.StatelessClient.StatelessClientOptions.AllowUnconfirmedUserSessions.set -> void
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.HttpClient.get -> System.Net.Http.HttpClient?
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.HttpClient.set -> void
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.Proxy.get -> System.Net.IWebProxy?
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.Proxy.set -> void
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.Retry.set -> void
 Supabase.Gotrue.StatelessClient.StatelessClientOptions.StatelessClientOptions() -> void
 Supabase.Gotrue.StatelessClient.StatelessClientOptions.Url.get -> string!
 Supabase.Gotrue.StatelessClient.StatelessClientOptions.Url.set -> void

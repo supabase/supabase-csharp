@@ -1,6 +1,6 @@
 ---
 name: sdk-quality-gate
-description: Use before declaring any Supabase C# SDK change done or opening a PR, and as the Verify step of every flow. Runs the committed scripts/quality-gate/gate.sh script — the mechanized gauntlet (build/analyzers with a warning ratchet, format on changed files, tests, a line-coverage ratchet, vulnerability scan and E2E/acceptance tests, plus a public-API diff signal) — and reports its verdict. This is the deterministic "is it done" check; do not report a change as done without a PASS.
+description: Use before declaring any Supabase C# SDK change done or opening a PR, and as the Verify step of every flow. Runs the committed scripts/quality-gate/gate.sh script — the mechanized gauntlet (build/analyzers with a warning baseline, format on changed files, tests, a line-coverage baseline, vulnerability scan and E2E/acceptance tests, plus a public-API diff signal) — and reports its verdict. This is the deterministic "is it done" check; do not report a change as done without a PASS.
 ---
 
 # Skill: SDK quality gate
@@ -19,7 +19,7 @@ scripts/quality-gate/gate.sh <package> --fast    # inner loop only
 
 There are two modes. `--fast` is the inner loop only (build, format, tests) — the
 fast local red/green cycle; the default is the full gate and adds security, the
-public-API check, E2E and a line-coverage ratchet. `<package>` is a directory —
+public-API check, E2E and a line-coverage baseline. `<package>` is a directory —
 e.g. `gotrue-csharp`,
 `core-csharp` — and defaults to the current directory. Run with `bash <path>` if
 the executable bit is unset.
@@ -107,16 +107,29 @@ report it. Do not work around it and continue.
 ## Baselines
 
 `<package>/.gate-baseline.json` is committed and holds the discovered project
-paths, the warning count per code, and line coverage. It is created on the
-first run and **ratchets automatically** — no flags. Warnings ratchet *down*
-(fewer is better); coverage ratchets *up* (more is better, `coverage.line`, a
-single percentage, compared with a small epsilon to absorb rounding jitter
-between runs). Either direction, moving the number the wrong way means editing
-the file by hand, so the regression appears in code review.
+paths, the warning count per code, and line coverage. The warning baseline only
+moves *down* (fewer is better); coverage only *up* (more is better,
+`coverage.hermeticLine`, a single percentage). Either direction, moving the number the
+wrong way means editing the file by hand, so the regression appears in code review.
+
+**Writing the baseline is opt-in.** A plain `gate.sh` run is read-only — it reads
+the baseline to produce a verdict but never touches the file, so a contributor's
+run can't silently rewrite a committed baseline. Pass `--overwrite-baseline` to
+create it (a package's first run) or to update it. On CI this is a post-merge
+maintainer concern: PR runs stay read-only, and only the push-to-master run
+passes `--overwrite-baseline` and commits any improvement back to master.
+
+**Coverage is compared with a ~1% tolerance band, not an exact match.** Even
+hermetic (unit+contract) coverage isn't byte-reproducible on a loaded CI runner —
+async continuations (retry/backoff `Task.Delay`, cancellation races, background
+timers) get scheduled differently run to run, flipping a few covered lines. The
+band absorbs that jitter symmetrically: a drop within it passes, a rise within it
+doesn't move the baseline (so it never locks onto a lucky peak the next run can't
+reach), and a real regression — an untested method, far more than 1% — still fails.
 
 **Coverage has no ceiling.** It must always be at or above the best ever
 recorded — never capped at, say, 95%, because a cap reopens exactly the
-regression window the ratchet exists to close: once at a cap, a large chunk of
+regression window the baseline exists to close: once at a cap, a large chunk of
 fully untested new code could land without the aggregate dipping below it,
 especially against a large existing denominator. If coverage nears 100% and the
 remaining gaps are genuinely low-value to test (a guard clause, an unreachable
@@ -129,7 +142,9 @@ Optional keys: `formatBaseRef` (default: `origin/HEAD`, then `main`/`master`)
 for the changed-file comparison, and `e2eHealthUrl` if the local stack isn't on
 the default port.
 
-When the script reports `baseline lowered` or `baseline raised`, commit the file.
+When a `--overwrite-baseline` run reports `baseline lowered` or `baseline raised`,
+commit the file. A read-only run (the default) never emits those — it won't have
+written anything to commit.
 
 ## What the script cannot check
 

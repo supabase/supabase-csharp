@@ -102,6 +102,13 @@ for fx in "${fixtures[@]}"; do
     done
   fi
 
+  # Snapshot the baseline before the run so a fixture can assert whether the gate
+  # WROTE it. Writing is opt-in (--overwrite-baseline): a default run must leave the
+  # file byte-identical, an --overwrite-baseline run must change it. "__ABSENT__"
+  # distinguishes "no file" from "empty file", so a first-run create is detectable.
+  bl="$work/.gate-baseline.json"
+  bl_before="$(cat "$bl" 2>/dev/null || echo __ABSENT__)"
+
   NO_COLOR=1 bash "$GATE" "$work" $mode >"$run_log" 2>&1
   rc=$?
   [[ -n "$stack_pid" ]] && kill "$stack_pid" 2>/dev/null
@@ -135,6 +142,17 @@ for fx in "${fixtures[@]}"; do
         esac
       fi
     done
+  fi
+
+  # Optional: did the run write .gate-baseline.json? (expect.baselineWrite: true|false)
+  want_write="$(jq -r '.baselineWrite // "unset"' "$exp")"
+  if [[ "$want_write" != "unset" ]]; then
+    bl_after="$(cat "$bl" 2>/dev/null || echo __ABSENT__)"
+    if [[ "$want_write" == "true" && "$bl_before" == "$bl_after" ]]; then
+      miss+="      ${RED}✗${OFF} baseline: expected --overwrite-baseline to WRITE it, but it is unchanged\n"
+    elif [[ "$want_write" == "false" && "$bl_before" != "$bl_after" ]]; then
+      miss+="      ${RED}✗${OFF} baseline: expected a read-only run (no write), but the file CHANGED\n"
+    fi
   fi
 
   if [[ -z "$miss" ]]; then

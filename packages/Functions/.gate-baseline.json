@@ -4,13 +4,13 @@
   "project": "Functions/Functions.csproj",
   "testProject": "Functions.Tests/Functions.Tests.csproj",
   "warnings": {
-    "total": 12,
+    "total": 10,
     "byCode": {
-      "IDE0161": 12
+      "IDE0161": 10
     }
   },
-  "updated": "2026-08-14T08:21:47Z",
+  "updated": "2026-08-20T12:24:42Z",
   "coverage": {
-    "line": 82.35
+    "hermeticLine": 98.18
   }
 }

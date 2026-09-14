@@ -53,6 +53,10 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// </summary>
     protected readonly Header StorageHeader = new();
 
+    private readonly HttpClient requestClient;
+    private readonly HttpClient uploadClient;
+    private readonly HttpClient downloadClient;
+
     /// <summary>
     ///
     /// </summary>
@@ -60,13 +64,27 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="bucketId"></param>
     /// <param name="options"></param>
     /// <param name="headers"></param>
+    // Resolves the HttpClients only after Options has settled to its final, caller-supplied value — a
+    // previous version resolved these before a chained-from ctor's `this.Options = options` ran, so a
+    // custom ClientOptions' timeouts/injected clients were silently ignored in favor of a throwaway
+    // default ClientOptions().
     public StorageFileApi(
         string url,
         string bucketId,
         ClientOptions? options,
         Dictionary<string, string>? headers = null
     )
-        : this(url, headers, bucketId) => this.Options = options ?? new ClientOptions();
+    {
+        this.Url = url;
+        this.BucketId = bucketId;
+        this.Options = options ?? new ClientOptions();
+        this.Headers = headers ?? new Dictionary<string, string>();
+        this.StorageHeader.Add(this.Headers);
+
+        this.requestClient = Helpers.ResolveRequestClient(this.Options);
+        this.uploadClient = Helpers.ResolveUploadClient(this.Options);
+        this.downloadClient = Helpers.ResolveDownloadClient(this.Options);
+    }
 
     /// <summary>
     ///
@@ -82,9 +100,13 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     {
         this.Url = url;
         this.BucketId = bucketId;
-        this.Options ??= new ClientOptions();
+        this.Options = new ClientOptions();
         this.Headers = headers ?? new Dictionary<string, string>();
         this.StorageHeader.Add(this.Headers);
+
+        this.requestClient = Helpers.ResolveRequestClient(this.Options);
+        this.uploadClient = Helpers.ResolveUploadClient(this.Options);
+        this.downloadClient = Helpers.ResolveDownloadClient(this.Options);
     }
 
     /// <summary>
@@ -153,6 +175,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         }
 
         var response = await Helpers.MakeRequestAsync<CreateSignedUrlResponse>(
+            this.requestClient,
+            this.Options.Retry,
             HttpMethod.Post,
             url,
             body,
@@ -188,6 +212,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             { "paths", paths },
         };
         var response = await Helpers.MakeRequestAsync<List<CreateSignedUrlsResponse>>(
+            this.requestClient,
+            this.Options.Retry,
             HttpMethod.Post,
             $"{this.Url}/object/sign/{this.BucketId}",
             body,
@@ -229,6 +255,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             body.Add("prefix", string.IsNullOrEmpty(path) ? "" : path);
 
         var response = await Helpers.MakeRequestAsync<List<FileObject>>(
+            this.requestClient,
+            this.Options.Retry,
             HttpMethod.Post,
             $"{this.Url}/object/list/{this.BucketId}",
             body,
@@ -246,6 +274,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     public async Task<FileObjectV2?> Info(string path)
     {
         var response = await Helpers.MakeRequestAsync<FileObjectV2>(
+            this.requestClient,
+            this.Options.Retry,
             HttpMethod.Get,
             $"{this.Url}/object/info/{this.BucketId}/{path}",
             null,
@@ -369,12 +399,17 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (options.Upsert)
             this.StorageHeader.Add("x-upsert", options.Upsert.ToString().ToLower());
 
+        if (options.Metadata != null)
+            this.StorageHeader.Add("x-metadata", ParseMetadata(options.Metadata));
+
+        options.Headers?.ToList().ForEach(x => this.StorageHeader.Add(x.Key, x.Value));
+
         var progress = new Progress<float>();
 
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        await Helpers.HttpUploadClient!.UploadFileAsync(
+        await this.uploadClient.UploadFileAsync(
             signedUrl.SignedUrl,
             localFilePath,
             this.StorageHeader.Get(),
@@ -416,12 +451,14 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (options.Metadata != null)
             this.StorageHeader.Add("x-metadata", ParseMetadata(options.Metadata));
 
+        options.Headers?.ToList().ForEach(x => this.StorageHeader.Add(x.Key, x.Value));
+
         var progress = new Progress<float>();
 
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        await Helpers.HttpUploadClient!.UploadBytesAsync(
+        await this.uploadClient.UploadBytesAsync(
             signedUrl.SignedUrl,
             data,
             this.StorageHeader.Get(),
@@ -539,6 +576,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             { "destinationBucket", options?.DestinationBucket },
         };
         await Helpers.MakeRequestAsync<GenericResponse>(
+            this.requestClient,
+            this.Options.Retry,
             HttpMethod.Post,
             $"{this.Url}/object/move",
             body,
@@ -569,6 +608,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         };
 
         await Helpers.MakeRequestAsync<GenericResponse>(
+            this.requestClient,
+            this.Options.Retry,
             HttpMethod.Post,
             $"{this.Url}/object/copy",
             body,
@@ -724,6 +765,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     {
         var data = new Dictionary<string, object> { { "prefixes", paths } };
         var response = await Helpers.MakeRequestAsync<List<FileObject>>(
+            this.requestClient,
+            this.Options.Retry,
             HttpMethod.Delete,
             $"{this.Url}/object/{this.BucketId}",
             data,
@@ -744,6 +787,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
 
         var url = $"{this.Url}/object/upload/sign/{path}";
         var response = await Helpers.MakeRequestAsync<CreatedUploadSignedUrlResponse>(
+            this.requestClient,
+            this.Options.Retry,
             HttpMethod.Post,
             url,
             null,
@@ -773,8 +818,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         CancellationToken cancellationToken = default
     )
     {
-        var url = options.ToPurgeUrl($"{this.Url}/cdn/{this.GetFinalPath(path)}");
-        return Helpers.MakeRequestAsync<GenericResponse>(HttpMethod.Delete, url, null, this.Headers, cancellationToken);
+        var url = options.ToPurgeUrl($"{this.Url}/cdn/{Helpers.EncodePath(this.GetFinalPath(path))}");
+        return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
     }
 
     private async Task<string> UploadOrUpdate(
@@ -806,7 +851,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        await Helpers.HttpUploadClient!.UploadFileAsync(uri, localPath, this.StorageHeader.Get(), progress, cancellationToken);
+        await this.uploadClient.UploadFileAsync(uri, localPath, this.StorageHeader.Get(), progress, cancellationToken);
 
         return this.GetFinalPath(supabasePath);
     }
@@ -846,7 +891,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        await Helpers.HttpUploadClient!.UploadOrContinueFileAsync(
+        await this.uploadClient.UploadOrContinueFileAsync(
             uri,
             localPath,
             metadata,
@@ -891,7 +936,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        await Helpers.HttpUploadClient!.UploadOrContinueByteAsync(
+        await this.uploadClient.UploadOrContinueByteAsync(
             uri,
             data,
             metadata,
@@ -938,7 +983,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        await Helpers.HttpUploadClient!.UploadBytesAsync(uri, data, this.StorageHeader.Get(), progress, cancellationToken);
+        await this.uploadClient.UploadBytesAsync(uri, data, this.StorageHeader.Get(), progress, cancellationToken);
 
         return this.GetFinalPath(supabasePath);
     }
@@ -967,7 +1012,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        var stream = await Helpers.HttpDownloadClient!.DownloadDataAsync(
+        var stream = await this.downloadClient.DownloadDataAsync(
             builder.Uri,
             this.Headers,
             progress,
@@ -1008,7 +1053,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        var stream = await Helpers.HttpDownloadClient!.DownloadDataAsync(
+        var stream = await this.downloadClient.DownloadDataAsync(
             builder.Uri,
             this.Headers,
             progress,

@@ -30,7 +30,7 @@ public class NetworkStatusTests
         var client = TestClients.AgainstCliStack();
         client.Online = false;
         var status = new NetworkStatus { Client = client };
-        (await status.PingCheck(TestClients.CliPingUrl)).Should().BeTrue();
+        (await status.PingCheckAsync(TestClients.CliPingUrl)).Should().BeTrue();
         client.Online.Should().BeTrue();
         client.Online = false;
         await status.StartAsync(TestClients.CliPingUrl);
@@ -42,7 +42,7 @@ public class NetworkStatusTests
     {
         var client = new Client(new ClientOptions { AllowUnconfirmedUserSessions = true, Url = UnreachableUrl }) { Online = true };
         var status = new NetworkStatus { Client = client };
-        (await status.PingCheck(UnreachableUrl)).Should().BeFalse();
+        (await status.PingCheckAsync(UnreachableUrl)).Should().BeFalse();
         client.Online.Should().BeFalse();
     }
 

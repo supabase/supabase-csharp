@@ -54,3 +54,16 @@ CREATE POLICY messages_insert_all
     FOR INSERT
     TO PUBLIC
     WITH CHECK (true);
+
+-- Issue #400: a private, per-user broadcast topic. An authenticated user may read only messages on
+-- their own 'user:<uid>' topic. Realtime evaluates this policy during the private-channel phx_join, so
+-- the join succeeds only when the current user's JWT rides the join frame (an untrusted publishable/anon
+-- key alone is not enough). Local stack only.
+CREATE POLICY messages_select_own_user_topic
+    ON realtime.messages
+    FOR SELECT
+    TO authenticated
+    USING (
+        realtime.topic() = 'user:' || auth.uid()::text
+        AND extension = 'broadcast'
+    );

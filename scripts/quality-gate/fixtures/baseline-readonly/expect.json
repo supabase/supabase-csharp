@@ -1,0 +1,10 @@
+{
+  "description": "The committed baseline pins warnings at 3 but the code is clean (0), so the run WOULD improve the baseline. Without --overwrite-baseline the gate must be read-only: the verdict still reflects the improvement (1a PASS), but .gate-baseline.json is left byte-identical. Guards that a PR/local run never rewrites a committed baseline out from under a contributor.",
+  "mode": "--fast",
+  "exit": 0,
+  "verdict": "PARTIAL",
+  "baselineWrite": false,
+  "stages": [
+    { "id": "1a", "status": "PASS" }
+  ]
+}

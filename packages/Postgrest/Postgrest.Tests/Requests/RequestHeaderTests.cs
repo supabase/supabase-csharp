@@ -16,12 +16,7 @@ namespace Postgrest.Tests.Requests;
 public class RequestHeaderTests
 {
     [TestMethod]
-    public void PrepareRequestHeaders_ShouldPassThroughCallerHeaders()
-    {
-        var headers = Helpers.PrepareRequestHeaders(HttpMethod.Get,
-            new Dictionary<string, string> { { "Authorization", "Bearer token" } });
-        headers["Authorization"].Should().Be("Bearer token");
-    }
+    public void PrepareRequestHeaders_ShouldPassThroughCallerHeaders() => Helpers.PrepareRequestHeaders(HttpMethod.Get, new Dictionary<string, string> { { "Authorization", "Bearer token" } })["Authorization"].Should().Be("Bearer token");
 
     [TestMethod]
     public void PrepareRequestHeaders_ShouldUseAcceptProfile_GivenSchemaOnAGetRequest()
@@ -48,17 +43,9 @@ public class RequestHeaderTests
     }
 
     [TestMethod]
-    public void PrepareRequestHeaders_ShouldLeaveOpenEndedRange_GivenNoUpperBound()
-    {
-        var headers = Helpers.PrepareRequestHeaders(HttpMethod.Get, rangeFrom: 2);
-        headers["Range"].Should().Be("2-");
-    }
+    public void PrepareRequestHeaders_ShouldLeaveOpenEndedRange_GivenNoUpperBound() => Helpers.PrepareRequestHeaders(HttpMethod.Get, rangeFrom: 2)["Range"].Should().Be("2-");
 
     [TestMethod]
-    public void PrepareRequestHeaders_ShouldIdentifyTheSdkViaXClientInfo()
-    {
-        var headers = Helpers.PrepareRequestHeaders(HttpMethod.Get);
-        headers.Should().ContainKey("X-Client-Info")
-            .WhoseValue.Should().StartWith("postgrest-csharp/");
-    }
+    public void PrepareRequestHeaders_ShouldIdentifyTheSdkViaXClientInfo() =>
+        Helpers.PrepareRequestHeaders(HttpMethod.Get).Should().ContainKey("X-Client-Info").WhoseValue.Should().Be(Supabase.Core.Util.GetAssemblyVersion(typeof(Client)));
 }

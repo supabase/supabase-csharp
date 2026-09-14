@@ -20,25 +20,26 @@ namespace Gotrue.Tests.Authentication;
 public class OAuthSignInTests : AuthClientFixture
 {
     [TestMethod]
-    public async Task SignIn_ShouldBuildProviderAuthorizeUrlWithState_GivenProvider()
+    public async Task SignIn_ShouldBuildProviderAuthorizeUrlWithoutState_GivenProvider()
     {
+        // Provider-side state is owned by the GoTrue server; the SDK must not inject its own or
+        // sign-in fails with bad_oauth_state (issue #377).
         var result = await this.Client.SignIn(Constants.Provider.Google);
         result.Uri.ToString().Should().StartWith($"{TestClients.CliAuthUrl}/authorize");
-        result.Uri.Query.Should().Contain("provider=google").And.Contain("state=");
+        result.Uri.Query.Should().Contain("provider=google").And.NotContain("state=");
     }
 
     [TestMethod]
     public async Task SignIn_ShouldIncludeScopesInAuthorizeUrl_GivenScopesOption()
     {
         var result = await this.Client.SignIn(Constants.Provider.Google, new SignInOptions { Scopes = "special scopes please" });
-        result.Uri.Query.Should().Contain("provider=google").And.Contain("scopes=special+scopes+please").And.Contain("state=");
+        result.Uri.Query.Should().Contain("provider=google").And.Contain("scopes=special+scopes+please").And.NotContain("state=");
     }
 
     [TestMethod]
     public async Task SignIn_ShouldReturnPkceVerifierAndChallengeUrl_GivenPkceFlow()
     {
         var result = await this.Client.SignIn(Constants.Provider.Github, new SignInOptions { FlowType = Constants.OAuthFlowType.PKCE });
-        this.VerifySignedOut();
         result.PKCEVerifier.Should().NotBeNullOrEmpty();
         result.Uri.Query.Should().Contain("flow_type=pkce")
             .And.Contain("code_challenge=")

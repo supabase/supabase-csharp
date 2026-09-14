@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Realtime.Socket;
+using Supabase.Realtime.Sockets;
 
 namespace Supabase.Realtime;
 
@@ -81,4 +82,12 @@ public class ClientOptions
     /// The Supabase umbrella client wires this automatically to its own Postgrest client.
     /// </summary>
     public IPostgrestClient? PostgrestClient { get; set; }
+
+    /// <summary>
+    /// Builds the WebSocket transport <see cref="RealtimeSocket"/> connects through. Left null, the default
+    /// <see cref="System.Net.WebSockets.ClientWebSocket"/>-backed transport is used — the same behavior as
+    /// before this option existed. Set this to swap in a platform-specific transport (e.g. a browser-native
+    /// adapter for Unity IL2CPP/WebGL builds).
+    /// </summary>
+    public IWebSocketFactory? WebSocketFactory { get; set; }
 }

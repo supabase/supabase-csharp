@@ -1,13 +1,13 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Channel;
+using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Models;
 using Supabase.Realtime.PostgresChanges;
 using Supabase.Realtime.Presence;
 using Supabase.Realtime.Socket;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Supabase.Realtime.Exceptions;
 using static Supabase.Realtime.Constants;
 using static Supabase.Realtime.PostgresChanges.PostgresChangesOptions;
 
@@ -250,7 +250,7 @@ public interface IRealtimeChannel
     /// <param name="options">The configuration options for the broadcast registration.</param>
     /// <typeparam name="TBroadcastResponse">The type of the broadcast response, which must inherit from <see cref="BaseBroadcast"/>.</typeparam>
     /// <returns>A <see cref="RealtimeBroadcast{TBroadcastResponse}"/> instance for managing the broadcast.</returns>
-    public RealtimeBroadcast<TBroadcastResponse> Register<TBroadcastResponse>(BroadcastOptions options)
+    RealtimeBroadcast<TBroadcastResponse> Register<TBroadcastResponse>(BroadcastOptions options)
         where TBroadcastResponse : BaseBroadcast;
 
     /// <summary>
@@ -260,6 +260,15 @@ public interface IRealtimeChannel
     /// <typeparam name="TPresenceResponse"></typeparam>
     /// <returns></returns>
     RealtimePresence<TPresenceResponse> Register<TPresenceResponse>(string presenceKey)
+        where TPresenceResponse : BasePresence;
+
+    /// <summary>
+    /// Registers a <see cref="RealtimePresence{TPresenceResponse}"/> instance with the specified options.
+    /// </summary>
+    /// <typeparam name="TPresenceResponse">The model representing a presence payload.</typeparam>
+    /// <param name="options">The presence options to configure the channel's behavior.</param>
+    /// <returns>A <see cref="RealtimePresence{TPresenceResponse}"/> instance for managing presence state.</returns>
+    RealtimePresence<TPresenceResponse> Register<TPresenceResponse>(PresenceOptions options)
         where TPresenceResponse : BasePresence;
 
     /// <summary>

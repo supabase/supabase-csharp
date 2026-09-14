@@ -393,10 +393,10 @@ features:
     symbols:
       - InvokeFunctionOptions.HttpMethod
   functions.invocation.streaming_response:
-    status: partially_implemented
-    note: "RawInvoke returns raw HttpContent, but the request uses the default buffered completion (no incremental text/event-stream streaming)."
+    status: implemented
+    note: "InvokeStream returns response bodies for incremental reading."
     symbols:
-      - Client.RawInvoke
+      - Client.InvokeStream
   functions.invocation.region_selection:
     status: implemented
     note: "Full AWS region list; per-call override or client default; emits x-region."

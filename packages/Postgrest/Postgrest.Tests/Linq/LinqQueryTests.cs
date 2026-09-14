@@ -50,12 +50,50 @@ public class LinqQueryTests
     }
 
     [TestMethod]
+    public async Task Where_ShouldSelectOnlyMatchingRows_GivenNullableValueComparisons()
+    {
+        var client = LocalStack.Client();
+        var marker = $"nullable-value-{Guid.NewGuid()}";
+        await client.Table<KitchenSink>().Insert(new List<KitchenSink>
+        {
+            new() { StringValue = marker, IntValue = null },
+            new() { StringValue = marker, IntValue = 1 },
+            new() { StringValue = marker, IntValue = 5 }
+        });
+
+        try
+        {
+            var matching = await client.Table<KitchenSink>()
+                .Where(x => x.StringValue == marker && x.IntValue!.Value > 3).Get();
+            matching.Models.Should().ContainSingle().Which.IntValue.Should().Be(5);
+
+            var converted = await client.Table<KitchenSink>()
+                .Where(x => x.StringValue == marker && (long) x.IntValue!.Value > 3L).Get();
+            converted.Models.Should().ContainSingle().Which.Id.Should().Be(matching.Model!.Id);
+        }
+        finally
+        {
+            await client.Table<KitchenSink>().Where(x => x.StringValue == marker).Delete();
+        }
+    }
+
+    [TestMethod]
     public async Task Not_ShouldExcludeMatchingRows_GivenTheExpressionOverload()
     {
         var client = LocalStack.Client();
         var filtered = await client.Table<User>().Not(x => x.Username!, Operator.Equals, "supabot").Get();
         var all = await client.Table<User>().Get();
         filtered.Models.Should().Equal(all.Models.Where(u => u.Username != "supabot").ToList());
+    }
+
+    [TestMethod]
+    public async Task Where_ShouldSelectRowsMatchingAnyBranch_GivenThreeChainedOrs()
+    {
+        var client = LocalStack.Client();
+        var response = await client.Table<User>()
+            .Where(x => x.Username == "supabot" || x.Username == "kiwicopple" || x.Status == "OFFLINE").Get();
+        response.Models.Should()
+            .OnlyContain(m => m.Username == "supabot" || m.Username == "kiwicopple" || m.Status == "OFFLINE");
     }
 
     [TestMethod]

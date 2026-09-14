@@ -1,0 +1,3 @@
+#nullable enable
+Supabase.Extensions.DependencyInjection.SupabaseServiceCollectionExtensions
+static Supabase.Extensions.DependencyInjection.SupabaseServiceCollectionExtensions.AddSupabase(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, string! supabaseUrl, string! supabaseKey, System.Action<Supabase.SupabaseOptions!>? configureOptions = null) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!

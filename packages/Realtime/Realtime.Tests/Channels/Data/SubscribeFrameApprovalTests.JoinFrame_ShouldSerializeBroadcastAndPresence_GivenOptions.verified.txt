@@ -1,1 +1,1 @@
-﻿{"topic":"realtime:room:1","event":"phx_join","payload":{"config":{"broadcast":{"self":true,"ack":true},"presence":{"key":"client-1"},"postgres_changes":[],"private":false}},"ref":"1","join_ref":"1"}
+﻿{"topic":"realtime:room:1","event":"phx_join","payload":{"config":{"broadcast":{"self":true,"ack":true},"presence":{"key":"client-1","enabled":true},"postgres_changes":[],"private":false}},"ref":"1","join_ref":"1"}

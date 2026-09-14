@@ -1,0 +1,3 @@
+#nullable enable
+N.Alpha
+N.Gamma

@@ -29,6 +29,8 @@ public class Client : IPostgrestClient
     /// <inheritdoc />
     public ClientOptions Options { get; }
 
+    private readonly HttpClient? httpClient;
+
     /// <inheritdoc />
     public void AddRequestPreparedHandler(OnRequestPreparedEventHandler handler) =>
         Hooks.Instance.AddRequestPreparedHandler(handler);
@@ -72,6 +74,7 @@ public class Client : IPostgrestClient
     {
         this.BaseUrl = baseUrl;
         this.Options = options ?? new ClientOptions();
+        this.httpClient = Helpers.ResolveHttpClient(this.Options);
     }
 
 
@@ -133,7 +136,7 @@ public class Client : IPostgrestClient
 
         // Send request
         var request =
-            Helpers.MakeRequestAsync(this.Options, HttpMethod.Post, canonicalUri, serializerSettings, data, headers, operation: "rpc");
+            Helpers.MakeRequestAsync(this.Options, this.httpClient, HttpMethod.Post, canonicalUri, serializerSettings, data, headers, operation: "rpc");
         return request;
     }
 }

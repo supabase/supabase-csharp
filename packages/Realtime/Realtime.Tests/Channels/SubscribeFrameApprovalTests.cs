@@ -48,7 +48,7 @@ public class SubscribeFrameApprovalTests : FrameApprovalFixture
     {
         var payload = JoinPush.ForPublicChannel(
             new BroadcastOptions(broadcastSelf: true, broadcastAck: true),
-            new PresenceOptions("client-1"));
+            PresenceOptions.WithPresence("client-1"));
         await this.Verify(this.Encode(JoinFrame("realtime:room:1", payload))).UseDirectory("Data");
     }
 }

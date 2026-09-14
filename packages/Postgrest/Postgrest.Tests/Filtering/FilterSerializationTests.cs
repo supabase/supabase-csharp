@@ -159,4 +159,56 @@ public class FilterSerializationTests
             (or.Key + "=" + or.Value).Should().Be("or=(a.gte.0,a.lte.100)");
         }
     }
+
+    [TestMethod]
+    public void PrepareFilter_ShouldDropTheDot_GivenNestedGroups()
+    {
+        var inner = new QueryFilter(Operator.And, new List<IPostgrestQueryFilter>
+        {
+            new QueryFilter("a", Operator.GreaterThanOrEqual, "0"),
+            new QueryFilter("a", Operator.LessThanOrEqual, "100")
+        });
+        var middle = new QueryFilter(Operator.Or, new List<IPostgrestQueryFilter>
+        {
+            inner,
+            new QueryFilter("b", Operator.Equals, "bar")
+        });
+        var outer = new QueryFilter(Operator.And, new List<IPostgrestQueryFilter>
+        {
+            middle,
+            new QueryFilter("c", Operator.Equals, "buzz")
+        });
+        var result = Prepare(outer);
+        (result.Key + "=" + result.Value).Should()
+            .Be("and=(or(and(a.gte.0,a.lte.100),b.eq.bar),c.eq.buzz)");
+    }
+
+    [TestMethod]
+    public void PrepareFilter_ShouldDropTheDot_GivenNegatedGroupInsideGroup()
+    {
+        var negated = new QueryFilter(Operator.Not, new QueryFilter(Operator.And, new List<IPostgrestQueryFilter>
+        {
+            new QueryFilter("a", Operator.GreaterThanOrEqual, "0"),
+            new QueryFilter("a", Operator.LessThanOrEqual, "100")
+        }));
+        var result = Prepare(new QueryFilter(Operator.Or, new List<IPostgrestQueryFilter>
+        {
+            negated,
+            new QueryFilter("b", Operator.Equals, "bar")
+        }));
+        (result.Key + "=" + result.Value).Should().Be("or=(not.and(a.gte.0,a.lte.100),b.eq.bar)");
+    }
+
+    [TestMethod]
+    public void PrepareFilter_ShouldKeepTheDot_GivenValueOperatorsInsideGroup()
+    {
+        var result = Prepare(new QueryFilter(Operator.Or, new List<IPostgrestQueryFilter>
+        {
+            new QueryFilter("foo", Operator.In, new List<object> { "bar", "buzz" }),
+            new QueryFilter("foo", Operator.Contains, new List<object> { "bar", "buzz" }),
+            new QueryFilter("foo", Operator.FTS, new FullTextSearchConfig("bar", "english"))
+        }));
+        (result.Key + "=" + result.Value).Should()
+            .Be("or=(foo.in.(\"bar\",\"buzz\"),foo.cs.{bar,buzz},foo.fts(english).bar)");
+    }
 }

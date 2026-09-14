@@ -140,8 +140,26 @@ resharper_trailing_comma_in_multiline_lists = true
 # public-member-PascalCase and async-suffix naming rules — IDE1006. That is
 # inherent to the convention, not a defect, so silence IDE1006 in test code only.
 # (Build never emitted it; this is what the IDE and `dotnet format` surface.)
+# Two things had to be fixed here, confirmed empirically against `dotnet format`
+# (not just reasoned about — both silently produced false "clean" results otherwise):
+# 1. The async-suffix violation is reported under IDE1006 but its severity is
+#    actually driven by the naming RULE's own `.severity` (line 102), which a
+#    blanket `dotnet_diagnostic.IDE1006.severity` override does not suppress —
+#    the rule itself needs its own override too.
+# 2. `**/*.Tests/**/*.cs` does NOT match a file sitting directly inside a
+#    `*.Tests` folder (only files in a subfolder of one) — the trailing `**/`
+#    still requires a literal path separator even when `**` matches zero
+#    segments. Most test projects here happen to be organized into subfolders
+#    (Http/, Diagnostics/, …) so this went unnoticed; a project with test files
+#    directly in its root (e.g. Functions.Tests) was silently unexempted.
+#    Match both shapes explicitly rather than relying on `**` to cover both.
+[**/*.Tests/*.cs]
+dotnet_diagnostic.IDE1006.severity = none
+dotnet_naming_rule.async_methods_suffix.severity = none
+
 [**/*.Tests/**/*.cs]
 dotnet_diagnostic.IDE1006.severity = none
+dotnet_naming_rule.async_methods_suffix.severity = none
 
 [*.{csproj,props,targets,nuspec}]
 indent_size = 2

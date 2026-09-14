@@ -14,10 +14,29 @@ Supabase.Core.Diagnostics.Instrumentation
 Supabase.Core.Diagnostics.UrlSanitizer
 Supabase.Core.Extensions.DictionaryExtensions
 Supabase.Core.Helpers
+Supabase.Core.Http.DefaultHttpClientFactory
+Supabase.Core.Http.RetryExecutor
+Supabase.Core.Http.RetryOptions
+Supabase.Core.Http.RetryOptions.<Clone>$() -> Supabase.Core.Http.RetryOptions!
+Supabase.Core.Http.RetryOptions.BaseDelay.get -> System.TimeSpan
+Supabase.Core.Http.RetryOptions.BaseDelay.init -> void
+Supabase.Core.Http.RetryOptions.Equals(Supabase.Core.Http.RetryOptions? other) -> bool
+Supabase.Core.Http.RetryOptions.MaxDelay.get -> System.TimeSpan
+Supabase.Core.Http.RetryOptions.MaxDelay.init -> void
+Supabase.Core.Http.RetryOptions.MaxRetries.get -> int
+Supabase.Core.Http.RetryOptions.MaxRetries.init -> void
+Supabase.Core.Http.RetryOptions.RetryOptions() -> void
+Supabase.Core.Http.RetryOptions.RetryableStatusCodes.get -> System.Collections.Generic.IReadOnlyCollection<int>!
+Supabase.Core.Http.RetryOptions.RetryableStatusCodes.init -> void
+Supabase.Core.Http.RetryOptions.UseJitter.get -> bool
+Supabase.Core.Http.RetryOptions.UseJitter.init -> void
 Supabase.Core.Interfaces.IGettableHeaders
 Supabase.Core.Interfaces.IGettableHeaders.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Core.Interfaces.IGettableHeaders.GetHeaders.set -> void
 Supabase.Core.Util
+override Supabase.Core.Http.RetryOptions.Equals(object? obj) -> bool
+override Supabase.Core.Http.RetryOptions.GetHashCode() -> int
+override Supabase.Core.Http.RetryOptions.ToString() -> string!
 static Supabase.Core.Diagnostics.ActivityExtensions.SetFailure(this System.Diagnostics.Activity? activity, System.Exception! exception) -> System.Diagnostics.Activity?
 static Supabase.Core.Diagnostics.ActivityExtensions.SetHttpRequestTags(this System.Diagnostics.Activity? activity, string! method, System.Uri! uri) -> System.Diagnostics.Activity?
 static Supabase.Core.Diagnostics.ActivityExtensions.SetHttpResponseTags(this System.Diagnostics.Activity? activity, int statusCode) -> System.Diagnostics.Activity?
@@ -31,4 +50,9 @@ static Supabase.Core.Helpers.GetCustomAttribute<T>(System.Type! type) -> T!
 static Supabase.Core.Helpers.GetCustomAttribute<T>(object! obj) -> T!
 static Supabase.Core.Helpers.GetMappedToAttr(System.Enum! obj) -> Supabase.Core.Attributes.MapToAttribute!
 static Supabase.Core.Helpers.GetPropertyValue<T>(object! obj, string! propName) -> T
+static Supabase.Core.Http.DefaultHttpClientFactory.Create(System.TimeSpan? timeout = null, System.Net.IWebProxy? proxy = null) -> System.Net.Http.HttpClient!
+static Supabase.Core.Http.RetryExecutor.SendAsync(System.Net.Http.HttpClient! client, System.Func<System.Net.Http.HttpRequestMessage!>! requestFactory, Supabase.Core.Http.RetryOptions! options, System.Net.Http.HttpCompletionOption completionOption, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Net.Http.HttpResponseMessage!>!
+static Supabase.Core.Http.RetryExecutor.SendAsync(System.Net.Http.HttpClient! client, System.Func<System.Net.Http.HttpRequestMessage!>! requestFactory, Supabase.Core.Http.RetryOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Net.Http.HttpResponseMessage!>!
+static Supabase.Core.Http.RetryOptions.operator !=(Supabase.Core.Http.RetryOptions? left, Supabase.Core.Http.RetryOptions? right) -> bool
+static Supabase.Core.Http.RetryOptions.operator ==(Supabase.Core.Http.RetryOptions? left, Supabase.Core.Http.RetryOptions? right) -> bool
 static Supabase.Core.Util.GetAssemblyVersion(System.Type! clientType) -> string!

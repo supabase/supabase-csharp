@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
 using static Gotrue.Tests.TestUtils;
@@ -43,11 +44,12 @@ internal static class TestClients
     internal static IGotrueAdminClient<User> AdminAgainstCliStack(string serviceKey) =>
         new AdminClient(serviceKey, CliOptions());
 
-    internal static IGotrueClient<User, Session> Against(MockGotrueServer server) =>
+    internal static IGotrueClient<User, Session> Against(MockGotrueServer server, bool autoRefreshToken = false, HttpClient? httpClient = null) =>
         new Client(new ClientOptions
         {
             Url = server.Url,
-            AutoRefreshToken = false,
+            AutoRefreshToken = autoRefreshToken,
+            HttpClient = httpClient,
             AllowUnconfirmedUserSessions = false,
             Headers = new Dictionary<string, string> { { "apikey", MockGotrueServer.ApiKey } },
         });

@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
 		.github\workflows\build-documentation.yaml = .github\workflows\build-documentation.yaml
 		.github\workflows\release.yml = .github\workflows\release.yml
+		.github\workflows\format-master.yml = .github\workflows\format-master.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Release-Please", "Release-Please", "{21D282EA-837A-4D3F-829B-F3C2043BC73A}"
@@ -103,9 +104,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Migrations", "Migrations", 
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{97E13694-38F0-4D01-BA50-436D9ADCF99C}"
-	ProjectSection(SolutionItems) = preProject
-		scripts\quality-gate\gate.sh = scripts\quality-gate\gate.sh
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{226BEB75-46D1-4366-BBDE-03C9E7A6D6F1}"
 	ProjectSection(SolutionItems) = preProject
@@ -173,6 +171,74 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "red-test", "red-test", "{61
 		scripts\quality-gate\fixtures\red-test\overlay\Sample.Tests\WidgetTests.cs = scripts\quality-gate\fixtures\red-test\overlay\Sample.Tests\WidgetTests.cs
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{996F8526-0051-4327-A551-1175C455CC5F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DependencyInjection", "DependencyInjection", "{9FD9C523-BB83-D457-CA1C-9430D9580376}"
+	ProjectSection(SolutionItems) = preProject
+		packages\extensions\DependencyInjection\README.md = packages\extensions\DependencyInjection\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjection", "packages\extensions\DependencyInjection\DependencyInjection\DependencyInjection.csproj", "{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependencyInjection.Tests", "packages\extensions\DependencyInjection\DependencyInjection.Tests\DependencyInjection.Tests.csproj", "{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fixtures", "fixtures", "{3074019A-049A-4959-9FCC-410144E423F5}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\quality-gate\fixtures-mark-api\run.sh = scripts\quality-gate\fixtures-mark-api\run.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "additions", "additions", "{1085D75D-D916-4F8D-8B9B-8C242DA847BE}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\quality-gate\fixtures-mark-api\additions\expected\Pkg\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\additions\expected\Pkg\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\additions\expected\Pkg\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\additions\expected\Pkg\PublicAPI.Unshipped.txt
+		scripts\quality-gate\fixtures-mark-api\additions\input\Pkg\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\additions\input\Pkg\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\additions\input\Pkg\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\additions\input\Pkg\PublicAPI.Unshipped.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dedupe", "dedupe", "{320443A0-3589-44BD-85FD-59118B0D8AF4}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\quality-gate\fixtures-mark-api\dedupe\expected\Pkg\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\dedupe\expected\Pkg\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\dedupe\expected\Pkg\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\dedupe\expected\Pkg\PublicAPI.Unshipped.txt
+		scripts\quality-gate\fixtures-mark-api\dedupe\input\Pkg\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\dedupe\input\Pkg\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\dedupe\input\Pkg\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\dedupe\input\Pkg\PublicAPI.Unshipped.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "multi-package", "multi-package", "{D40502AB-54A1-4E0B-952B-C96AF567B08A}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\quality-gate\fixtures-mark-api\multi-package\expected\PkgA\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\multi-package\expected\PkgA\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\multi-package\expected\PkgA\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\multi-package\expected\PkgA\PublicAPI.Unshipped.txt
+		scripts\quality-gate\fixtures-mark-api\multi-package\expected\PkgB\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\multi-package\expected\PkgB\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\multi-package\expected\PkgB\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\multi-package\expected\PkgB\PublicAPI.Unshipped.txt
+		scripts\quality-gate\fixtures-mark-api\multi-package\input\PkgA\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\multi-package\input\PkgA\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\multi-package\input\PkgA\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\multi-package\input\PkgA\PublicAPI.Unshipped.txt
+		scripts\quality-gate\fixtures-mark-api\multi-package\input\PkgB\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\multi-package\input\PkgB\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\multi-package\input\PkgB\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\multi-package\input\PkgB\PublicAPI.Unshipped.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "noop", "noop", "{53322416-5ED2-433A-8CCD-36BC424C7ED0}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\quality-gate\fixtures-mark-api\noop\expected\Pkg\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\noop\expected\Pkg\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\noop\expected\Pkg\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\noop\expected\Pkg\PublicAPI.Unshipped.txt
+		scripts\quality-gate\fixtures-mark-api\noop\input\Pkg\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\noop\input\Pkg\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\noop\input\Pkg\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\noop\input\Pkg\PublicAPI.Unshipped.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "removals", "removals", "{9BB19953-99BC-4D4C-B164-FAC2444FE56C}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\quality-gate\fixtures-mark-api\removals\expected\Pkg\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\removals\expected\Pkg\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\removals\expected\Pkg\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\removals\expected\Pkg\PublicAPI.Unshipped.txt
+		scripts\quality-gate\fixtures-mark-api\removals\input\Pkg\PublicAPI.Shipped.txt = scripts\quality-gate\fixtures-mark-api\removals\input\Pkg\PublicAPI.Shipped.txt
+		scripts\quality-gate\fixtures-mark-api\removals\input\Pkg\PublicAPI.Unshipped.txt = scripts\quality-gate\fixtures-mark-api\removals\input\Pkg\PublicAPI.Unshipped.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Quality Gate", "Quality Gate", "{B7F880FB-DCBF-4EE7-82F3-C8D2127984F7}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\quality-gate\gate.sh = scripts\quality-gate\gate.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Public API", "Public API", "{77474E39-B8A1-46A4-BF35-C042DAFCAE4B}"
+EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -351,11 +417,40 @@ Global
 		{ACE6D9C0-1F55-4A95-8250-C074D5EBA913}.Release|x64.Build.0 = Release|Any CPU
 		{ACE6D9C0-1F55-4A95-8250-C074D5EBA913}.Release|x86.ActiveCfg = Release|Any CPU
 		{ACE6D9C0-1F55-4A95-8250-C074D5EBA913}.Release|x86.Build.0 = Release|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Debug|x64.Build.0 = Debug|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Debug|x86.Build.0 = Debug|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Release|x64.ActiveCfg = Release|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Release|x64.Build.0 = Release|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Release|x86.ActiveCfg = Release|Any CPU
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6}.Release|x86.Build.0 = Release|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Debug|x64.Build.0 = Debug|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Debug|x86.Build.0 = Debug|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Release|x64.ActiveCfg = Release|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Release|x64.Build.0 = Release|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Release|x86.ActiveCfg = Release|Any CPU
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{1085D75D-D916-4F8D-8B9B-8C242DA847BE} = {3074019A-049A-4959-9FCC-410144E423F5}
+		{320443A0-3589-44BD-85FD-59118B0D8AF4} = {3074019A-049A-4959-9FCC-410144E423F5}
+		{D40502AB-54A1-4E0B-952B-C96AF567B08A} = {3074019A-049A-4959-9FCC-410144E423F5}
+		{53322416-5ED2-433A-8CCD-36BC424C7ED0} = {3074019A-049A-4959-9FCC-410144E423F5}
+		{9BB19953-99BC-4D4C-B164-FAC2444FE56C} = {3074019A-049A-4959-9FCC-410144E423F5}
 		{81C5FA5E-A62B-98A1-4CBC-09B5BB06FF07} = {809F86A1-1C4C-B159-0CD4-DF9D33D876CE}
 		{52157DD7-2D5D-41C3-87A4-2894AD47528C} = {81C5FA5E-A62B-98A1-4CBC-09B5BB06FF07}
 		{A1459477-0702-4211-956E-5D2F88BEF669} = {81C5FA5E-A62B-98A1-4CBC-09B5BB06FF07}
@@ -378,8 +473,6 @@ Global
 		{B898A942-9C1A-4C3F-8992-664B636D0ED8} = {48B3645E-6A5B-E050-DA5F-480AE4911C13}
 		{ACE6D9C0-1F55-4A95-8250-C074D5EBA913} = {48B3645E-6A5B-E050-DA5F-480AE4911C13}
 		{D1072B4D-1697-4401-9431-F90A6B9AD2BB} = {AB28C3BB-F406-476D-9004-804D35EAA048}
-		{226BEB75-46D1-4366-BBDE-03C9E7A6D6F1} = {97E13694-38F0-4D01-BA50-436D9ADCF99C}
-		{3CC0DE6E-563A-4EA3-AF1A-0AF14FC57FE5} = {97E13694-38F0-4D01-BA50-436D9ADCF99C}
 		{27BCCB1B-2091-4A34-9966-098BCE684A6E} = {3CC0DE6E-563A-4EA3-AF1A-0AF14FC57FE5}
 		{A024290F-C0C4-4A3B-BE9D-7715CC9AF747} = {3CC0DE6E-563A-4EA3-AF1A-0AF14FC57FE5}
 		{AEA69720-4764-432F-9843-634D152C8C33} = {3CC0DE6E-563A-4EA3-AF1A-0AF14FC57FE5}
@@ -388,6 +481,15 @@ Global
 		{1E2B584D-174B-4820-967B-FDB389FC03B4} = {3CC0DE6E-563A-4EA3-AF1A-0AF14FC57FE5}
 		{097CDFF6-9B52-46C9-88BF-62ED8FE62957} = {3CC0DE6E-563A-4EA3-AF1A-0AF14FC57FE5}
 		{612A3F59-5D51-4E02-80C1-4E687887B73D} = {3CC0DE6E-563A-4EA3-AF1A-0AF14FC57FE5}
+		{996F8526-0051-4327-A551-1175C455CC5F} = {809F86A1-1C4C-B159-0CD4-DF9D33D876CE}
+		{9FD9C523-BB83-D457-CA1C-9430D9580376} = {996F8526-0051-4327-A551-1175C455CC5F}
+		{481455AC-C8A3-4F61-A0C2-5D1CBF3D76F6} = {9FD9C523-BB83-D457-CA1C-9430D9580376}
+		{709EBF63-BDED-465F-9CEA-D1C7C9E2AB03} = {9FD9C523-BB83-D457-CA1C-9430D9580376}
+		{B7F880FB-DCBF-4EE7-82F3-C8D2127984F7} = {97E13694-38F0-4D01-BA50-436D9ADCF99C}
+		{3CC0DE6E-563A-4EA3-AF1A-0AF14FC57FE5} = {B7F880FB-DCBF-4EE7-82F3-C8D2127984F7}
+		{77474E39-B8A1-46A4-BF35-C042DAFCAE4B} = {97E13694-38F0-4D01-BA50-436D9ADCF99C}
+		{3074019A-049A-4959-9FCC-410144E423F5} = {77474E39-B8A1-46A4-BF35-C042DAFCAE4B}
+		{226BEB75-46D1-4366-BBDE-03C9E7A6D6F1} = {B7F880FB-DCBF-4EE7-82F3-C8D2127984F7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {832DE89D-7252-4B03-9301-BB8D36B40992}

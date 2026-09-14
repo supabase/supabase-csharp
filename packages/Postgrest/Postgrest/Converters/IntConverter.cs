@@ -1,21 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Supabase.Postgrest.Converters;
 
 /// <summary>
-/// Serializes a <c>List&lt;int&gt;</c> as the Postgres array literal (e.g. <c>{1,2,3}</c>) Postgrest
-/// expects. Write-only, matching the previous Newtonsoft converter.
+/// Reads a <c>List&lt;int&gt;</c> from a JSON array (<c>[1,2,3]</c>) or a Postgres array literal
+/// (<c>"{1,2,3}"</c>), and writes a JSON array.
 /// </summary>
 public class IntArrayConverter : JsonConverter<List<int>>
 {
-    /// <summary>
-    /// Reads the JSON array Postgrest returns (e.g. <c>[1,2,3]</c>) — the previous Newtonsoft converter
-    /// was write-only (<c>CanRead = false</c>) and let the default reader handle this shape, so the array
-    /// form is preserved. The Postgres literal string form (<c>"{1,2,3}"</c>) is also accepted.
-    /// </summary>
+    /// <inheritdoc />
     public override List<int>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         switch (reader.TokenType)
@@ -23,13 +20,7 @@ public class IntArrayConverter : JsonConverter<List<int>>
             case JsonTokenType.Null:
                 return null;
             case JsonTokenType.String:
-                var literal = reader.GetString()!.Trim('{', '}');
-                if (string.IsNullOrEmpty(literal))
-                    return new List<int>();
-                var result = new List<int>();
-                foreach (var part in literal.Split(','))
-                    result.Add(int.Parse(part));
-                return result;
+                return ParseLiteral(reader.GetString()!);
             case JsonTokenType.StartArray:
                 var list = new List<int>();
                 while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
@@ -40,7 +31,30 @@ public class IntArrayConverter : JsonConverter<List<int>>
         }
     }
 
+    private static List<int> ParseLiteral(string literal)
+    {
+        var contents = literal.Trim('{', '}');
+        if (contents.Length == 0)
+            return new List<int>();
+
+        var result = new List<int>();
+        foreach (var part in contents.Split(','))
+        {
+            if (!int.TryParse(part, NumberStyles.Integer, CultureInfo.InvariantCulture, out var item))
+                throw new JsonException($"Cannot read '{literal}' as List<int>.");
+
+            result.Add(item);
+        }
+
+        return result;
+    }
+
     /// <inheritdoc />
-    public override void Write(Utf8JsonWriter writer, List<int> value, JsonSerializerOptions options) =>
-        writer.WriteStringValue($"{{{string.Join(",", value)}}}");
+    public override void Write(Utf8JsonWriter writer, List<int> value, JsonSerializerOptions options)
+    {
+        writer.WriteStartArray();
+        foreach (var item in value)
+            writer.WriteNumberValue(item);
+        writer.WriteEndArray();
+    }
 }

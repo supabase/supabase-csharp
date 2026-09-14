@@ -43,6 +43,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
     private readonly ClientOptions options;
     private readonly JsonSerializerOptions serializerSettings;
+    private readonly HttpClient? httpClient;
 
     private HttpMethod method = HttpMethod.Get;
 
@@ -82,6 +83,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         this.BaseUrl = baseUrl;
         this.options = options ?? new ClientOptions();
         this.serializerSettings = serializerSettings;
+        this.httpClient = Helpers.ResolveHttpClient(this.options);
 
         foreach (var property in typeof(TModel).GetProperties())
         {
@@ -591,27 +593,22 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     public async Task<TModel?> Single(CancellationToken cancellationToken = default)
     {
         this.method = HttpMethod.Get;
-        var headers = new Dictionary<string, string>
-        {
-            { "Accept", "application/vnd.pgrst.object+json" },
-            { "Prefer", "return=representation" }
-        };
 
-        var request = this.Send<TModel>(this.method, null, headers, cancellationToken);
+        // Fetch a list and enforce cardinality client-side, as postgrest-js's maybeSingle() does:
+        // asking PostgREST for a single object answers zero rows and several rows with the same 406.
+        var request = this.Send<TModel>(this.method, null, null, cancellationToken);
         this.Clear();
 
-        try
-        {
-            var result = await request;
-            return result.Models.FirstOrDefault();
-        }
-        catch (PostgrestException e)
-        {
-            if (e.Response!.StatusCode == HttpStatusCode.NotAcceptable)
-                return null;
+        var result = await request;
 
-            throw;
-        }
+        if (result.Models.Count > 1)
+            throw new PostgrestException($"The query matched {result.Models.Count} rows when at most one was expected.")
+            {
+                Response = result.ResponseMessage,
+                StatusCode = (int) HttpStatusCode.NotAcceptable
+            };
+
+        return result.Models.FirstOrDefault();
     }
 
     /// <inheritdoc />
@@ -780,18 +777,18 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             case Operator.And:
                 if (filter.Criteria is List<IPostgrestQueryFilter> subFilters)
                 {
-                    var list = new List<KeyValuePair<string, string>>();
                     foreach (var subFilter in subFilters)
                     {
                         if (subFilter == null)
                             throw new ArgumentException(
                                 $"Expected all filters supplied to a `{filter.Op}` filter to be non-null.");
 
-                        list.Add(this.PrepareFilter(subFilter));
-                    }
+                        var preppedFilter = this.PrepareFilter(subFilter);
 
-                    foreach (var preppedFilter in list)
-                        strBuilder.Append($"{preppedFilter.Key}.{preppedFilter.Value},");
+                        // PostgREST wants `or(a,b)`, not `or.(a,b)` - only column filters take the dot (issue #336).
+                        var separator = IsLogicalGroup(subFilter) ? "" : ".";
+                        strBuilder.Append($"{preppedFilter.Key}{separator}{preppedFilter.Value},");
+                    }
 
                     return new KeyValuePair<string, string>(asAttribute.Mapping,
                         $"({strBuilder.ToString().Trim(',')})");
@@ -892,6 +889,10 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             ? new KeyValuePair<string, string>($"not.{prepared.Key}", prepared.Value)
             : new KeyValuePair<string, string>(prepared.Key, $"not.{prepared.Value}");
 
+    private static bool IsLogicalGroup(IPostgrestQueryFilter filter) =>
+        filter.Op is Operator.And or Operator.Or ||
+        (filter.Op is Operator.Not && filter.Criteria is QueryFilter { Op: Operator.And or Operator.Or });
+
     /// <inheritdoc />
     public void Clear()
     {
@@ -955,7 +956,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             $"Data:\n\t{JsonSerializer.Serialize(preparedData, PostgrestSerializerOptions.Passthrough)}");
 
         var operation = PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert);
-        return Helpers.MakeRequestAsync(this.options, method, url, this.serializerSettings, preparedData, requestHeaders,
+        return Helpers.MakeRequestAsync(this.options, this.httpClient, method, url, this.serializerSettings, preparedData, requestHeaders,
             cancellationToken, operation);
     }
 
@@ -981,7 +982,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             $"Data:\n\t{JsonSerializer.Serialize(preparedData, PostgrestSerializerOptions.Passthrough)}");
 
         var operation = PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert);
-        return Helpers.MakeRequestAsync<TU>(this.options, method, url, this.serializerSettings, preparedData, requestHeaders, this.GetHeaders, cancellationToken, operation);
+        return Helpers.MakeRequestAsync<TU>(this.options, this.httpClient, method, url, this.serializerSettings, preparedData, requestHeaders, this.GetHeaders, cancellationToken, operation);
     }
 
     private static string FindTableName(object? obj = null)

@@ -13,6 +13,8 @@ concurrency:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write   # only used by the post-merge baseline refresh step below
 
     steps:
       - uses: actions/checkout@v4
@@ -35,10 +37,50 @@ jobs:
         run: supabase start
 
       # Runs the same quality gate as contributors and agents (scripts/quality-gate).
-      # Its exit code is the merge gate: build/analyzers, format, inner-loop tests,
-      # dependency vulnerabilities, public-API sync and E2E/acceptance tests are all
-      # blocking — a non-zero exit fails the job. Only the public-API diff is a
-      # signal (breaking changes may be intentional), surfaced but non-blocking.
+      # Its exit code is the merge gate: build/analyzers, inner-loop tests,
+      # public-API sync and E2E/acceptance tests are all blocking — a non-zero exit
+      # fails the job. The public-API diff (breaking changes may be intentional) and
+      # the dependency-vulnerability scan (a vulnerable package may have no available
+      # fix, which shouldn't wedge every PR) are signals — surfaced but non-blocking.
+      #
+      # The flag depends on the event (this workflow only runs on pull_request and
+      # push:master, so the two branches below are exactly those two cases):
+      #   PR   → --bypass-format: a fork contributor can't always fix a format
+      #          violation themselves the way an agent can, and blocking the merge on
+      #          it would just be the friction this exists to remove. format-master.yml
+      #          auto-formats master after merge regardless. The gate stays read-only
+      #          (no --overwrite-baseline), so a PR run never rewrites a baseline.
+      #   push → --overwrite-baseline:  The gate writes the improved baseline to the
+      #          runner's tree; the next step commits it. Format stays blocking here
+      #          (no --bypass-format).
       - name: Quality gate
-        run: ./scripts/quality-gate/gate.sh packages
+        run: ./scripts/quality-gate/gate.sh packages ${{ github.event_name == 'pull_request' && '--bypass-format' || '--overwrite-baseline' }}
+
+      # Commit the new baseline back to master. always() so an improvement still
+      # lands even if a later stage failed — a coverage/warning gain is orthogonal to,
+      # say, a flaky E2E. Only runs on push (PRs are read-only, nothing to commit).
+      #
+      # format-master.yml fires on the same merge and also pushes to master, so this
+      # push can lose a race; fetch+rebase+retry rather than clobber. The push uses the
+      # default GITHUB_TOKEN, whose pushes don't trigger another workflow run, so this
+      # can't loop back into itself.
+      - name: Refresh baseline on master
+        if: always() && github.event_name == 'push'
+        run: |
+          if ! git status --porcelain -- 'packages/*/.gate-baseline.json' | grep -q .; then
+            echo "no baseline change"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -- 'packages/*/.gate-baseline.json'
+          git commit -m "chore(quality-gate): refresh baseline after merge"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:master; then exit 0; fi
+            echo "push rejected (attempt $attempt) — rebasing onto latest master and retrying"
+            git fetch origin master
+            git rebase origin/master || { git rebase --abort; exit 1; }
+          done
+          echo "could not push baseline after retries" >&2
+          exit 1
 

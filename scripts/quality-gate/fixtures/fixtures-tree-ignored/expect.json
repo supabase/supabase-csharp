@@ -1,5 +1,5 @@
 {
-  "description": "A second, buildable Sample/Sample.Tests pair is planted (untracked, uncommitted) under scripts/quality-gate/fixtures/decoy — mimicking exactly what broke for real: an untracked .cs file living inside the gate's own fixtures tree. The gate must behave IDENTICALLY to the plain clean case: the decoy must never be discovered as a package (no MULTI, no extra stage rows) and must never be counted as a changed .cs file needing format review (no false 'nothing was inspected' FAIL). Regression coverage for the bug that shipped in the coverage-ratchet change: a bare/broad-scope gate run picked up the gate's own fixtures as gated content.",
+  "description": "A second, buildable Sample/Sample.Tests pair is planted (untracked, uncommitted) under scripts/quality-gate/fixtures/decoy — mimicking exactly what broke for real: an untracked .cs file living inside the gate's own fixtures tree. The gate must behave IDENTICALLY to the plain clean case: the decoy must never be discovered as a package (no MULTI, no extra stage rows) and must never be counted as a changed .cs file needing format review (no false 'nothing was inspected' FAIL). Regression coverage for the bug that shipped in the coverage-baseline change: a bare/broad-scope gate run picked up the gate's own fixtures as gated content.",
   "mode": "--fast",
   "exit": 0,
   "verdict": "PARTIAL",

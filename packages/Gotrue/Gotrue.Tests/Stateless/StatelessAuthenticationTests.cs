@@ -102,11 +102,12 @@ public class StatelessAuthenticationTests : StatelessFixture
     [TestMethod]
     public void SignIn_ShouldBuildProviderAuthorizeUrl_GivenProvider()
     {
+        // Provider-side state is owned by the GoTrue server; the SDK must not inject its own (issue #377).
         var result = this.Client.SignIn(Provider.Google, Options);
         result.Uri.ToString().Should().StartWith($"{TestClients.CliAuthUrl}/authorize");
-        result.Uri.Query.Should().Contain("provider=google").And.Contain("state=");
+        result.Uri.Query.Should().Contain("provider=google").And.NotContain("state=");
         var scoped = this.Client.SignIn(Provider.Google, Options, new SignInOptions { Scopes = "special scopes please" });
-        scoped.Uri.Query.Should().Contain("scopes=special+scopes+please").And.Contain("state=");
+        scoped.Uri.Query.Should().Contain("scopes=special+scopes+please").And.NotContain("state=");
     }
 
     [TestMethod]

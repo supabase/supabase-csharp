@@ -37,6 +37,24 @@ public class SessionPersistenceTests : AuthClientFixture
     }
 
     [TestMethod]
+    public async Task LoadSessionAsync_ShouldRestoreSignedInSession_GivenPersistedSession()
+    {
+        var session = await this.SignUpNewUser();
+        this.VerifyGoodSession(session);
+        var restoredPersistence = SessionPersistenceSubstitute.Tracking();
+        await restoredPersistence.SaveSessionAsync(session);
+        var restoredClient = TestClients.AgainstCliStack();
+        restoredClient.SetPersistence(restoredPersistence);
+        await restoredClient.LoadSessionAsync();
+        restoredClient.CurrentSession.Should().BeSameAs(await restoredPersistence.LoadSessionAsync());
+        restoredClient.CurrentUser!.Id.Should().Be(session.User!.Id, "the async load restores the signed-in user");
+        var refreshed = await restoredClient.RetrieveSessionAsync();
+        refreshed!.AccessToken.Should().NotBeNull();
+        refreshed.RefreshToken.Should().NotBeNull();
+        refreshed.User!.Id.Should().Be(session.User.Id);
+    }
+
+    [TestMethod]
     public async Task SetSession_ShouldRestoreUserFromTokenPairAndForceRefreshWhenRequested()
     {
         await this.SignUpNewUser();

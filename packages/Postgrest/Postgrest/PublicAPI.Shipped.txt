@@ -1,10 +1,10 @@
 #nullable enable
 Supabase.Postgrest.Attributes.ColumnAttribute
-Supabase.Postgrest.Attributes.ColumnAttribute.ColumnAttribute(string? columnName = null, Newtonsoft.Json.NullValueHandling nullValueHandling = Newtonsoft.Json.NullValueHandling.Include, bool ignoreOnInsert = false, bool ignoreOnUpdate = false) -> void
+Supabase.Postgrest.Attributes.ColumnAttribute.ColumnAttribute(string? columnName = null, System.Text.Json.Serialization.JsonIgnoreCondition nullValueHandling = System.Text.Json.Serialization.JsonIgnoreCondition.Never, bool ignoreOnInsert = false, bool ignoreOnUpdate = false) -> void
 Supabase.Postgrest.Attributes.ColumnAttribute.ColumnName.get -> string!
 Supabase.Postgrest.Attributes.ColumnAttribute.IgnoreOnInsert.get -> bool
 Supabase.Postgrest.Attributes.ColumnAttribute.IgnoreOnUpdate.get -> bool
-Supabase.Postgrest.Attributes.ColumnAttribute.NullValueHandling.get -> Newtonsoft.Json.NullValueHandling
+Supabase.Postgrest.Attributes.ColumnAttribute.NullValueHandling.get -> System.Text.Json.Serialization.JsonIgnoreCondition
 Supabase.Postgrest.Attributes.ColumnAttribute.NullValueHandling.set -> void
 Supabase.Postgrest.Attributes.PrimaryKeyAttribute
 Supabase.Postgrest.Attributes.PrimaryKeyAttribute.ColumnName.get -> string!
@@ -50,8 +50,14 @@ Supabase.Postgrest.ClientOptions
 Supabase.Postgrest.ClientOptions.ClientOptions() -> void
 Supabase.Postgrest.ClientOptions.Headers.get -> System.Collections.Generic.Dictionary<string!, string!>!
 Supabase.Postgrest.ClientOptions.Headers.set -> void
+Supabase.Postgrest.ClientOptions.HttpClient.get -> System.Net.Http.HttpClient?
+Supabase.Postgrest.ClientOptions.HttpClient.set -> void
+Supabase.Postgrest.ClientOptions.Proxy.get -> System.Net.IWebProxy?
+Supabase.Postgrest.ClientOptions.Proxy.set -> void
 Supabase.Postgrest.ClientOptions.QueryParams.get -> System.Collections.Generic.Dictionary<string!, string!>!
 Supabase.Postgrest.ClientOptions.QueryParams.set -> void
+Supabase.Postgrest.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
+Supabase.Postgrest.ClientOptions.Retry.set -> void
 Supabase.Postgrest.ClientOptions.Schema.get -> string!
 Supabase.Postgrest.ClientOptions.Schema.set -> void
 Supabase.Postgrest.ClientOptions.SerializeEnumsAsStrings.get -> bool
@@ -95,8 +101,12 @@ Supabase.Postgrest.Constants.Ordering.Ascending = 0 -> Supabase.Postgrest.Consta
 Supabase.Postgrest.Constants.Ordering.Descending = 1 -> Supabase.Postgrest.Constants.Ordering
 Supabase.Postgrest.Converters.DateTimeConverter
 Supabase.Postgrest.Converters.DateTimeConverter.DateTimeConverter() -> void
+Supabase.Postgrest.Converters.DateTimeListConverter
+Supabase.Postgrest.Converters.DateTimeListConverter.DateTimeListConverter() -> void
 Supabase.Postgrest.Converters.IntArrayConverter
 Supabase.Postgrest.Converters.IntArrayConverter.IntArrayConverter() -> void
+Supabase.Postgrest.Converters.PostgrestStringEnumConverter
+Supabase.Postgrest.Converters.PostgrestStringEnumConverter.PostgrestStringEnumConverter() -> void
 Supabase.Postgrest.Exceptions.FailureHint
 Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.ForeignKeyViolation = 2 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
@@ -226,9 +236,6 @@ Supabase.Postgrest.Models.CachedModel<TModel>.CachedModel() -> void
 Supabase.Postgrest.Models.CachedModel<TModel>.Models.get -> System.Collections.Generic.List<TModel!>?
 Supabase.Postgrest.Models.CachedModel<TModel>.Models.set -> void
 Supabase.Postgrest.OnRequestPreparedEventHandler
-Supabase.Postgrest.PostgrestContractResolver
-Supabase.Postgrest.PostgrestContractResolver.PostgrestContractResolver() -> void
-Supabase.Postgrest.PostgrestContractResolver.SetState(bool isInsert = false, bool isUpdate = false, bool isUpsert = false) -> void
 Supabase.Postgrest.PostgrestDiagnostics
 Supabase.Postgrest.QueryFilter
 Supabase.Postgrest.QueryFilter.Criteria.get -> object?
@@ -300,7 +307,7 @@ Supabase.Postgrest.Responses.BaseResponse.ResponseMessage.set -> void
 Supabase.Postgrest.Responses.ModeledResponse<T>
 Supabase.Postgrest.Responses.ModeledResponse<T>.Count -> int
 Supabase.Postgrest.Responses.ModeledResponse<T>.Model.get -> T?
-Supabase.Postgrest.Responses.ModeledResponse<T>.ModeledResponse(Supabase.Postgrest.Responses.BaseResponse! baseResponse, Newtonsoft.Json.JsonSerializerSettings! serializerSettings, System.Func<System.Collections.Generic.Dictionary<string!, string!>!>? getHeaders = null, bool shouldParse = true) -> void
+Supabase.Postgrest.Responses.ModeledResponse<T>.ModeledResponse(Supabase.Postgrest.Responses.BaseResponse! baseResponse, System.Text.Json.JsonSerializerOptions! serializerSettings, System.Func<System.Collections.Generic.Dictionary<string!, string!>!>? getHeaders = null, bool shouldParse = true) -> void
 Supabase.Postgrest.Responses.ModeledResponse<T>.Models.get -> System.Collections.Generic.List<T!>!
 Supabase.Postgrest.Table<TModel>
 Supabase.Postgrest.Table<TModel>.And(System.Collections.Generic.List<Supabase.Postgrest.Interfaces.IPostgrestQueryFilter!>! filters) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
@@ -343,7 +350,7 @@ Supabase.Postgrest.Table<TModel>.Select(string! columnQuery) -> Supabase.Postgre
 Supabase.Postgrest.Table<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, System.Collections.Generic.KeyValuePair<object!, object?>>!>! keyValuePairExpression) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! keySelector, object? value) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Single(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel?>!
-Supabase.Postgrest.Table<TModel>.Table(string! baseUrl, Newtonsoft.Json.JsonSerializerSettings! serializerSettings, Supabase.Postgrest.ClientOptions? options = null) -> void
+Supabase.Postgrest.Table<TModel>.Table(string! baseUrl, System.Text.Json.JsonSerializerOptions! serializerSettings, Supabase.Postgrest.ClientOptions? options = null) -> void
 Supabase.Postgrest.Table<TModel>.TableName.get -> string!
 Supabase.Postgrest.Table<TModel>.Update(Supabase.Postgrest.QueryOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.Responses.ModeledResponse<TModel!>!>!
 Supabase.Postgrest.Table<TModel>.Update(TModel! model, Supabase.Postgrest.QueryOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.Responses.ModeledResponse<TModel!>!>!
@@ -353,28 +360,27 @@ Supabase.Postgrest.Table<TModel>.Where(System.Linq.Expressions.Expression<System
 Supabase.Postgrest.TableWithCache<T>
 Supabase.Postgrest.TableWithCache<T>.CacheProvider.get -> Supabase.Postgrest.Interfaces.IPostgrestCacheProvider!
 Supabase.Postgrest.TableWithCache<T>.Get(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.Requests.CacheBackedRequest<T!>!>!
-Supabase.Postgrest.TableWithCache<T>.TableWithCache(string! baseUrl, Supabase.Postgrest.Interfaces.IPostgrestCacheProvider! cacheProvider, Newtonsoft.Json.JsonSerializerSettings! serializerSettings, Supabase.Postgrest.ClientOptions? options = null) -> void
+Supabase.Postgrest.TableWithCache<T>.TableWithCache(string! baseUrl, Supabase.Postgrest.Interfaces.IPostgrestCacheProvider! cacheProvider, System.Text.Json.JsonSerializerOptions! serializerSettings, Supabase.Postgrest.ClientOptions? options = null) -> void
 const Supabase.Postgrest.ClientOptions.DATE_TIME_FORMAT = "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFK" -> string!
 const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "Supabase.Postgrest" -> string!
 const Supabase.Postgrest.QueryFilter.NullVal = "null" -> string!
 override Supabase.Postgrest.Attributes.ReferenceAttribute.Equals(object? obj) -> bool
-override Supabase.Postgrest.Converters.DateTimeConverter.CanConvert(System.Type! objectType) -> bool
-override Supabase.Postgrest.Converters.DateTimeConverter.CanWrite.get -> bool
-override Supabase.Postgrest.Converters.DateTimeConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object? existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object?
-override Supabase.Postgrest.Converters.DateTimeConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object? value, Newtonsoft.Json.JsonSerializer! serializer) -> void
-override Supabase.Postgrest.Converters.IntArrayConverter.CanConvert(System.Type! objectType) -> bool
-override Supabase.Postgrest.Converters.IntArrayConverter.CanRead.get -> bool
-override Supabase.Postgrest.Converters.IntArrayConverter.ReadJson(Newtonsoft.Json.JsonReader! reader, System.Type! objectType, object? existingValue, Newtonsoft.Json.JsonSerializer! serializer) -> object?
-override Supabase.Postgrest.Converters.IntArrayConverter.WriteJson(Newtonsoft.Json.JsonWriter! writer, object? value, Newtonsoft.Json.JsonSerializer! serializer) -> void
+override Supabase.Postgrest.Converters.DateTimeConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> System.DateTime
+override Supabase.Postgrest.Converters.DateTimeConverter.Write(System.Text.Json.Utf8JsonWriter! writer, System.DateTime value, System.Text.Json.JsonSerializerOptions! options) -> void
+override Supabase.Postgrest.Converters.DateTimeListConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> System.Collections.Generic.List<System.DateTime>?
+override Supabase.Postgrest.Converters.DateTimeListConverter.Write(System.Text.Json.Utf8JsonWriter! writer, System.Collections.Generic.List<System.DateTime>! value, System.Text.Json.JsonSerializerOptions! options) -> void
+override Supabase.Postgrest.Converters.IntArrayConverter.Read(ref System.Text.Json.Utf8JsonReader reader, System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> System.Collections.Generic.List<int>?
+override Supabase.Postgrest.Converters.IntArrayConverter.Write(System.Text.Json.Utf8JsonWriter! writer, System.Collections.Generic.List<int>! value, System.Text.Json.JsonSerializerOptions! options) -> void
+override Supabase.Postgrest.Converters.PostgrestStringEnumConverter.CanConvert(System.Type! typeToConvert) -> bool
+override Supabase.Postgrest.Converters.PostgrestStringEnumConverter.CreateConverter(System.Type! typeToConvert, System.Text.Json.JsonSerializerOptions! options) -> System.Text.Json.Serialization.JsonConverter!
 override Supabase.Postgrest.Index.Equals(object? value) -> bool
 override Supabase.Postgrest.Index.GetHashCode() -> int
 override Supabase.Postgrest.Index.ToString() -> string!
 override Supabase.Postgrest.IntRange.Equals(object? value) -> bool
 override Supabase.Postgrest.IntRange.GetHashCode() -> int
 override Supabase.Postgrest.IntRange.ToString() -> string!
-override Supabase.Postgrest.PostgrestContractResolver.CreateProperty(System.Reflection.MemberInfo! member, Newtonsoft.Json.MemberSerialization memberSerialization) -> Newtonsoft.Json.Serialization.JsonProperty!
 readonly Supabase.Postgrest.ClientOptions.DateTimeStyles -> System.Globalization.DateTimeStyles
-static Supabase.Postgrest.Client.SerializerSettings(Supabase.Postgrest.ClientOptions? options = null) -> Newtonsoft.Json.JsonSerializerSettings!
+static Supabase.Postgrest.Client.SerializerSettings(Supabase.Postgrest.ClientOptions? options = null) -> System.Text.Json.JsonSerializerOptions!
 static Supabase.Postgrest.Exceptions.FailureHint.DetectReason(Supabase.Postgrest.Exceptions.PostgrestException! pgex) -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 static Supabase.Postgrest.Extensions.UriExtensions.GetInstanceUrl(this System.Uri! uri) -> string!
 static Supabase.Postgrest.Index.End.get -> Supabase.Postgrest.Index!
@@ -387,5 +393,5 @@ static Supabase.Postgrest.IntRange.EndAt(Supabase.Postgrest.Index! end) -> Supab
 static Supabase.Postgrest.IntRange.StartAt(Supabase.Postgrest.Index! start) -> Supabase.Postgrest.IntRange!
 virtual Supabase.Postgrest.Interfaces.IPostgrestDebugger.DebugEventHandler.Invoke(object? sender, string! message, Supabase.Postgrest.Exceptions.PostgrestException? exception) -> void
 virtual Supabase.Postgrest.Models.BaseModel.Delete<T>(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-virtual Supabase.Postgrest.OnRequestPreparedEventHandler.Invoke(object! sender, Supabase.Postgrest.ClientOptions! clientOptions, System.Net.Http.HttpMethod! method, string! url, Newtonsoft.Json.JsonSerializerSettings! serializerSettings, object? data = null, System.Collections.Generic.Dictionary<string!, string!>? headers = null) -> void
+virtual Supabase.Postgrest.OnRequestPreparedEventHandler.Invoke(object! sender, Supabase.Postgrest.ClientOptions! clientOptions, System.Net.Http.HttpMethod! method, string! url, System.Text.Json.JsonSerializerOptions! serializerSettings, object? data = null, System.Collections.Generic.Dictionary<string!, string!>? headers = null) -> void
 virtual Supabase.Postgrest.Requests.CacheBackedRequest<TModel>.RemoteModelsPopulatedEventHandler.Invoke(Supabase.Postgrest.Requests.CacheBackedRequest<TModel!>! sender) -> void

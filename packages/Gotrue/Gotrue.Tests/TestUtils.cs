@@ -43,9 +43,12 @@ public static class TestUtils
     public static string GenerateServiceRoleToken(string jwtSecret)
     {
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret));
+        // Backdated so sub-second clock skew against the containerized server cannot fail gotrue's zero-leeway nbf check.
+        var issuedAt = DateTime.UtcNow.AddMinutes(-1);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            IssuedAt = DateTime.UtcNow,
+            IssuedAt = issuedAt,
+            NotBefore = issuedAt,
             Expires = DateTime.UtcNow.AddDays(7),
             SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256Signature),
             Claims = new Dictionary<string, object> { { "role", "service_role" } },

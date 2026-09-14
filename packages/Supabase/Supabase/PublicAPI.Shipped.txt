@@ -55,9 +55,19 @@ Supabase.SupabaseOptions.AutoConnectRealtime.get -> bool
 Supabase.SupabaseOptions.AutoConnectRealtime.set -> void
 Supabase.SupabaseOptions.AutoRefreshToken.get -> bool
 Supabase.SupabaseOptions.AutoRefreshToken.set -> void
+Supabase.SupabaseOptions.FunctionsRetry.get -> Supabase.Core.Http.RetryOptions!
+Supabase.SupabaseOptions.FunctionsRetry.set -> void
 Supabase.SupabaseOptions.FunctionsUrlFormat.get -> string!
 Supabase.SupabaseOptions.FunctionsUrlFormat.set -> void
+Supabase.SupabaseOptions.GotrueRetry.get -> Supabase.Core.Http.RetryOptions!
+Supabase.SupabaseOptions.GotrueRetry.set -> void
 Supabase.SupabaseOptions.Headers -> System.Collections.Generic.Dictionary<string!, string!>!
+Supabase.SupabaseOptions.HttpClient.get -> System.Net.Http.HttpClient?
+Supabase.SupabaseOptions.HttpClient.set -> void
+Supabase.SupabaseOptions.PostgrestRetry.get -> Supabase.Core.Http.RetryOptions!
+Supabase.SupabaseOptions.PostgrestRetry.set -> void
+Supabase.SupabaseOptions.Proxy.get -> System.Net.IWebProxy?
+Supabase.SupabaseOptions.Proxy.set -> void
 Supabase.SupabaseOptions.RealtimeUrlFormat.get -> string!
 Supabase.SupabaseOptions.RealtimeUrlFormat.set -> void
 Supabase.SupabaseOptions.RestUrlFormat.get -> string!
@@ -70,6 +80,8 @@ Supabase.SupabaseOptions.StorageClientOptions.set -> void
 Supabase.SupabaseOptions.StorageUrlFormat.get -> string!
 Supabase.SupabaseOptions.StorageUrlFormat.set -> void
 Supabase.SupabaseOptions.SupabaseOptions() -> void
+Supabase.SupabaseOptions.WebSocketFactory.get -> Supabase.Realtime.Sockets.IWebSocketFactory?
+Supabase.SupabaseOptions.WebSocketFactory.set -> void
 Supabase.SupabaseTable<TModel>
 Supabase.SupabaseTable<TModel>.On(Supabase.Realtime.PostgresChanges.PostgresChangesOptions.ListenType listenType, Supabase.Realtime.Interfaces.IRealtimeChannel.PostgresChangesHandler! handler) -> System.Threading.Tasks.Task<Supabase.Realtime.RealtimeChannel!>!
 Supabase.SupabaseTable<TModel>.SupabaseTable(Supabase.Postgrest.Interfaces.IPostgrestClient! postgrestClient, Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>! realtimeClient, string! schema = "public") -> void

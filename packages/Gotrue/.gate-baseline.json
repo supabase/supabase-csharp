@@ -4,10 +4,10 @@
   "project": "Gotrue/Gotrue.csproj",
   "testProject": "Gotrue.Tests/Gotrue.Tests.csproj",
   "warnings": {
-    "total": 540,
+    "total": 300,
     "byCode": {
-      "IDE0009": 324,
-      "CS1591": 126,
+      "CS1591": 124,
+      "IDE0009": 86,
       "CS8618": 60,
       "CS8619": 8,
       "IDE0005": 4,
@@ -18,8 +18,8 @@
       "CS1574": 2
     }
   },
-  "updated": "2026-08-14T12:52:38Z",
+  "updated": "2026-09-03T12:48:44Z",
   "coverage": {
-    "line": 74.39
+    "hermeticLine": 51.20
   }
 }

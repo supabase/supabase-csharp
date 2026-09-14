@@ -76,9 +76,9 @@ public class RealtimeChannel : IRealtimeChannel
     public BroadcastOptions? BroadcastOptions { get; private set; } = new();
 
     /// <summary>
-    /// The saved Presence Options, set in <see cref="Register{TPresenceResponse}(string)"/>
+    /// The saved Presence Options, set in <see cref="Register{TPresenceResponse}(string)"/> or <see cref="Register{TPresenceResponse}(PresenceOptions)"/>
     /// </summary>
-    public PresenceOptions? PresenceOptions { get; private set; } = new(string.Empty);
+    public PresenceOptions? PresenceOptions { get; private set; }
 
     /// <summary>
     /// The saved Postgres Changes Options, set in <see cref="Register(PostgresChanges.PostgresChangesOptions)"/>
@@ -240,14 +240,25 @@ public class RealtimeChannel : IRealtimeChannel
     /// <returns></returns>
     /// <exception cref="InvalidOperationException">Thrown if called multiple times.</exception>
     public RealtimePresence<TPresenceResponse> Register<TPresenceResponse>(string presenceKey)
+        where TPresenceResponse : BasePresence =>
+        this.Register<TPresenceResponse>(PresenceOptions.WithPresence(presenceKey));
+
+    /// <summary>
+    /// Registers a <see cref="RealtimePresence{TPresenceResponse}"/> instance with the specified options.
+    /// </summary>
+    /// <typeparam name="TPresenceResponse">The model representing a presence payload.</typeparam>
+    /// <param name="options">The presence options to configure the channel's presence behavior.</param>
+    /// <returns>A <see cref="RealtimePresence{TPresenceResponse}"/> instance for managing presence state.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if called multiple times.</exception>
+    public RealtimePresence<TPresenceResponse> Register<TPresenceResponse>(PresenceOptions options)
         where TPresenceResponse : BasePresence
     {
         if (this.presence != null)
             throw new InvalidOperationException(
                 "Register can only be called with presence options for a channel once.");
 
-        this.PresenceOptions = new PresenceOptions(presenceKey);
-        var instance = new RealtimePresence<TPresenceResponse>(this, this.PresenceOptions, this.Options.SerializerSettings);
+        this.PresenceOptions = options;
+        var instance = new RealtimePresence<TPresenceResponse>(this, options, this.Options.SerializerSettings);
         this.presence = instance;
 
         this.PresenceSync = (_, response) => this.presence.TriggerSync(response);
@@ -443,6 +454,13 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="postgresChangesOptions"></param>
     internal void RegisterPostgresChangesOptions(PostgresChangesOptions postgresChangesOptions)
     {
+        if (this.IsJoined || this.IsJoining)
+            throw new RealtimeException(
+                $"Cannot add `postgres_changes` callbacks for {this.Topic} after `Subscribe()`.")
+            {
+                Reason = FailureHint.Reason.StateInvalid,
+            };
+
         this.PostgresChangesOptions.Add(postgresChangesOptions);
         this.BindPostgresChangesOptions(postgresChangesOptions);
     }
@@ -534,7 +552,7 @@ public class RealtimeChannel : IRealtimeChannel
 
     /// <summary>
     /// Sends a `Push` request under this channel.
-    /// 
+    ///
     /// Maintains a buffer in the event push is called prior to the channel being joined.
     /// </summary>
     /// <param name="eventName"></param>
@@ -649,10 +667,10 @@ public class RealtimeChannel : IRealtimeChannel
     /// Generates the Join Push message by merging broadcast, presence, and postgres_changes options.
     /// </summary>
     /// <returns></returns>
-    private Push GenerateJoinPush() => new(this.Socket, this, ChannelEventJoin,
+    internal Push GenerateJoinPush() => new(this.Socket, this, ChannelEventJoin,
         payload: this.Options.IsPrivate
-            ? Channel.JoinPush.ForPrivateChannel(this.BroadcastOptions, this.PresenceOptions, this.PostgresChangesOptions)
-            : Channel.JoinPush.ForPublicChannel(this.BroadcastOptions, this.PresenceOptions, this.PostgresChangesOptions));
+            ? Channel.JoinPush.ForPrivateChannel(this.BroadcastOptions, this.PresenceOptions, this.PostgresChangesOptions, this.Options.RetrieveAccessToken())
+            : Channel.JoinPush.ForPublicChannel(this.BroadcastOptions, this.PresenceOptions, this.PostgresChangesOptions, this.Options.RetrieveAccessToken()));
 
     /// <summary>
     /// Generates an auth push.
@@ -885,7 +903,7 @@ public class RealtimeChannel : IRealtimeChannel
     }
 
     /// <summary>
-    /// Try to invoke the handler properly based on event type and socket response 
+    /// Try to invoke the handler properly based on event type and socket response
     /// </summary>
     /// <param name="eventType"></param>
     /// <param name="response"></param>

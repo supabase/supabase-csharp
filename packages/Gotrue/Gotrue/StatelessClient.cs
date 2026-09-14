@@ -4,9 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
+using Supabase.Core.Http;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using static Supabase.Gotrue.Constants;
@@ -109,7 +112,8 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
     }
 
     /// <inheritdoc />
-    public IGotrueApi<User, Session> GetApi(StatelessClientOptions options) => new Api(options.Url, options.Headers);
+    public IGotrueApi<User, Session> GetApi(StatelessClientOptions options) =>
+        new Api(options.Url, options.Headers, options.HttpClient ?? (options.Proxy != null ? DefaultHttpClientFactory.Create(proxy: options.Proxy) : null), options.Retry);
 
     /// <inheritdoc />
     public Task<Session?> SignUp(string email, string password, StatelessClientOptions options, SignUpOptions? signUpOptions = null) => this.SignUp(SignUpType.Email, email, password, options, signUpOptions);
@@ -118,17 +122,13 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
     public async Task<Session?> SignUp(SignUpType type, string identifier, string password, StatelessClientOptions options, SignUpOptions? signUpOptions = null)
     {
         var api = this.GetApi(options);
-        var session = type switch
+        // Return pending users regardless of AllowUnconfirmedUserSessions; this client stores no session.
+        return type switch
         {
-            SignUpType.Email => await api.SignUpWithEmail(identifier, password, signUpOptions),
-            SignUpType.Phone => await api.SignUpWithPhone(identifier, password, signUpOptions),
+            SignUpType.Email => await api.SignUpWithEmail(identifier, password, signUpOptions).ConfigureAwait(false),
+            SignUpType.Phone => await api.SignUpWithPhone(identifier, password, signUpOptions).ConfigureAwait(false),
             _ => null,
         };
-        if (session?.User?.IsConfirmed == true || session?.User != null && options.AllowUnconfirmedUserSessions)
-        {
-            return session;
-        }
-        return null;
     }
 
     /// <inheritdoc />
@@ -266,9 +266,9 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
         await this.GetApi(options).UpdateUserById(serviceRoleToken, userId, userData);
 
     /// <inheritdoc />
-    public async Task<bool> DeleteUser(string uid, string serviceRoleToken, StatelessClientOptions options)
+    public async Task<bool> DeleteUser(string uid, string serviceRoleToken, StatelessClientOptions options, bool shouldSoftDelete = false)
     {
-        var result = await this.GetApi(options).DeleteUser(uid, serviceRoleToken);
+        var result = await this.GetApi(options).DeleteUser(uid, serviceRoleToken, shouldSoftDelete);
         result.ResponseMessage?.EnsureSuccessStatusCode();
         return true;
     }
@@ -338,9 +338,23 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
         public string Url { get; set; } = GOTRUE_URL;
 
         /// <summary>
-        ///     Very unlikely this flag needs to be changed except in very specific contexts.
-        ///     Enables tests to be E2E tests to be run without requiring users to have
-        ///     confirmed emails - mirrors the Gotrue server's configuration.
+        ///     An HttpClient to send requests through. When null, the client builds and owns its own.
+        /// </summary>
+        public HttpClient? HttpClient { get; set; }
+
+        /// <summary>
+        ///     A proxy to route requests through. Only used when <see cref="HttpClient"/> is not supplied.
+        /// </summary>
+        public IWebProxy? Proxy { get; set; }
+
+        /// <summary>
+        ///     Retry policy applied to each request. Default (<see cref="RetryOptions.MaxRetries"/> 0) sends once, unretried.
+        /// </summary>
+        public RetryOptions Retry { get; set; } = new RetryOptions();
+
+        /// <summary>
+        ///     Allows sign-in to return a session for an unconfirmed user. Defaults to false.
+        ///     Sign-up returns pending users regardless of this option.
         /// </summary>
         public bool AllowUnconfirmedUserSessions { get; set; }
     }

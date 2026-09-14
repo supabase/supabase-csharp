@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Supabase.Core.Http;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
@@ -32,7 +33,7 @@ public class AdminClient : IGotrueAdminClient<User>
 
         options ??= new ClientOptions();
         this.Options = options;
-        this.api = new Api(options.Url, options.Headers);
+        this.api = new Api(options.Url, options.Headers, options.HttpClient ?? (options.Proxy != null ? DefaultHttpClientFactory.Create(proxy: options.Proxy) : null), options.Retry);
     }
 
     /// <summary>
@@ -69,9 +70,9 @@ public class AdminClient : IGotrueAdminClient<User>
     }
 
     /// <inheritdoc />
-    public async Task<bool> DeleteUser(string uid)
+    public async Task<bool> DeleteUser(string uid, bool shouldSoftDelete = false)
     {
-        var result = await this.api.DeleteUser(uid, this.serviceKey);
+        var result = await this.api.DeleteUser(uid, this.serviceKey, shouldSoftDelete);
         result.ResponseMessage?.EnsureSuccessStatusCode();
         return true;
     }

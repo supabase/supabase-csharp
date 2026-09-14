@@ -1,0 +1,11 @@
+{
+  "description": "The same changed .cs format violation as format-violation, but run with --bypass-format (the flag PR-time CI passes). Format must still REPORT the violation (1b FAIL) but as a SIGNAL, not a blocking stage — so the gate does not fail: exit 0, verdict PARTIAL. Guards that --bypass-format demotes format from gate to signal without hiding the violation, the mirror of format-violation's blocking case.",
+  "mode": "--fast --bypass-format",
+  "exit": 0,
+  "verdict": "PARTIAL",
+  "stages": [
+    { "id": "1a", "status": "PASS" },
+    { "id": "1b", "status": "FAIL" },
+    { "id": "2",  "status": "PASS" }
+  ]
+}

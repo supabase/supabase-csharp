@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "package": "DependencyInjection",
+  "project": "DependencyInjection/DependencyInjection.csproj",
+  "testProject": "DependencyInjection.Tests/DependencyInjection.Tests.csproj",
+  "warnings": {
+    "total": 0,
+    "byCode": {}
+  },
+  "updated": "2026-08-25T06:28:26Z",
+  "coverage": {
+    "hermeticLine": 100.00
+  }
+}

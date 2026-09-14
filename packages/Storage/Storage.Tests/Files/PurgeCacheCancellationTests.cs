@@ -25,13 +25,6 @@ public class PurgeCacheCancellationTests
     private Client client = null!;
     private HttpClient? requestClient;
 
-    [TestInitialize]
-    public void TestInitialize() =>
-        this.client = new Client("http://localhost/storage/v1", new Dictionary<string, string>
-        {
-            { "Authorization", "Bearer test-key" }
-        });
-
     [TestCleanup]
     public void TestCleanup() => this.requestClient?.Dispose();
 
@@ -67,8 +60,13 @@ public class PurgeCacheCancellationTests
         return requestSawLiveToken;
     }
 
-    private void UseHandler(HttpMessageHandler handler) =>
-        Supabase.Storage.Helpers.HttpRequestClient = this.requestClient = new HttpClient(handler);
+    private void UseHandler(HttpMessageHandler handler)
+    {
+        this.requestClient = new HttpClient(handler);
+        this.client = new Client("http://localhost/storage/v1",
+            new ClientOptions { HttpRequestClient = this.requestClient },
+            new Dictionary<string, string> { { "Authorization", "Bearer test-key" } });
+    }
 
     private sealed class StubHandler(Func<HttpRequestMessage, CancellationToken, HttpResponseMessage> respond)
         : HttpMessageHandler

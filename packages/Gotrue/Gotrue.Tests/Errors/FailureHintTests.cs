@@ -26,10 +26,10 @@ public class FailureHintTests
     private MockGotrueServer server = null!;
 
     [TestInitialize]
-    public void TestInitializer() => server = new MockGotrueServer();
+    public void TestInitializer() => this.server = new MockGotrueServer();
 
     [TestCleanup]
-    public void TestCleanup() => server.Dispose();
+    public void TestCleanup() => this.server.Dispose();
 
     [TestMethod]
     [DataRow(400, "Invalid login credentials", UserBadLogin, DisplayName = "400 invalid login")]
@@ -51,19 +51,37 @@ public class FailureHintTests
     [DataRow(422, "Password is too weak", UserBadPassword, DisplayName = "422 bad password")]
     [DataRow(429, "Too many requests", UserTooManyRequests, DisplayName = "429 rate limited")]
     [DataRow(500, "boom", Unknown, DisplayName = "unrecognized status")]
-    public async Task DetectReason_ShouldMapServerErrorToReason(int statusCode, string body, FailureHint.Reason expected)
+    [DataRow(502, "boom", NetworkError, DisplayName = "standard server/gateway errors")]
+    [DataRow(503, "boom", NetworkError, DisplayName = "standard server/gateway errors")]
+    [DataRow(504, "boom", NetworkError, DisplayName = "standard server/gateway errors")]
+    [DataRow(520, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
+    [DataRow(521, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
+    [DataRow(522, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
+    [DataRow(523, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
+    [DataRow(524, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
+    [DataRow(530, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
+    public async Task DetectReason_ShouldMapServerErrorToReason(
+        int statusCode,
+        string body,
+        FailureHint.Reason expected
+    )
     {
-        StubSignUp(statusCode, body);
-        var signUp = () => TestClients.Against(server).SignUp(RandomEmail(), Password);
+        this.StubSignUp(statusCode, body);
+        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
-        exception.Which.Reason.Should().Be(expected, $"status {statusCode} with body \"{body}\" classifies as {expected}");
+        exception
+            .Which.Reason.Should()
+            .Be(expected, $"status {statusCode} with body \"{body}\" classifies as {expected}");
     }
 
     private void StubSignUp(int statusCode, string body) =>
-        server
-            .Given(Request.Create().WithPath("/signup").UsingPost())
-            .RespondWith(Response.Create()
-                .WithStatusCode(statusCode)
-                .WithHeader("Content-Type", "application/json")
-                .WithBody(body));
+        this
+            .server.Given(Request.Create().WithPath("/signup").UsingPost())
+            .RespondWith(
+                Response
+                    .Create()
+                    .WithStatusCode(statusCode)
+                    .WithHeader("Content-Type", "application/json")
+                    .WithBody(body)
+            );
 }

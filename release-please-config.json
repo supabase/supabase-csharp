@@ -15,7 +15,8 @@
         "packages/Postgrest/Postgrest/Postgrest.csproj",
         "packages/Realtime/Realtime/Realtime.csproj",
         "packages/Storage/Storage/Storage.csproj",
-        "packages/Supabase/Supabase/Supabase.csproj"
+        "packages/Supabase/Supabase/Supabase.csproj",
+        "packages/extensions/DependencyInjection/DependencyInjection/DependencyInjection.csproj"
       ]
     }
   },

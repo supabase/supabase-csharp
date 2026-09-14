@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Supabase.Core;
 using Supabase.Core.Extensions;
+using Supabase.Core.Http;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
@@ -42,17 +45,32 @@ public class Api : IGotrueApi<User, Session>
         }
     }
 
+    private readonly HttpClient? httpClient;
+    private readonly RetryOptions retry;
+
     /// <summary>
     /// Creates a new API client
     /// </summary>
     /// <param name="url"></param>
     /// <param name="headers"></param>
-    public Api(string url, Dictionary<string, string>? headers = null)
+    /// <param name="httpClient">The client to send requests through. Defaults to a shared client when null.</param>
+    /// <param name="retry">Retry policy applied to each request. Defaults to no retries.</param>
+    public Api(string url, Dictionary<string, string>? headers = null, HttpClient? httpClient = null, RetryOptions? retry = null)
     {
         this.Url = url;
         headers ??= new Dictionary<string, string>();
         this.headers = headers;
+        this.httpClient = httpClient;
+        this.retry = retry ?? new RetryOptions();
     }
+
+    /// <summary>Routes through the resolved <see cref="httpClient"/> and <see cref="retry"/> policy.</summary>
+    private Task<BaseResponse> MakeRequestAsync(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null) =>
+        Helpers.MakeRequestAsync(method, url, data, headers, this.httpClient, this.retry);
+
+    /// <summary>Routes through the resolved <see cref="httpClient"/> and <see cref="retry"/> policy.</summary>
+    private Task<T?> MakeRequestAsync<T>(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null) where T : class =>
+        Helpers.MakeRequestAsync<T>(method, url, data, headers, this.httpClient, this.retry);
 
     /// <summary>
     /// Signs a user up using an email address and password.
@@ -79,24 +97,36 @@ public class Api : IGotrueApi<User, Session>
             }
         }
 
-        var response = await Helpers.MakeRequestAsync(HttpMethod.Post, endpoint, body, this.Headers);
+        return await this.PostSignUp(endpoint, body).ConfigureAwait(false);
+    }
 
-        if (!string.IsNullOrEmpty(response.Content))
+    private async Task<Session?> PostSignUp(string endpoint, Dictionary<string, object> body)
+    {
+        var response = await this.MakeRequestAsync(HttpMethod.Post, endpoint, body, this.Headers).ConfigureAwait(false);
+        return ReadSignUpResponse(response.Content);
+    }
+
+    /// <summary>Reads a sign-up response: a session, the bare user returned while confirmation is pending, or null.</summary>
+    private static Session? ReadSignUpResponse(string? content)
+    {
+        if (string.IsNullOrEmpty(content))
         {
-            // Gotrue returns a Session object for an auto-/pre-confirmed account
-            var session = JsonSerializer.Deserialize<Session>(response.Content!, Helpers.SerializerOptions);
-
-            // If account is unconfirmed, Gotrue returned the user object, so fill User data
-            // in from the parsed response.
-            if (session is { User: null })
-            {
-                // Gotrue returns a User object for an unconfirmed account
-                session.User = JsonSerializer.Deserialize<User>(response.Content!, Helpers.SerializerOptions);
-            }
-
-            return session;
+            return null;
         }
-        return null;
+
+        var session = JsonSerializer.Deserialize<Session>(content, Helpers.SerializerOptions);
+        if (session is { User: null })
+        {
+            // An acknowledgement such as { msg, code } must not become an empty User.
+            var user = JsonSerializer.Deserialize<User>(content, Helpers.SerializerOptions);
+            session.User = user?.Id != null ? user : null;
+            if (session.User == null && session.AccessToken == null)
+            {
+                return null;
+            }
+        }
+
+        return session;
     }
 
     /// <summary>
@@ -108,7 +138,7 @@ public class Api : IGotrueApi<User, Session>
     public Task<Session?> SignInWithEmail(string email, string password)
     {
         var body = new Dictionary<string, object> { { "email", email }, { "password", password } };
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=password", body, this.Headers);
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=password", body, this.Headers);
     }
 
     /// <summary>
@@ -151,7 +181,7 @@ public class Api : IGotrueApi<User, Session>
         if (!string.IsNullOrEmpty(options.CaptchaToken))
             body.Add("gotrue_meta_security", new Dictionary<string, string> { { "captcha_token", options.CaptchaToken! } });
 
-        await Helpers.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers);
+        await this.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers);
 
         return new PasswordlessSignInState { PKCEVerifier = verifier };
     }
@@ -188,7 +218,7 @@ public class Api : IGotrueApi<User, Session>
         if (!string.IsNullOrEmpty(options.CaptchaToken))
             body.Add("gotrue_meta_security", new Dictionary<string, string> { { "captcha_token", options.CaptchaToken! } });
 
-        await Helpers.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers);
+        await this.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers);
 
         return new PasswordlessSignInState();
     }
@@ -210,7 +240,7 @@ public class Api : IGotrueApi<User, Session>
         if (options != null && !string.IsNullOrEmpty(options.CaptchaToken))
             body.Add("gotrue_meta_security", new Dictionary<string, string> { { "captcha_token", options.CaptchaToken! } });
 
-        return await Helpers.MakeRequestAsync<Session>(HttpMethod.Post, url, body, this.Headers);
+        return await this.MakeRequestAsync<Session>(HttpMethod.Post, url, body, this.Headers);
     }
 
     /// <summary>
@@ -247,7 +277,7 @@ public class Api : IGotrueApi<User, Session>
         if (!string.IsNullOrEmpty(captchaToken))
             body.Add("gotrue_meta_security", new Dictionary<string, object?> { { "captcha_token", captchaToken } });
 
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=id_token", body, this.Headers);
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=id_token", body, this.Headers);
     }
 
     private Task<SSOResponse?> SignInWithSsoInternal(Guid? providerId = null, string? domain = null, SignInWithSSOOptions? options = null)
@@ -284,7 +314,7 @@ public class Api : IGotrueApi<User, Session>
         if (!string.IsNullOrEmpty(options?.CaptchaToken))
             body.Add("gotrue_meta_security", new Dictionary<string, object?> { { "captcha_token", options?.CaptchaToken } });
 
-        return Helpers.MakeRequestAsync<SSOResponse>(HttpMethod.Post, $"{this.Url}/sso", body, this.Headers);
+        return this.MakeRequestAsync<SSOResponse>(HttpMethod.Post, $"{this.Url}/sso", body, this.Headers);
     }
 
     /// <inheritdoc />
@@ -313,7 +343,7 @@ public class Api : IGotrueApi<User, Session>
             }
         }
 
-        return Helpers.MakeRequestAsync(HttpMethod.Post, endpoint, data, this.Headers);
+        return this.MakeRequestAsync(HttpMethod.Post, endpoint, data, this.Headers);
     }
 
     /// <summary>
@@ -331,7 +361,7 @@ public class Api : IGotrueApi<User, Session>
         if (options?.Data != null)
             body["data"] = options.Data;
 
-        return Helpers.MakeRequestAsync(HttpMethod.Post, url, body, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync(HttpMethod.Post, url, body, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
@@ -367,7 +397,7 @@ public class Api : IGotrueApi<User, Session>
             }
         }
 
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, endpoint, body, this.Headers);
+        return this.PostSignUp(endpoint, body);
     }
 
     /// <summary>
@@ -383,7 +413,7 @@ public class Api : IGotrueApi<User, Session>
             { "phone", phone },
             { "password", password }
         };
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=password", data, this.Headers);
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=password", data, this.Headers);
     }
 
     /// <summary>
@@ -394,7 +424,7 @@ public class Api : IGotrueApi<User, Session>
     public Task<BaseResponse> SendMobileOTP(string phone)
     {
         var data = new Dictionary<string, string> { { "phone", phone } };
-        return Helpers.MakeRequestAsync(HttpMethod.Post, $"{this.Url}/otp", data, this.Headers);
+        return this.MakeRequestAsync(HttpMethod.Post, $"{this.Url}/otp", data, this.Headers);
     }
 
     /// <summary>
@@ -412,7 +442,7 @@ public class Api : IGotrueApi<User, Session>
             { "token", token },
             { "type", Core.Helpers.GetMappedToAttr(type).Mapping }
         };
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/verify", data, this.Headers);
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/verify", data, this.Headers);
     }
 
     /// <summary>
@@ -430,7 +460,7 @@ public class Api : IGotrueApi<User, Session>
             { "token", token },
             { "type", Core.Helpers.GetMappedToAttr(type).Mapping }
         };
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/verify", data, this.Headers);
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/verify", data, this.Headers);
     }
 
     /// <summary>
@@ -446,7 +476,7 @@ public class Api : IGotrueApi<User, Session>
             { "token_hash", tokenHash },
             { "type", Core.Helpers.GetMappedToAttr(type).Mapping }
         };
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/verify", data, this.Headers);
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/verify", data, this.Headers);
     }
 
     /// <summary>
@@ -457,7 +487,7 @@ public class Api : IGotrueApi<User, Session>
     public Task<BaseResponse> ResetPasswordForEmail(string email)
     {
         var data = new Dictionary<string, string> { { "email", email } };
-        return Helpers.MakeRequestAsync(HttpMethod.Post, $"{this.Url}/recover", data, this.Headers);
+        return this.MakeRequestAsync(HttpMethod.Post, $"{this.Url}/recover", data, this.Headers);
     }
 
     /// <summary>
@@ -489,7 +519,7 @@ public class Api : IGotrueApi<User, Session>
         if (!string.IsNullOrEmpty(options.CaptchaToken))
             body.Add("gotrue_meta_security", new Dictionary<string, string> { { "captcha_token", options.CaptchaToken! } });
 
-        await Helpers.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers);
+        await this.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers);
 
         return new ResetPasswordForEmailState { PKCEVerifier = verifier };
     }
@@ -505,6 +535,11 @@ public class Api : IGotrueApi<User, Session>
         {
             ["Authorization"] = $"Bearer {jwt}"
         };
+
+        // Opaque keys need an apikey header too. Keep any configured key and never copy a JWT here (#424).
+        var hasApiKey = headers.Keys.Any(key => string.Equals(key, "apikey", StringComparison.OrdinalIgnoreCase));
+        if (!hasApiKey && !new JwtSecurityTokenHandler().CanReadToken(jwt))
+            headers["apikey"] = jwt;
 
         return headers;
     }
@@ -528,7 +563,7 @@ public class Api : IGotrueApi<User, Session>
             { "code_verifier", codeVerifier }
         };
 
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, url.ToString(), body, this.Headers);
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, url.ToString(), body, this.Headers);
     }
 
     /// <inheritdoc />
@@ -541,11 +576,11 @@ public class Api : IGotrueApi<User, Session>
             { "issuer", mfaEnrollParams.Issuer }
         };
 
-        return Helpers.MakeRequestAsync<MfaEnrollResponse>(HttpMethod.Post, $"{this.Url}/factors", body, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync<MfaEnrollResponse>(HttpMethod.Post, $"{this.Url}/factors", body, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <inheritdoc />
-    public Task<MfaChallengeResponse?> Challenge(string jwt, MfaChallengeParams mfaChallengeParams) => Helpers.MakeRequestAsync<MfaChallengeResponse>(HttpMethod.Post, $"{this.Url}/factors/{mfaChallengeParams.FactorId}/challenge", null, this.CreateAuthedRequestHeaders(jwt));
+    public Task<MfaChallengeResponse?> Challenge(string jwt, MfaChallengeParams mfaChallengeParams) => this.MakeRequestAsync<MfaChallengeResponse>(HttpMethod.Post, $"{this.Url}/factors/{mfaChallengeParams.FactorId}/challenge", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
     public Task<MfaVerifyResponse?> Verify(string jwt, MfaVerifyParams mfaVerifyParams)
@@ -556,23 +591,38 @@ public class Api : IGotrueApi<User, Session>
             { "challenge_id", mfaVerifyParams.ChallengeId }
         };
 
-        return Helpers.MakeRequestAsync<MfaVerifyResponse>(HttpMethod.Post, $"{this.Url}/factors/{mfaVerifyParams.FactorId}/verify", body, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync<MfaVerifyResponse>(HttpMethod.Post, $"{this.Url}/factors/{mfaVerifyParams.FactorId}/verify", body, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <inheritdoc />
-    public Task<MfaUnenrollResponse?> Unenroll(string jwt, MfaUnenrollParams mfaUnenrollParams) => Helpers.MakeRequestAsync<MfaUnenrollResponse>(HttpMethod.Delete, $"{this.Url}/factors/{mfaUnenrollParams.FactorId}", null, this.CreateAuthedRequestHeaders(jwt));
+    public Task<MfaUnenrollResponse?> Unenroll(string jwt, MfaUnenrollParams mfaUnenrollParams) => this.MakeRequestAsync<MfaUnenrollResponse>(HttpMethod.Delete, $"{this.Url}/factors/{mfaUnenrollParams.FactorId}", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
-    public Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams) => Helpers.MakeRequestAsync(HttpMethod.Get, $"{this.Url}/admin/users/{listFactorsParams.UserId}/factors", null, this.CreateAuthedRequestHeaders(jwt));
+    public Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams) => this.MakeRequestAsync(HttpMethod.Get, $"{this.Url}/admin/users/{listFactorsParams.UserId}/factors", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
-    public Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams) => Helpers.MakeRequestAsync<MfaAdminDeleteFactorResponse>(HttpMethod.Delete, $"{this.Url}/admin/users/{deleteFactorParams.UserId}/factors/{deleteFactorParams.Id}", null, this.CreateAuthedRequestHeaders(jwt));
+    public Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams) => this.MakeRequestAsync<MfaAdminDeleteFactorResponse>(HttpMethod.Delete, $"{this.Url}/admin/users/{deleteFactorParams.UserId}/factors/{deleteFactorParams.Id}", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
     public async Task<ProviderAuthState> LinkIdentity(string token, Provider provider, SignInOptions options)
     {
         var state = Helpers.GetUrlForProvider($"{this.Url}/user/identities/authorize", provider, options);
-        await Helpers.MakeRequestAsync(HttpMethod.Get, state.Uri.ToString(), null, this.CreateAuthedRequestHeaders(token));
+
+        // Need to skip the HTTP redirect to avoid "No API key found in request" error and match auth-js behavior
+        var uri = Helpers.AddQueryParams(state.Uri.ToString(), new Dictionary<string, string> { { "skip_http_redirect", "true" } });
+        var response = await this.MakeRequestAsync(HttpMethod.Get, uri.ToString(), null, this.CreateAuthedRequestHeaders(token));
+
+        var content = response?.Content;
+
+        Dictionary<string, string>? payload = null;
+        if (!string.IsNullOrEmpty(content))
+            payload = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
+
+        if (payload == null || !payload.TryGetValue("url", out var url) || string.IsNullOrEmpty(url))
+            throw new GotrueException("Gotrue did not return a provider authorization url for the identity link.", FailureHint.Reason.BadSessionUrl);
+
+        state.Uri = new Uri(url);
+
         return state;
     }
 
@@ -581,7 +631,7 @@ public class Api : IGotrueApi<User, Session>
     {
         EnsureIdTokenProviderSupported(options.Provider);
         var body = BuildIdTokenLinkBody(options);
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=id_token", body, this.CreateAuthedRequestHeaders(token));
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=id_token", body, this.CreateAuthedRequestHeaders(token));
     }
 
     private static void EnsureIdTokenProviderSupported(Provider provider)
@@ -614,7 +664,7 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public async Task<bool> UnlinkIdentity(string token, UserIdentity userIdentity)
     {
-        var result = await Helpers.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/user/identities/{userIdentity.IdentityId}", null, this.CreateAuthedRequestHeaders(token));
+        var result = await this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/user/identities/{userIdentity.IdentityId}", null, this.CreateAuthedRequestHeaders(token));
         return result.ResponseMessage is { IsSuccessStatusCode: true };
     }
 
@@ -628,7 +678,7 @@ public class Api : IGotrueApi<User, Session>
     {
         var data = new Dictionary<string, string>();
 
-        return Helpers.MakeRequestAsync(HttpMethod.Post, $"{this.Url}/logout?scope={Core.Helpers.GetMappedToAttr(scope).Mapping}", data, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync(HttpMethod.Post, $"{this.Url}/logout?scope={Core.Helpers.GetMappedToAttr(scope).Mapping}", data, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
@@ -640,7 +690,7 @@ public class Api : IGotrueApi<User, Session>
     {
         var data = new Dictionary<string, string>();
 
-        return Helpers.MakeRequestAsync<User>(HttpMethod.Get, $"{this.Url}/user", data, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync<User>(HttpMethod.Get, $"{this.Url}/user", data, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
@@ -653,7 +703,7 @@ public class Api : IGotrueApi<User, Session>
     {
         var data = new Dictionary<string, string>();
 
-        return Helpers.MakeRequestAsync<User>(HttpMethod.Get, $"{this.Url}/admin/users/{userId}", data, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync<User>(HttpMethod.Get, $"{this.Url}/admin/users/{userId}", data, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
@@ -662,7 +712,7 @@ public class Api : IGotrueApi<User, Session>
     /// <param name="jwt"></param>
     /// <param name="attributes"></param>
     /// <returns></returns>
-    public Task<User?> UpdateUser(string jwt, UserAttributes attributes) => Helpers.MakeRequestAsync<User>(HttpMethod.Put, $"{this.Url}/user", attributes, this.CreateAuthedRequestHeaders(jwt));
+    public Task<User?> UpdateUser(string jwt, UserAttributes attributes) => this.MakeRequestAsync<User>(HttpMethod.Put, $"{this.Url}/user", attributes, this.CreateAuthedRequestHeaders(jwt));
 
     /// <summary>
     /// Lists users
@@ -678,7 +728,7 @@ public class Api : IGotrueApi<User, Session>
     {
         var data = this.TransformListUsersParams(filter, sortBy, sortOrder, page, perPage);
 
-        return Helpers.MakeRequestAsync<UserList<User>>(HttpMethod.Get, $"{this.Url}/admin/users", data, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync<UserList<User>>(HttpMethod.Get, $"{this.Url}/admin/users", data, this.CreateAuthedRequestHeaders(jwt));
     }
 
     private Dictionary<string, string> TransformListUsersParams(string? filter = null, string? sortBy = null, SortOrder sortOrder = SortOrder.Descending, int? page = null, int? perPage = null)
@@ -719,7 +769,7 @@ public class Api : IGotrueApi<User, Session>
     {
         attributes ??= new AdminUserAttributes();
 
-        return Helpers.MakeRequestAsync<User>(HttpMethod.Post, $"{this.Url}/admin/users", attributes, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync<User>(HttpMethod.Post, $"{this.Url}/admin/users", attributes, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
@@ -729,7 +779,7 @@ public class Api : IGotrueApi<User, Session>
     /// <param name="userId">userID</param>
     /// <param name="userData">User attributes e.g. email, password, etc.</param>
     /// <returns></returns>
-    public Task<User?> UpdateUserById(string jwt, string userId, UserAttributes userData) => Helpers.MakeRequestAsync<User>(HttpMethod.Put, $"{this.Url}/admin/users/{userId}", userData, this.CreateAuthedRequestHeaders(jwt));
+    public Task<User?> UpdateUserById(string jwt, string userId, UserAttributes userData) => this.MakeRequestAsync<User>(HttpMethod.Put, $"{this.Url}/admin/users/{userId}", userData, this.CreateAuthedRequestHeaders(jwt));
 
     /// <summary>
     /// Sends a re-authentication request, used for password changes.
@@ -738,18 +788,19 @@ public class Api : IGotrueApi<User, Session>
     /// </summary>
     /// <param name="userJwt">The user's auth token.</param>
     /// <returns></returns>
-    public Task<BaseResponse> Reauthenticate(string userJwt) => Helpers.MakeRequestAsync(HttpMethod.Get, $"{this.Url}/reauthenticate", null, this.CreateAuthedRequestHeaders(userJwt));
+    public Task<BaseResponse> Reauthenticate(string userJwt) => this.MakeRequestAsync(HttpMethod.Get, $"{this.Url}/reauthenticate", null, this.CreateAuthedRequestHeaders(userJwt));
 
     /// <summary>
     /// Delete a user
     /// </summary>
     /// <param name="uid">The user uid you want to remove.</param>
     /// <param name="jwt">A valid JWT. Must be a full-access API key (e.g. service_role key).</param>
+    /// <param name="shouldSoftDelete">When true, the user is soft-deleted (identifiable by the hashed user id but not reversible) instead of hard-deleted. Defaults to a hard delete.</param>
     /// <returns></returns>
-    public Task<BaseResponse> DeleteUser(string uid, string jwt)
+    public Task<BaseResponse> DeleteUser(string uid, string jwt, bool shouldSoftDelete = false)
     {
-        var data = new Dictionary<string, string>();
-        return Helpers.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/users/{uid}", data, this.CreateAuthedRequestHeaders(jwt));
+        var data = new Dictionary<string, object> { { "should_soft_delete", shouldSoftDelete } };
+        return this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/users/{uid}", data, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
@@ -757,7 +808,7 @@ public class Api : IGotrueApi<User, Session>
     /// </summary>
     /// <returns>mpose up -d
     /// </returns>
-    public Task<Settings?> Settings() => Helpers.MakeRequestAsync<Settings>(HttpMethod.Get, $"{this.Url}/settings", null, this.Headers);
+    public Task<Settings?> Settings() => this.MakeRequestAsync<Settings>(HttpMethod.Get, $"{this.Url}/settings", null, this.Headers);
 
     /// <summary>
     /// Generates email links and OTPs to be sent via a custom email provider.
@@ -769,7 +820,7 @@ public class Api : IGotrueApi<User, Session>
     {
         var url = string.IsNullOrEmpty(options.RedirectTo) ? $"{this.Url}/admin/generate_link" : $"{this.Url}/admin/generate_link?redirect_to={options.RedirectTo}";
 
-        return Helpers.MakeRequestAsync(HttpMethod.Post, url, options, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync(HttpMethod.Post, url, options, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
@@ -790,6 +841,6 @@ public class Api : IGotrueApi<User, Session>
             { "refresh_token", refreshToken }
         };
 
-        return Helpers.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=refresh_token", data, this.Headers.MergeLeft(headers));
+        return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=refresh_token", data, this.Headers.MergeLeft(headers));
     }
 }

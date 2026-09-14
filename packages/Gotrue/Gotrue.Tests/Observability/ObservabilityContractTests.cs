@@ -41,22 +41,22 @@ public class ObservabilityContractTests
     [TestInitialize]
     public void TestInitializer()
     {
-        server = new MockGotrueServer();
-        client = new Client(new ClientOptions
+        this.server = new MockGotrueServer();
+        this.client = new Client(new ClientOptions
         {
-            Url = server.Url,
+            Url = this.server.Url,
             AutoRefreshToken = true,
             AllowUnconfirmedUserSessions = false,
             Headers = new Dictionary<string, string> { { "apikey", MockGotrueServer.ApiKey } },
         });
-        activityListener = new ActivityListener
+        this.activityListener = new ActivityListener
         {
             ShouldListenTo = source => source.Name == GotrueDiagnostics.SourceName,
             Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
-            ActivityStopped = activity => activities.Add(activity),
+            ActivityStopped = activity => this.activities.Add(activity),
         };
-        ActivitySource.AddActivityListener(activityListener);
-        meterListener = new MeterListener
+        ActivitySource.AddActivityListener(this.activityListener);
+        this.meterListener = new MeterListener
         {
             InstrumentPublished = (instrument, listener) =>
             {
@@ -66,45 +66,45 @@ public class ObservabilityContractTests
                 }
             },
         };
-        meterListener.SetMeasurementEventCallback<double>((instrument, value, tags, _) =>
+        this.meterListener.SetMeasurementEventCallback<double>((instrument, value, tags, _) =>
         {
             var tagValues = new Dictionary<string, object?>();
             foreach (var tag in tags)
             {
                 tagValues[tag.Key] = tag.Value;
             }
-            lock (measurements)
+            lock (this.measurements)
             {
-                measurements.Add(new RecordedMeasurement(instrument.Name, instrument.Unit, value, tagValues));
+                this.measurements.Add(new RecordedMeasurement(instrument.Name, instrument.Unit, value, tagValues));
             }
         });
-        meterListener.Start();
+        this.meterListener.Start();
     }
 
     [TestCleanup]
     public void TestCleanup()
     {
-        client.Shutdown();
-        activityListener.Dispose();
-        meterListener.Dispose();
-        server.Dispose();
+        this.client.Shutdown();
+        this.activityListener.Dispose();
+        this.meterListener.Dispose();
+        this.server.Dispose();
     }
 
     [TestMethod]
     public async Task HttpSpan_ShouldRecordUrlWithoutQueryString()
     {
-        MockTokenSuccess();
-        await Refresh();
-        HttpTokenSpan().GetTagItem("url.full").Should().Be($"{server.Url}/token",
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.HttpTokenSpan().GetTagItem("url.full").Should().Be($"{this.server.Url}/token",
             "the query string carries grant types and credentials and must never be recorded");
     }
 
     [TestMethod]
     public async Task HttpSpan_ShouldFollowOpenTelemetryHttpClientConventions()
     {
-        MockTokenSuccess();
-        await Refresh();
-        var httpSpan = HttpTokenSpan();
+        this.MockTokenSuccess();
+        await this.Refresh();
+        var httpSpan = this.HttpTokenSpan();
         httpSpan.Kind.Should().Be(ActivityKind.Client);
         httpSpan.GetTagItem("http.request.method").Should().Be("POST");
         httpSpan.GetTagItem("http.response.status_code").Should().Be(200);
@@ -113,18 +113,18 @@ public class ObservabilityContractTests
     [TestMethod]
     public async Task DomainSpan_ShouldParentTheHttpSpan()
     {
-        MockTokenSuccess();
-        await Refresh();
-        var domainSpan = activities.Should().ContainSingle(a => a.OperationName == "gotrue.refresh_token").Which;
-        HttpTokenSpan().ParentSpanId.Should().Be(domainSpan.SpanId);
+        this.MockTokenSuccess();
+        await this.Refresh();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.refresh_token").Which;
+        this.HttpTokenSpan().ParentSpanId.Should().Be(domainSpan.SpanId);
     }
 
     [TestMethod]
     public async Task HttpSpan_ShouldBeMarkedError_GivenFailedRequest()
     {
-        MockTokenFailure();
-        await FluentActions.Awaiting(Refresh).Should().ThrowAsync<Exception>();
-        var httpSpan = HttpTokenSpan();
+        this.MockTokenFailure();
+        await FluentActions.Awaiting(this.Refresh).Should().ThrowAsync<Exception>();
+        var httpSpan = this.HttpTokenSpan();
         httpSpan.Status.Should().Be(ActivityStatusCode.Error);
         httpSpan.GetTagItem("http.response.status_code").Should().Be(500);
     }
@@ -132,9 +132,9 @@ public class ObservabilityContractTests
     [TestMethod]
     public async Task DomainSpan_ShouldBeMarkedError_GivenFailedRefresh()
     {
-        MockTokenFailure();
-        await FluentActions.Awaiting(Refresh).Should().ThrowAsync<Exception>();
-        var domainSpan = activities.Should().ContainSingle(a => a.OperationName == "gotrue.refresh_token").Which;
+        this.MockTokenFailure();
+        await FluentActions.Awaiting(this.Refresh).Should().ThrowAsync<Exception>();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.refresh_token").Which;
         domainSpan.Status.Should().Be(ActivityStatusCode.Error,
             "a failed refresh must mark its domain span as error so a silently-swallowed background auto-refresh failure is still visible in traces (issue #91)");
     }
@@ -142,17 +142,17 @@ public class ObservabilityContractTests
     [TestMethod]
     public async Task RequestDurationHistogram_ShouldRecordOncePerRequest()
     {
-        MockTokenSuccess();
-        await Refresh();
-        meterListener.RecordObservableInstruments();
-        var measurement = measurements.Should().ContainSingle().Which;
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.meterListener.RecordObservableInstruments();
+        var measurement = this.measurements.Should().ContainSingle().Which;
         using (new AssertionScope())
         {
             measurement.Instrument.Should().Be("supabase.gotrue.http.request.duration");
             measurement.Unit.Should().Be("s", "the histogram records a duration in seconds");
             measurement.Value.Should().BeGreaterThan(0);
             measurement.Tags.Should().Contain("http.request.method", "POST");
-            measurement.Tags.Should().Contain("server.address", new Uri(server.Url).Host);
+            measurement.Tags.Should().Contain("server.address", new Uri(this.server.Url).Host);
             measurement.Tags.Should().Contain("http.response.status_code", 200);
             measurement.Tags.Should().Contain("url.path", "/token");
             measurement.Tags.Should().NotContainKey("error.type", "a successful request carries no error tag");
@@ -162,10 +162,10 @@ public class ObservabilityContractTests
     [TestMethod]
     public async Task RequestDurationHistogram_ShouldTagErrorType_GivenFailedRequest()
     {
-        MockTokenFailure();
-        await FluentActions.Awaiting(Refresh).Should().ThrowAsync<Exception>();
-        meterListener.RecordObservableInstruments();
-        var measurement = measurements.Should().ContainSingle().Which;
+        this.MockTokenFailure();
+        await FluentActions.Awaiting(this.Refresh).Should().ThrowAsync<Exception>();
+        this.meterListener.RecordObservableInstruments();
+        var measurement = this.measurements.Should().ContainSingle().Which;
         measurement.Tags.Should().Contain("http.response.status_code", 500);
         measurement.Tags.Should().Contain("error.type", "500");
     }
@@ -173,13 +173,13 @@ public class ObservabilityContractTests
     [TestMethod]
     public async Task Telemetry_ShouldNotContainSessionTokens()
     {
-        MockTokenSuccess();
-        await Refresh();
-        var tagValues = activities
+        this.MockTokenSuccess();
+        await this.Refresh();
+        var tagValues = this.activities
             .SelectMany(a => a.TagObjects)
             .Select(tag => tag.Value?.ToString() ?? "")
-            .Concat(measurements.SelectMany(m => m.Tags.Values).Select(v => v?.ToString() ?? ""))
-            .Concat(activities.Select(a => a.DisplayName));
+            .Concat(this.measurements.SelectMany(m => m.Tags.Values).Select(v => v?.ToString() ?? ""))
+            .Concat(this.activities.Select(a => a.DisplayName));
         tagValues.Should().OnlyContain(value =>
             !value.Contains(AccessToken) && !value.Contains(RefreshTokenValue) &&
             !value.Contains("new-access-token") && !value.Contains("new-refresh-token"));
@@ -190,27 +190,27 @@ public class ObservabilityContractTests
     {
         var messages = new List<string>();
 #pragma warning disable CS0618 // the obsolete debug surface stays leak-free until it is removed in v8
-        client.AddDebugListener((message, _) => messages.Add(message));
+        this.client.AddDebugListener((message, _) => messages.Add(message));
 #pragma warning restore CS0618
-        MockTokenSuccess();
-        await Refresh();
-        server.Reset();
-        MockTokenFailure();
-        var session = await client.RetrieveSessionAsync();
-        session.Should().BeNull("the failed refresh destroys the session");
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.server.Reset();
+        this.MockTokenFailure();
+        var session = await this.client.RetrieveSessionAsync();
+        session.Should().NotBeNull("a 5xx is transient, so the session is kept");
         messages.Should().NotBeEmpty("the failed refresh should be reported to debug listeners");
         messages.Should().OnlyContain(message =>
                 !message.Contains("new-access-token") && !message.Contains("new-refresh-token"),
             "debug output must never contain the session's access or refresh token");
     }
 
-    private Task Refresh() => client.RefreshToken(AccessToken, RefreshTokenValue);
+    private Task Refresh() => this.client.RefreshToken(AccessToken, RefreshTokenValue);
 
     private Activity HttpTokenSpan() =>
-        activities.Should().ContainSingle(a => a.OperationName == "POST /token").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /token").Which;
 
     private void MockTokenSuccess() =>
-        server
+        this.server
             .Given(Request.Create().WithPath("/token").UsingPost())
             .RespondWith(Response.Create()
                 .WithStatusCode(200)
@@ -218,7 +218,7 @@ public class ObservabilityContractTests
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TokenRefresh", "Fixtures", "token_success.json"))));
 
     private void MockTokenFailure() =>
-        server
+        this.server
             .Given(Request.Create().WithPath("/token").UsingPost())
             .RespondWith(Response.Create()
                 .WithStatusCode(500)

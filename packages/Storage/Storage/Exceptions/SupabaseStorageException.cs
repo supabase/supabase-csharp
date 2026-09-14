@@ -1,24 +1,25 @@
-﻿using System;
+using System;
 using System.Net.Http;
 
-namespace Supabase.Storage.Exceptions
+namespace Supabase.Storage.Exceptions;
+
+public class SupabaseStorageException : Exception
 {
-    public class SupabaseStorageException : Exception
-    {
-        public SupabaseStorageException(string? message) : base(message) { }
-        public SupabaseStorageException(string? message, Exception? innerException) : base(message, innerException) { }
+    public SupabaseStorageException(string? message) : base(message) { }
+    public SupabaseStorageException(string? message, Exception? innerException) : base(message, innerException) { }
 
-        public HttpResponseMessage? Response { get; internal set; }
+    public HttpResponseMessage? Response { get; internal set; }
 
-        public string? Content { get; internal set; }
+    public string? Content { get; internal set; }
 
-        public int StatusCode { get; internal set; }
+    public int StatusCode { get; internal set; }
 
-        public FailureHint.Reason Reason { get; private set; }
+    /// <summary>
+    /// Gets the error code returned by the Storage service, if available.
+    /// </summary>
+    public string? Code { get; internal set; }
 
-        public void AddReason()
-        {
-            Reason = FailureHint.DetectReason(this);
-        }
-    }
+    public FailureHint.Reason Reason { get; private set; }
+
+    public void AddReason() => this.Reason = FailureHint.DetectReason(this);
 }

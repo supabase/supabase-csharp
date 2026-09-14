@@ -31,9 +31,19 @@ Supabase.Storage.Client.Client(string! url, System.Collections.Generic.Dictionar
 Supabase.Storage.Client.From(string! id) -> Supabase.Storage.Interfaces.IStorageFileApi<Supabase.Storage.FileObject!>!
 Supabase.Storage.ClientOptions
 Supabase.Storage.ClientOptions.ClientOptions() -> void
+Supabase.Storage.ClientOptions.HttpDownloadClient.get -> System.Net.Http.HttpClient?
+Supabase.Storage.ClientOptions.HttpDownloadClient.set -> void
 Supabase.Storage.ClientOptions.HttpDownloadTimeout -> System.TimeSpan
+Supabase.Storage.ClientOptions.HttpRequestClient.get -> System.Net.Http.HttpClient?
+Supabase.Storage.ClientOptions.HttpRequestClient.set -> void
 Supabase.Storage.ClientOptions.HttpRequestTimeout -> System.TimeSpan
+Supabase.Storage.ClientOptions.HttpUploadClient.get -> System.Net.Http.HttpClient?
+Supabase.Storage.ClientOptions.HttpUploadClient.set -> void
 Supabase.Storage.ClientOptions.HttpUploadTimeout -> System.TimeSpan
+Supabase.Storage.ClientOptions.Proxy.get -> System.Net.IWebProxy?
+Supabase.Storage.ClientOptions.Proxy.set -> void
+Supabase.Storage.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
+Supabase.Storage.ClientOptions.Retry.set -> void
 Supabase.Storage.CreateSignedUrlResponse
 Supabase.Storage.CreateSignedUrlResponse.CreateSignedUrlResponse() -> void
 Supabase.Storage.CreateSignedUrlResponse.SignedUrl.get -> string?
@@ -53,6 +63,8 @@ Supabase.Storage.DownloadOptions.DownloadOptions() -> void
 Supabase.Storage.DownloadOptions.FileName.get -> string?
 Supabase.Storage.DownloadOptions.FileName.set -> void
 Supabase.Storage.ErrorResponse
+Supabase.Storage.ErrorResponse.Code.get -> string?
+Supabase.Storage.ErrorResponse.Code.set -> void
 Supabase.Storage.ErrorResponse.ErrorResponse() -> void
 Supabase.Storage.ErrorResponse.Message.get -> string?
 Supabase.Storage.ErrorResponse.Message.set -> void
@@ -69,6 +81,7 @@ Supabase.Storage.Exceptions.FailureHint.Reason.NotFound = 3 -> Supabase.Storage.
 Supabase.Storage.Exceptions.FailureHint.Reason.Unknown = 0 -> Supabase.Storage.Exceptions.FailureHint.Reason
 Supabase.Storage.Exceptions.SupabaseStorageException
 Supabase.Storage.Exceptions.SupabaseStorageException.AddReason() -> void
+Supabase.Storage.Exceptions.SupabaseStorageException.Code.get -> string?
 Supabase.Storage.Exceptions.SupabaseStorageException.Content.get -> string?
 Supabase.Storage.Exceptions.SupabaseStorageException.Reason.get -> Supabase.Storage.Exceptions.FailureHint.Reason
 Supabase.Storage.Exceptions.SupabaseStorageException.Response.get -> System.Net.Http.HttpResponseMessage?

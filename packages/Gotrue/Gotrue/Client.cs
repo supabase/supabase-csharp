@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Supabase.Core.Diagnostics;
+using Supabase.Core.Http;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
@@ -46,6 +48,21 @@ public class Client : IGotrueClient<User, Session>
     private IGotruePersistenceListener<Session>? sessionPersistence;
 
     /// <summary>
+    ///     Guards <see cref="refreshAttempt" /> and the writes to <see cref="CurrentSession" />.
+    /// </summary>
+    private readonly object refreshGate = new();
+
+    /// <summary>
+    ///     Orders persistence writes, so a destroy in flight cannot land after the save that replaced it.
+    /// </summary>
+    private readonly SemaphoreSlim persistenceGate = new(1, 1);
+
+    /// <summary>
+    ///     The running token refresh, shared by concurrent callers. A completed attempt is replaced, never reused.
+    /// </summary>
+    internal RefreshAttempt? refreshAttempt;
+
+    /// <summary>
     ///     Initializes the GoTrue stateful client.
     ///     You will likely want to at least specify a
     ///     <see>
@@ -63,9 +80,9 @@ public class Client : IGotrueClient<User, Session>
     ///     </see>
     ///     .
     ///     For a typical client application, you'll want to load the session from persistence
-    ///     and then refresh it. If your application is listening for session changes, you'll
-    ///     get two SignIn notifications if the persisted session is valid - one for the
-    ///     session loaded from disk, and a second on a successful session refresh.
+    ///     and then refresh it. If your application is listening for session changes, a valid
+    ///     persisted session raises UserUpdated when it is loaded from disk, and TokenRefreshed
+    ///     once the refresh succeeds - neither step raises SignedIn.
     ///     <remarks></remarks>
     ///     <example>
     ///         var client = new Supabase.Gotrue.Client(options);
@@ -78,7 +95,7 @@ public class Client : IGotrueClient<User, Session>
     {
         options ??= new ClientOptions();
         this.Options = options;
-        this.api = new Api(options.Url, options.Headers);
+        this.api = new Api(options.Url, options.Headers, options.HttpClient ?? (options.Proxy != null ? DefaultHttpClientFactory.Create(proxy: options.Proxy) : null), options.Retry);
         if (options.AutoRefreshToken)
         {
             this.TokenRefresh = new TokenRefresh(this);
@@ -92,15 +109,8 @@ public class Client : IGotrueClient<User, Session>
     public TokenRefresh? TokenRefresh { get; }
 
     /// <inheritdoc />
-    public void SetPersistence(IGotrueSessionPersistence<Session> persistence)
-    {
-        if (this.sessionPersistence != null)
-        {
-            this.authEventHandlers.Remove(this.sessionPersistence.EventHandler);
-        }
+    public void SetPersistence(IGotrueSessionPersistence<Session> persistence) =>
         this.sessionPersistence = new PersistenceListener(persistence);
-        this.authEventHandlers.Add(this.sessionPersistence.EventHandler);
-    }
 
     /// <inheritdoc />
     public ClientOptions Options { get; }
@@ -109,7 +119,42 @@ public class Client : IGotrueClient<User, Session>
     public Task<User?> GetUser(string jwt) => this.api.GetUser(jwt);
 
     /// <inheritdoc />
-    public void NotifyAuthStateChange(AuthState stateChanged)
+    public void NotifyAuthStateChange(AuthState stateChanged) => this.InvokeStateChangedHandlers(stateChanged);
+
+    /// <inheritdoc />
+    public async Task NotifyAuthStateChangeAsync(AuthState stateChanged, CancellationToken cancellationToken = default)
+    {
+        await this.PersistSessionChangeAsync(stateChanged, cancellationToken).ConfigureAwait(false);
+        this.InvokeStateChangedHandlers(stateChanged);
+    }
+
+    private async Task PersistSessionChangeAsync(AuthState stateChanged, CancellationToken cancellationToken)
+    {
+        if (this.sessionPersistence == null)
+        {
+            return;
+        }
+        await this.persistenceGate.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            // A SignedOut that finds a session was raced by a sign-in, and must not wipe what that sign-in saved.
+            if (stateChanged == SignedOut && this.CurrentSession != null)
+            {
+                return;
+            }
+            await this.sessionPersistence.EventHandlerAsync(this, stateChanged, cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            this.debugNotification?.Log("Auth State Change Handler Failure", e);
+        }
+        finally
+        {
+            this.persistenceGate.Release();
+        }
+    }
+
+    private void InvokeStateChangedHandlers(AuthState stateChanged)
     {
         foreach (var handler in this.authEventHandlers)
         {
@@ -170,7 +215,6 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
         var session = type switch
         {
             SignUpType.Email => await this.api.SignUpWithEmail(identifier, password, options),
@@ -179,8 +223,8 @@ public class Client : IGotrueClient<User, Session>
         };
         if (session?.User?.IsConfirmed == true || session?.User != null && this.Options.AllowUnconfirmedUserSessions)
         {
-            this.UpdateSession(session);
-            this.NotifyAuthStateChange(SignedIn);
+            await this.UpdateSessionAsync(session).ConfigureAwait(false);
+            await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
             return this.CurrentSession;
         }
         return session;
@@ -208,10 +252,9 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
         var result = await this.api.SignInWithIdToken(provider, idToken, accessToken, nonce, captchaToken);
-        this.UpdateSession(result);
-        this.NotifyAuthStateChange(SignedIn);
+        await this.UpdateSessionAsync(result).ConfigureAwait(false);
+        await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
         return result;
     }
 
@@ -224,7 +267,6 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
         return await this.api.SignInWithOtp(options);
     }
 
@@ -237,7 +279,6 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
         return await this.api.SignInWithOtp(options);
     }
 
@@ -265,7 +306,7 @@ public class Client : IGotrueClient<User, Session>
         {
             case SignInType.Email:
                 newSession = await this.api.SignInWithEmail(identifierOrToken, password!);
-                this.UpdateSession(newSession);
+                await this.UpdateSessionAsync(newSession).ConfigureAwait(false);
                 break;
             case SignInType.Phone:
                 if (string.IsNullOrEmpty(password))
@@ -274,7 +315,7 @@ public class Client : IGotrueClient<User, Session>
                     return null;
                 }
                 newSession = await this.api.SignInWithPhone(identifierOrToken, password!);
-                this.UpdateSession(newSession);
+                await this.UpdateSessionAsync(newSession).ConfigureAwait(false);
                 break;
             case SignInType.RefreshToken:
                 if (this.CurrentSession == null || string.IsNullOrEmpty(this.CurrentSession.AccessToken))
@@ -292,42 +333,38 @@ public class Client : IGotrueClient<User, Session>
         {
             return null;
         }
-        this.NotifyAuthStateChange(SignedIn);
+        await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
         return this.CurrentSession;
     }
 
     /// <inheritdoc />
-    public Task<ProviderAuthState> SignIn(Provider provider, SignInOptions? options = null)
+    public async Task<ProviderAuthState> SignIn(Provider provider, SignInOptions? options = null)
     {
         if (!this.Online)
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
-        var providerUri = this.api.GetUriForProvider(provider, options);
-        return Task.FromResult(providerUri);
+        return this.api.GetUriForProvider(provider, options);
     }
 
     /// <inheritdoc />
-    public Task<SSOResponse?> SignInWithSSO(Guid providerId, SignInWithSSOOptions? options = null)
+    public async Task<SSOResponse?> SignInWithSSO(Guid providerId, SignInWithSSOOptions? options = null)
     {
         if (!this.Online)
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
-        return this.api.SignInWithSSO(providerId, options);
+        return await this.api.SignInWithSSO(providerId, options).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public Task<SSOResponse?> SignInWithSSO(string domain, SignInWithSSOOptions? options = null)
+    public async Task<SSOResponse?> SignInWithSSO(string domain, SignInWithSSOOptions? options = null)
     {
         if (!this.Online)
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
-        return this.api.SignInWithSSO(domain, options);
+        return await this.api.SignInWithSSO(domain, options).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -338,10 +375,9 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
         var newSession = await this.api.SignInAnonymously(options);
-        this.UpdateSession(newSession);
-        this.NotifyAuthStateChange(SignedIn);
+        await this.UpdateSessionAsync(newSession).ConfigureAwait(false);
+        await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
         return this.CurrentSession;
     }
 
@@ -354,12 +390,11 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
         var session = await this.api.VerifyMobileOTP(phone, token, type);
         if (session?.AccessToken != null)
         {
-            this.UpdateSession(session);
-            this.NotifyAuthStateChange(SignedIn);
+            await this.UpdateSessionAsync(session).ConfigureAwait(false);
+            await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
             return session;
         }
         return null;
@@ -374,12 +409,11 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
         var session = await this.api.VerifyEmailOTP(email, token, type);
         if (session?.AccessToken != null)
         {
-            this.UpdateSession(session);
-            this.NotifyAuthStateChange(SignedIn);
+            await this.UpdateSessionAsync(session).ConfigureAwait(false);
+            await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
             return session;
         }
         return null;
@@ -393,12 +427,11 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        this.DestroySession();
         var session = await this.api.VerifyTokenHash(tokenHash, type);
         if (session?.AccessToken != null)
         {
-            this.UpdateSession(session);
-            this.NotifyAuthStateChange(SignedIn);
+            await this.UpdateSessionAsync(session).ConfigureAwait(false);
+            await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
             return session;
         }
         return null;
@@ -438,8 +471,8 @@ public class Client : IGotrueClient<User, Session>
         var result = await this.api.LinkIdentityWithIdToken(this.CurrentSession.AccessToken!, options).ConfigureAwait(false);
         if (result?.AccessToken != null)
         {
-            this.UpdateSession(result);
-            this.NotifyAuthStateChange(SignedIn);
+            await this.UpdateSessionAsync(result).ConfigureAwait(false);
+            await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
         }
         return result;
     }
@@ -467,15 +500,15 @@ public class Client : IGotrueClient<User, Session>
         {
             await this.api.SignOut(this.CurrentSession.AccessToken, scope);
         }
-        this.UpdateSession(null);
-        this.NotifyAuthStateChange(SignedOut);
+        await this.UpdateSessionAsync(null).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.UpdateUser);
-        if (this.CurrentSession == null || string.IsNullOrEmpty(this.CurrentSession.AccessToken))
+        var session = this.CurrentSession;
+        if (session == null || string.IsNullOrEmpty(session.AccessToken))
         {
             throw new GotrueException("Not Logged in.");
         }
@@ -483,9 +516,15 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        var result = await this.api.UpdateUser(this.CurrentSession.AccessToken!, attributes);
-        this.CurrentSession.User = result;
-        this.NotifyAuthStateChange(UserUpdated);
+        var result = await this.api.UpdateUser(session.AccessToken!, attributes);
+        // The session may have refreshed meanwhile, so the update lands on the current one if it is still this user's.
+        var current = this.CurrentSession;
+        if (current == null || current.User?.Id != result?.Id)
+        {
+            return result;
+        }
+        current.User = result;
+        await this.NotifyAuthStateChangeAsync(UserUpdated).ConfigureAwait(false);
         return result;
     }
 
@@ -532,16 +571,19 @@ public class Client : IGotrueClient<User, Session>
             throw new GotrueException("Only supported when online", Offline);
         }
         await this.RefreshToken();
-        var user = await this.api.GetUser(this.CurrentSession.AccessToken);
-        this.CurrentSession.User = user;
-        return this.CurrentSession;
+        var session = this.CurrentSession;
+        if (session == null)
+        {
+            throw new GotrueException("Not Logged in.", NoSessionFound);
+        }
+        session.User = await this.api.GetUser(session.AccessToken);
+        return session;
     }
 
     /// <inheritdoc />
     public async Task<Session> SetSession(string accessToken, string refreshToken, bool forceAccessTokenRefresh = false)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SetSession);
-        this.DestroySession();
         if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
         {
             throw new GotrueException("`accessToken` and `refreshToken` cannot be empty.", NoSessionFound);
@@ -558,23 +600,34 @@ public class Client : IGotrueClient<User, Session>
             {
                 throw new GotrueException("Could not generate a session given the provided parameters.", NoSessionFound);
             }
-            this.CurrentSession = result;
-            this.NotifyAuthStateChange(SignedIn);
-            return this.CurrentSession;
+            this.SetCurrentSession(result);
+            await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
+            return result;
         }
         var iat = payload.IssuedAt;
         var exp = payload.ValidTo;
         var expiresIn = (long) (exp - iat).TotalSeconds;
-        this.CurrentSession = new Session
+        var session = new Session
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             TokenType = "bearer",
             ExpiresIn = expiresIn,
-            User = await this.api.GetUser(accessToken),
         };
-        this.NotifyAuthStateChange(SignedIn);
-        return this.CurrentSession;
+        // Installed before the user is fetched, so a refresh meanwhile moves to these tokens instead of spending them.
+        this.SetCurrentSession(session);
+        try
+        {
+            session.User = await this.api.GetUser(accessToken);
+        }
+        catch
+        {
+            // Nothing was announced yet, so the failed install just goes away.
+            this.TryReplaceSession(null, refreshToken);
+            throw;
+        }
+        await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
+        return session;
     }
 
     /// <summary>
@@ -624,11 +677,11 @@ public class Client : IGotrueClient<User, Session>
         };
         if (storeSession)
         {
-            this.UpdateSession(session);
-            this.NotifyAuthStateChange(SignedIn);
+            await this.UpdateSessionAsync(session).ConfigureAwait(false);
+            await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
             if (query.Get("type") == "recovery")
             {
-                this.NotifyAuthStateChange(PasswordRecovery);
+                await this.NotifyAuthStateChangeAsync(PasswordRecovery).ConfigureAwait(false);
             }
         }
         return session;
@@ -645,10 +698,10 @@ public class Client : IGotrueClient<User, Session>
             return null;
         }
 
-        // If we aren't online, we can't refresh the token
+        // We can't refresh the token offline, so return the session as loaded.
         if (!this.Online)
         {
-            throw new GotrueException("Only supported when online", Offline);
+            return this.CurrentSession;
         }
 
         // We have a session, and hasn't expired, and we seem to be online. Let's try to refresh it.
@@ -659,14 +712,19 @@ public class Client : IGotrueClient<User, Session>
                 await this.RefreshToken();
                 return this.CurrentSession;
             }
+            catch (GotrueException e) when (e.Reason is InvalidRefreshToken)
+            {
+                // RefreshToken destroyed the session, unless it was replaced mid-flight.
+                activity.SetFailure(e);
+                return this.CurrentSession;
+            }
             catch (Exception e)
             {
+                // Anything else is treated as transient - keep the session so the next refresh can retry.
                 // Never log the session itself here - it contains the access and refresh tokens.
                 this.debugNotification?.Log($"Failed to refresh token ({e.Message})", e);
-                this.debugNotification?.Log($"Destroying session created at {this.CurrentSession?.CreatedAt:O} (expires in {this.CurrentSession?.ExpiresIn}s) that could not be refreshed");
                 activity.SetFailure(e);
-                this.DestroySession();
-                return null;
+                return this.CurrentSession;
             }
         }
         return this.CurrentSession;
@@ -679,8 +737,8 @@ public class Client : IGotrueClient<User, Session>
         var result = await this.api.ExchangeCodeForSession(codeVerifier, authCode);
         if (result != null)
         {
-            this.UpdateSession(result);
-            this.NotifyAuthStateChange(SignedIn);
+            await this.UpdateSessionAsync(result).ConfigureAwait(false);
+            await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
             return this.CurrentSession;
         }
         return null;
@@ -724,14 +782,13 @@ public class Client : IGotrueClient<User, Session>
             {
                 throw new GotrueException("Could not refresh token from provided session.", NoSessionFound);
             }
-            this.CurrentSession = result;
-            this.NotifyAuthStateChange(TokenRefreshed);
+            this.SetCurrentSession(result);
+            await this.NotifyAuthStateChangeAsync(TokenRefreshed).ConfigureAwait(false);
         }
         catch (GotrueException ex) when (ex.Reason is InvalidRefreshToken)
         {
             activity.SetFailure(ex);
-            this.DestroySession();
-            this.NotifyAuthStateChange(SignedOut);
+            await this.ClearRejectedSessionAsync(refreshToken).ConfigureAwait(false);
             throw;
         }
         catch (Exception ex)
@@ -744,30 +801,70 @@ public class Client : IGotrueClient<User, Session>
     /// <inheritdoc />
     public async Task RefreshToken()
     {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RefreshToken);
         if (!this.Online)
         {
             throw new GotrueException("Only supported when online", Offline);
         }
-        if (this.CurrentSession == null || string.IsNullOrEmpty(this.CurrentSession?.AccessToken) || string.IsNullOrEmpty(this.CurrentSession?.RefreshToken))
+        Task attempt;
+        // Refresh tokens are single-use, and startup can race the auto-refresh timer here - so callers share the in-flight attempt.
+        // The session is read and the attempt registered under one hold of the gate, so a sign-out cannot interleave.
+        lock (this.refreshGate)
         {
-            throw new GotrueException("No current session.", NoSessionFound);
+            var session = this.CurrentSession;
+            if (session == null || string.IsNullOrEmpty(session.AccessToken) || string.IsNullOrEmpty(session.RefreshToken))
+            {
+                throw new GotrueException("No current session.", NoSessionFound);
+            }
+            if (this.refreshAttempt is { Refresh.IsCompleted: false } current && current.Token == session.RefreshToken)
+            {
+                attempt = current.Refresh;
+            }
+            else
+            {
+                attempt = this.RefreshCurrentSession(session.AccessToken!, session.RefreshToken!);
+                this.refreshAttempt = new RefreshAttempt(session.RefreshToken!, attempt);
+            }
         }
         try
         {
-            var result = await this.api.RefreshAccessToken(this.CurrentSession.AccessToken!, this.CurrentSession.RefreshToken!);
+            await attempt;
+        }
+        finally
+        {
+            // Only this attempt's own registration is cleared, so a later attempt is never deregistered.
+            lock (this.refreshGate)
+            {
+                if (ReferenceEquals(this.refreshAttempt?.Refresh, attempt))
+                {
+                    this.refreshAttempt = null;
+                }
+            }
+        }
+    }
+
+    private async Task RefreshCurrentSession(string accessToken, string refreshToken)
+    {
+        // The refresh gate is held while this method starts, and app code must never run under it.
+        await Task.Yield();
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RefreshToken);
+        try
+        {
+            var result = await this.api.RefreshAccessToken(accessToken, refreshToken);
             if (result == null || string.IsNullOrEmpty(result.AccessToken))
             {
                 throw new GotrueException("Could not refresh token from provided session.", NoSessionFound);
             }
-            this.CurrentSession = result;
-            this.NotifyAuthStateChange(TokenRefreshed);
+            // The session was replaced while this call was in flight, so the result is the previous user's.
+            if (!this.TryReplaceSession(result, refreshToken))
+            {
+                return;
+            }
+            await this.NotifyAuthStateChangeAsync(TokenRefreshed).ConfigureAwait(false);
         }
         catch (GotrueException ex) when (ex.Reason is InvalidRefreshToken)
         {
             activity.SetFailure(ex);
-            this.DestroySession();
-            this.NotifyAuthStateChange(SignedOut);
+            await this.ClearRejectedSessionAsync(refreshToken).ConfigureAwait(false);
             throw;
         }
         catch (Exception ex)
@@ -781,9 +878,56 @@ public class Client : IGotrueClient<User, Session>
     /// <inheritdoc />
     public void LoadSession()
     {
-        if (this.sessionPersistence != null)
+        if (this.sessionPersistence == null)
         {
-            this.UpdateSession(this.sessionPersistence.Persistence.LoadSession());
+            return;
+        }
+        var before = this.CurrentSession;
+        Session? session;
+        try
+        {
+            session = this.sessionPersistence.Persistence.LoadSession();
+        }
+        catch (Exception e)
+        {
+            this.debugNotification?.Log($"Failed to load the persisted session ({e.Message})", e);
+            return;
+        }
+        this.ApplyLoadedSession(before, session);
+    }
+
+    /// <inheritdoc />
+    public async Task LoadSessionAsync(CancellationToken cancellationToken = default)
+    {
+        if (this.sessionPersistence == null)
+        {
+            return;
+        }
+        var before = this.CurrentSession;
+        Session? session;
+        try
+        {
+            session = await this.sessionPersistence.Persistence.LoadSessionAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            this.debugNotification?.Log($"Failed to load the persisted session ({e.Message})", e);
+            return;
+        }
+        this.ApplyLoadedSession(before, session);
+    }
+
+    private void ApplyLoadedSession(Session? before, Session? loaded)
+    {
+        var coldStartWithNothingToRestore = loaded == null && before == null;
+        var signInRacedTheLoad = !ReferenceEquals(this.CurrentSession, before);
+        if (coldStartWithNothingToRestore || signInRacedTheLoad)
+        {
+            return;
+        }
+        if (this.SetCurrentSession(loaded) is { } stateChanged)
+        {
+            this.NotifyAuthStateChange(stateChanged);
         }
     }
 
@@ -855,8 +999,8 @@ public class Client : IGotrueClient<User, Session>
             ExpiresIn = result.ExpiresIn,
             User = result.User,
         };
-        this.UpdateSession(session);
-        this.NotifyAuthStateChange(MfaChallengeVerified);
+        await this.UpdateSessionAsync(session).ConfigureAwait(false);
+        await this.NotifyAuthStateChangeAsync(MfaChallengeVerified).ConfigureAwait(false);
         return session;
     }
 
@@ -897,8 +1041,8 @@ public class Client : IGotrueClient<User, Session>
             ExpiresIn = result.ExpiresIn,
             User = result.User,
         };
-        this.UpdateSession(session);
-        this.NotifyAuthStateChange(MfaChallengeVerified);
+        await this.UpdateSessionAsync(session).ConfigureAwait(false);
+        await this.NotifyAuthStateChangeAsync(MfaChallengeVerified).ConfigureAwait(false);
         return session;
     }
 
@@ -963,28 +1107,66 @@ public class Client : IGotrueClient<User, Session>
         return Task.FromResult(response);
     }
 
-    /// <summary>
-    ///     Saves the session
-    /// </summary>
-    /// <param name="session"></param>
-    private void UpdateSession(Session? session)
+    private AuthState? SetCurrentSession(Session? session)
     {
+        bool dirty;
+        lock (this.refreshGate)
+        {
+            dirty = this.CurrentSession != session;
+            this.CurrentSession = session;
+            if (session == null)
+            {
+                // The session and the in-flight attempt clear together, so a concurrent RefreshToken cannot see one without the other.
+                this.refreshAttempt = null;
+            }
+        }
         if (session == null)
         {
-            this.CurrentSession = null;
-            this.NotifyAuthStateChange(SignedOut);
-            return;
+            return SignedOut;
         }
-        var dirty = this.CurrentSession != session;
-        this.CurrentSession = session;
-        if (dirty)
+        return dirty ? UserUpdated : null;
+    }
+
+    // Writes the session only while the given refresh token is still the current one.
+    private bool TryReplaceSession(Session? session, string expectedRefreshToken)
+    {
+        lock (this.refreshGate)
         {
-            this.NotifyAuthStateChange(UserUpdated);
+            if (this.CurrentSession?.RefreshToken != expectedRefreshToken)
+            {
+                return false;
+            }
+            this.SetCurrentSession(session);
+            return true;
         }
     }
 
+    private async Task UpdateSessionAsync(Session? session, CancellationToken cancellationToken = default)
+    {
+        if (this.SetCurrentSession(session) is { } stateChanged)
+        {
+            await this.NotifyAuthStateChangeAsync(stateChanged, cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    // Only signs out the session the token belonged to.
+    private async Task ClearRejectedSessionAsync(string refreshToken)
+    {
+        if (!this.TryReplaceSession(null, refreshToken) || this.CurrentSession != null)
+        {
+            return;
+        }
+        await this.NotifyAuthStateChangeAsync(SignedOut).ConfigureAwait(false);
+    }
+
     /// <summary>
-    ///     Clears the session
+    ///     A token refresh in flight, with the refresh token it was started for. A caller holding a different
+    ///     one belongs to another session, so it starts its own attempt instead of joining this one.
     /// </summary>
-    private void DestroySession() => this.UpdateSession(null);
+    internal readonly struct RefreshAttempt(string token, Task refresh)
+    {
+        internal string Token { get; } = token;
+
+        internal Task Refresh { get; } = refresh;
+    }
 }

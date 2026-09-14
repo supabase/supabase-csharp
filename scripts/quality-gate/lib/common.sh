@@ -55,3 +55,65 @@ all_test_projects() {  # all_test_projects <dir>
   find "$1" -name '*Tests*.csproj' -o -name '*.Tests.csproj' 2>/dev/null \
     | grep -v '/bin/\|/obj/\|/scripts/quality-gate/fixtures/' | sort -u
 }
+
+# One or many packages? A baseline that pins testProject settles it as single.
+# Otherwise, the number of test projects under the directory decides: more than one
+# means the directory holds several packages, so the run is a solution. $ALL forces
+# the solution run for a directory that would otherwise resolve to one package.
+#
+# Reads $PACKAGE_DIR/$PACKAGE_NAME/$ALL/$CLI_PROJECT (set by the caller's argument
+# parsing); writes $BASELINE, $PKG_DIR/$PKG_NAME/$PKG_PROJ/$PKG_TEST, $MULTI, $SLN,
+# $SCOPE_DIR, $BUILD_TARGET, $SCAN_TARGET. Shared by gate.sh and any other entry
+# point (e.g. format-suggest.sh) that needs the same package resolution.
+discover_scope() {
+  BASELINE="$PACKAGE_DIR/.gate-baseline.json"
+  PKG_DIR=(); PKG_NAME=(); PKG_PROJ=(); PKG_TEST=()
+  MULTI=0; SLN=""
+
+  local _bpkg_test; _bpkg_test="$(bget .testProject)"
+  [[ -n "$_bpkg_test" ]] && _bpkg_test="$PACKAGE_DIR/$_bpkg_test"
+
+  if [[ -n "$_bpkg_test" && -f "$_bpkg_test" ]]; then
+    MULTI=0                                   # baseline pins a single package
+  else
+    local _dirs=() _seen="" t p
+    while IFS= read -r t; do
+      [[ -n "$t" ]] || continue
+      p="$(cd "$(dirname "$(dirname "$t")")" && pwd -P)"
+      case "$_seen" in *"|$p|"*) ;; *) _seen="$_seen|$p|"; _dirs+=("$p") ;; esac
+    done < <(all_test_projects "$PACKAGE_DIR")
+    if [[ ${#_dirs[@]} -gt 1 || ( $ALL -eq 1 && ${#_dirs[@]} -ge 1 ) ]]; then
+      MULTI=1; PKG_DIR=("${_dirs[@]}")
+    fi
+  fi
+
+  if [[ $MULTI -eq 1 ]]; then
+    # Solution: one .sln at the git root drives the build; each package resolves its
+    # own two projects for tests and warning attribution.
+    SCOPE_DIR="$PACKAGE_DIR"
+    local _sroot; _sroot="$(git -C "$SCOPE_DIR" rev-parse --show-toplevel 2>/dev/null || echo "$SCOPE_DIR")"
+    SLN="$(find "$_sroot" -maxdepth 1 -name '*.sln' 2>/dev/null | sort | head -n1)"
+    [[ -f "$SLN" ]] || { echo "solution mode needs a .sln at $_sroot, none found" >&2; exit 3; }
+    local p
+    for p in "${PKG_DIR[@]}"; do
+      PKG_NAME+=("$(basename "$p")")
+      PKG_PROJ+=("$(find_production_project "$p")")
+      PKG_TEST+=("$(find_test_project "$p")")
+    done
+    BUILD_TARGET="$SLN"; SCAN_TARGET="$SLN"
+  else
+    # Single package: production project = the one non-test csproj, unless the baseline
+    # or a .csproj argument pins it. The test project is required.
+    SCOPE_DIR="$PACKAGE_DIR"
+    local _proj _test
+    _proj="$(bget .project)"; [[ -n "$_proj" ]] && _proj="$PACKAGE_DIR/$_proj"
+    [[ -f "${_proj:-}"      ]] || _proj="$(find_production_project "$PACKAGE_DIR")"
+    [[ -n "$CLI_PROJECT"    ]] && _proj="$CLI_PROJECT"
+    _test="${_bpkg_test:-}"
+    [[ -f "${_test:-}"      ]] || _test="$(find_test_project "$PACKAGE_DIR")"
+    [[ -f "${_test:-}"      ]] || { echo "no test project found under $PACKAGE_DIR — set testProject in $BASELINE" >&2; exit 3; }
+    [[ -f "${_proj:-}"      ]] || { echo "no production project found under $PACKAGE_DIR — set production project in $BASELINE" >&2; exit 3; }
+    PKG_DIR=("$PACKAGE_DIR"); PKG_NAME=("$PACKAGE_NAME"); PKG_PROJ=("$_proj"); PKG_TEST=("$_test")
+    BUILD_TARGET="$_test"; SCAN_TARGET="$_proj"
+  fi
+}

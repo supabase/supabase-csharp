@@ -12,6 +12,7 @@ using System.Web;
 using Supabase.Core;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Extensions;
+using Supabase.Core.Http;
 using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
@@ -26,6 +27,14 @@ internal static class Helpers
     private static readonly HttpClient Client = new HttpClient();
 
     private static readonly Guid AppSession = Guid.NewGuid();
+
+    /// <summary>
+    /// Resolves the client a request should be sent through, once per <see cref="Postgrest.Client"/>/<see cref="Table{TModel}"/>
+    /// construction: the caller-injected <see cref="ClientOptions.HttpClient"/>, else a proxy-configured client when
+    /// <see cref="ClientOptions.Proxy"/> is set, else null (callers fall back to the shared default <see cref="Client"/>).
+    /// </summary>
+    internal static HttpClient? ResolveHttpClient(ClientOptions options) =>
+        options.HttpClient ?? (options.Proxy != null ? DefaultHttpClientFactory.Create(proxy: options.Proxy) : null);
 
     /// <summary>
     /// Mirrors Newtonsoft's <c>JToken.HasValues</c>: true only when the serialized payload is a non-empty
@@ -43,10 +52,11 @@ internal static class Helpers
     }
 
     /// <summary>
-    /// Helper to make a request using the defined parameters to an API Endpoint and coerce into a model. 
+    /// Helper to make a request using the defined parameters to an API Endpoint and coerce into a model.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="clientOptions"></param>
+    /// <param name="httpClient">The resolved client to send through. Defaults to a shared client when null.</param>
     /// <param name="method"></param>
     /// <param name="url"></param>
     /// <param name="data"></param>
@@ -56,10 +66,10 @@ internal static class Helpers
     /// <param name="cancellationToken"></param>
     /// <param name="operation">Logical operation name recorded on telemetry (select/insert/update/…).</param>
     /// <returns></returns>
-    public static async Task<ModeledResponse<T>> MakeRequestAsync<T>(ClientOptions clientOptions, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data = null,
+    public static async Task<ModeledResponse<T>> MakeRequestAsync<T>(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data = null,
         Dictionary<string, string>? headers = null, Func<Dictionary<string, string>>? getHeaders = null, CancellationToken cancellationToken = default, string? operation = null) where T : BaseModel, new()
     {
-        var baseResponse = await MakeRequestAsync(clientOptions, method, url, serializerSettings, data, headers, cancellationToken, operation);
+        var baseResponse = await MakeRequestAsync(clientOptions, httpClient, method, url, serializerSettings, data, headers, cancellationToken, operation);
         return new ModeledResponse<T>(baseResponse, serializerSettings, getHeaders);
     }
 
@@ -67,6 +77,7 @@ internal static class Helpers
     /// Helper to make a request using the defined parameters to an API Endpoint.
     /// </summary>
     /// <param name="clientOptions"></param>
+    /// <param name="httpClient">The resolved client to send through. Defaults to a shared client when null.</param>
     /// <param name="method"></param>
     /// <param name="url"></param>
     /// <param name="data"></param>
@@ -75,7 +86,7 @@ internal static class Helpers
     /// <param name="cancellationToken"></param>
     /// <param name="operation">Logical operation name recorded on telemetry (select/insert/update/…).</param>
     /// <returns></returns>
-    public static async Task<BaseResponse> MakeRequestAsync(ClientOptions clientOptions, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data = null,
+    public static async Task<BaseResponse> MakeRequestAsync(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data = null,
         Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default, string? operation = null)
     {
         var builder = new UriBuilder(url);
@@ -93,7 +104,7 @@ internal static class Helpers
 
         builder.Query = query.ToString();
 
-        using var requestMessage = new HttpRequestMessage(method, builder.Uri);
+        string? body = null;
 
         if (data != null && method != HttpMethod.Get)
         {
@@ -101,16 +112,28 @@ internal static class Helpers
 
             if (!string.IsNullOrWhiteSpace(stringContent) && HasValues(stringContent))
             {
-                requestMessage.Content = new StringContent(stringContent, Encoding.UTF8, "application/json");
+                body = stringContent;
             }
         }
 
-        if (headers != null)
+        HttpRequestMessage CreateRequest()
         {
-            foreach (var kvp in headers)
+            var requestMessage = new HttpRequestMessage(method, builder.Uri);
+
+            if (body != null)
             {
-                requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
+                requestMessage.Content = new StringContent(body, Encoding.UTF8, "application/json");
             }
+
+            if (headers != null)
+            {
+                foreach (var kvp in headers)
+                {
+                    requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
+                }
+            }
+
+            return requestMessage;
         }
 
         using var activity = PostgrestInstrumentation.StartHttpActivity(method, builder.Uri, operation);
@@ -120,7 +143,7 @@ internal static class Helpers
 
         try
         {
-            using var response = await Client.SendAsync(requestMessage, cancellationToken).ConfigureAwait(false);
+            using var response = await RetryExecutor.SendAsync(httpClient ?? Client, CreateRequest, clientOptions.Retry, cancellationToken).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 
@@ -186,13 +209,13 @@ internal static class Helpers
             {
                 // Default version to match other clients
                 // https://github.com/search?q=org%3Asupabase-community+x-client-info&type=code
-                headers.Add("X-Client-Info", $"postgrest-csharp/{Util.GetAssemblyVersion(typeof(Client))}");
+                headers.Add("X-Client-Info", Util.GetAssemblyVersion(typeof(Client)));
             }
             catch (Exception)
             {
                 // Fallback for when the version can't be found
                 // e.g. running in the Unity Editor, ILL2CPP builds, etc.
-                headers.Add("X-Client-Info", $"postgrest-csharp/session-{AppSession}");
+                headers.Add("X-Client-Info", $"supabase.postgrest-csharp/session-{AppSession}");
             }
         }
 

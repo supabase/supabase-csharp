@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "package": "baseline-overwrite",
+  "project": "Sample/Sample.csproj",
+  "testProject": "Sample.Tests/Sample.Tests.csproj",
+  "warnings": { "total": 3, "byCode": {} },
+  "updated": "2026-08-12T00:00:00Z"
+}

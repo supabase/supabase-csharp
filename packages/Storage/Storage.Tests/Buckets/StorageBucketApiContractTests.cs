@@ -165,6 +165,15 @@ public class StorageBucketApiContractTests
         this.SingleRequest().Query.Should().Contain(pair => pair.Key == "transformations" && pair.Value.Contains("true"));
     }
 
+    [TestMethod]
+    public async Task PurgeBucketCache_ShouldEncodeDelimiters_GivenABucketIdWithUrlDelimiters()
+    {
+        this.Respond("/storage/v1/cdn/*", "DELETE", 200, "{\"message\":\"success\"}");
+        await this.client.PurgeBucketCache("my?bucket");
+        this.SingleRequest().AbsoluteUrl.Should().EndWith("/storage/v1/cdn/my%3Fbucket",
+            "a raw '?' in the id would start a query string and purge the wrong bucket");
+    }
+
     private void Respond(string path, string method, int statusCode, string body) =>
         this.server.Given(Request.Create().WithPath(path).UsingMethod(method))
             .RespondWith(Response.Create().WithStatusCode(statusCode)

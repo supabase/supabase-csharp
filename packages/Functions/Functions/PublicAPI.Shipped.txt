@@ -1,13 +1,16 @@
 #nullable enable
 Supabase.Functions.Client
 Supabase.Functions.Client.Client(string! baseUrl, Supabase.Functions.Client.FunctionRegion? region = null) -> void
+Supabase.Functions.Client.Client(string! baseUrl, Supabase.Functions.Client.FunctionRegion? region = null, Supabase.Functions.ClientOptions? options = null) -> void
 Supabase.Functions.Client.FunctionRegion
 Supabase.Functions.Client.FunctionRegion.Equals(Supabase.Functions.Client.FunctionRegion! other) -> bool
 Supabase.Functions.Client.FunctionRegion.FunctionRegion(string! region) -> void
 Supabase.Functions.Client.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Functions.Client.GetHeaders.set -> void
 Supabase.Functions.Client.Invoke(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null) -> System.Threading.Tasks.Task<string!>!
+Supabase.Functions.Client.Invoke(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
 Supabase.Functions.Client.Invoke<T>(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null) -> System.Threading.Tasks.Task<T?>!
+Supabase.Functions.Client.Invoke<T>(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
 Supabase.Functions.Client.InvokeFunctionOptions
 Supabase.Functions.Client.InvokeFunctionOptions.Body.get -> System.Collections.Generic.Dictionary<string!, object!>!
 Supabase.Functions.Client.InvokeFunctionOptions.Body.set -> void
@@ -20,7 +23,20 @@ Supabase.Functions.Client.InvokeFunctionOptions.HttpMethod.set -> void
 Supabase.Functions.Client.InvokeFunctionOptions.HttpTimeout.get -> System.TimeSpan
 Supabase.Functions.Client.InvokeFunctionOptions.HttpTimeout.set -> void
 Supabase.Functions.Client.InvokeFunctionOptions.InvokeFunctionOptions() -> void
+Supabase.Functions.Client.InvokeStream(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Net.Http.HttpResponseMessage!>!
+Supabase.Functions.Client.Options.get -> Supabase.Functions.ClientOptions!
 Supabase.Functions.Client.RawInvoke(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null) -> System.Threading.Tasks.Task<System.Net.Http.HttpContent!>!
+Supabase.Functions.Client.RawInvoke(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Net.Http.HttpContent!>!
+Supabase.Functions.ClientOptions
+Supabase.Functions.ClientOptions.<Clone>$() -> Supabase.Functions.ClientOptions!
+Supabase.Functions.ClientOptions.ClientOptions() -> void
+Supabase.Functions.ClientOptions.Equals(Supabase.Functions.ClientOptions? other) -> bool
+Supabase.Functions.ClientOptions.HttpClient.get -> System.Net.Http.HttpClient?
+Supabase.Functions.ClientOptions.HttpClient.init -> void
+Supabase.Functions.ClientOptions.Proxy.get -> System.Net.IWebProxy?
+Supabase.Functions.ClientOptions.Proxy.init -> void
+Supabase.Functions.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
+Supabase.Functions.ClientOptions.Retry.init -> void
 Supabase.Functions.Exceptions.FailureHint
 Supabase.Functions.Exceptions.FailureHint.Reason
 Supabase.Functions.Exceptions.FailureHint.Reason.Internal = 2 -> Supabase.Functions.Exceptions.FailureHint.Reason
@@ -37,8 +53,12 @@ Supabase.Functions.Exceptions.FunctionsException.StatusCode.get -> int
 Supabase.Functions.FunctionsDiagnostics
 Supabase.Functions.Interfaces.IFunctionsClient
 Supabase.Functions.Interfaces.IFunctionsClient.Invoke(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null) -> System.Threading.Tasks.Task<string!>!
+Supabase.Functions.Interfaces.IFunctionsClient.Invoke(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
 Supabase.Functions.Interfaces.IFunctionsClient.Invoke<T>(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null) -> System.Threading.Tasks.Task<T?>!
+Supabase.Functions.Interfaces.IFunctionsClient.Invoke<T>(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<T?>!
+Supabase.Functions.Interfaces.IFunctionsClient.InvokeStream(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Net.Http.HttpResponseMessage!>!
 Supabase.Functions.Interfaces.IFunctionsClient.RawInvoke(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null) -> System.Threading.Tasks.Task<System.Net.Http.HttpContent!>!
+Supabase.Functions.Interfaces.IFunctionsClient.RawInvoke(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Net.Http.HttpContent!>!
 Supabase.Functions.Responses.BaseResponse
 Supabase.Functions.Responses.BaseResponse.BaseResponse() -> void
 Supabase.Functions.Responses.BaseResponse.Content.get -> string?
@@ -49,6 +69,9 @@ const Supabase.Functions.FunctionsDiagnostics.SourceName = "Supabase.Functions" 
 override Supabase.Functions.Client.FunctionRegion.Equals(object! obj) -> bool
 override Supabase.Functions.Client.FunctionRegion.GetHashCode() -> int
 override Supabase.Functions.Client.FunctionRegion.ToString() -> string!
+override Supabase.Functions.ClientOptions.Equals(object? obj) -> bool
+override Supabase.Functions.ClientOptions.GetHashCode() -> int
+override Supabase.Functions.ClientOptions.ToString() -> string!
 static Supabase.Functions.Client.FunctionRegion.Any.get -> Supabase.Functions.Client.FunctionRegion!
 static Supabase.Functions.Client.FunctionRegion.ApNortheast1.get -> Supabase.Functions.Client.FunctionRegion!
 static Supabase.Functions.Client.FunctionRegion.ApNortheast2.get -> Supabase.Functions.Client.FunctionRegion!
@@ -68,4 +91,6 @@ static Supabase.Functions.Client.FunctionRegion.explicit operator Supabase.Funct
 static Supabase.Functions.Client.FunctionRegion.explicit operator string!(Supabase.Functions.Client.FunctionRegion! region) -> string!
 static Supabase.Functions.Client.FunctionRegion.operator !=(Supabase.Functions.Client.FunctionRegion? left, Supabase.Functions.Client.FunctionRegion? right) -> bool
 static Supabase.Functions.Client.FunctionRegion.operator ==(Supabase.Functions.Client.FunctionRegion? left, Supabase.Functions.Client.FunctionRegion? right) -> bool
+static Supabase.Functions.ClientOptions.operator !=(Supabase.Functions.ClientOptions? left, Supabase.Functions.ClientOptions? right) -> bool
+static Supabase.Functions.ClientOptions.operator ==(Supabase.Functions.ClientOptions? left, Supabase.Functions.ClientOptions? right) -> bool
 static Supabase.Functions.Exceptions.FailureHint.DetectReason(Supabase.Functions.Exceptions.FunctionsException! ex) -> Supabase.Functions.Exceptions.FailureHint.Reason

@@ -1,5 +1,5 @@
 {
-  "description": "A new, untested method drops line coverage below the committed baseline (100%→50%). Tests still pass; only the coverage ratchet must FAIL.",
+  "description": "A new, untested method drops line coverage below the committed baseline (100%→50%). Tests still pass; only the coverage baseline check must FAIL.",
   "mode": "",
   "needsStack": true,
   "exit": 1,

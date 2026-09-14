@@ -1,36 +1,26 @@
-﻿using System;
-namespace Supabase.Gotrue
+using System;
+namespace Supabase.Gotrue;
+
+/// <summary>
+/// Represents an OAuth Provider's URI and Parameters.
+///
+/// For use with Provider Auth, PKCE Auth, and ID Token auth.
+/// </summary>
+public class ProviderAuthState
 {
     /// <summary>
-    /// Represents an OAuth Provider's URI and Parameters.
-    ///
-    /// For use with Provider Auth, PKCE Auth, and ID Token auth.
+    /// The Generated Provider's URI
     /// </summary>
-    public class ProviderAuthState
-    {
-        /// <summary>
-        /// The Generated Provider's URI
-        /// </summary>
-        public Uri Uri { get; set; }
+    public Uri Uri { get; set; }
 
-        /// <summary>
-        /// The PKCE Verifier nonce, only set during a PKCE auth flow.
-        /// </summary>
-        public string? PKCEVerifier { get; set; }
+    /// <summary>
+    /// The PKCE Verifier nonce, only set during a PKCE auth flow.
+    /// </summary>
+    public string? PKCEVerifier { get; set; }
 
-        /// <summary>
-        /// The state parameter included in the OAuth URL for CSRF protection (RFC 6749 §10.12).
-        /// Validate this against the state echoed back in the OAuth callback.
-        /// </summary>
-        public string State { get; set; } = null!;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="uri"></param>
-        public ProviderAuthState(Uri uri)
-        {
-            Uri = uri;
-        }
-    }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="uri"></param>
+    public ProviderAuthState(Uri uri) => this.Uri = uri;
 }

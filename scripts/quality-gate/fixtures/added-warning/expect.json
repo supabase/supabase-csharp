@@ -1,5 +1,5 @@
 {
-  "description": "Build emits a warning above a baseline of 0 — the ratchet must FAIL (exit 1). The build still COMPILED, so the short-circuit does not apply: format and tests run and pass. Only a failed compile makes downstream stages impossible; a ratchet failure does not, so hiding them behind a SKIP would tell you less.",
+  "description": "Build emits a warning above a baseline of 0 — the baseline check must FAIL (exit 1). The build still COMPILED, so the short-circuit does not apply: format and tests run and pass. Only a failed compile makes downstream stages impossible; a baseline failure does not, so hiding them behind a SKIP would tell you less.",
   "mode": "--fast",
   "exit": 1,
   "verdict": "FAIL",

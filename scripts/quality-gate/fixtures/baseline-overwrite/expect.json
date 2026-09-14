@@ -1,0 +1,10 @@
+{
+  "description": "The same improving scenario as baseline-readonly (baseline pins warnings at 3, code is clean), but run with --overwrite-baseline: the run must PERSIST the improvement to .gate-baseline.json. Guards that the opt-in flag actually writes — the post-merge path that keeps master's baselines current.",
+  "mode": "--fast --overwrite-baseline",
+  "exit": 0,
+  "verdict": "PARTIAL",
+  "baselineWrite": true,
+  "stages": [
+    { "id": "1a", "status": "PASS" }
+  ]
+}

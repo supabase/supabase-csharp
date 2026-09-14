@@ -77,7 +77,7 @@ public class BroadcastRelayTests
         var client1 = Helpers.PrivateSocketClient();
         await client1.ConnectAsync();
         var channel1 = client1.Channel("online-users",
-            ChannelOptions.Private(client1.Options, () => Helpers.ApiKey, Wire.Settings()));
+            ChannelOptions.Private(client1.Options, () => null, Wire.Settings()));
         var broadcast1 = channel1.Register<BroadcastExample>(true, true);
         broadcast1.AddBroadcastEventHandler((_, _) =>
         {
@@ -88,7 +88,7 @@ public class BroadcastRelayTests
         var client2 = Helpers.PrivateSocketClient();
         await client2.ConnectAsync();
         var channel2 = client2.Channel("online-users",
-            ChannelOptions.Private(client2.Options, () => Helpers.ApiKey, Wire.Settings()));
+            ChannelOptions.Private(client2.Options, () => null, Wire.Settings()));
         var broadcast2 = channel2.Register<BroadcastExample>(true, true);
         broadcast2.AddBroadcastEventHandler((_, _) =>
         {

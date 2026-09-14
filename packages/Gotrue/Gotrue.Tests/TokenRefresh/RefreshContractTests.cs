@@ -37,19 +37,23 @@ public class RefreshContractTests
     [TestInitialize]
     public void TestInitializer()
     {
-        server = new MockGotrueServer();
-        client = TestClients.Against(server);
+        this.server = new MockGotrueServer();
+        this.client = TestClients.Against(this.server);
+        var persistence = SessionPersistenceSubstitute.Tracking();
+        persistence.SaveSession(new Session { AccessToken = AccessToken, RefreshToken = RefreshTokenValue, ExpiresIn = 3600 });
+        this.client.SetPersistence(persistence);
+        this.client.LoadSession();
     }
 
     [TestCleanup]
-    public void TestCleanup() => server.Dispose();
+    public void TestCleanup() => this.server.Dispose();
 
     [TestMethod]
     public async Task RefreshToken_ShouldPostRefreshTokenGrantWithBearerAndApiKey()
     {
-        MockSuccessResponse();
-        await client.RefreshToken(AccessToken, RefreshTokenValue);
-        server.VerifySingleReceivedRequest()
+        this.MockSuccessResponse();
+        await this.client.RefreshToken(AccessToken, RefreshTokenValue);
+        this.server.VerifySingleReceivedRequest()
             .WithMethod(HttpMethod.Post)
             .WithPath("/token")
             .WithQueryParam("grant_type", "refresh_token")
@@ -62,13 +66,13 @@ public class RefreshContractTests
     [TestMethod]
     public async Task RefreshToken_ShouldBecomeTheCurrentSession_GivenSuccess()
     {
-        MockSuccessResponse();
-        await client.RefreshToken(AccessToken, RefreshTokenValue);
-        client.CurrentSession.Should().NotBeNull();
-        client.CurrentSession!.AccessToken.Should().Be("new-access-token");
-        client.CurrentSession!.RefreshToken.Should().Be("new-refresh-token");
-        client.CurrentSession!.User!.Id.Should().Be("user-id-123");
-        client.CurrentSession!.ExpiresIn.Should().Be(3600);
+        this.MockSuccessResponse();
+        await this.client.RefreshToken(AccessToken, RefreshTokenValue);
+        this.client.CurrentSession.Should().NotBeNull();
+        this.client.CurrentSession!.AccessToken.Should().Be("new-access-token");
+        this.client.CurrentSession!.RefreshToken.Should().Be("new-refresh-token");
+        this.client.CurrentSession!.User!.Id.Should().Be("user-id-123");
+        this.client.CurrentSession!.ExpiresIn.Should().Be(3600);
     }
 
     [TestMethod]
@@ -76,37 +80,50 @@ public class RefreshContractTests
     [DataRow("malformed_token_error.json", DisplayName = "malformed token (validation_failed)")]
     public async Task RefreshToken_ShouldThrowInvalidRefreshTokenAndDestroySession_GivenRejected(string fixture)
     {
-        MockErrorResponse(400, Fixture(fixture));
-        var refresh = () => client.RefreshToken(AccessToken, RefreshTokenValue);
+        this.MockErrorResponse(400, Fixture(fixture));
+        var refresh = () => this.client.RefreshToken(AccessToken, RefreshTokenValue);
         var exception = await refresh.Should().ThrowAsync<GotrueException>();
         exception.Which.Reason.Should().Be(InvalidRefreshToken);
-        client.CurrentSession.Should().BeNull();
+        this.client.CurrentSession.Should().BeNull();
     }
 
     [TestMethod]
     public async Task RefreshToken_ShouldNotifySignedOut_GivenRejected()
     {
         var stateChanges = new List<Constants.AuthState>();
-        client.AddStateChangedListener((_, state) => stateChanges.Add(state));
-        MockErrorResponse(400, Fixture("token_not_found_error.json"));
-        var refresh = () => client.RefreshToken(AccessToken, RefreshTokenValue);
+        this.client.AddStateChangedListener((_, state) => stateChanges.Add(state));
+        this.MockErrorResponse(400, Fixture("token_not_found_error.json"));
+        var refresh = () => this.client.RefreshToken(AccessToken, RefreshTokenValue);
         await refresh.Should().ThrowAsync<GotrueException>();
-        stateChanges.Should().Contain(SignedOut,
+        stateChanges.Should().ContainSingle(state => state == SignedOut,
             "a rejected refresh must notify listeners the session ended — the auto-refresh timer swallows the exception, so the SignedOut event is the only way a background refresh failure reaches the app (issue #91)");
     }
 
     [TestMethod]
-    public async Task RefreshToken_ShouldThrowUnknownAndDestroySession_GivenUnrecognizedError()
+    public async Task RefreshToken_ShouldThrowUnknownAndKeepSession_GivenUnrecognizedError()
     {
-        MockErrorResponse(500, Fixture("unclassified_error.json"));
-        var refresh = () => client.RefreshToken(AccessToken, RefreshTokenValue);
+        this.MockErrorResponse(500, Fixture("unclassified_error.json"));
+        var refresh = () => this.client.RefreshToken(AccessToken, RefreshTokenValue);
         var exception = await refresh.Should().ThrowAsync<GotrueException>();
         exception.Which.Reason.Should().Be(Unknown);
-        client.CurrentSession.Should().BeNull();
+        this.client.CurrentSession.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public async Task RefreshToken_ShouldKeepTheCurrentSession_GivenAForeignTokenIsRejected()
+    {
+        var stateChanges = new List<Constants.AuthState>();
+        this.client.AddStateChangedListener((_, state) => stateChanges.Add(state));
+        this.MockErrorResponse(400, Fixture("token_not_found_error.json"));
+        var refresh = () => this.client.RefreshToken("another-access-token", "another-refresh-token");
+        await refresh.Should().ThrowAsync<GotrueException>();
+        this.client.CurrentSession!.RefreshToken.Should().Be(RefreshTokenValue,
+            "a refresh rejected for another session must not sign the current one out (issue #396)");
+        stateChanges.Should().NotContain(SignedOut);
     }
 
     private void MockSuccessResponse() =>
-        server
+        this.server
             .Given(Request.Create().WithPath("/token").UsingPost())
             .RespondWith(Response.Create()
                 .WithStatusCode(200)
@@ -114,7 +131,7 @@ public class RefreshContractTests
                 .WithBody(Fixture("token_success.json")));
 
     private void MockErrorResponse(int statusCode, string body) =>
-        server
+        this.server
             .Given(Request.Create().WithPath("/token").UsingPost())
             .RespondWith(Response.Create()
                 .WithStatusCode(statusCode)

@@ -29,13 +29,6 @@ public class StorageFileDownloadCancellationTests
     private Client client = null!;
     private HttpClient? downloadClient;
 
-    [TestInitialize]
-    public void TestInitialize() =>
-        this.client = new Client("http://localhost/storage/v1", new Dictionary<string, string>
-        {
-            { "Authorization", "Bearer test-key" }
-        });
-
     [TestCleanup]
     public void TestCleanup() => this.downloadClient?.Dispose();
 
@@ -76,8 +69,13 @@ public class StorageFileDownloadCancellationTests
             "the body copy must carry the token even when the server omits Content-Length and no progress handler is supplied");
     }
 
-    private void UseHandler(HttpMessageHandler handler) =>
-        Supabase.Storage.Helpers.HttpDownloadClient = this.downloadClient = new HttpClient(handler);
+    private void UseHandler(HttpMessageHandler handler)
+    {
+        this.downloadClient = new HttpClient(handler);
+        this.client = new Client("http://localhost/storage/v1",
+            new ClientOptions { HttpDownloadClient = this.downloadClient },
+            new Dictionary<string, string> { { "Authorization", "Bearer test-key" } });
+    }
 
     private static HttpResponseMessage EmptyOk() =>
         new(HttpStatusCode.OK) { Content = new ByteArrayContent(Array.Empty<byte>()) };

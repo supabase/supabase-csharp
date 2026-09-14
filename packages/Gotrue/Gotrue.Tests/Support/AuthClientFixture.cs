@@ -29,16 +29,16 @@ public abstract class AuthClientFixture
     [TestInitialize]
     public void InitializeClient()
     {
-        StateChanges.Clear();
-        Persistence = SessionPersistenceSubstitute.Tracking();
-        Client = TestClients.AgainstCliStack();
-        Client.SetPersistence(Persistence);
-        Client.AddStateChangedListener((_, state) => StateChanges.Add(state));
+        this.StateChanges.Clear();
+        this.Persistence = SessionPersistenceSubstitute.Tracking();
+        this.Client = TestClients.AgainstCliStack();
+        this.Client.SetPersistence(this.Persistence);
+        this.Client.AddStateChangedListener((_, state) => this.StateChanges.Add(state));
     }
 
     protected async Task<Session> SignUpNewUser()
     {
-        var session = await Client.SignUp(RandomEmail(), Password);
+        var session = await this.Client.SignUp(RandomEmail(), Password);
         session.Should().NotBeNull();
         return session!;
     }
@@ -48,9 +48,9 @@ public abstract class AuthClientFixture
         using (new AssertionScope())
         {
             session.Should().NotBeNull();
-            StateChanges.Should().Contain(SignedIn);
-            Persistence.LoadSession().Should().BeSameAs(Client.CurrentSession, "the SDK persists the session it signed in");
-            Client.CurrentUser!.Id.Should().Be(session!.User!.Id);
+            this.StateChanges.Should().Contain(SignedIn);
+            this.Persistence.LoadSession().Should().BeSameAs(this.Client.CurrentSession, "the SDK persists the session it signed in");
+            this.Client.CurrentUser!.Id.Should().Be(session!.User!.Id);
             session.AccessToken.Should().NotBeNull();
             session.RefreshToken.Should().NotBeNull();
             session.User.Should().NotBeNull();
@@ -61,10 +61,10 @@ public abstract class AuthClientFixture
     {
         using (new AssertionScope())
         {
-            StateChanges.Should().Contain(SignedOut);
-            Persistence.LoadSession().Should().BeNull();
-            Client.CurrentSession.Should().BeNull();
-            Client.CurrentUser.Should().BeNull();
+            this.StateChanges.Should().ContainSingle(state => state == SignedOut);
+            this.Persistence.LoadSession().Should().BeNull();
+            this.Client.CurrentSession.Should().BeNull();
+            this.Client.CurrentUser.Should().BeNull();
         }
     }
 }

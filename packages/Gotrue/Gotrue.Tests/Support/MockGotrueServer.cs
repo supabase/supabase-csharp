@@ -83,6 +83,13 @@ internal sealed class ReceivedRequest
         return this;
     }
 
+    internal ReceivedRequest WithoutHeader(string name)
+    {
+        this.request.Headers!.Keys.Should().NotContain(key => string.Equals(key, name, StringComparison.OrdinalIgnoreCase),
+            $"'{name}' should not have been sent");
+        return this;
+    }
+
     internal ReceivedRequest WithJsonContentType()
     {
         this.request.Headers.Should().ContainKey("Content-Type").WhoseValue.Single().Should().StartWith("application/json");

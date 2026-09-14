@@ -30,10 +30,10 @@ first_failure() {  # first failed test name, for an actionable summary line
     | head -n1 | sed -E 's/^\s*(Failed|X) //' || true
 }
 
-# ============================================================ 1a  build + ratchet
+# ============================================================ 1a  build + baseline
 # --no-incremental is load-bearing: on an incremental build, up-to-date projects
-# emit no warnings, so the count reads zero and the ratchet passes on a change that
-# added ten.
+# emit no warnings, so the count reads zero and the baseline check passes on a
+# change that added ten.
 BUILD_OK=0
 stage_build() {
   local log="$SCOPE_LOGS/1a-build.log"
@@ -51,7 +51,9 @@ stage_build() {
     parse_warnings "$log" "$OUT/warnings.txt" "$OUT/warnings-by-code.txt" "$PROJECT" "$TEST_PROJECT"
     v="$(warn_verdict "$OUT/warnings-by-code.txt")"
     add 1a "Build (analyzers)" block "${PKG_NAME[$i]}" "${v%%|||*}" "${v#*|||}" "$log"
-    save_baseline
+    # Read-only unless --overwrite-baseline: a PR/local run reads the baseline for
+    # its verdict but never writes it (updating it is a post-merge maintainer step).
+    if [[ "${OVERWRITE_BASELINE:-0}" -eq 1 ]]; then save_baseline; fi
   done
   # Restore scope for the scope-wide helpers below; a per-package baseline must not
   # leak into cget for the solution-wide format/api stages.
@@ -65,6 +67,11 @@ stage_build() {
 # debt-carrying package on legacy code the change never touched.
 
 default_base_ref() {
+  # Override for callers that already know the exact commit to diff against —
+  # e.g. format-master.yml, which runs ON master post-merge, where every one of
+  # origin/HEAD/main/master below IS the current commit (a no-op diff). Not read
+  # from .gate-config.json: this is a per-invocation override, not repo config.
+  [[ -n "${GATE_FORMAT_BASE_REF:-}" ]] && { echo "$GATE_FORMAT_BASE_REF"; return; }
   local r; r="$(cget .formatBaseRef)"
   [[ -n "$r" ]] && { echo "$r"; return; }
   for c in origin/HEAD origin/main origin/master main master; do
@@ -109,14 +116,20 @@ changed_cs_files() {  # repo-RELATIVE paths, committed + staged + unstaged + unt
 # "inspected nothing" must never report as "clean".
 stage_format() {
   local log="$SCOPE_LOGS/1b-format.log" root
+  # --bypass-format (PR-time CI only, see gate.sh): report as a signal, not a
+  # blocking stage. A human contributor can't always fix a violation themselves
+  # the way an agent can; master gets auto-formatted post-merge regardless (see
+  # .github/workflows/format-master.yml), so this run's verdict shouldn't block
+  # on it. Local/agent runs never set this — format stays blocking for them.
+  local kind="block"; [[ "${BYPASS_FORMAT:-0}" -eq 1 ]] && kind="signal"
   if ! root="$(git -C "$SCOPE_DIR" rev-parse --show-toplevel 2>/dev/null)"; then
-    add 1b "Format + naming" block "" SKIP "not a git repository — cannot scope to changed files" ""
+    add 1b "Format + naming" "$kind" "" SKIP "not a git repository — cannot scope to changed files" ""
     return
   fi
   local files=() rel
   while IFS= read -r rel; do [[ -n "$rel" && -f "$root/$rel" ]] && files+=("$rel"); done < <(changed_cs_files)
   if [[ ${#files[@]} -eq 0 ]]; then
-    add 1b "Format + naming" block "" PASS "no changed .cs files in the gated scope" ""; return
+    add 1b "Format + naming" "$kind" "" PASS "no changed .cs files in the gated scope" ""; return
   fi
 
   : > "$log"
@@ -138,9 +151,9 @@ stage_format() {
     done
     [[ $pkg_matched -eq 0 ]] && continue     # this package holds none of the changed files
     if [[ $pkg_fail -eq 0 ]]; then
-      add 1b "Format + naming" block "${PKG_NAME[$i]}" PASS "$pkg_matched changed file(s) clean" "$log"
+      add 1b "Format + naming" "$kind" "${PKG_NAME[$i]}" PASS "$pkg_matched changed file(s) clean" "$log"
     else
-      add 1b "Format + naming" block "${PKG_NAME[$i]}" FAIL \
+      add 1b "Format + naming" "$kind" "${PKG_NAME[$i]}" FAIL \
         "$pkg_matched changed file(s) with violations — fix: (cd $root && dotnet format <proj> --include <files>)" "$log"
     fi
   done
@@ -150,7 +163,7 @@ stage_format() {
   # returns non-zero when the test is false, and under `set -e` a stage returning
   # non-zero would abort the run before the report prints.
   if [[ $any -eq 0 ]]; then
-    add 1b "Format + naming" block "" FAIL \
+    add 1b "Format + naming" "$kind" "" FAIL \
       "matched 0 of ${#files[@]} changed .cs file(s) — none fall under a gated project; nothing was inspected" "$log"
   fi
   return 0
@@ -189,20 +202,26 @@ stage_inner_loop() {
 # requires POSITIVE confirmation ("no vulnerable packages"), never merely the
 # absence of the findings line: if the tool's output drifts, absence would read as
 # clean. It needs network — offline is SKIP, never PASS.
+#
+# This is a SIGNAL, not a blocking stage: a vulnerable dependency may have no
+# fixed version available, and blocking the merge on something we cannot act on
+# would wedge every PR for a defect that is not the PR's to fix. A finding is
+# surfaced for the maintainer to weigh — bump the dependency when a fix exists,
+# accept and track it when one doesn't — not enforced by the gate's exit code.
 stage_security() {
   local log="$SCOPE_LOGS/4-security.log"
   run "$log" dotnet list "$SCAN_TARGET" package --vulnerable --include-transitive
   if grep -qiE 'unable to load the service index|could not resolve|failed to retrieve' "$log"; then
-    add 4 "Dependency vulnerabilities" block "" SKIP "no network — scan not performed" "$log"
+    add 4 "Dependency vulnerabilities" signal "" SKIP "no network — scan not performed" "$log"
   elif [[ $RC -ne 0 ]]; then
-    add 4 "Dependency vulnerabilities" block "" SKIP "command failed (exit $RC)" "$log"
+    add 4 "Dependency vulnerabilities" signal "" SKIP "command failed (exit $RC)" "$log"
   elif grep -qi 'has the following vulnerable packages' "$log"; then
-    add 4 "Dependency vulnerabilities" block "" FAIL \
+    add 4 "Dependency vulnerabilities" signal "" FAIL \
       "$(awk '/^[[:space:]]+> /{n++} END{print n+0}' "$log") vulnerable package(s)" "$log"
   elif grep -qi 'no vulnerable packages' "$log"; then
-    add 4 "Dependency vulnerabilities" block "" PASS "none known" "$log"
+    add 4 "Dependency vulnerabilities" signal "" PASS "none known" "$log"
   else
-    add 4 "Dependency vulnerabilities" block "" SKIP \
+    add 4 "Dependency vulnerabilities" signal "" SKIP \
       "scan produced no recognizable result — neither confirmation nor findings (see log)" "$log"
   fi
 }
@@ -308,23 +327,45 @@ stack_up() {
   (exec 3<>"/dev/tcp/$host/$port") >/dev/null 2>&1 && return 0 || return 1
 }
 
+# Coverlet's VSTest collector instruments every assembly it can find in the test
+# output dir by default — every ProjectReference along with the package under
+# test, not just the package itself. Left unscoped, a package's "own" coverage
+# report silently includes its dependencies' code too: a shared dependency (e.g.
+# Core) gaining new, legitimately-uncovered-from-here lines then drags down every
+# consumer's number, for a reason that has nothing to do with that consumer's own
+# code or tests. That dependency's coverage is already tracked on its own row —
+# counting it a second time, inside an unrelated package's number, is simply
+# wrong, not just noisy. `;Include=[<AssemblyName>]*` scopes the collector to
+# exactly the module under test. Confirmed necessary and sufficient directly: on
+# a branch that only changes Core, every *downstream* package's row FAILed with
+# multi-point regressions before this filter, and the newly-added Core classes
+# (0% covered, as expected — they're exercised by Core's own tests) were exactly
+# the extra lines showing up inside e.g. Functions' report. With the filter, that
+# report contains only Functions' own classes.
+pkg_assembly_name() {  # pkg_assembly_name <production-csproj>
+  local n; n="$(grep -oE '<AssemblyName>[^<]+</AssemblyName>' "$1" 2>/dev/null | head -n1 | sed -E 's/<[^>]+>//g')"
+  [[ -n "$n" ]] && echo "$n" || basename "$1" .csproj
+}
+
 # ============================================================ 2  tests (full)
 # Full mode, stack reachable: one UNFILTERED dotnet test run per package — every
 # TestCategory, unit/contract/E2E together — instead of the two disjoint filtered
 # runs (inner loop, then E2E-if-green) that --fast still uses. This is what makes
-# "full coverage" (unit+contract+E2E, not just the inner loop) measurable from a
-# single Cobertura report, with no third test execution and no cross-run merge.
+# "full coverage" (unit+contract+E2E, not just the inner loop) measurable, and it
+# is the single source of test-correctness truth: this row's PASS/FAIL is what
+# blocks on a red test, E2E included.
 #
 # TRADEOFF, deliberate: a red unit test no longer blocks E2E from running in the
 # same pass (previously E2E was "worth minutes only when the inner loop is
 # green"). Both categories execute together now; the row FAILs if either does.
 stage_tests_full() {
-  local i log sum ff resdir
+  local i log sum ff resdir hermetic_log hermetic_dir asm
   for i in "${!PKG_DIR[@]}"; do
     _use_pkg "$i"
+    asm="$(pkg_assembly_name "$PROJECT")"
     log="$LOGS/2-tests.log"; resdir="$LOGS/coverage"; rm -rf "$resdir"
     run "$log" dotnet test "$TEST_PROJECT" -c Release --no-build \
-      --collect:"XPlat Code Coverage" --results-directory "$resdir" -v minimal
+      --collect:"XPlat Code Coverage;Include=[$asm]*" --results-directory "$resdir" -v minimal
     sum="$(grep -E '^(Passed!|Failed!)' "$log" 2>/dev/null | tail -n1 || true)"
     if no_tests_matched "$log"; then
       add 2 "Tests (Unit + Contract + E2E)" block "${PKG_NAME[$i]}" FAIL \
@@ -336,33 +377,56 @@ stage_tests_full() {
       add 2 "Tests (Unit + Contract + E2E)" block "${PKG_NAME[$i]}" FAIL \
         "${sum:-tests failed}${ff:+ — first: $ff}" "$log"
     fi
+
+    # A second, filtered pass sources the coverage baseline below from a hermetic
+    # (unit+contract-only) report — see lib/coverage.sh for why the coverage baseline
+    # must not read the unfiltered run above. Not a correctness check of its own: the
+    # same tests already ran, and any failure already surfaced, in the pass just
+    # above — this run exists only to produce a reproducible Cobertura report.
+    hermetic_log="$LOGS/2c-hermetic-coverage.log"; hermetic_dir="$LOGS/coverage-hermetic"; rm -rf "$hermetic_dir"
+    run "$hermetic_log" dotnet test "$TEST_PROJECT" -c Release --no-build --filter "TestCategory!=E2E" \
+      --collect:"XPlat Code Coverage;Include=[$asm]*" --results-directory "$hermetic_dir" -v minimal
   done
 }
 
 # =========================================================== 2b  coverage
-# Blocking. Reads the SAME run's Cobertura output that stage_tests_full just
-# produced — it never runs dotnet test itself. "Full" coverage only exists when
-# the unfiltered run executed, so this must only ever be called when it did;
-# gate.sh emits SKIP markers directly (never calling this function) for the
-# build-failed and stack-down cases, same causal-skip pattern as every other
-# stage: a check that could not run must never report as passed, and coverage
-# that could not be confirmed "full" must never be reported as if it were.
+# Blocking, but scoped to the HERMETIC (unit+contract) report the filtered pass
+# above just produced — never dotnet test itself. That report only exists when
+# stage_tests_full ran, so this must only ever be called when it did; gate.sh
+# emits SKIP markers directly (never calling this function) for the build-failed
+# and stack-down cases, same causal-skip pattern as every other stage: a check
+# that could not run must never report as passed.
+#
+# The full (unit+contract+E2E) report is also read here, but only to append an
+# informational figure to the detail string — never to gate the verdict or move
+# the baseline. See lib/coverage.sh's header for why: E2E is non-hermetic by
+# design, so its coverage contribution is real and worth showing, just not a
+# reproducible enough signal to block a merge on.
 stage_coverage() {
-  local i cov log
+  local i cov cov_full log detail v
   for i in "${!PKG_DIR[@]}"; do
     _use_pkg "$i"
-    log="$LOGS/2-tests.log"
-    cov="$(find "$LOGS/coverage" -name 'coverage.cobertura.xml' 2>/dev/null | head -n1)"
+    log="$LOGS/2c-hermetic-coverage.log"
+    cov="$(find "$LOGS/coverage-hermetic" -name 'coverage.cobertura.xml' 2>/dev/null | head -n1)"
     if [[ -z "$cov" || ! -s "$cov" ]]; then
-      add 2b "Coverage (line)" block "${PKG_NAME[$i]}" SKIP "no coverage report produced — see log" "$log"
+      add 2b "Coverage (line, unit+contract)" block "${PKG_NAME[$i]}" SKIP "no coverage report produced — see log" "$log"
       continue
     fi
     if ! parse_coverage "$cov"; then
-      add 2b "Coverage (line)" block "${PKG_NAME[$i]}" SKIP "0 instrumentable lines — nothing to measure" "$log"
+      add 2b "Coverage (line, unit+contract)" block "${PKG_NAME[$i]}" SKIP "0 instrumentable lines — nothing to measure" "$log"
       continue
     fi
-    local v; v="$(coverage_verdict)"
-    add 2b "Coverage (line)" block "${PKG_NAME[$i]}" "${v%%|||*}" "${v#*|||}" "$log"
-    save_coverage_baseline
+    v="$(coverage_verdict)"
+    # Read-only unless --overwrite-baseline (see stage_build). Guarded here too so a
+    # PR/local run's verdict never has the side effect of raising the coverage baseline.
+    # while COV_* still reflects the hermetic report parsed above:
+    if [[ "${OVERWRITE_BASELINE:-0}" -eq 1 ]]; then save_coverage_baseline; fi
+
+    detail="${v#*|||}"
+    cov_full="$(find "$LOGS/coverage" -name 'coverage.cobertura.xml' 2>/dev/null | head -n1)"
+    if [[ -n "$cov_full" && -s "$cov_full" ]] && parse_coverage "$cov_full"; then
+      detail="$detail · full incl. E2E: ${COV_PCT}% (${COV_COVERED}/${COV_VALID})"
+    fi
+    add 2b "Coverage (line, unit+contract)" block "${PKG_NAME[$i]}" "${v%%|||*}" "$detail" "$LOGS/2-tests.log"
   done
 }

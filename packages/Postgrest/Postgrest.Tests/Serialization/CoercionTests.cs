@@ -24,7 +24,9 @@ public class CoercionTests
     public async Task Insert_ShouldRoundTripEveryPrimitiveAndCollection()
     {
         var client = LocalStack.Client();
-        var existing = await client.Table<KitchenSink>().Single();
+        // Scope to the seeded row; other tests insert kitchen_sink rows (issue #300).
+        var existing = await client.Table<KitchenSink>()
+            .Where(x => x.Id == new Guid("f3ff356d-5803-43a7-b125-ba10cf10fdcd")).Single();
         if (existing != null)
         {
             using (new AssertionScope())

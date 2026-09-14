@@ -74,6 +74,7 @@ internal static class HttpClientProgress
                         Content = content,
                         Response = response,
                         StatusCode = resolvedStatus,
+                        Code = errorResponse?.Code,
                     };
 
                     e.AddReason();
@@ -231,6 +232,7 @@ internal static class HttpClientProgress
                     Content = httpContent,
                     Response = response,
                     StatusCode = resolvedStatus,
+                    Code = errorResponse?.Code,
                 };
 
                 e.AddReason();
@@ -431,6 +433,7 @@ internal static class HttpClientProgress
             Content = httpContent,
             Response = response,
             StatusCode = errorResponse?.StatusCode ?? (int) response.StatusCode,
+            Code = errorResponse?.Code,
         };
         error.AddReason();
 
@@ -442,11 +445,13 @@ internal static class HttpClientProgress
     )
     {
         var httpContent = await response.OriginHttpResponse.Content.ReadAsStringAsync();
+        var errorResponse = ErrorResponse.TryParse(httpContent);
         var error = new SupabaseStorageException(httpContent)
         {
             Content = httpContent,
             Response = response.OriginHttpResponse,
             StatusCode = (int) response.OriginHttpResponse.StatusCode,
+            Code = errorResponse?.Code,
         };
         error.AddReason();
 

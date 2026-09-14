@@ -9,9 +9,11 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Supabase.Core.Diagnostics;
+using Supabase.Core.Http;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Responses;
 
@@ -128,10 +130,11 @@ public static class Helpers
         if (attr == null)
             throw new Exception("Unknown provider");
 
-        var state = !string.IsNullOrEmpty(options.State) ? options.State : GenerateNonce();
-        query.Add("state", state);
-        result.State = state;
-
+        // The OAuth `state` is generated and validated by the GoTrue server (its flow_state);
+        // it is not a client parameter. Sending our own collides with that round-trip and makes
+        // sign-in fail with `bad_oauth_state` (issue #377), so we no longer add it — matching
+        // auth-js. For server-side CSRF correlation, carry a token on `RedirectTo`, which GoTrue
+        // echoes back to your callback.
         query.Add("provider", attr.Mapping);
 
         if (!string.IsNullOrEmpty(options.Scopes))
@@ -170,18 +173,22 @@ public static class Helpers
     }
 
     /// <summary>
-    /// Helper to make a request using the defined parameters to an API Endpoint and coerce into a model. 
+    /// Helper to make a request using the defined parameters to an API Endpoint and coerce into a model.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="method"></param>
     /// <param name="url"></param>
     /// <param name="data"></param>
     /// <param name="headers"></param>
+    /// <param name="httpClient">The client to send through. Defaults to a shared client when null.</param>
+    /// <param name="retry">Retry policy to apply. Defaults to no retries.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    internal static async Task<T?> MakeRequestAsync<T>(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null)
+    internal static async Task<T?> MakeRequestAsync<T>(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null,
+        HttpClient? httpClient = null, RetryOptions? retry = null, CancellationToken cancellationToken = default)
         where T : class
     {
-        var baseResponse = await MakeRequestAsync(method, url, data, headers);
+        var baseResponse = await MakeRequestAsync(method, url, data, headers, httpClient, retry, cancellationToken);
         return baseResponse.Content != null ? JsonSerializer.Deserialize<T>(baseResponse.Content, SerializerOptions) : default;
     }
 
@@ -192,47 +199,24 @@ public static class Helpers
     /// <param name="url"></param>
     /// <param name="data"></param>
     /// <param name="headers"></param>
+    /// <param name="httpClient">The client to send through. Defaults to a shared client when null.</param>
+    /// <param name="retry">Retry policy to apply. Defaults to no retries.</param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    internal static async Task<BaseResponse> MakeRequestAsync(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null)
+    internal static async Task<BaseResponse> MakeRequestAsync(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null,
+        HttpClient? httpClient = null, RetryOptions? retry = null, CancellationToken cancellationToken = default)
     {
-        var builder = new UriBuilder(url);
-        var query = HttpUtility.ParseQueryString(builder.Query);
+        var uri = BuildUri(url, method, data);
 
-        if (data != null && method == HttpMethod.Get)
-        {
-            // Case if it's a Get request the data object is a dictionary<string,string>
-            if (data is Dictionary<string, string> reqParams)
-            {
-                foreach (var param in reqParams)
-                    query[param.Key] = param.Value;
-            }
-
-        }
-
-        builder.Query = query.ToString();
-
-        using var requestMessage = new HttpRequestMessage(method, builder.Uri);
-        if (data != null && method != HttpMethod.Get)
-        {
-            requestMessage.Content = new StringContent(JsonSerializer.Serialize(data, SerializerOptions), Encoding.UTF8, "application/json");
-        }
-
-        if (headers != null)
-        {
-            foreach (var kvp in headers)
-            {
-                requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
-            }
-        }
-
-        using var activity = GotrueInstrumentation.StartHttpActivity(method, builder.Uri);
+        using var activity = GotrueInstrumentation.StartHttpActivity(method, uri);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
         string? errorType = null;
 
         try
         {
-            using var response = await Client.SendAsync(requestMessage).ConfigureAwait(false);
+            using var response = await RetryExecutor.SendAsync(httpClient ?? Client, () => BuildRequestMessage(method, uri, data, headers),
+                retry ?? new RetryOptions(), cancellationToken).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 
@@ -259,7 +243,43 @@ public static class Helpers
         }
         finally
         {
-            GotrueInstrumentation.RecordRequest(method, builder.Uri, statusCode, errorType, startTimestamp);
+            GotrueInstrumentation.RecordRequest(method, uri, statusCode, errorType, startTimestamp);
         }
+    }
+
+    private static Uri BuildUri(string url, HttpMethod method, object? data)
+    {
+        var builder = new UriBuilder(url);
+        var query = HttpUtility.ParseQueryString(builder.Query);
+
+        // Case if it's a Get request the data object is a dictionary<string,string>
+        if (method == HttpMethod.Get && data is Dictionary<string, string> reqParams)
+        {
+            foreach (var param in reqParams)
+                query[param.Key] = param.Value;
+        }
+
+        builder.Query = query.ToString();
+        return builder.Uri;
+    }
+
+    private static HttpRequestMessage BuildRequestMessage(HttpMethod method, Uri uri, object? data, Dictionary<string, string>? headers)
+    {
+        var request = new HttpRequestMessage(method, uri);
+
+        if (data != null && method != HttpMethod.Get)
+        {
+            request.Content = new StringContent(JsonSerializer.Serialize(data, SerializerOptions), Encoding.UTF8, "application/json");
+        }
+
+        if (headers != null)
+        {
+            foreach (var kvp in headers)
+            {
+                request.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
+            }
+        }
+
+        return request;
     }
 }
