@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -21,6 +22,8 @@ public class ArrayConverterTests
     {
         [JsonPropertyName("intArray")] public List<int> IntArray { get; set; } = new();
         [JsonPropertyName("stringArray")] public List<string> StringArray { get; set; } = new();
+        [JsonPropertyName("nestedIntArray")] public List<List<int>> NestedIntArray { get; set; } = new();
+        [JsonPropertyName("nestedStringArray")] public List<List<string>> NestedStringArray { get; set; } = new();
     }
 
     private static ArrayModel Coerce(string json) =>
@@ -62,5 +65,90 @@ public class ArrayConverterTests
     {
         StringArrayConverter.Parse("{a,b,c}").Should().Equal("a", "b", "c");
         StringArrayConverter.Parse("[a,b,c]").Should().Equal("a", "b", "c");
+    }
+
+    [TestMethod]
+    public void StringArrayParse_ShouldHonorQuotesAndEscapes() =>
+        StringArrayConverter.Parse("""{"a,b","c\"d","e\\f",""}""")
+            .Should().Equal("a,b", "c\"d", "e\\f", "");
+
+    [TestMethod]
+    public void StringArrayParse_ShouldKeepUnicodeSpaces() =>
+        StringArrayConverter.Parse("{a\u00A0,\u00A0,NULL\u00A0}").Should().Equal("a\u00A0", "\u00A0", "NULL\u00A0");
+
+    [TestMethod]
+    public void StringArrayParse_ShouldReadNullElement_GivenUnquotedNull() =>
+        StringArrayConverter.Parse("""{NULL,"NULL"}""")
+            .Should().Equal(new[] { null!, "NULL" }, "a quoted NULL is text, not the null element");
+
+    [TestMethod]
+    public void StringArrayParse_ShouldIgnoreWhitespace_GivenUnquotedElements() =>
+        StringArrayConverter.Parse(" {a , b} ").Should().Equal("a", "b");
+
+    [TestMethod]
+    public void StringArrayParse_ShouldReturnEmpty_GivenWhitespaceOnlyBraces() =>
+        StringArrayConverter.Parse("{ }").Should().BeEmpty();
+
+    [TestMethod]
+    [DataRow("{a,}")]
+    [DataRow("{a}b")]
+    [DataRow("""{"a}""")]
+    [DataRow("""{a"b}""")]
+    [DataRow("{a{b}")]
+    [DataRow("{a,,b}")]
+    [DataRow("abc")]
+    public void StringArrayRead_ShouldReturnNull_GivenMalformedLiteral(string literal) =>
+        Coerce(JsonSerializer.Serialize(new { stringArray = literal })).StringArray.Should().BeNull();
+
+    [TestMethod]
+    [DataRow("{1,}")]
+    [DataRow("{1,NULL}")]
+    [DataRow("{{1,2},{3,4}}")]
+    [DataRow("[0:1]={1,2}")]
+    public void IntArrayRead_ShouldReturnNull_GivenUnreadableLiteral(string literal) =>
+        Coerce(JsonSerializer.Serialize(new { intArray = literal })).IntArray.Should().BeNull();
+
+    [TestMethod]
+    public void NestedIntArrayRead_ShouldKeepShape_GivenNestedLiteral() =>
+        Coerce("""{"nestedIntArray":"{{1,2},{3,4}}"}""").NestedIntArray
+            .Should().BeEquivalentTo(new[] { new[] { 1, 2 }, new[] { 3, 4 } }, options => options.WithStrictOrdering());
+
+    [TestMethod]
+    public void NestedStringArrayRead_ShouldKeepShape_GivenQuotedAndNullElements() =>
+        Coerce("""{"nestedStringArray":"{{\"a,b\",NULL},{c}}"}""").NestedStringArray
+            .Should().BeEquivalentTo(new[] { new[] { "a,b", null }, new[] { "c" } }, options => options.WithStrictOrdering());
+
+    [TestMethod]
+    public void NestedIntArrayRead_ShouldKeepShape_GivenJsonArrays() =>
+        Coerce("""{"nestedIntArray":[[1,2],[3,4]]}""").NestedIntArray
+            .Should().BeEquivalentTo(new[] { new[] { 1, 2 }, new[] { 3, 4 } }, options => options.WithStrictOrdering());
+
+    [TestMethod]
+    [DataRow("{1,2,3}")]
+    [DataRow("{{1,2},3}")]
+    [DataRow("{{1,2}")]
+    public void NestedIntArrayRead_ShouldReturnNull_GivenUnreadableLiteral(string literal) =>
+        Coerce(JsonSerializer.Serialize(new { nestedIntArray = literal })).NestedIntArray.Should().BeNull();
+
+    [TestMethod]
+    public void NestedIntArrayRead_ShouldReturnNullAndKeepReading_GivenAJsonArrayWithABadElement() =>
+        Coerce("""{"nestedIntArray":[[1,2],["x",4]],"stringArray":"{ok}"}""")
+            .Should().BeEquivalentTo(new { NestedIntArray = (List<List<int>>?) null, StringArray = new[] { "ok" } });
+
+    [TestMethod]
+    public void NestedIntArrayRead_ShouldReturnNullAndKeepReading_GivenAJsonObject() =>
+        Coerce("""{"nestedIntArray":{},"stringArray":"{ok}"}""")
+            .Should().BeEquivalentTo(new { NestedIntArray = (List<List<int>>?) null, StringArray = new[] { "ok" } });
+
+    [TestMethod]
+    public void IntArrayRead_ShouldReturnNull_GivenDeeplyNestedBraces() =>
+        Coerce(JsonSerializer.Serialize(new { intArray = new string('{', 100_000) })).IntArray.Should().BeNull();
+
+    [TestMethod]
+    public void NestedIntArrayWrite_ShouldEmitJsonArrays()
+    {
+        var model = new ArrayModel { NestedIntArray = new() { new() { 1, 2 }, new() { 3, 4 } } };
+        var json = JsonNode.Parse(JsonSerializer.Serialize(model, Wire.Settings()))!;
+        json["nestedIntArray"]!.ToJsonString().Should().Be("[[1,2],[3,4]]");
     }
 }

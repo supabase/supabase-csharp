@@ -43,6 +43,7 @@ internal static class RealtimeSerializerOptions
                 new DateTimeListConverter(options.DateTimeFormat),
                 new IntArrayConverter(),
                 new StringArrayConverter(),
+                new PostgresNestedArrayConverter(),
                 new ObjectToInferredTypesConverter(),
             },
         };
