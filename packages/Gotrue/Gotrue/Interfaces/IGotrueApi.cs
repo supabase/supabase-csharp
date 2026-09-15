@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using static Supabase.Gotrue.Constants;
 
@@ -81,4 +82,11 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="userIdentity">Identity to be unlinked</param>
     /// <returns></returns>
     Task<bool> UnlinkIdentity(string token, UserIdentity userIdentity);
+
+    /// <summary>
+    /// Resends a confirmation code to a user's email or phone.
+    /// </summary>
+    /// <param name="resendParameters"></param>
+    /// <returns></returns>
+    Task<BaseResponse> Resend(ResendParameters resendParameters);
 }

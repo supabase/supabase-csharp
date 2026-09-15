@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.Resend;
+using Supabase.Gotrue.Responses;
 using static Supabase.Gotrue.Constants;
 
 #endregion
@@ -531,6 +533,13 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="accessToken">The access token to send as the bearer authorization.</param>
     /// <param name="refreshToken">The refresh token to exchange for a new session.</param>
     Task RefreshToken(string accessToken, string refreshToken);
+
+    /// <summary>
+    /// Resends a confirmation code to a user's email or phone.
+    /// </summary>
+    /// <param name="resendParameters"></param>
+    /// <returns></returns>
+    Task<BaseResponse> Resend(ResendParameters resendParameters);
 
     #region MFA
 

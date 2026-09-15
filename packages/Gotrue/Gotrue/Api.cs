@@ -11,6 +11,7 @@ using Supabase.Core.Http;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using static Supabase.Gotrue.Constants;
 
@@ -843,4 +844,16 @@ public class Api : IGotrueApi<User, Session>
 
         return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=refresh_token", data, this.Headers.MergeLeft(headers));
     }
+
+    /// <summary>
+    /// Resends a confirmation code to a user's email or phone.
+    /// </summary>
+    /// <param name="resendParameters"></param>
+    /// <returns>BaseResponse</returns>
+    public Task<BaseResponse> Resend(ResendParameters resendParameters) => this.MakeRequestAsync(
+        HttpMethod.Post,
+        $"{this.Url}/resend",
+        resendParameters,
+        this.Headers
+    );
 }
