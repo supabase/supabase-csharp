@@ -4,17 +4,14 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
         <PackOnBuild>true</PackOnBuild>
-        <Title>Supabase</Title>
         <PackageId>Supabase</PackageId>
-        <PackageProjectUrl>https://github.com/supabase-community/supabase-csharp/tree/master/packages/Supabase</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Supabase</PackageProjectUrl>
         <RootNamespace>Supabase</RootNamespace>
         <AssemblyName>Supabase</AssemblyName>
-        <Description>A C# implementation of the Supabase client</Description>
+        <Description>Supabase client for .NET that composes Auth, Database, Storage, Realtime and Edge Functions behind one client.</Description>
         <NeutralLanguage>en</NeutralLanguage>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <Owners>Joseph Schultz &lt;joseph@acupofjose.com&gt;</Owners>
-        <Summary>A C# implementation of the Supabase client</Summary>
-        <PackageTags>supabase</PackageTags>
+        <PackageTags>supabase;postgres;baas;auth;storage;realtime;edge-functions;blazor;maui</PackageTags>
         <!-- x-release-please-start-version -->
         <ReleaseVersion>8.1.1</ReleaseVersion>
         <PackageVersion>8.1.1</PackageVersion>

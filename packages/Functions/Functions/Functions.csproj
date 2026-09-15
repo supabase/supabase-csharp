@@ -2,15 +2,12 @@
 	<PropertyGroup>
 		<PackOnBuild>true</PackOnBuild>
 		<PackageId>Supabase.Functions</PackageId>
-		<PackageProjectUrl>https://github.com/supabase-community/supabase-csharp/tree/master/packages/Functions</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Functions</PackageProjectUrl>
 		<RootNamespace>Supabase.Functions</RootNamespace>
 		<AssemblyName>Supabase.Functions</AssemblyName>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Owners>Joseph Schultz &lt;joseph@acupofjose.com&gt;</Owners>
-		<Summary>A C# client for Supabase Functions</Summary>
-		<Title>Function</Title>
-		<Description>A C# client for Supabase Functions</Description>
-		<PackageTags>supabase, functions</PackageTags>
+		<Description>Supabase Edge Functions client for .NET that invokes functions with typed and streamed responses.</Description>
+		<PackageTags>supabase;edge-functions;functions;serverless;streaming</PackageTags>
     <!-- x-release-please-start-version -->
 		<PackageVersion>8.1.1</PackageVersion>
 		<ReleaseVersion>8.1.1</ReleaseVersion>

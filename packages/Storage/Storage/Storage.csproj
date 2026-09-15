@@ -2,15 +2,12 @@
     <PropertyGroup>
         <PackOnBuild>true</PackOnBuild>
         <PackageId>Supabase.Storage</PackageId>
-        <PackageProjectUrl>https://github.com/supabase-community/supabase-csharp/tree/master/packages/Storage</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Storage</PackageProjectUrl>
         <RootNamespace>Supabase.Storage</RootNamespace>
         <AssemblyName>Supabase.Storage</AssemblyName>
-        <Description>A C# implementation of the Supabase Storage client</Description>
+        <Description>Supabase Storage client for .NET for buckets, uploads, resumable uploads, downloads, signed URLs and image transforms.</Description>
         <NeutralLanguage>en-US</NeutralLanguage>
-        <Owners>Joseph Schultz &lt;joseph@acupofjose.com&gt;</Owners>
-        <Summary>A C# implementation of the Supabase Storage client</Summary>
-        <Title>Supabase Storage</Title>
-        <PackageTags>supabase, storage</PackageTags>
+        <PackageTags>supabase;storage;files;upload;buckets;signed-url;tus</PackageTags>
         <!-- x-release-please-start-version -->
         <ReleaseVersion>8.1.1</ReleaseVersion>
         <PackageVersion>8.1.1</PackageVersion>

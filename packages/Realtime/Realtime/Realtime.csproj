@@ -1,17 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <Title>Supabase.Realtime</Title>
         <PackageId>Supabase.Realtime</PackageId>
-        <PackageProjectUrl>https://github.com/supabase-community/supabase-csharp/tree/master/packages/Realtime</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Realtime</PackageProjectUrl>
         <RootNamespace>Supabase.Realtime</RootNamespace>
         <AssemblyName>Supabase.Realtime</AssemblyName>
-        <Description>Realtime-csharp is written as a client library for supabase/realtime.</Description>
+        <Description>Supabase Realtime client for .NET for Postgres changes, broadcast and presence over websockets.</Description>
         <PackOnBuild>true</PackOnBuild>
         <NeutralLanguage>en</NeutralLanguage>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <Owners>Joseph Schultz &lt;joseph@acupofjose.com&gt;</Owners>
-        <Summary>Realtime-csharp is written as a  client library for supabase/realtime.</Summary>
-        <PackageTags>supabase, realtime, phoenix</PackageTags>
+        <PackageTags>supabase;realtime;websocket;postgres;broadcast;presence;phoenix</PackageTags>
         <!-- x-release-please-start-version -->
         <PackageVersion>8.1.1</PackageVersion>
         <ReleaseVersion>8.1.1</ReleaseVersion>

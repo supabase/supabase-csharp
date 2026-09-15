@@ -1,11 +1,11 @@
 # Supabase.Extensions.DependencyInjection
 
-[![Build and Test](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml)
+[![Build and Test](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Extensions.DependencyInjection)](https://www.nuget.org/packages/Supabase.Extensions.DependencyInjection/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../../LICENSE)
 
 ASP.NET Core / `Microsoft.Extensions.DependencyInjection` integration for the
-[Supabase C# SDK](https://github.com/supabase-community/supabase-csharp).
+[Supabase C# SDK](https://github.com/supabase/supabase-csharp).
 
 Registers a `Supabase.Client` — and each of its sub-clients individually — against
 `IHttpClientFactory`-managed, pooled `HttpClient`s. Without this, an app that resolves a

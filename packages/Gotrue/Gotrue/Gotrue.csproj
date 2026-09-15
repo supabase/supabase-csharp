@@ -3,15 +3,12 @@
     <PropertyGroup>
         <PackOnBuild>true</PackOnBuild>
         <PackageId>Supabase.Gotrue</PackageId>
-        <PackageProjectUrl>https://github.com/supabase-community/supabase-csharp/tree/master/packages/Gotrue</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Gotrue</PackageProjectUrl>
         <RootNamespace>Supabase.Gotrue</RootNamespace>
         <AssemblyName>Supabase.Gotrue</AssemblyName>
         <NeutralLanguage>en</NeutralLanguage>
-        <Owners>Joseph Schultz &lt;joseph@acupofjose.com&gt;</Owners>
-        <Summary>A C# client for gotrue</Summary>
-        <Title>Gotrue</Title>
-        <Description>A C# client for gotrue</Description>
-        <PackageTags>supabase, gotrue</PackageTags>
+        <Description>Supabase Auth client for .NET covering email, phone and OAuth sign-in, magic links, MFA and session refresh.</Description>
+        <PackageTags>supabase;auth;authentication;gotrue;jwt;oauth;mfa;pkce;sso</PackageTags>
         <!-- x-release-please-start-version -->
         <PackageVersion>8.1.1</PackageVersion>
         <ReleaseVersion>8.1.1</ReleaseVersion>

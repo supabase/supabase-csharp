@@ -2,20 +2,15 @@
     <PropertyGroup>
         <WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>
         <Nullable>enable</Nullable>
-        <Title>Supabase.Postgrest</Title>
         <AssemblyName>Supabase.Postgrest</AssemblyName>
         <PackageId>Supabase.Postgrest</PackageId>
-        <PackageProjectUrl>https://github.com/supabase-community/supabase-csharp/tree/master/packages/Postgrest</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Postgrest</PackageProjectUrl>
         <RootNamespace>Supabase.Postgrest</RootNamespace>
         <PackOnBuild>true</PackOnBuild>
         <NeutralLanguage>en-US</NeutralLanguage>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <Owners>Joseph Schultz &lt;joseph@acupofjose.com&gt;</Owners>
-        <Summary>Library to interact with postgREST servers</Summary>
-        <Description>Postgrest-csharp is written primarily as a helper library for supabase/supabase-csharp, however, it should be easy enough to use outside of the supabase ecosystem.
-            The bulk of this library is a translation and c-sharp-ification of the supabase/postgrest-js library.
-        </Description>
-        <PackageTags>supabase,postgrest</PackageTags>
+        <Description>Supabase Database client for .NET that queries Postgres through PostgREST with typed models, filters and RPC.</Description>
+        <PackageTags>supabase;postgrest;postgres;postgresql;database;rest;rpc;linq</PackageTags>
         <!-- x-release-please-start-version -->
         <ReleaseVersion>8.1.1</ReleaseVersion>
         <PackageVersion>8.1.1</PackageVersion>

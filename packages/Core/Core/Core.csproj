@@ -2,16 +2,14 @@
 	<PropertyGroup>
 		<PackOnBuild>true</PackOnBuild>
 		<PackageId>Supabase.Core</PackageId>
-		<PackageProjectUrl>https://github.com/supabase-community/supabase-csharp/tree/master/packages/Core</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Core</PackageProjectUrl>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Summary>Shared core for supabase-csharp</Summary>
-		<Title>Supabase Core</Title>
-		<Description>Shared core for Supabase.*</Description>
+		<Description>Supabase .NET shared HTTP, retry and telemetry pieces used by the Supabase packages.</Description>
 		<AssemblyName>Supabase.Core</AssemblyName>
 		<RootNamespace>Supabase.Core</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageTags>supabase, core</PackageTags>
+		<PackageTags>supabase;core</PackageTags>
 		<!-- x-release-please-start-version -->
 		<PackageVersion>8.1.1</PackageVersion>
 		<ReleaseVersion>8.1.1</ReleaseVersion>
