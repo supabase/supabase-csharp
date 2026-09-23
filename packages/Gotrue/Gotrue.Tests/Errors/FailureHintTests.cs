@@ -2,6 +2,7 @@
 
 using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Gotrue.Exceptions;
@@ -32,46 +33,90 @@ public class FailureHintTests
     public void TestCleanup() => this.server.Dispose();
 
     [TestMethod]
-    [DataRow(400, "Invalid login credentials", UserBadLogin, DisplayName = "400 invalid login")]
-    [DataRow(400, "Email not confirmed", UserEmailNotConfirmed, DisplayName = "400 email not confirmed")]
-    [DataRow(400, "Invalid Refresh Token", InvalidRefreshToken, DisplayName = "400 invalid refresh token")]
-    [DataRow(400, "refresh_token_not_found", InvalidRefreshToken, DisplayName = "400 refresh token not found")]
-    [DataRow(400, "Refresh token is not valid", InvalidRefreshToken, DisplayName = "400 malformed refresh token")]
-    [DataRow(400, "Phone number is invalid", UserBadPhoneNumber, DisplayName = "400 bad phone")]
-    [DataRow(400, "Email address is invalid", UserBadEmailAddress, DisplayName = "400 bad email")]
-    [DataRow(400, "You must provide a value", UserMissingInformation, DisplayName = "400 missing information")]
-    [DataRow(401, "This endpoint requires a Bearer token", AdminTokenRequired, DisplayName = "401 bearer required")]
-    [DataRow(403, "Invalid token", AdminTokenRequired, DisplayName = "403 invalid token")]
-    [DataRow(403, "invalid JWT", AdminTokenRequired, DisplayName = "403 invalid JWT")]
-    [DataRow(404, "No SSO provider assigned for this domain", SsoDomainNotFound, DisplayName = "404 sso domain not found")]
-    [DataRow(404, "No such SSO provider", SsoProviderNotFound, DisplayName = "404 sso provider not found")]
-    [DataRow(422, "User already registered", UserAlreadyRegistered, DisplayName = "422 already registered")]
-    [DataRow(422, "Phone and Email are both invalid", UserBadMultiple, DisplayName = "422 bad phone and email")]
-    [DataRow(422, "Invalid email and password", UserBadMultiple, DisplayName = "422 bad email and password")]
-    [DataRow(422, "Password is too weak", UserBadPassword, DisplayName = "422 bad password")]
-    [DataRow(429, "Too many requests", UserTooManyRequests, DisplayName = "429 rate limited")]
-    [DataRow(500, "boom", Unknown, DisplayName = "unrecognized status")]
-    [DataRow(502, "boom", NetworkError, DisplayName = "standard server/gateway errors")]
-    [DataRow(503, "boom", NetworkError, DisplayName = "standard server/gateway errors")]
-    [DataRow(504, "boom", NetworkError, DisplayName = "standard server/gateway errors")]
-    [DataRow(520, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
-    [DataRow(521, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
-    [DataRow(522, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
-    [DataRow(523, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
-    [DataRow(524, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
-    [DataRow(530, "boom", CloudflareNetworkError, DisplayName = "cloudflare errors")]
-    public async Task DetectReason_ShouldMapServerErrorToReason(
-        int statusCode,
-        string body,
-        FailureHint.Reason expected
-    )
+    [DataRow(429, UserTooManyRequests, DisplayName = "429 rate limited")]
+    [DataRow(500, Unknown, DisplayName = "unrecognized status")]
+    [DataRow(502, NetworkError, DisplayName = "502 gateway error")]
+    [DataRow(503, NetworkError, DisplayName = "503 gateway error")]
+    [DataRow(504, NetworkError, DisplayName = "504 gateway error")]
+    [DataRow(520, CloudflareNetworkError, DisplayName = "520 cloudflare error")]
+    [DataRow(521, CloudflareNetworkError, DisplayName = "521 cloudflare error")]
+    [DataRow(522, CloudflareNetworkError, DisplayName = "522 cloudflare error")]
+    [DataRow(523, CloudflareNetworkError, DisplayName = "523 cloudflare error")]
+    [DataRow(524, CloudflareNetworkError, DisplayName = "524 cloudflare error")]
+    [DataRow(530, CloudflareNetworkError, DisplayName = "530 cloudflare error")]
+    public async Task DetectReason_ShouldFallBackToStatusCode_GivenNoErrorCode(int statusCode, FailureHint.Reason expected)
     {
-        this.StubSignUp(statusCode, body);
+        this.StubSignUp(statusCode, "an upstream gateway page");
         var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         exception
             .Which.Reason.Should()
-            .Be(expected, $"status {statusCode} with body \"{body}\" classifies as {expected}");
+            .Be(expected, $"a bodyless status {statusCode} classifies as {expected}");
+    }
+
+    [TestMethod]
+    [DataRow("invalid_credentials", UserBadLogin, DisplayName = "invalid_credentials")]
+    [DataRow("email_not_confirmed", UserEmailNotConfirmed, DisplayName = "email_not_confirmed")]
+    [DataRow("email_address_invalid", UserBadEmailAddress, DisplayName = "email_address_invalid")]
+    [DataRow("refresh_token_not_found", InvalidRefreshToken, DisplayName = "refresh_token_not_found")]
+    [DataRow("refresh_token_already_used", InvalidRefreshToken, DisplayName = "refresh_token_already_used")]
+    [DataRow("user_already_exists", UserAlreadyRegistered, DisplayName = "user_already_exists")]
+    [DataRow("email_exists", UserAlreadyRegistered, DisplayName = "email_exists")]
+    [DataRow("phone_exists", UserAlreadyRegistered, DisplayName = "phone_exists")]
+    [DataRow("weak_password", UserBadPassword, DisplayName = "weak_password")]
+    [DataRow("over_request_rate_limit", UserTooManyRequests, DisplayName = "over_request_rate_limit")]
+    [DataRow("over_email_send_rate_limit", UserTooManyRequests, DisplayName = "over_email_send_rate_limit")]
+    [DataRow("over_sms_send_rate_limit", UserTooManyRequests, DisplayName = "over_sms_send_rate_limit")]
+    [DataRow("bad_jwt", AdminTokenRequired, DisplayName = "bad_jwt")]
+    [DataRow("no_authorization", AdminTokenRequired, DisplayName = "no_authorization")]
+    [DataRow("not_admin", AdminTokenRequired, DisplayName = "not_admin")]
+    [DataRow("sso_provider_not_found", SsoProviderNotFound, DisplayName = "sso_provider_not_found")]
+    [DataRow("mfa_verification_failed", MfaChallengeUnverified, DisplayName = "mfa_verification_failed")]
+    [DataRow("mfa_verification_rejected", MfaChallengeUnverified, DisplayName = "mfa_verification_rejected")]
+    [DataRow("mfa_challenge_expired", MfaChallengeUnverified, DisplayName = "mfa_challenge_expired")]
+    public async Task DetectReason_ShouldMapErrorCodeToReason(string errorCode, FailureHint.Reason expected)
+    {
+        this.StubSignUp(400, $$"""{"code":400,"error_code":"{{errorCode}}","msg":"a server message"}""");
+        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var exception = await signUp.Should().ThrowAsync<GotrueException>();
+        exception.Which.Reason.Should().Be(expected, $"error_code \"{errorCode}\" classifies as {expected}");
+        exception.Which.ErrorCode.Should().Be(errorCode, "the raw server error_code is exposed for precise handling");
+    }
+
+    [TestMethod]
+    public async Task DetectReason_ShouldClassifyFromErrorCode_GivenConflictingMessageText()
+    {
+        this.StubSignUp(400, """{"code":400,"error_code":"invalid_credentials","msg":"Email not confirmed"}""");
+        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var exception = await signUp.Should().ThrowAsync<GotrueException>();
+        exception.Which.Reason.Should()
+            .Be(UserBadLogin, "classification comes from the machine-readable error_code, not the message text");
+    }
+
+    [TestMethod]
+    public async Task DetectReason_ShouldBeUnknown_GivenAnUnmappedErrorCode()
+    {
+        this.StubSignUp(400, """{"code":400,"error_code":"validation_failed","msg":"You must provide a value"}""");
+        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var exception = await signUp.Should().ThrowAsync<GotrueException>();
+        using (new AssertionScope())
+        {
+            exception.Which.Reason.Should().Be(Unknown, "a generic/unmapped code resolves to Unknown rather than guessing from message text");
+            exception.Which.ErrorCode.Should().Be("validation_failed", "the raw code is still surfaced so callers can branch on it");
+        }
+    }
+
+    [TestMethod]
+    public async Task ErrorCode_ShouldBeNull_GivenANonJsonBody()
+    {
+        this.StubSignUp(502, "an upstream gateway page");
+        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var exception = await signUp.Should().ThrowAsync<GotrueException>();
+        using (new AssertionScope())
+        {
+            exception.Which.ErrorCode.Should().BeNull("a gateway/Cloudflare page carries no error_code");
+            exception.Which.Reason.Should().Be(NetworkError, "status-code classification still applies");
+        }
     }
 
     private void StubSignUp(int statusCode, string body) =>

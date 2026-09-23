@@ -78,13 +78,13 @@ public class RefreshContractTests
     [TestMethod]
     [DataRow("token_not_found_error.json", DisplayName = "unknown token (refresh_token_not_found)")]
     [DataRow("malformed_token_error.json", DisplayName = "malformed token (validation_failed)")]
-    public async Task RefreshToken_ShouldThrowInvalidRefreshTokenAndDestroySession_GivenRejected(string fixture)
+    public async Task RefreshToken_ShouldThrowAndDestroySession_GivenTheServerRejectsTheToken(string fixture)
     {
         this.MockErrorResponse(400, Fixture(fixture));
         var refresh = () => this.client.RefreshToken(AccessToken, RefreshTokenValue);
-        var exception = await refresh.Should().ThrowAsync<GotrueException>();
-        exception.Which.Reason.Should().Be(InvalidRefreshToken);
-        this.client.CurrentSession.Should().BeNull();
+        await refresh.Should().ThrowAsync<GotrueException>();
+        this.client.CurrentSession.Should().BeNull(
+            "a definitive (4xx) refresh rejection destroys the session regardless of the specific error_code — GoTrue returns the generic validation_failed for a malformed token, so classification cannot gate this");
     }
 
     [TestMethod]
