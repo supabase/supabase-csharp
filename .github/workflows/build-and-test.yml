@@ -71,6 +71,7 @@ jobs:
         if: always() && github.event_name == 'push'
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.PAT_AUTOMATION_STEPS }}
           add-paths: packages/*/.gate-baseline.json
           base: master
           branch: automation/refresh-baseline

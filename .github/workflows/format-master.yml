@@ -46,6 +46,7 @@ jobs:
       - name: Open PR with formatting fix
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.PAT_AUTOMATION_STEPS }}
           add-paths: "*.cs"
           base: master
           branch: automation/format-master
