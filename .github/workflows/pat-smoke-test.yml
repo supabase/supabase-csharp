@@ -4,7 +4,7 @@ name: PAT smoke test
 # Runs on push to the test branch only, so master is never involved.
 on:
   push:
-    branches: [test/pat-smoke]
+    branches: [pat-pr]
 
 jobs:
   pat-smoke:
