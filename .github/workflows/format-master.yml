@@ -15,17 +15,17 @@ concurrency:
 
 jobs:
   format-master:
-    if: github.event.head_commit.author.email != 'github-actions[bot]@users.noreply.github.com'
+    if: >-
+      !startsWith(github.event.head_commit.message, 'chore(format)') &&
+      !startsWith(github.event.head_commit.message, 'chore(quality-gate)')
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # push the format branch for the PR below
-      pull-requests: write   # open the auto-format PR
+      contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          # format-suggest.sh's --base-ref needs the pushed-from commit to be
-          # present locally to diff against it.
           fetch-depth: 0
 
       - name: Setup .NET
