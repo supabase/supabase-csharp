@@ -1,5 +1,20 @@
 # Changelog
 
+## [8.2.0](https://github.com/supabase/supabase-csharp/compare/v8.1.1...v8.2.0) (2026-09-24)
+
+
+### Features
+
+* **gotrue:** add GetClaimsAsync with local JWKS verification ([#439](https://github.com/supabase/supabase-csharp/issues/439)) ([ad1513c](https://github.com/supabase/supabase-csharp/commit/ad1513cf04d7b2aa42d6e0ce7afbb06bf6e7122e))
+
+
+### Bug Fixes
+
+* **postgrest:** allow null reference values in Set ([#434](https://github.com/supabase/supabase-csharp/issues/434)) ([e1bfe19](https://github.com/supabase/supabase-csharp/commit/e1bfe19b5a12b1679a2693667ec47262bb38dd9e))
+* **postgrest:** resolve nullable Value in bare boolean predicates ([#432](https://github.com/supabase/supabase-csharp/issues/432)) ([9e6cc43](https://github.com/supabase/supabase-csharp/commit/9e6cc43293a0c2044fa94bad65c21dbdc50be567))
+* **realtime:** parse postgres array literals instead of splitting on commas ([#436](https://github.com/supabase/supabase-csharp/issues/436)) ([5bdf30e](https://github.com/supabase/supabase-csharp/commit/5bdf30ef34773ee29ee570aebf365a0303481de5))
+* **release:** replace automatic changes on master with PRs, fix repository owner after organization change ([#433](https://github.com/supabase/supabase-csharp/issues/433)) ([296b165](https://github.com/supabase/supabase-csharp/commit/296b165392cdaaa97159d918c96d97f7c954d531))
+
 ## [8.1.1](https://github.com/supabase/supabase-csharp/compare/v8.1.0...v8.1.1) (2026-09-14)
 
 

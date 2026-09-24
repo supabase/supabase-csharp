@@ -10,8 +10,8 @@
         <Description>Supabase Auth client for .NET covering email, phone and OAuth sign-in, magic links, MFA and session refresh.</Description>
         <PackageTags>supabase;auth;authentication;gotrue;jwt;oauth;mfa;pkce;sso</PackageTags>
         <!-- x-release-please-start-version -->
-        <PackageVersion>8.1.1</PackageVersion>
-        <ReleaseVersion>8.1.1</ReleaseVersion>
+        <PackageVersion>8.2.0</PackageVersion>
+        <ReleaseVersion>8.2.0</ReleaseVersion>
         <!-- x-release-please-end -->
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
@@ -29,7 +29,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Version)' == '' ">
-        <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.1.1</VersionPrefix> <!-- x-release-please-version -->
+        <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.2.0</VersionPrefix> <!-- x-release-please-version -->
         <VersionSuffix Condition=" '$(VersionSuffix)' == '' ">
         </VersionSuffix>
         <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>

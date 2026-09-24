@@ -9,8 +9,8 @@
 		<Description>Supabase client registration for Microsoft.Extensions.DependencyInjection with pooled HttpClients for ASP.NET Core.</Description>
 		<PackageTags>supabase;dependency-injection;aspnetcore;httpclientfactory</PackageTags>
 		<!-- x-release-please-start-version -->
-		<PackageVersion>8.1.1</PackageVersion>
-		<ReleaseVersion>8.1.1</ReleaseVersion>
+		<PackageVersion>8.2.0</PackageVersion>
+		<ReleaseVersion>8.2.0</ReleaseVersion>
 		<!-- x-release-please-end -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -22,7 +22,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Version)' == '' ">
-		<VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.1.1</VersionPrefix> <!-- x-release-please-version -->
+		<VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.2.0</VersionPrefix> <!-- x-release-please-version -->
 		<VersionSuffix Condition=" '$(VersionSuffix)' == '' "></VersionSuffix>
 		<Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
 		<Version Condition=" '$(Version)' == '' ">$(VersionPrefix)</Version>
