@@ -150,7 +150,9 @@ internal class WhereExpressionVisitor : ExpressionVisitor
     /// <summary>
     /// Handles a logical negation (i.e. `x => !(x.Name == "foo")`). The operand is visited as its own
     /// branch and the resulting filter is wrapped in a `not.` filter; a locally evaluated operand
-    /// (i.e. `x => !someLocalBool`) simply flips its boolean value.
+    /// (i.e. `x => !someLocalBool`) simply flips its boolean value. A negation of an already-negated
+    /// filter (i.e. `x => !x.IsActive.HasValue`, whose operand is the `not.is.null` filter) cancels the
+    /// two `not.`s rather than emitting an invalid `not.not.` value.
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
@@ -164,6 +166,8 @@ internal class WhereExpressionVisitor : ExpressionVisitor
 
         if (constant != null)
             this.ConstantValue = !constant;
+        else if (filter is { Op: Operator.Not, Criteria: QueryFilter negated })
+            this.Filter = negated;
         else
             this.Filter = new QueryFilter(Operator.Not, filter!);
 
@@ -184,7 +188,8 @@ internal class WhereExpressionVisitor : ExpressionVisitor
     /// <summary>
     /// Handles a boolean column used directly as a predicate (i.e. `x => x.IsActive`, its nullable
     /// `x => x.IsActive!.Value` form, or negated via <see cref="VisitUnary"/> `x => !x.IsActive`),
-    /// translating it into a `column.eq.true` filter.
+    /// translating it into a `column.eq.true` filter. A `Nullable&lt;T&gt;.HasValue` access
+    /// (i.e. `x => x.IsActive.HasValue`) instead becomes a `column IS NOT NULL` check.
     /// </summary>
     /// <param name="node"></param>
     /// <returns></returns>
@@ -192,6 +197,14 @@ internal class WhereExpressionVisitor : ExpressionVisitor
     {
         if (node.Type != typeof(bool) || !this.ContainsParameter(node))
             return base.VisitMember(node);
+
+        if (IsNullableHasValueAccess(node))
+        {
+            var nullableColumn = this.ResolveColumn(node.Expression!) ?? throw new ArgumentException(
+                $"Expression: '{node}' is expected to be property with a ColumnAttribute or PrimaryKeyAttribute");
+            this.Filter = BuildFilter(nullableColumn, Operator.NotEqual, null);
+            return node;
+        }
 
         var column = this.ResolveColumn(node) ?? throw new ArgumentException(
             $"Expression: '{node}' is expected to be property with a ColumnAttribute or PrimaryKeyAttribute");
@@ -310,6 +323,17 @@ internal class WhereExpressionVisitor : ExpressionVisitor
     /// <returns></returns>
     private static bool IsNullableValueAccess(MemberExpression member) =>
         member.Member.Name == "Value" &&
+        member.Expression != null &&
+        Nullable.GetUnderlyingType(member.Expression.Type) != null;
+
+    /// <summary>
+    /// True for the `Nullable&lt;T&gt;.HasValue` access on a nullable column (i.e. the `.HasValue` in
+    /// `x.IsActive.HasValue`); its inner expression is the column being null-checked.
+    /// </summary>
+    /// <param name="member"></param>
+    /// <returns></returns>
+    private static bool IsNullableHasValueAccess(MemberExpression member) =>
+        member.Member.Name == "HasValue" &&
         member.Expression != null &&
         Nullable.GetUnderlyingType(member.Expression.Type) != null;
 
