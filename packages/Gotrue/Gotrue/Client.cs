@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Http;
+using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
@@ -61,6 +62,16 @@ public class Client : IGotrueClient<User, Session>
     ///     The running token refresh, shared by concurrent callers. A completed attempt is replaced, never reused.
     /// </summary>
     internal RefreshAttempt? refreshAttempt;
+
+    /// <summary>
+    ///     How long a fetched key set is reused before the server is asked again.
+    /// </summary>
+    private static readonly TimeSpan JwksTtl = TimeSpan.FromMinutes(10);
+
+    /// <summary>
+    ///     Cached public keys, refreshed when no matching key is found.
+    /// </summary>
+    private JwksCache? jwksCache;
 
     /// <summary>
     ///     Initializes the GoTrue stateful client.
@@ -1107,6 +1118,57 @@ public class Client : IGotrueClient<User, Session>
         return Task.FromResult(response);
     }
 
+    /// <inheritdoc />
+    public async Task<GetClaimsResponse> GetClaimsAsync(string? jwt = null, GetClaimsOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var token = jwt ?? this.CurrentSession?.AccessToken;
+        if (string.IsNullOrEmpty(token))
+        {
+            throw new GotrueException("Not Logged in.", NoSessionFound);
+        }
+        var decoded = JwtVerification.Decode(token);
+        if (options?.AllowExpired != true)
+        {
+            JwtVerification.ValidateExpiry(decoded);
+        }
+        var key = await this.FindSigningKeyAsync(decoded.Header.Alg, decoded.Header.Kid, options?.Jwks, cancellationToken).ConfigureAwait(false);
+        if (key == null)
+        {
+            await this.api.GetUserAsync(token, cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            JwtVerification.VerifySignature(token, key);
+        }
+        return JwtVerification.BuildResponse(decoded);
+    }
+
+    /// <summary>
+    ///     Finds a matching public key, or returns null to use server verification.
+    /// </summary>
+    private async Task<Jwk?> FindSigningKeyAsync(string? alg, string? kid, Jwks? suppliedKeys, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(kid) || alg is not ("RS256" or "ES256"))
+        {
+            return null;
+        }
+        Jwk? Match(Jwks? keys) => keys?.Keys?.FirstOrDefault(jwk => jwk?.Kid == kid);
+        var cachedKeys = this.jwksCache is { } cached && cached.FetchedAt + JwksTtl > DateTime.UtcNow
+            ? cached.Jwks
+            : null;
+        var matchingKey = Match(suppliedKeys) ?? Match(cachedKeys);
+        if (matchingKey != null)
+        {
+            return matchingKey;
+        }
+        var fetched = await this.api.GetJwksAsync(cancellationToken).ConfigureAwait(false);
+        if (fetched != null)
+        {
+            this.jwksCache = new JwksCache(fetched, DateTime.UtcNow);
+        }
+        return Match(fetched);
+    }
+
     private AuthState? SetCurrentSession(Session? session)
     {
         bool dirty;
@@ -1169,4 +1231,6 @@ public class Client : IGotrueClient<User, Session>
 
         internal Task Refresh { get; } = refresh;
     }
+
+    private sealed record JwksCache(Jwks Jwks, DateTime FetchedAt);
 }

@@ -481,7 +481,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             throw new ArgumentException(
                 "Expression should return a KeyValuePair with a key of a Model Property and a value.");
 
-        if (value == null && visitor.ExpectedType != typeof(string))
+        if (value == null && visitor.ExpectedType.IsValueType)
         {
             if (Nullable.GetUnderlyingType(visitor.ExpectedType) == null)
                 throw new ArgumentException(

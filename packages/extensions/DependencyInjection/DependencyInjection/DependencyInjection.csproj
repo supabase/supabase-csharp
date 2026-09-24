@@ -2,18 +2,15 @@
 	<PropertyGroup>
 		<PackOnBuild>true</PackOnBuild>
 		<PackageId>Supabase.Extensions.DependencyInjection</PackageId>
-		<PackageProjectUrl>https://github.com/supabase-community/supabase-csharp/tree/master/packages/extensions/DependencyInjection</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/extensions/DependencyInjection</PackageProjectUrl>
 		<RootNamespace>Supabase.Extensions.DependencyInjection</RootNamespace>
 		<AssemblyName>Supabase.Extensions.DependencyInjection</AssemblyName>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Owners>Joseph Schultz &lt;joseph@acupofjose.com&gt;</Owners>
-		<Summary>ASP.NET Core / Microsoft.Extensions.DependencyInjection integration for the Supabase C# SDK</Summary>
-		<Title>Supabase Dependency Injection</Title>
-		<Description>Registers a Supabase.Client (and each of its sub-clients) against IHttpClientFactory-managed, pooled HttpClients, for safe use under sustained ASP.NET Core load.</Description>
-		<PackageTags>supabase, dependency-injection, aspnetcore</PackageTags>
+		<Description>Supabase client registration for Microsoft.Extensions.DependencyInjection with pooled HttpClients for ASP.NET Core.</Description>
+		<PackageTags>supabase;dependency-injection;aspnetcore;httpclientfactory</PackageTags>
 		<!-- x-release-please-start-version -->
-		<PackageVersion>8.1.0</PackageVersion>
-		<ReleaseVersion>8.1.0</ReleaseVersion>
+		<PackageVersion>8.1.1</PackageVersion>
+		<ReleaseVersion>8.1.1</ReleaseVersion>
 		<!-- x-release-please-end -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -25,7 +22,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Version)' == '' ">
-		<VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.1.0</VersionPrefix> <!-- x-release-please-version -->
+		<VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.1.1</VersionPrefix> <!-- x-release-please-version -->
 		<VersionSuffix Condition=" '$(VersionSuffix)' == '' "></VersionSuffix>
 		<Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
 		<Version Condition=" '$(Version)' == '' ">$(VersionPrefix)</Version>

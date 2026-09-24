@@ -17,16 +17,24 @@ jobs:
       releases_created: ${{ steps.release.outputs.releases_created }}
       tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.RELEASER_APP_ID }}
+          private-key: ${{ secrets.RELEASER_PRIVATE_KEY }}
+
       - uses: googleapis/release-please-action@v4
         id: release
         with:
           target-branch: ${{ github.ref_name }}
+          token: ${{ steps.app-token.outputs.token }}
           manifest-file: .release-please-manifest.json
           config-file: release-please-config.json
 
   publish:
     needs: release-please
-    if: ${{ github.repository_owner == 'supabase-community' && (needs.release-please.outputs.releases_created == 'true'|| github.event_name == 'workflow_dispatch') }}
+    if: ${{ github.repository_owner == 'supabase' && (needs.release-please.outputs.releases_created == 'true'|| github.event_name == 'workflow_dispatch') }}
     name: build, pack & publish
     runs-on: ubuntu-latest
     permissions:
@@ -68,34 +76,37 @@ jobs:
 
   mark-api-shipped:
     needs: [release-please, publish]
-    if: ${{ github.repository_owner == 'supabase-community' && (needs.release-please.outputs.releases_created == 'true'|| github.event_name == 'workflow_dispatch') }}
+    if: ${{ github.repository_owner == 'supabase' && (needs.release-please.outputs.releases_created == 'true'|| github.event_name == 'workflow_dispatch') }}
     name: mark public API shipped
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          app-id: ${{ secrets.RELEASER_APP_ID }}
+          private-key: ${{ secrets.RELEASER_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
           ref: master
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Fold Unshipped API into Shipped
         run: ./scripts/quality-gate/mark-api-shipped.sh packages
 
-      - name: Commit shipped API to master
-        run: |
-          if ! git status --porcelain -- 'packages/*/PublicAPI.*.txt' | grep -q .; then
-            echo "no public API to ship"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -- 'packages/*/PublicAPI.*.txt'
-          git commit -m "chore(quality-gate): mark public API shipped after release"
-          for attempt in 1 2 3 4 5; do
-            if git push origin HEAD:master; then exit 0; fi
-            echo "push rejected (attempt $attempt) — rebasing onto latest master and retrying"
-            git fetch origin master
-            git rebase origin/master || { git rebase --abort; exit 1; }
-          done
-          echo "could not push shipped API after retries" >&2
-          exit 1
+      - name: Open PR to mark shipped API
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          add-paths: packages/*/PublicAPI.*.txt
+          base: master
+          branch: automation/mark-api-shipped
+          delete-branch: true
+          commit-message: "chore(quality-gate): mark public API shipped after release"
+          title: "chore(quality-gate): mark public API shipped after release"
+          body: |
+            Folds Unshipped public API into Shipped after release ${{ needs.release-please.outputs.tag_name }}.

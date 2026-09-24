@@ -33,4 +33,13 @@ public class UpdateApprovalTests : RequestApprovalFixture
             .Update();
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
+
+    [TestMethod]
+    public async Task UpdateRequest_ShouldIncludeExplicitNull_GivenAJsonColumnSetToNull()
+    {
+        await this.Client.Table<UserWithJsonData>().Filter("username", Operator.Equals, "null-set-target")
+            .Set(user => user.Data!, null)
+            .Update();
+        await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
 }

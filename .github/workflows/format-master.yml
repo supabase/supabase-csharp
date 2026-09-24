@@ -15,16 +15,17 @@ concurrency:
 
 jobs:
   format-master:
-    if: github.event.head_commit.author.email != 'github-actions[bot]@users.noreply.github.com'
+    if: >-
+      !startsWith(github.event.head_commit.message, 'chore(format)') &&
+      !startsWith(github.event.head_commit.message, 'chore(quality-gate)')
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
         with:
-          # format-suggest.sh's --base-ref needs the pushed-from commit to be
-          # present locally to diff against it.
           fetch-depth: 0
 
       - name: Setup .NET
@@ -42,14 +43,15 @@ jobs:
           fi
           ./scripts/quality-gate/format-suggest.sh packages --base-ref "$before"
 
-      - name: Commit and push if anything changed
-        run: |
-          if git status --porcelain -- '*.cs' | grep -q .; then
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add -- '*.cs'
-            git commit -m "chore(format): auto-format after merge"
-            git push origin HEAD:master
-          else
-            echo "nothing to format"
-          fi
+      - name: Open PR with formatting fix
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.PAT_AUTOMATION_STEPS }}
+          add-paths: "*.cs"
+          base: master
+          branch: automation/format-master
+          delete-branch: true
+          commit-message: "chore(format): auto-format after merge"
+          title: "chore(format): auto-format after merge"
+          body: |
+            Applies `dotnet format` to files changed by the last merge to master.

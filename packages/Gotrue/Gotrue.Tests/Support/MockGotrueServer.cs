@@ -31,6 +31,9 @@ internal sealed class MockGotrueServer : IDisposable
 
     internal void Reset() => this.server.ResetMappings();
 
+    internal int CountReceivedRequests(string? path = null) =>
+        this.server.LogEntries.Count(entry => path == null || entry.RequestMessage!.Path == path);
+
     internal ReceivedRequest VerifySingleReceivedRequest()
     {
         var entry = this.server.LogEntries.Should().ContainSingle("the SDK should emit exactly one request").Which;

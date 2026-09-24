@@ -1,6 +1,6 @@
 # Supabase
 
-[![Build and Test](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml)
+[![Build and Test](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase)](https://www.nuget.org/packages/Supabase/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
@@ -8,7 +8,7 @@ The unified C# client for [Supabase](https://supabase.com). One client composes 
 Storage, Realtime, and Edge Functions, so you configure your project once and reach every service
 from a single object.
 
-Part of the [Supabase C# SDK](https://github.com/supabase-community/supabase-csharp). To use a single
+Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). To use a single
 service on its own, reference its package instead — see [Individual services](#individual-services).
 
 ## Installation
@@ -18,7 +18,7 @@ dotnet add package Supabase
 ```
 
 Targets .NET Standard 2.1, so it runs on .NET Core / .NET 5+, Xamarin, MAUI, and Unity. See the
-[wiki](https://github.com/supabase-community/supabase-csharp/wiki) for platform-specific guides.
+[wiki](https://github.com/supabase/supabase-csharp/wiki) for platform-specific guides.
 
 ## Getting started
 
@@ -85,7 +85,7 @@ Pass a `SupabaseOptions` to the constructor:
 By default the client does not persist the auth session, so the user is signed out when the process
 ends. Provide a `SessionHandler` to save, load, and destroy the session — for example to a file or to
 the platform's secure storage. See
-[Authorization with Gotrue](https://github.com/supabase-community/supabase-csharp/wiki/Authorization-with-Gotrue#offline-support)
+[Authorization with Gotrue](https://github.com/supabase/supabase-csharp/wiki/Authorization-with-Gotrue#offline-support)
 in the wiki for a worked example.
 
 > **A note on keys:** some APIs (user administration, bypassing RLS, etc.) require an elevated key
@@ -154,15 +154,15 @@ Each service is also published as a standalone package, useful when you only nee
 
 ## Documentation
 
-- [Getting Started](https://github.com/supabase-community/supabase-csharp/wiki#getting-started)
+- [Getting Started](https://github.com/supabase/supabase-csharp/wiki#getting-started)
 - [Supabase C# reference](https://supabase.com/docs/reference/csharp/introduction)
 - [Generated API docs](https://supabase-community.github.io/supabase-csharp/api/Supabase.Client.html)
-- [Examples](https://github.com/supabase-community/supabase-csharp/wiki/Examples)
-- [Troubleshooting](https://github.com/supabase-community/supabase-csharp/wiki/Troubleshooting) · [Discussions](https://github.com/supabase-community/supabase-csharp/discussions)
+- [Examples](https://github.com/supabase/supabase-csharp/wiki/Examples)
+- [Troubleshooting](https://github.com/supabase/supabase-csharp/wiki/Troubleshooting) · [Discussions](https://github.com/supabase/supabase-csharp/discussions)
 
 ## Contributing
 
-Contributions are welcome. See the [repository root](https://github.com/supabase-community/supabase-csharp)
+Contributions are welcome. See the [repository root](https://github.com/supabase/supabase-csharp)
 for how to build and test the SDK.
 
 ## License

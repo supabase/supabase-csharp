@@ -1,6 +1,6 @@
 # Supabase.Realtime
 
-[![Build and Test](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml)
+[![Build and Test](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Realtime)](https://www.nuget.org/packages/Supabase.Realtime/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
@@ -8,7 +8,7 @@ A C# client for [Supabase Realtime](https://supabase.com/docs/guides/realtime) â
 changes, and use Broadcast and Presence over a single websocket connection. It is a C#-ification of
 [realtime-js](https://github.com/supabase/realtime-js).
 
-Part of the [Supabase C# SDK](https://github.com/supabase-community/supabase-csharp). Most projects
+Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.Realtime`); reference
 this package directly to use Realtime on its own.
 
@@ -178,7 +178,7 @@ client.AddDebugHandler((sender, message, exception) => Debug.WriteLine(message))
 
 ## Contributing
 
-Contributions are welcome. See the [repository root](https://github.com/supabase-community/supabase-csharp)
+Contributions are welcome. See the [repository root](https://github.com/supabase/supabase-csharp)
 for how to build and test the SDK.
 
 Note that the Realtime test suite expects `realtime-dev.localhost` to resolve locally â€” add a hosts

@@ -1,1 +1,116 @@
 #nullable enable
+override Supabase.Gotrue.Claims.GetClaimsOptions.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.GetClaimsOptions.GetHashCode() -> int
+override Supabase.Gotrue.Claims.GetClaimsOptions.ToString() -> string!
+override Supabase.Gotrue.Claims.GetClaimsResponse.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.GetClaimsResponse.GetHashCode() -> int
+override Supabase.Gotrue.Claims.GetClaimsResponse.ToString() -> string!
+override Supabase.Gotrue.Claims.Jwk.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.Jwk.GetHashCode() -> int
+override Supabase.Gotrue.Claims.Jwk.ToString() -> string!
+override Supabase.Gotrue.Claims.Jwks.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.Jwks.GetHashCode() -> int
+override Supabase.Gotrue.Claims.Jwks.ToString() -> string!
+override Supabase.Gotrue.Claims.JwtClaims.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.JwtClaims.GetHashCode() -> int
+override Supabase.Gotrue.Claims.JwtClaims.ToString() -> string!
+override Supabase.Gotrue.Claims.JwtHeader.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.JwtHeader.GetHashCode() -> int
+override Supabase.Gotrue.Claims.JwtHeader.ToString() -> string!
+static Supabase.Gotrue.Claims.GetClaimsOptions.operator !=(Supabase.Gotrue.Claims.GetClaimsOptions? left, Supabase.Gotrue.Claims.GetClaimsOptions? right) -> bool
+static Supabase.Gotrue.Claims.GetClaimsOptions.operator ==(Supabase.Gotrue.Claims.GetClaimsOptions? left, Supabase.Gotrue.Claims.GetClaimsOptions? right) -> bool
+static Supabase.Gotrue.Claims.GetClaimsResponse.operator !=(Supabase.Gotrue.Claims.GetClaimsResponse? left, Supabase.Gotrue.Claims.GetClaimsResponse? right) -> bool
+static Supabase.Gotrue.Claims.GetClaimsResponse.operator ==(Supabase.Gotrue.Claims.GetClaimsResponse? left, Supabase.Gotrue.Claims.GetClaimsResponse? right) -> bool
+static Supabase.Gotrue.Claims.Jwk.operator !=(Supabase.Gotrue.Claims.Jwk? left, Supabase.Gotrue.Claims.Jwk? right) -> bool
+static Supabase.Gotrue.Claims.Jwk.operator ==(Supabase.Gotrue.Claims.Jwk? left, Supabase.Gotrue.Claims.Jwk? right) -> bool
+static Supabase.Gotrue.Claims.Jwks.operator !=(Supabase.Gotrue.Claims.Jwks? left, Supabase.Gotrue.Claims.Jwks? right) -> bool
+static Supabase.Gotrue.Claims.Jwks.operator ==(Supabase.Gotrue.Claims.Jwks? left, Supabase.Gotrue.Claims.Jwks? right) -> bool
+static Supabase.Gotrue.Claims.JwtClaims.operator !=(Supabase.Gotrue.Claims.JwtClaims? left, Supabase.Gotrue.Claims.JwtClaims? right) -> bool
+static Supabase.Gotrue.Claims.JwtClaims.operator ==(Supabase.Gotrue.Claims.JwtClaims? left, Supabase.Gotrue.Claims.JwtClaims? right) -> bool
+static Supabase.Gotrue.Claims.JwtHeader.operator !=(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
+static Supabase.Gotrue.Claims.JwtHeader.operator ==(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
+Supabase.Gotrue.Api.GetJwksAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.Jwks?>!
+Supabase.Gotrue.Api.GetUserAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
+Supabase.Gotrue.Claims.GetClaimsOptions
+Supabase.Gotrue.Claims.GetClaimsOptions.<Clone>$() -> Supabase.Gotrue.Claims.GetClaimsOptions!
+Supabase.Gotrue.Claims.GetClaimsOptions.AllowExpired.get -> bool
+Supabase.Gotrue.Claims.GetClaimsOptions.AllowExpired.init -> void
+Supabase.Gotrue.Claims.GetClaimsOptions.Equals(Supabase.Gotrue.Claims.GetClaimsOptions? other) -> bool
+Supabase.Gotrue.Claims.GetClaimsOptions.GetClaimsOptions() -> void
+Supabase.Gotrue.Claims.GetClaimsOptions.Jwks.get -> Supabase.Gotrue.Claims.Jwks?
+Supabase.Gotrue.Claims.GetClaimsOptions.Jwks.init -> void
+Supabase.Gotrue.Claims.GetClaimsResponse
+Supabase.Gotrue.Claims.GetClaimsResponse.<Clone>$() -> Supabase.Gotrue.Claims.GetClaimsResponse!
+Supabase.Gotrue.Claims.GetClaimsResponse.Claims.get -> Supabase.Gotrue.Claims.JwtClaims!
+Supabase.Gotrue.Claims.GetClaimsResponse.Claims.init -> void
+Supabase.Gotrue.Claims.GetClaimsResponse.Equals(Supabase.Gotrue.Claims.GetClaimsResponse? other) -> bool
+Supabase.Gotrue.Claims.GetClaimsResponse.GetClaimsResponse() -> void
+Supabase.Gotrue.Claims.GetClaimsResponse.Header.get -> Supabase.Gotrue.Claims.JwtHeader!
+Supabase.Gotrue.Claims.GetClaimsResponse.Header.init -> void
+Supabase.Gotrue.Claims.GetClaimsResponse.Signature.get -> byte[]!
+Supabase.Gotrue.Claims.GetClaimsResponse.Signature.init -> void
+Supabase.Gotrue.Claims.Jwk
+Supabase.Gotrue.Claims.Jwk.<Clone>$() -> Supabase.Gotrue.Claims.Jwk!
+Supabase.Gotrue.Claims.Jwk.Alg.get -> string?
+Supabase.Gotrue.Claims.Jwk.Alg.init -> void
+Supabase.Gotrue.Claims.Jwk.Crv.get -> string?
+Supabase.Gotrue.Claims.Jwk.Crv.init -> void
+Supabase.Gotrue.Claims.Jwk.E.get -> string?
+Supabase.Gotrue.Claims.Jwk.E.init -> void
+Supabase.Gotrue.Claims.Jwk.Equals(Supabase.Gotrue.Claims.Jwk? other) -> bool
+Supabase.Gotrue.Claims.Jwk.Jwk() -> void
+Supabase.Gotrue.Claims.Jwk.Kid.get -> string?
+Supabase.Gotrue.Claims.Jwk.Kid.init -> void
+Supabase.Gotrue.Claims.Jwk.Kty.get -> string?
+Supabase.Gotrue.Claims.Jwk.Kty.init -> void
+Supabase.Gotrue.Claims.Jwk.N.get -> string?
+Supabase.Gotrue.Claims.Jwk.N.init -> void
+Supabase.Gotrue.Claims.Jwk.Use.get -> string?
+Supabase.Gotrue.Claims.Jwk.Use.init -> void
+Supabase.Gotrue.Claims.Jwk.X.get -> string?
+Supabase.Gotrue.Claims.Jwk.X.init -> void
+Supabase.Gotrue.Claims.Jwk.Y.get -> string?
+Supabase.Gotrue.Claims.Jwk.Y.init -> void
+Supabase.Gotrue.Claims.Jwks
+Supabase.Gotrue.Claims.Jwks.<Clone>$() -> Supabase.Gotrue.Claims.Jwks!
+Supabase.Gotrue.Claims.Jwks.Equals(Supabase.Gotrue.Claims.Jwks? other) -> bool
+Supabase.Gotrue.Claims.Jwks.Jwks() -> void
+Supabase.Gotrue.Claims.Jwks.Keys.get -> System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Claims.Jwk!>!
+Supabase.Gotrue.Claims.Jwks.Keys.init -> void
+Supabase.Gotrue.Claims.JwtClaims
+Supabase.Gotrue.Claims.JwtClaims.<Clone>$() -> Supabase.Gotrue.Claims.JwtClaims!
+Supabase.Gotrue.Claims.JwtClaims.Aal.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.Aal.init -> void
+Supabase.Gotrue.Claims.JwtClaims.AdditionalClaims.get -> System.Collections.Generic.Dictionary<string!, System.Text.Json.JsonElement>!
+Supabase.Gotrue.Claims.JwtClaims.AdditionalClaims.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Aud.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Claims.JwtClaims.Aud.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Equals(Supabase.Gotrue.Claims.JwtClaims? other) -> bool
+Supabase.Gotrue.Claims.JwtClaims.Exp.get -> long?
+Supabase.Gotrue.Claims.JwtClaims.Exp.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Iat.get -> long?
+Supabase.Gotrue.Claims.JwtClaims.Iat.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Iss.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.Iss.init -> void
+Supabase.Gotrue.Claims.JwtClaims.JwtClaims() -> void
+Supabase.Gotrue.Claims.JwtClaims.Role.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.Role.init -> void
+Supabase.Gotrue.Claims.JwtClaims.SessionId.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.SessionId.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Sub.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.Sub.init -> void
+Supabase.Gotrue.Claims.JwtHeader
+Supabase.Gotrue.Claims.JwtHeader.<Clone>$() -> Supabase.Gotrue.Claims.JwtHeader!
+Supabase.Gotrue.Claims.JwtHeader.Alg.get -> string?
+Supabase.Gotrue.Claims.JwtHeader.Alg.init -> void
+Supabase.Gotrue.Claims.JwtHeader.Equals(Supabase.Gotrue.Claims.JwtHeader? other) -> bool
+Supabase.Gotrue.Claims.JwtHeader.JwtHeader() -> void
+Supabase.Gotrue.Claims.JwtHeader.Kid.get -> string?
+Supabase.Gotrue.Claims.JwtHeader.Kid.init -> void
+Supabase.Gotrue.Claims.JwtHeader.Typ.get -> string?
+Supabase.Gotrue.Claims.JwtHeader.Typ.init -> void
+Supabase.Gotrue.Client.GetClaimsAsync(string? jwt = null, Supabase.Gotrue.Claims.GetClaimsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.GetClaimsResponse!>!
+Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidJwt = 22 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetJwksAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.Jwks?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUserAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TUser?>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetClaimsAsync(string? jwt = null, Supabase.Gotrue.Claims.GetClaimsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.GetClaimsResponse!>!

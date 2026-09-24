@@ -14,7 +14,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # only used by the post-merge baseline refresh step below
+      contents: write        # push the baseline branch for the post-merge PR below
+      pull-requests: write   # open the post-merge baseline-refresh PR
 
     steps:
       - uses: actions/checkout@v4
@@ -66,31 +67,17 @@ jobs:
       - name: Quality gate
         run: ./scripts/quality-gate/gate.sh packages ${{ github.event_name == 'pull_request' && '--bypass-format' || '--overwrite-baseline' }}
 
-      # Commit the new baseline back to master. always() so an improvement still
-      # lands even if a later stage failed — a coverage/warning gain is orthogonal to,
-      # say, a flaky E2E. Only runs on push (PRs are read-only, nothing to commit).
-      #
-      # format-master.yml fires on the same merge and also pushes to master, so this
-      # push can lose a race; fetch+rebase+retry rather than clobber. The push uses the
-      # default GITHUB_TOKEN, whose pushes don't trigger another workflow run, so this
-      # can't loop back into itself.
       - name: Refresh baseline on master
         if: always() && github.event_name == 'push'
-        run: |
-          if ! git status --porcelain -- 'packages/*/.gate-baseline.json' | grep -q .; then
-            echo "no baseline change"
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -- 'packages/*/.gate-baseline.json'
-          git commit -m "chore(quality-gate): refresh baseline after merge"
-          for attempt in 1 2 3 4 5; do
-            if git push origin HEAD:master; then exit 0; fi
-            echo "push rejected (attempt $attempt) — rebasing onto latest master and retrying"
-            git fetch origin master
-            git rebase origin/master || { git rebase --abort; exit 1; }
-          done
-          echo "could not push baseline after retries" >&2
-          exit 1
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.PAT_AUTOMATION_STEPS }}
+          add-paths: packages/*/.gate-baseline.json
+          base: master
+          branch: automation/refresh-baseline
+          delete-branch: true
+          commit-message: "chore(quality-gate): refresh baseline after merge"
+          title: "chore(quality-gate): refresh baseline after merge"
+          body: |
+            Refreshes the quality-gate baseline after a merge to master.
 

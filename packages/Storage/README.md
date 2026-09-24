@@ -1,13 +1,13 @@
 # Supabase.Storage
 
-[![Build and Test](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml)
+[![Build and Test](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Storage)](https://www.nuget.org/packages/Supabase.Storage/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
 A C# client for [Supabase Storage](https://supabase.com/docs/guides/storage) — upload, download, and
 serve files from buckets, with signed and public URLs.
 
-Part of the [Supabase C# SDK](https://github.com/supabase-community/supabase-csharp). Most projects
+Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.Storage`); reference
 this package directly when you only need storage.
 
@@ -139,7 +139,7 @@ ActivitySource.AddActivityListener(listener);
 
 ## Contributing
 
-Contributions are welcome. See the [repository root](https://github.com/supabase-community/supabase-csharp)
+Contributions are welcome. See the [repository root](https://github.com/supabase/supabase-csharp)
 for how to build and test the SDK.
 
 ## License

@@ -1,13 +1,13 @@
 # Supabase.Gotrue
 
-[![Build and Test](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml)
+[![Build and Test](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Gotrue)](https://www.nuget.org/packages/Supabase.Gotrue/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
 A C# client for [Supabase Auth](https://supabase.com/docs/guides/auth) (GoTrue) — email/password,
 OAuth providers, SSO, magic links, and user management.
 
-Part of the [Supabase C# SDK](https://github.com/supabase-community/supabase-csharp). Most projects
+Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.Auth`); reference this
 package directly to use Auth on its own. The client is written to be platform-agnostic and works on
 .NET, Xamarin, MAUI, and Unity — see the [Unity session-persistence example](https://gist.github.com/wiverson/fbb07498743dff19b72c9c58599931e9).
@@ -78,6 +78,20 @@ bool SaveSession(Session session)
     File.WriteAllText(path, JsonSerializer.Serialize(session));
     return true;
 }
+```
+
+## JWT claims
+
+`GetClaimsAsync` verifies an access token and returns its claims. It uses the current session's token
+unless you provide one. RS256 and ES256 tokens can be verified locally using cached public keys;
+otherwise, verification requires a request to the Auth server.
+
+```csharp
+var result = await client.GetClaimsAsync();
+var userId = result.Claims.Sub;
+
+// Verify an explicitly supplied access token.
+var incoming = await client.GetClaimsAsync(accessToken);
 ```
 
 ## OAuth (PKCE flow)
@@ -203,7 +217,7 @@ web page to handle confirmation, then have the app inspect the returned user to 
 
 ## Contributing
 
-Contributions are welcome. See the [repository root](https://github.com/supabase-community/supabase-csharp)
+Contributions are welcome. See the [repository root](https://github.com/supabase/supabase-csharp)
 for how to build and test the SDK.
 
 ## License

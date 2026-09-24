@@ -16,7 +16,7 @@
     <Authors>Supabase</Authors>
     <Copyright>MIT</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/supabase-community/supabase-csharp</RepositoryUrl>
+    <RepositoryUrl>https://github.com/supabase/supabase-csharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!--

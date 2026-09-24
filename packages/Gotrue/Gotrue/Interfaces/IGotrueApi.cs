@@ -1,6 +1,8 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
+using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using static Supabase.Gotrue.Constants;
@@ -15,7 +17,9 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
 {
     Task<TUser?> CreateUser(string jwt, AdminUserAttributes? attributes = null);
     Task<BaseResponse> DeleteUser(string uid, string jwt, bool shouldSoftDelete = false);
+    Task<Jwks?> GetJwksAsync(CancellationToken cancellationToken = default);
     Task<TUser?> GetUser(string jwt);
+    Task<TUser?> GetUserAsync(string jwt, CancellationToken cancellationToken = default);
     Task<TUser?> GetUserById(string jwt, string userId);
     Task<BaseResponse> InviteUserByEmail(string email, string jwt, InviteUserByEmailOptions? options = null);
     Task<UserList<TUser>?> ListUsers(string jwt, string? filter = null, string? sortBy = null, SortOrder sortOrder = SortOrder.Descending, int? page = null, int? perPage = null);

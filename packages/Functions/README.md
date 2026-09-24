@@ -1,12 +1,12 @@
 # Supabase.Functions
 
-[![Build and Test](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml)
+[![Build and Test](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Functions)](https://www.nuget.org/packages/Supabase.Functions/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
 A C# client for invoking [Supabase Edge Functions](https://supabase.com/docs/guides/functions).
 
-Part of the [Supabase C# SDK](https://github.com/supabase-community/supabase-csharp). Most projects
+Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.Functions`); reference
 this package directly when you only need to invoke functions.
 
@@ -123,7 +123,7 @@ ActivitySource.AddActivityListener(listener);
 
 ## Contributing
 
-Contributions are welcome. See the [repository root](https://github.com/supabase-community/supabase-csharp)
+Contributions are welcome. See the [repository root](https://github.com/supabase/supabase-csharp)
 for how to build and test the SDK.
 
 ## License

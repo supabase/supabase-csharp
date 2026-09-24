@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -52,21 +53,11 @@ public class IntArrayConverter : JsonConverter<List<int>>
     internal static List<int> Parse(string value)
     {
         var result = new List<int>();
-
-        if (string.IsNullOrEmpty(value))
-            return result;
-
-        var firstChar = value[0];
-        var lastChar = value[value.Length - 1];
-
-        var isBraced = (firstChar == '{' && lastChar == '}') || (firstChar == '[' && lastChar == ']');
-        if (!isBraced)
-            return result;
-
-        foreach (var item in value.Trim('{', '}', '[', ']').Split(','))
+        foreach (var item in PostgresArrayLiteral.Parse(value))
         {
-            if (string.IsNullOrEmpty(item)) continue;
-            result.Add(int.Parse(item));
+            if (item is not string element)
+                throw new JsonException($"'{value}' is not a flat array of ints.");
+            result.Add(int.Parse(element, CultureInfo.InvariantCulture));
         }
 
         return result;

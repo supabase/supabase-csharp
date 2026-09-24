@@ -122,6 +122,11 @@ public static class FailureHint
         /// 520-524, 530: Cloudflare-specific error codes (web server down, connection timed out, etc.)
         /// </summary>
         CloudflareNetworkError,
+
+        /// <summary>
+        /// The JWT is expired, malformed, or its signature did not verify.
+        /// </summary>
+        InvalidJwt,
     }
 
     /// <summary>

@@ -1,6 +1,6 @@
 # Supabase.Postgrest
 
-[![Build and Test](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase-community/supabase-csharp/actions/workflows/build-and-test.yml)
+[![Build and Test](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/supabase/supabase-csharp/actions/workflows/build-and-test.yml)
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Postgrest)](https://www.nuget.org/packages/Supabase.Postgrest/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
@@ -8,7 +8,7 @@ A C# client for [PostgREST](https://postgrest.org) — query your Supabase datab
 auto-generated REST API, with strongly-typed models and LINQ. It is a C#-ification of
 [postgrest-js](https://github.com/supabase/postgrest-js).
 
-Part of the [Supabase C# SDK](https://github.com/supabase-community/supabase-csharp). Most projects
+Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.From<T>()`); reference
 this package directly to use PostgREST on its own. It also works outside the Supabase ecosystem
 against any PostgREST server.
@@ -333,7 +333,7 @@ ActivitySource.AddActivityListener(listener);
 
 ## Contributing
 
-Contributions are welcome. See the [repository root](https://github.com/supabase-community/supabase-csharp)
+Contributions are welcome. See the [repository root](https://github.com/supabase/supabase-csharp)
 for how to build and test the SDK.
 
 ## License
