@@ -1,1 +1,26 @@
 #nullable enable
+Supabase.Gotrue.Api.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Client.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Resend.ResendOptions
+Supabase.Gotrue.Resend.ResendOptions.CaptchaToken.get -> string?
+Supabase.Gotrue.Resend.ResendOptions.CaptchaToken.set -> void
+Supabase.Gotrue.Resend.ResendOptions.EmailRedirectTo.get -> string?
+Supabase.Gotrue.Resend.ResendOptions.EmailRedirectTo.set -> void
+Supabase.Gotrue.Resend.ResendOptions.ResendOptions() -> void
+Supabase.Gotrue.Resend.ResendParameters
+Supabase.Gotrue.Resend.ResendParameters.Email.get -> string?
+Supabase.Gotrue.Resend.ResendParameters.Email.set -> void
+Supabase.Gotrue.Resend.ResendParameters.Options.get -> Supabase.Gotrue.Resend.ResendOptions?
+Supabase.Gotrue.Resend.ResendParameters.Options.set -> void
+Supabase.Gotrue.Resend.ResendParameters.Phone.get -> string?
+Supabase.Gotrue.Resend.ResendParameters.Phone.set -> void
+Supabase.Gotrue.Resend.ResendParameters.ResendParameters(Supabase.Gotrue.Resend.ResendType type) -> void
+Supabase.Gotrue.Resend.ResendParameters.Type.get -> string?
+Supabase.Gotrue.Resend.ResendParameters.Type.set -> void
+Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.EmailChange = 3 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.PhoneChange = 2 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.SignUp = 0 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.Sms = 1 -> Supabase.Gotrue.Resend.ResendType
