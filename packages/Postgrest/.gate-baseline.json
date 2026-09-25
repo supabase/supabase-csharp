@@ -4,9 +4,9 @@
   "project": "Postgrest/Postgrest.csproj",
   "testProject": "Postgrest.Tests/Postgrest.Tests.csproj",
   "warnings": {
-    "total": 142,
+    "total": 134,
     "byCode": {
-      "IDE0009": 114,
+      "IDE0009": 106,
       "IDE0022": 8,
       "IDE0161": 6,
       "IDE0005": 4,
@@ -16,8 +16,8 @@
       "CS0659": 2
     }
   },
-  "updated": "2026-08-28T13:08:53Z",
+  "updated": "2026-09-25T06:07:32Z",
   "coverage": {
-    "hermeticLine": 69.83
+    "hermeticLine": 70.91
   }
 }
