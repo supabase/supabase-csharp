@@ -176,9 +176,12 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
     public ProviderAuthState SignIn(Provider provider, StatelessClientOptions options, SignInOptions? signInOptions = null) => this.GetApi(options).GetUriForProvider(provider, signInOptions);
 
     /// <inheritdoc />
-    public async Task<bool> SignOut(string accessToken, StatelessClientOptions options)
+    public Task<bool> SignOut(string accessToken, StatelessClientOptions options) => this.SignOutAsync(accessToken, options, SignOutScope.Global);
+
+    /// <inheritdoc />
+    public async Task<bool> SignOutAsync(string accessToken, StatelessClientOptions options, SignOutScope scope)
     {
-        var result = await this.GetApi(options).SignOut(accessToken);
+        var result = await this.GetApi(options).SignOut(accessToken, scope).ConfigureAwait(false);
         result.ResponseMessage?.EnsureSuccessStatusCode();
         return true;
     }

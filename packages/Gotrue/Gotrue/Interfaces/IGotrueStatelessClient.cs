@@ -200,6 +200,12 @@ public interface IGotrueStatelessClient<TUser, TSession>
     Task<bool> SignOut(string accessToken, StatelessClientOptions options);
 
     /// <summary>
+    /// Signs out the user from the sessions in the given scope.
+    /// JWT tokens will still be valid for stateless auth until they expire.
+    /// </summary>
+    Task<bool> SignOutAsync(string accessToken, StatelessClientOptions options, SignOutScope scope);
+
+    /// <summary>
     /// Signs up a user
     /// </summary>
     /// <param name="type">Type of signup</param>
