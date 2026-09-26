@@ -507,11 +507,20 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignOut);
         activity?.SetTag(GotrueInstrumentation.Tags.SignOutScope, scope.ToString());
-        if (this.CurrentSession?.AccessToken != null)
+        try
         {
-            await this.api.SignOut(this.CurrentSession.AccessToken, scope);
+            if (this.CurrentSession?.AccessToken != null)
+            {
+                await this.api.SignOut(this.CurrentSession.AccessToken, scope).ConfigureAwait(false);
+            }
         }
-        await this.UpdateSessionAsync(null).ConfigureAwait(false);
+        finally
+        {
+            if (scope != SignOutScope.Others)
+            {
+                await this.UpdateSessionAsync(null).ConfigureAwait(false);
+            }
+        }
     }
 
     /// <inheritdoc />
