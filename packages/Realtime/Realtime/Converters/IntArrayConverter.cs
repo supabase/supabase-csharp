@@ -18,6 +18,7 @@ public class IntArrayConverter : JsonConverter<List<int>>
     /// <inheritdoc />
     public override List<int>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        var start = reader;
         try
         {
             switch (reader.TokenType)
@@ -32,11 +33,14 @@ public class IntArrayConverter : JsonConverter<List<int>>
                         list.Add(reader.GetInt32());
                     return list;
                 default:
+                    reader.Skip();
                     return null;
             }
         }
         catch
         {
+            reader = start;
+            reader.Skip();
             return null;
         }
     }
