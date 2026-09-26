@@ -141,6 +141,18 @@ public class ArrayConverterTests
             .Should().BeEquivalentTo(new { NestedIntArray = (List<List<int>>?) null, StringArray = new[] { "ok" } });
 
     [TestMethod]
+    [DataRow("""{"intArray":[1,"x"],"stringArray":"{ok}"}""")]
+    [DataRow("""{"intArray":{},"stringArray":"{ok}"}""")]
+    public void IntArrayRead_ShouldReturnNullAndKeepReading_GivenABadJsonValue(string json) =>
+        Coerce(json).Should().BeEquivalentTo(new { IntArray = (List<int>?) null, StringArray = new[] { "ok" } });
+
+    [TestMethod]
+    [DataRow("""{"stringArray":["a",1],"intArray":"{1}"}""")]
+    [DataRow("""{"stringArray":{},"intArray":"{1}"}""")]
+    public void StringArrayRead_ShouldReturnNullAndKeepReading_GivenABadJsonValue(string json) =>
+        Coerce(json).Should().BeEquivalentTo(new { StringArray = (List<string>?) null, IntArray = new[] { 1 } });
+
+    [TestMethod]
     public void IntArrayRead_ShouldReturnNull_GivenDeeplyNestedBraces() =>
         Coerce(JsonSerializer.Serialize(new { intArray = new string('{', 100_000) })).IntArray.Should().BeNull();
 

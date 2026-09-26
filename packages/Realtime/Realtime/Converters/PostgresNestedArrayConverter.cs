@@ -73,7 +73,7 @@ internal class PostgresNestedArrayConverter : JsonConverterFactory
                     case JsonTokenType.StartArray:
                         var list = new List<TElement>();
                         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                            list.Add(JsonSerializer.Deserialize<TElement>(ref reader, options)!);
+                            list.Add(JsonSerializer.Deserialize<TElement>(ref reader, options) ?? throw new JsonException());
                         return list;
                     default:
                         reader.Skip();
