@@ -31,6 +31,7 @@ static Supabase.Gotrue.Claims.JwtHeader.operator !=(Supabase.Gotrue.Claims.JwtHe
 static Supabase.Gotrue.Claims.JwtHeader.operator ==(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
 Supabase.Gotrue.Api.GetJwksAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.Jwks?>!
 Supabase.Gotrue.Api.GetUserAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
+Supabase.Gotrue.Api.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Claims.GetClaimsOptions
 Supabase.Gotrue.Claims.GetClaimsOptions.<Clone>$() -> Supabase.Gotrue.Claims.GetClaimsOptions!
 Supabase.Gotrue.Claims.GetClaimsOptions.AllowExpired.get -> bool
@@ -110,10 +111,29 @@ Supabase.Gotrue.Claims.JwtHeader.Kid.init -> void
 Supabase.Gotrue.Claims.JwtHeader.Typ.get -> string?
 Supabase.Gotrue.Claims.JwtHeader.Typ.init -> void
 Supabase.Gotrue.Client.GetClaimsAsync(string? jwt = null, Supabase.Gotrue.Claims.GetClaimsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.GetClaimsResponse!>!
+Supabase.Gotrue.Client.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidJwt = 22 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetJwksAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.Jwks?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUserAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TUser?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetClaimsAsync(string? jwt = null, Supabase.Gotrue.Claims.GetClaimsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.GetClaimsResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Resend.ResendOptions
+Supabase.Gotrue.Resend.ResendOptions.CaptchaToken.get -> string?
+Supabase.Gotrue.Resend.ResendOptions.EmailRedirectTo.get -> string?
+Supabase.Gotrue.Resend.ResendOptions.ResendOptions(string? captchaToken, string? emailRedirectTo) -> void
+Supabase.Gotrue.Resend.ResendParameters
+Supabase.Gotrue.Resend.ResendParameters.Email.get -> string?
+Supabase.Gotrue.Resend.ResendParameters.Options.get -> Supabase.Gotrue.Resend.ResendOptions?
+Supabase.Gotrue.Resend.ResendParameters.Phone.get -> string?
+Supabase.Gotrue.Resend.ResendParameters.ResendParameters(Supabase.Gotrue.Resend.ResendType type, string? email, string? phone, Supabase.Gotrue.Resend.ResendOptions? options) -> void
+Supabase.Gotrue.Resend.ResendParameters.ToDictionary() -> System.Collections.Generic.Dictionary<string!, object!>!
+Supabase.Gotrue.Resend.ResendParameters.Type.get -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.EmailChange = 3 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.PhoneChange = 2 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.SignUp = 0 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.Sms = 1 -> Supabase.Gotrue.Resend.ResendType
 Supabase.Gotrue.SignUpOptions.CaptchaToken.get -> string?
 Supabase.Gotrue.SignUpOptions.CaptchaToken.set -> void
 Supabase.Gotrue.Api.SignInWithEmail(string! email, string! password, Supabase.Gotrue.SignInWithPasswordOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
