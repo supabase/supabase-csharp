@@ -16,9 +16,9 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     public ClientOptions Options { get; protected set; }
     protected string Url { get; set; }
 
-    private readonly HttpClient requestClient;
-    private readonly HttpClient uploadClient;
-    private readonly HttpClient downloadClient;
+    private protected readonly HttpClient requestClient;
+    private protected readonly HttpClient uploadClient;
+    private protected readonly HttpClient downloadClient;
 
     private readonly Dictionary<string, string> initializedHeaders;
     private Dictionary<string, string> headers;

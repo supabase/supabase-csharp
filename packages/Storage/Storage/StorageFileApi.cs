@@ -86,6 +86,28 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         this.downloadClient = Helpers.ResolveDownloadClient(this.Options);
     }
 
+    // Used by Client.From, so every bucket shares the clients the Client already resolved.
+    internal StorageFileApi(
+        string url,
+        string bucketId,
+        ClientOptions options,
+        Dictionary<string, string> headers,
+        HttpClient requestClient,
+        HttpClient uploadClient,
+        HttpClient downloadClient
+    )
+    {
+        this.Url = url;
+        this.BucketId = bucketId;
+        this.Options = options;
+        this.Headers = headers;
+        this.StorageHeader.Add(this.Headers);
+
+        this.requestClient = requestClient;
+        this.uploadClient = uploadClient;
+        this.downloadClient = downloadClient;
+    }
+
     /// <summary>
     ///
     /// </summary>

@@ -2,7 +2,9 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -483,6 +485,48 @@ public class StorageFileApiContractTests
         {
             if (File.Exists(localPath))
                 File.Delete(localPath);
+        }
+    }
+
+    [TestMethod]
+    public async Task From_ShouldReuseTheConnection_GivenASecondCall()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var connections = 0;
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                var connection = await listener.AcceptTcpClientAsync();
+                connections++;
+                _ = AnswerGetRequests(connection);
+            }
+        });
+        var storage = new Client($"http://127.0.0.1:{((IPEndPoint) listener.LocalEndpoint).Port}/storage/v1");
+
+        try
+        {
+            await storage.From(Bucket).Info("a.png");
+            await storage.From(Bucket).Info("a.png");
+
+            connections.Should().Be(1, "a new HttpClient per From call opens a new connection each time (issue #450)");
+        }
+        finally
+        {
+            listener.Stop();
+        }
+    }
+
+    private static async Task AnswerGetRequests(TcpClient connection)
+    {
+        var stream = connection.GetStream();
+        using var reader = new StreamReader(stream);
+        while (await reader.ReadLineAsync() is { } line)
+        {
+            // A GET has no body, so the blank line ends the request.
+            if (line.Length == 0)
+                await stream.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}"));
         }
     }
 
