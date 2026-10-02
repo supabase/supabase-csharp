@@ -3,7 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -40,6 +42,14 @@ public static class Helpers
     };
 
     private static readonly HttpClient Client = new HttpClient();
+
+    // One client per proxy, freed with it.
+    private static readonly ConditionalWeakTable<IWebProxy, HttpClient> ProxyClients = new();
+
+    /// <summary>The injected client, else the one for the proxy. Null means the shared default <see cref="Client"/>.</summary>
+    internal static HttpClient? ResolveHttpClient(HttpClient? httpClient, IWebProxy? proxy) =>
+        httpClient ?? (proxy != null ? ProxyClients.GetValue(proxy, p => DefaultHttpClientFactory.Create(proxy: p)) : null);
+
     /// <summary>
     /// Generates a nonce (code verifier)
     /// Used with PKCE flow and Apple/Google Sign in.

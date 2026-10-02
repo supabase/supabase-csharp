@@ -1,5 +1,9 @@
 using System;
+using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Gotrue.Tests.Support;
@@ -11,7 +15,7 @@ using WireMock.ResponseBuilders;
 
 namespace Gotrue.Tests.Transport;
 
-/// <summary>Covers injectable HttpClient and retry-policy wiring through <see cref="Client"/> to the transport layer.</summary>
+/// <summary>Covers injectable HttpClient, retry-policy wiring and proxy client reuse in the transport layer.</summary>
 [TestClass]
 [TestCategory("Contract")]
 public class ApiTransportContractTests
@@ -59,6 +63,53 @@ public class ApiTransportContractTests
 
         client.CurrentSession!.AccessToken.Should().Be("new-token", "the retryable 503 should be retried until the second response succeeds");
         client.Shutdown();
+    }
+
+    [TestMethod]
+    public async Task Settings_ShouldReuseTheProxyConnection_GivenASecondStatelessCall()
+    {
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var connections = 0;
+        _ = Task.Run(async () =>
+        {
+            while (true)
+            {
+                var connection = await listener.AcceptTcpClientAsync();
+                connections++;
+                _ = AnswerGetRequests(connection);
+            }
+        });
+        var options = new StatelessClient.StatelessClientOptions
+        {
+            Url = "http://gotrue.test",
+            Proxy = new WebProxy($"http://127.0.0.1:{((IPEndPoint) listener.LocalEndpoint).Port}"),
+        };
+        var client = new StatelessClient();
+
+        try
+        {
+            await client.Settings(options);
+            await client.Settings(options);
+
+            connections.Should().Be(1, "a new HttpClient per stateless call opens a new connection each time (issue #450)");
+        }
+        finally
+        {
+            listener.Stop();
+        }
+    }
+
+    private static async Task AnswerGetRequests(TcpClient connection)
+    {
+        var stream = connection.GetStream();
+        using var reader = new StreamReader(stream);
+        while (await reader.ReadLineAsync() is { } line)
+        {
+            // A blank line ends a GET request.
+            if (line.Length == 0)
+                await stream.WriteAsync(Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}"));
+        }
     }
 
     private void MockTokenSuccess() =>

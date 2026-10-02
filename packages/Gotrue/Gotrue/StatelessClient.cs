@@ -113,7 +113,7 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
 
     /// <inheritdoc />
     public IGotrueApi<User, Session> GetApi(StatelessClientOptions options) =>
-        new Api(options.Url, options.Headers, options.HttpClient ?? (options.Proxy != null ? DefaultHttpClientFactory.Create(proxy: options.Proxy) : null), options.Retry);
+        new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry);
 
     /// <inheritdoc />
     public Task<Session?> SignUp(string email, string password, StatelessClientOptions options, SignUpOptions? signUpOptions = null) => this.SignUp(SignUpType.Email, email, password, options, signUpOptions);
