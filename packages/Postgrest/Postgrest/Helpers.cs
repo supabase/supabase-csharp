@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -26,15 +27,20 @@ internal static class Helpers
 {
     private static readonly HttpClient Client = new HttpClient();
 
+    // One client per proxy object. It is freed when the proxy is.
+    private static readonly ConditionalWeakTable<IWebProxy, HttpClient> ProxyClients = new();
+
     private static readonly Guid AppSession = Guid.NewGuid();
 
     /// <summary>
     /// Resolves the client a request should be sent through, once per <see cref="Postgrest.Client"/>/<see cref="Table{TModel}"/>
-    /// construction: the caller-injected <see cref="ClientOptions.HttpClient"/>, else a proxy-configured client when
-    /// <see cref="ClientOptions.Proxy"/> is set, else null (callers fall back to the shared default <see cref="Client"/>).
+    /// construction: the caller-injected <see cref="ClientOptions.HttpClient"/>, else the client for
+    /// <see cref="ClientOptions.Proxy"/> when it is set, else null (callers fall back to the shared default <see cref="Client"/>).
     /// </summary>
     internal static HttpClient? ResolveHttpClient(ClientOptions options) =>
-        options.HttpClient ?? (options.Proxy != null ? DefaultHttpClientFactory.Create(proxy: options.Proxy) : null);
+        options.HttpClient ?? (options.Proxy != null
+            ? ProxyClients.GetValue(options.Proxy, proxy => DefaultHttpClientFactory.Create(proxy: proxy))
+            : null);
 
     /// <summary>
     /// Mirrors Newtonsoft's <c>JToken.HasValues</c>: true only when the serialized payload is a non-empty
