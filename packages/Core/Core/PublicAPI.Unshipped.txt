@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.Core.Http.JsonBody
+static Supabase.Core.Http.JsonBody.Deserialize<T>(string! body, System.Text.Json.JsonSerializerOptions! options, System.Func<System.Text.Json.JsonException!, System.Exception!>! exceptionFactory) -> T?

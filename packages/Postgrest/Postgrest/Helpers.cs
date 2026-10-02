@@ -178,22 +178,13 @@ internal static class Helpers
     /// <summary>
     /// Deserializes a 2xx body and throws a PostgrestException when it can't be read, e.g. a proxy's HTML page.
     /// </summary>
-    internal static T? DeserializeBody<T>(BaseResponse response, JsonSerializerOptions options)
-    {
-        try
+    internal static T? DeserializeBody<T>(BaseResponse response, JsonSerializerOptions options) =>
+        JsonBody.Deserialize<T>(response.Content!, options, e => new PostgrestException(response.Content, e)
         {
-            return JsonSerializer.Deserialize<T>(response.Content!, options);
-        }
-        catch (JsonException e)
-        {
-            throw new PostgrestException(response.Content, e)
-            {
-                Content = response.Content,
-                Response = response.ResponseMessage,
-                StatusCode = (int) (response.ResponseMessage?.StatusCode ?? 0)
-            };
-        }
-    }
+            Content = response.Content,
+            Response = response.ResponseMessage,
+            StatusCode = (int) (response.ResponseMessage?.StatusCode ?? 0)
+        });
 
     /// <summary>
     /// Prepares the request with appropriate HTTP headers expected by Postgrest.
