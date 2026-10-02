@@ -1,5 +1,26 @@
 # Changelog
 
+## [8.3.0](https://github.com/supabase/supabase-csharp/compare/v8.2.0...v8.3.0) (2026-10-02)
+
+
+### Features
+
+* **gotrue:** add a captcha token to password sign-in ([#457](https://github.com/supabase/supabase-csharp/issues/457)) ([58ab7a4](https://github.com/supabase/supabase-csharp/commit/58ab7a4b92b15a404727ec7e306974eb6f26d3b8))
+* **gotrue:** add a captcha token to sign-up options ([#453](https://github.com/supabase/supabase-csharp/issues/453)) ([86be817](https://github.com/supabase/supabase-csharp/commit/86be81740c2e8d5992380d6af7e38d8a319868e4))
+* **gotrue:** add sign-out scope to the stateless client ([#447](https://github.com/supabase/supabase-csharp/issues/447)) ([437f5a5](https://github.com/supabase/supabase-csharp/commit/437f5a560ba3942d17b294667d127f51b374088a))
+
+
+### Bug Fixes
+
+* **functions:** return null from `Invoke<T>` for an empty body ([#462](https://github.com/supabase/supabase-csharp/issues/462)) ([ae23b98](https://github.com/supabase/supabase-csharp/commit/ae23b9837f9a15e718b80b26ef0e4f7cde01bd40))
+* **functions:** send the caller's content-type instead of dropping it ([#451](https://github.com/supabase/supabase-csharp/issues/451)) ([6690b0d](https://github.com/supabase/supabase-csharp/commit/6690b0d29aa83b9571aae41459f59ed71b32ed26))
+* **gotrue:** sign out locally even if the server call fails ([#448](https://github.com/supabase/supabase-csharp/issues/448)) ([b7a046b](https://github.com/supabase/supabase-csharp/commit/b7a046ba27d54b89e5451cbfd3142eea81ba78bd))
+* **postgrest:** throw a PostgrestException for a non-JSON 2xx body ([#459](https://github.com/supabase/supabase-csharp/issues/459)) ([5a815e6](https://github.com/supabase/supabase-csharp/commit/5a815e67724f3c4ad88e133513e2130ef70b7055))
+* **realtime:** skip unreadable json arrays instead of failing the record ([#449](https://github.com/supabase/supabase-csharp/issues/449)) ([16c0ab6](https://github.com/supabase/supabase-csharp/commit/16c0ab69bfbf9a66cc083db903c6047b922c5fcb))
+* **storage:** close the local file after a resumable upload ([#466](https://github.com/supabase/supabase-csharp/issues/466)) ([510c23c](https://github.com/supabase/supabase-csharp/commit/510c23c9e002704c1de911b40884852f69799362))
+* **storage:** use fresh headers on upload ([#468](https://github.com/supabase/supabase-csharp/issues/468)) ([7c72c13](https://github.com/supabase/supabase-csharp/commit/7c72c1357e05e75459c49e61d6b54c8fd69665f5))
+* **storage:** use per-request headers on uploads ([#470](https://github.com/supabase/supabase-csharp/issues/470)) ([aa15b97](https://github.com/supabase/supabase-csharp/commit/aa15b97766ea1a43b017db04dd5fdf2f6598349a))
+
 ## [8.2.0](https://github.com/supabase/supabase-csharp/compare/v8.1.1...v8.2.0) (2026-09-24)
 
 
