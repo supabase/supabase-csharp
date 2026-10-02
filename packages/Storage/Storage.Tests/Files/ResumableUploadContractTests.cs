@@ -1,13 +1,16 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Storage;
+using Supabase.Storage.Exceptions;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
@@ -107,6 +110,45 @@ namespace Storage.Tests.Files
                     keys => keys.Contains("Authorization") && keys.Contains("X-Injected"),
                     "every TUS request must carry both the upload's headers and the caller's own (issue #469)");
             }
+        }
+
+        [TestMethod]
+        public async Task UploadOrResume_ShouldThrow_GivenCancelAfterFirstChunk()
+        {
+            const int chunk = 6 * 1024 * 1024;
+            this.server.Given(Request.Create().UsingPatch().WithHeader("Upload-Offset", "0"))
+                .RespondWith(Response.Create().WithStatusCode(204)
+                    .WithHeader("Tus-Resumable", "1.0.0")
+                    .WithHeader("Upload-Offset", chunk.ToString(CultureInfo.InvariantCulture)));
+            using var cts = new CancellationTokenSource();
+
+            var act = () => this.client.From(Bucket).UploadOrResume(new byte[chunk + 1], FileName, new FileOptions(), (_, _) => cts.Cancel(), cts.Token);
+
+            await act.Should().ThrowAsync<OperationCanceledException>("only the first chunk was sent (issue #474)");
+        }
+
+        [TestMethod]
+        public async Task UploadOrResume_ShouldThrow_GivenAChunkTimeout()
+        {
+            this.server.Given(Request.Create().UsingPatch())
+                .RespondWith(Response.Create().WithStatusCode(204).WithDelay(TimeSpan.FromSeconds(1)));
+            var storage = new Client($"{this.server.Url}/storage/v1", new ClientOptions { HttpUploadTimeout = TimeSpan.FromMilliseconds(200) },
+                new Dictionary<string, string> { { "Authorization", "Bearer test-key" } });
+
+            var act = () => storage.From(Bucket).UploadOrResume(Payload, FileName, new FileOptions());
+
+            await act.Should().ThrowAsync<TaskCanceledException>("the chunk timed out (issue #474)");
+        }
+
+        [TestMethod]
+        public async Task UploadOrResume_ShouldThrow_GivenANon204ChunkResponse()
+        {
+            this.server.Given(Request.Create().UsingPatch())
+                .RespondWith(Response.Create().WithStatusCode(200));
+
+            var act = () => this.client.From(Bucket).UploadOrResume(Payload, FileName, new FileOptions());
+
+            await act.Should().ThrowAsync<SupabaseStorageException>("TUS acknowledges a chunk with 204 only (issue #474)");
         }
 
         private void StubTusEndpoints()

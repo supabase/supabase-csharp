@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using BirdMessenger;
@@ -373,6 +374,8 @@ internal static class HttpClientProgress
             if (upload != null)
                 fileLocation = new Uri(upload);
 
+            // BirdMessenger reports chunk failures only through OnFailedAsync, and stops quietly on cancel.
+            Exception? failure = null;
             var patchOption = new TusPatchRequestOption
             {
                 FileLocation = fileLocation,
@@ -385,15 +388,24 @@ internal static class HttpClientProgress
                     UploadMemoryCache.Remove(cacheKey);
                     return Task.CompletedTask;
                 },
-                OnFailedAsync = _ => Task.CompletedTask,
+                OnFailedAsync = x =>
+                {
+                    failure = x.Exception;
+                    return Task.CompletedTask;
+                },
                 OnPreSendRequestAsync = AddHeaders,
             };
 
             var responsePatch = await client.TusPatchAsync(patchOption, cancellationToken);
+            if (failure != null && !(failure is TusException { OriginHttpResponse: not null }))
+                ExceptionDispatchInfo.Capture(failure).Throw();
+            if (responsePatch.UploadedSize != fileStream.Length)
+                cancellationToken.ThrowIfCancellationRequested();
+
             statusCode = (int) responsePatch.OriginResponseMessage.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 
-            if (responsePatch.OriginResponseMessage.IsSuccessStatusCode)
+            if (failure == null && responsePatch.OriginResponseMessage.IsSuccessStatusCode)
                 return responsePatch.OriginResponseMessage;
 
             errorType = statusCode.Value.ToString();
