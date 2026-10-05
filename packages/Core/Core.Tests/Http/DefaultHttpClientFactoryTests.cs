@@ -22,4 +22,12 @@ public class DefaultHttpClientFactoryTests
     [TestMethod]
     public void Create_ShouldNotThrow_GivenAProxy() =>
         FluentActions.Invoking(() => DefaultHttpClientFactory.Create(proxy: new WebProxy("http://localhost:8888"))).Should().NotThrow();
+
+    [TestMethod]
+    public void CreateHandler_ShouldApplyProxy_GivenAProxy()
+    {
+        var proxy = new WebProxy("http://localhost:8888");
+        using var handler = DefaultHttpClientFactory.CreateHandler(proxy);
+        handler.Proxy.Should().BeSameAs(proxy);
+    }
 }
