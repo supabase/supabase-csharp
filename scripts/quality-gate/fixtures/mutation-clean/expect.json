@@ -1,0 +1,9 @@
+{
+  "description": "Every mutant in the changed file is killed — the tests actually assert on the new code. The mutation stage PASSes.",
+  "mode": "--mutation",
+  "exit": 0,
+  "verdict": "PASS",
+  "stages": [
+    { "id": "3", "status": "PASS" }
+  ]
+}

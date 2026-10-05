@@ -1,0 +1,7 @@
+{
+  "stryker-config": {
+    "project": "Sample.csproj",
+    "test-projects": ["Sample.Tests.csproj"],
+    "test-case-filter": "TestCategory!=E2E"
+  }
+}

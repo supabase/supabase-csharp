@@ -4,6 +4,8 @@
 #
 #   gate.sh [dir]                full gate — build, tests, security, public API, E2E
 #   gate.sh [dir] --fast         inner loop only — the agent's red/green cycle
+#   gate.sh [dir] --mutation     evaluate a Stryker report (a separate CI job produces
+#                                it; not run here). Opt-in — off the default/PR path.
 #   gate.sh [dir] --bypass-format  format + naming reports as a signal, not a
 #                                blocking stage, for this run. For PR-time CI
 #                                only: a human contributor can't always fix a
@@ -26,8 +28,9 @@
 # API check, per-package tests, and a single verdict. A single package keeps the
 # fast per-package path the inner loop uses. --all forces the solution run.
 #
-# Mutation testing is not run here — it is too slow for the inner/PR loop and lives
-# in its own scheduled GitHub Action.
+# Mutation testing (--mutation) does not run Stryker here — a separate CI job produces
+# the report this reads. It is never in build-and-test, so it can't gate a release;
+# branch protection makes its check required for merge.
 #
 # Config that belongs to the package lives in a committed .gate-baseline.json, not
 # on the command line. The file is created on the first run with --overwrite-baseline.
@@ -64,11 +67,12 @@ PACKAGE_DIR="$PWD"; MODE="standard"; ALL=0; CLI_PROJECT=""; BYPASS_FORMAT=0; OVE
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --fast) MODE="fast"; shift ;;
+    --mutation) MODE="mutation"; shift ;;
     --full) shift ;;   # accepted as an alias: the default run is already the full gate
     --all)  ALL=1; shift ;;
     --bypass-format) BYPASS_FORMAT=1; shift ;;
     --overwrite-baseline) OVERWRITE_BASELINE=1; shift ;;
-    -h|--help) sed -n '3,23p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '3,25p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     -*) echo "unknown option: $1  (try --help)" >&2; exit 3 ;;
     *)  PACKAGE_DIR="$1"; shift ;;
   esac
@@ -147,53 +151,59 @@ else
 fi
 echo
 
-stage_build
-STACK_OK=0
-if [[ $BUILD_OK -eq 1 && "$MODE" != "fast" ]]; then
-  # stage_build just reset $BASELINE to "" (so it doesn't leak into the
-  # scope-wide stages below) — restore it to a package's own baseline before
-  # probing, so a per-package e2eHealthUrl override is actually read. Without
-  # this, the probe silently falls through to $CONFIG / the hardcoded default,
-  # which can false-positive against an unrelated stack already running on the
-  # default port. First package is representative for a solution run.
-  BASELINE="${PKG_DIR[0]}/.gate-baseline.json"
-  if stack_up; then STACK_OK=1; fi
-  BASELINE=""
-fi
-
-if [[ $BUILD_OK -eq 1 ]]; then
-  stage_format
-  if [[ "$MODE" == "fast" ]]; then
-    stage_inner_loop
-  elif [[ $STACK_OK -eq 1 ]]; then
-    stage_tests_full
-    # No separate id-7 row here: stage_tests_full's own per-package rows already
-    # carry the full outcome (label says "Unit + Contract + E2E"), so a second row
-    # would only restate it — and imprecisely, since "E2E ran" isn't uniformly true
-    # across every package (a package with zero E2E tests has nothing to report).
-    stage_coverage
-  else
-    stage_inner_loop
-  fi
+# Mutation mode only reads a report — skip the build-first orchestration below.
+if [[ "$MODE" == "mutation" ]]; then
+  stage_mutation
 else
-  add 1b "Format + naming"              block "" SKIP "not run — build failed" ""
-  add 2  "Inner loop (Unit + Contract)" block "" SKIP "not run — build failed" ""
-fi
 
-if [[ "$MODE" != "fast" ]]; then
-  stage_security
-  # The sync check compiles (dotnet format runs the analyzers), so a failed build
-  # makes it impossible, not failing — skip it causally, as with format and tests.
-  if [[ $BUILD_OK -eq 1 ]]; then stage_api_sync
-  else add 5a "Public API declared" block "" SKIP "not run — build failed" ""; fi
-  stage_api_diff
+  stage_build
+  STACK_OK=0
+  if [[ $BUILD_OK -eq 1 && "$MODE" != "fast" ]]; then
+    # stage_build just reset $BASELINE to "" (so it doesn't leak into the
+    # scope-wide stages below) — restore it to a package's own baseline before
+    # probing, so a per-package e2eHealthUrl override is actually read. Without
+    # this, the probe silently falls through to $CONFIG / the hardcoded default,
+    # which can false-positive against an unrelated stack already running on the
+    # default port. First package is representative for a solution run.
+    BASELINE="${PKG_DIR[0]}/.gate-baseline.json"
+    if stack_up; then STACK_OK=1; fi
+    BASELINE=""
+  fi
 
-  if [[ $BUILD_OK -eq 0 ]]; then
-    add 7  "E2E / acceptance" block "" SKIP "not run — build failed" ""
-    add 2b "Coverage (line, unit+contract)"  block "" SKIP "not run — build failed" ""
-  elif [[ $STACK_OK -eq 0 ]]; then
-    add 7  "E2E / acceptance" block "" SKIP "stack down per $STACK_CHECK — run: supabase start" "$SCOPE_LOGS/7-stack.log"
-    add 2b "Coverage (line, unit+contract)"  block "" SKIP "not measured — stack down, full run did not execute" ""
+  if [[ $BUILD_OK -eq 1 ]]; then
+    stage_format
+    if [[ "$MODE" == "fast" ]]; then
+      stage_inner_loop
+    elif [[ $STACK_OK -eq 1 ]]; then
+      stage_tests_full
+      # No separate id-7 row here: stage_tests_full's own per-package rows already
+      # carry the full outcome (label says "Unit + Contract + E2E"), so a second row
+      # would only restate it — and imprecisely, since "E2E ran" isn't uniformly true
+      # across every package (a package with zero E2E tests has nothing to report).
+      stage_coverage
+    else
+      stage_inner_loop
+    fi
+  else
+    add 1b "Format + naming"              block "" SKIP "not run — build failed" ""
+    add 2  "Inner loop (Unit + Contract)" block "" SKIP "not run — build failed" ""
+  fi
+
+  if [[ "$MODE" != "fast" ]]; then
+    stage_security
+    # The sync check compiles (dotnet format runs the analyzers), so a failed build
+    # makes it impossible, not failing — skip it causally, as with format and tests.
+    if [[ $BUILD_OK -eq 1 ]]; then stage_api_sync
+    else add 5a "Public API declared" block "" SKIP "not run — build failed" ""; fi
+    stage_api_diff
+
+    if [[ $BUILD_OK -eq 0 ]]; then
+      add 7  "E2E / acceptance" block "" SKIP "not run — build failed" ""
+      add 2b "Coverage (line, unit+contract)"  block "" SKIP "not run — build failed" ""
+    elif [[ $STACK_OK -eq 0 ]]; then
+      add 7  "E2E / acceptance" block "" SKIP "stack down per $STACK_CHECK — run: supabase start" "$SCOPE_LOGS/7-stack.log"
+      add 2b "Coverage (line, unit+contract)"  block "" SKIP "not measured — stack down, full run did not execute" ""
+    fi
   fi
 fi
 

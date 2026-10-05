@@ -1,0 +1,9 @@
+{
+  "description": "The diff changed a file but no Stryker report exists — 'couldn't check' must never read as 'no survivors'. The stage SKIPs and the run is INCOMPLETE (exit 2).",
+  "mode": "--mutation",
+  "exit": 2,
+  "verdict": "INCOMPLETE",
+  "stages": [
+    { "id": "3", "status": "SKIP", "detailContains": "no usable mutation report" }
+  ]
+}

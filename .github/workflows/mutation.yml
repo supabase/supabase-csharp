@@ -1,0 +1,50 @@
+name: Mutation
+
+# Separate from build-and-test on purpose: release.yml waits only on build-and-test, so
+# this never delays a release. It runs in parallel with build-and-test on the PR; making
+# it block a merge is a branch-protection choice (mark the `mutation` check required).
+#
+# `dotnet stryker --since:origin/master` mutates only the changed diff (hermetic — E2E is
+# filtered out in each stryker-config.json), then gate.sh --mutation fails on any new
+# survivor. Only changed packages are mutated, so an unchanged package costs nothing.
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    # Ceiling, not the norm: Stryker.NET mutates everything if a non-C# file changed
+    # (stryker-net#3013), so the timeout bounds that worst case.
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # --since and the gate's diff both need origin/master
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Install Stryker
+        run: dotnet tool install --global dotnet-stryker
+
+      - name: Mutate changed packages
+        run: |
+          git diff --name-only origin/master...HEAD -- 'packages/**/*.cs' \
+            | sed -E 's#(packages/[^/]+)/.*#\1#' | sort -u \
+            | while read -r pkg; do
+                cfg=$(ls "$pkg"/*.Tests/stryker-config.json 2>/dev/null) || continue
+                ( cd "$(dirname "$cfg")" && dotnet stryker --since:origin/master )
+              done
+
+      - name: Evaluate mutation reports
+        run: ./scripts/quality-gate/gate.sh packages --mutation

@@ -1,0 +1,9 @@
+{
+  "description": "A surviving mutant lands on a line this diff added — a test executes the new code but asserts nothing, so line coverage is happy and the mutant lives. Only the mutation stage must FAIL.",
+  "mode": "--mutation",
+  "exit": 1,
+  "verdict": "FAIL",
+  "stages": [
+    { "id": "3", "status": "FAIL", "detailContains": "new survivor" }
+  ]
+}

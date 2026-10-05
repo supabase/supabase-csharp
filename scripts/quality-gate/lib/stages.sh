@@ -430,3 +430,83 @@ stage_coverage() {
     add 2b "Coverage (line, unit+contract)" block "${PKG_NAME[$i]}" "${v%%|||*}" "$detail" "$LOGS/2-tests.log"
   done
 }
+
+# ============================================================= 3  mutation
+# Opt-in (--mutation). Reads the report a separate CI job's `dotnet stryker` produced
+# and FAILs on a mutant left alive (Survived/NoCoverage) in a file this diff changed —
+# "no new survivors". Never runs Stryker; run-fixtures.sh drives it with canned reports.
+# A missing report is SKIP (couldn't check ≠ passed), which makes --mutation exit 2.
+MUTATION_UNDETECTED='.status=="Survived" or .status=="NoCoverage"'
+_MUT_CHANGED=()
+
+_mutation_report() {  # GATE_MUTATION_REPORT override, then .mutationReport, then newest on disk
+  if [[ -n "${GATE_MUTATION_REPORT:-}" ]]; then
+    [[ "$GATE_MUTATION_REPORT" == /* ]] && echo "$GATE_MUTATION_REPORT" || echo "$PACKAGE_DIR/$GATE_MUTATION_REPORT"
+    return
+  fi
+  local c; c="$(cget .mutationReport)"
+  [[ -n "$c" ]] && { echo "$PACKAGE_DIR/$c"; return; }
+  find "$PACKAGE_DIR" -name 'mutation-report.json' -not -path '*/bin/*' -not -path '*/obj/*' 2>/dev/null | sort | tail -n1
+}
+
+# Report keys may be absolute, repo-, or project-relative depending on Stryker version;
+# match by suffix in either direction. Caller guarantees $_MUT_CHANGED is non-empty.
+_mutation_file_changed() {  # <path>
+  local p="$1" c
+  for c in "${_MUT_CHANGED[@]}"; do
+    [[ "$c" == "$p" || "$c" == */"$p" || "$p" == */"$c" ]] && return 0
+  done
+  return 1
+}
+
+_pkg_has_changes() {  # true if any changed file lives under the current package
+  local rel="" c
+  [[ -n "$root" && "$PACKAGE_DIR" != "$root" ]] && rel="${PACKAGE_DIR#"$root"/}"
+  for c in "${_MUT_CHANGED[@]}"; do
+    [[ -z "$rel" || "$c" == "$rel/"* ]] && return 0
+  done
+  return 1
+}
+
+_pkg_is_tracked() {  # true if the package ships a stryker-config.json
+  find "$PACKAGE_DIR" -name 'stryker-config.json' -not -path '*/bin/*' -not -path '*/obj/*' 2>/dev/null | grep -q .
+}
+
+stage_mutation() {
+  local i report log root rel first count f status line normf
+  root="$(git -C "$SCOPE_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
+  _MUT_CHANGED=()
+  [[ -n "$root" ]] && while IFS= read -r rel; do [[ -n "$rel" ]] && _MUT_CHANGED+=("$rel"); done < <(changed_cs_files)
+
+  for i in "${!PKG_DIR[@]}"; do
+    _use_pkg "$i"
+    log="$LOGS/3-mutation.log"
+
+    if [[ ${#_MUT_CHANGED[@]} -eq 0 ]] || ! _pkg_has_changes; then
+      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" PASS "no changed .cs files here"; continue
+    fi
+    if ! _pkg_is_tracked; then
+      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" PASS "not mutation-tracked (no stryker-config.json)"; continue
+    fi
+
+    report="$(_mutation_report)"
+    if [[ -z "$report" || ! -f "$report" ]] || ! jq -e . "$report" >/dev/null 2>&1; then
+      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" SKIP "no usable mutation report — run dotnet stryker" "${report:-}"; continue
+    fi
+
+    : > "$log"; first=""; count=0
+    while IFS=$'\t' read -r f status line; do
+      [[ -n "$f" ]] || continue
+      normf="$f"; [[ "$normf" == /* && -n "$root" ]] && normf="${normf#"$root"/}"
+      _mutation_file_changed "$normf" || continue
+      count=$((count + 1)); echo "$status  $normf:$line" >> "$log"
+      [[ -z "$first" ]] && first="$normf:$line ($status)"
+    done < <(jq -r ".files | to_entries[] | .key as \$f | .value.mutants[] | select($MUTATION_UNDETECTED) | \"\(\$f)\t\(.status)\t\(.location.start.line // 0)\"" "$report")
+
+    if [[ $count -gt 0 ]]; then
+      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" FAIL "$count new survivor(s) — first: $first" "$log"
+    else
+      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" PASS "no survivors in changed code" "$report"
+    fi
+  done
+}
