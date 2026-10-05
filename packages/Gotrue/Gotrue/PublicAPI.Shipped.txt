@@ -42,8 +42,10 @@ Supabase.Gotrue.Api.ExchangeCodeForSession(string! codeVerifier, string! authCod
 Supabase.Gotrue.Api.GenerateLink(string! jwt, Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Gotrue.Api.GetHeaders.set -> void
+Supabase.Gotrue.Api.GetJwksAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.Jwks?>!
 Supabase.Gotrue.Api.GetUriForProvider(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions? options = null) -> Supabase.Gotrue.ProviderAuthState!
 Supabase.Gotrue.Api.GetUser(string! jwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
+Supabase.Gotrue.Api.GetUserAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Api.GetUserById(string! jwt, string! userId) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Api.Headers.get -> System.Collections.Generic.Dictionary<string!, string!>!
 Supabase.Gotrue.Api.Headers.set -> void
@@ -61,10 +63,12 @@ Supabase.Gotrue.Api.SendMobileOTP(string! phone) -> System.Threading.Tasks.Task<
 Supabase.Gotrue.Api.Settings() -> System.Threading.Tasks.Task<Supabase.Gotrue.Settings?>!
 Supabase.Gotrue.Api.SignInAnonymously(Supabase.Gotrue.SignInAnonymouslyOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.SignInWithEmail(string! email, string! password) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
+Supabase.Gotrue.Api.SignInWithEmail(string! email, string! password, Supabase.Gotrue.SignInWithPasswordOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.SignInWithIdToken(Supabase.Gotrue.Constants.Provider provider, string! idToken, string? accessToken = null, string? nonce = null, string? captchaToken = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.SignInWithOtp(Supabase.Gotrue.SignInWithPasswordlessEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.PasswordlessSignInState!>!
 Supabase.Gotrue.Api.SignInWithOtp(Supabase.Gotrue.SignInWithPasswordlessPhoneOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.PasswordlessSignInState!>!
 Supabase.Gotrue.Api.SignInWithPhone(string! phone, string! password) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
+Supabase.Gotrue.Api.SignInWithPhone(string! phone, string! password, Supabase.Gotrue.SignInWithPasswordOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.SignInWithSSO(System.Guid providerId, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Api.SignInWithSSO(string! domain, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Api.SignOut(string! jwt, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -78,6 +82,84 @@ Supabase.Gotrue.Api.Verify(string! jwt, Supabase.Gotrue.Mfa.MfaVerifyParams! mfa
 Supabase.Gotrue.Api.VerifyEmailOTP(string! email, string! token, Supabase.Gotrue.Constants.EmailOtpType type) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.VerifyMobileOTP(string! phone, string! token, Supabase.Gotrue.Constants.MobileOtpType type) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.VerifyTokenHash(string! tokenHash, Supabase.Gotrue.Constants.EmailOtpType type) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
+Supabase.Gotrue.Claims.GetClaimsOptions
+Supabase.Gotrue.Claims.GetClaimsOptions.<Clone>$() -> Supabase.Gotrue.Claims.GetClaimsOptions!
+Supabase.Gotrue.Claims.GetClaimsOptions.AllowExpired.get -> bool
+Supabase.Gotrue.Claims.GetClaimsOptions.AllowExpired.init -> void
+Supabase.Gotrue.Claims.GetClaimsOptions.Equals(Supabase.Gotrue.Claims.GetClaimsOptions? other) -> bool
+Supabase.Gotrue.Claims.GetClaimsOptions.GetClaimsOptions() -> void
+Supabase.Gotrue.Claims.GetClaimsOptions.Jwks.get -> Supabase.Gotrue.Claims.Jwks?
+Supabase.Gotrue.Claims.GetClaimsOptions.Jwks.init -> void
+Supabase.Gotrue.Claims.GetClaimsResponse
+Supabase.Gotrue.Claims.GetClaimsResponse.<Clone>$() -> Supabase.Gotrue.Claims.GetClaimsResponse!
+Supabase.Gotrue.Claims.GetClaimsResponse.Claims.get -> Supabase.Gotrue.Claims.JwtClaims!
+Supabase.Gotrue.Claims.GetClaimsResponse.Claims.init -> void
+Supabase.Gotrue.Claims.GetClaimsResponse.Equals(Supabase.Gotrue.Claims.GetClaimsResponse? other) -> bool
+Supabase.Gotrue.Claims.GetClaimsResponse.GetClaimsResponse() -> void
+Supabase.Gotrue.Claims.GetClaimsResponse.Header.get -> Supabase.Gotrue.Claims.JwtHeader!
+Supabase.Gotrue.Claims.GetClaimsResponse.Header.init -> void
+Supabase.Gotrue.Claims.GetClaimsResponse.Signature.get -> byte[]!
+Supabase.Gotrue.Claims.GetClaimsResponse.Signature.init -> void
+Supabase.Gotrue.Claims.Jwk
+Supabase.Gotrue.Claims.Jwk.<Clone>$() -> Supabase.Gotrue.Claims.Jwk!
+Supabase.Gotrue.Claims.Jwk.Alg.get -> string?
+Supabase.Gotrue.Claims.Jwk.Alg.init -> void
+Supabase.Gotrue.Claims.Jwk.Crv.get -> string?
+Supabase.Gotrue.Claims.Jwk.Crv.init -> void
+Supabase.Gotrue.Claims.Jwk.E.get -> string?
+Supabase.Gotrue.Claims.Jwk.E.init -> void
+Supabase.Gotrue.Claims.Jwk.Equals(Supabase.Gotrue.Claims.Jwk? other) -> bool
+Supabase.Gotrue.Claims.Jwk.Jwk() -> void
+Supabase.Gotrue.Claims.Jwk.Kid.get -> string?
+Supabase.Gotrue.Claims.Jwk.Kid.init -> void
+Supabase.Gotrue.Claims.Jwk.Kty.get -> string?
+Supabase.Gotrue.Claims.Jwk.Kty.init -> void
+Supabase.Gotrue.Claims.Jwk.N.get -> string?
+Supabase.Gotrue.Claims.Jwk.N.init -> void
+Supabase.Gotrue.Claims.Jwk.Use.get -> string?
+Supabase.Gotrue.Claims.Jwk.Use.init -> void
+Supabase.Gotrue.Claims.Jwk.X.get -> string?
+Supabase.Gotrue.Claims.Jwk.X.init -> void
+Supabase.Gotrue.Claims.Jwk.Y.get -> string?
+Supabase.Gotrue.Claims.Jwk.Y.init -> void
+Supabase.Gotrue.Claims.Jwks
+Supabase.Gotrue.Claims.Jwks.<Clone>$() -> Supabase.Gotrue.Claims.Jwks!
+Supabase.Gotrue.Claims.Jwks.Equals(Supabase.Gotrue.Claims.Jwks? other) -> bool
+Supabase.Gotrue.Claims.Jwks.Jwks() -> void
+Supabase.Gotrue.Claims.Jwks.Keys.get -> System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Claims.Jwk!>!
+Supabase.Gotrue.Claims.Jwks.Keys.init -> void
+Supabase.Gotrue.Claims.JwtClaims
+Supabase.Gotrue.Claims.JwtClaims.<Clone>$() -> Supabase.Gotrue.Claims.JwtClaims!
+Supabase.Gotrue.Claims.JwtClaims.Aal.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.Aal.init -> void
+Supabase.Gotrue.Claims.JwtClaims.AdditionalClaims.get -> System.Collections.Generic.Dictionary<string!, System.Text.Json.JsonElement>!
+Supabase.Gotrue.Claims.JwtClaims.AdditionalClaims.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Aud.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Claims.JwtClaims.Aud.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Equals(Supabase.Gotrue.Claims.JwtClaims? other) -> bool
+Supabase.Gotrue.Claims.JwtClaims.Exp.get -> long?
+Supabase.Gotrue.Claims.JwtClaims.Exp.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Iat.get -> long?
+Supabase.Gotrue.Claims.JwtClaims.Iat.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Iss.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.Iss.init -> void
+Supabase.Gotrue.Claims.JwtClaims.JwtClaims() -> void
+Supabase.Gotrue.Claims.JwtClaims.Role.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.Role.init -> void
+Supabase.Gotrue.Claims.JwtClaims.SessionId.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.SessionId.init -> void
+Supabase.Gotrue.Claims.JwtClaims.Sub.get -> string?
+Supabase.Gotrue.Claims.JwtClaims.Sub.init -> void
+Supabase.Gotrue.Claims.JwtHeader
+Supabase.Gotrue.Claims.JwtHeader.<Clone>$() -> Supabase.Gotrue.Claims.JwtHeader!
+Supabase.Gotrue.Claims.JwtHeader.Alg.get -> string?
+Supabase.Gotrue.Claims.JwtHeader.Alg.init -> void
+Supabase.Gotrue.Claims.JwtHeader.Equals(Supabase.Gotrue.Claims.JwtHeader? other) -> bool
+Supabase.Gotrue.Claims.JwtHeader.JwtHeader() -> void
+Supabase.Gotrue.Claims.JwtHeader.Kid.get -> string?
+Supabase.Gotrue.Claims.JwtHeader.Kid.init -> void
+Supabase.Gotrue.Claims.JwtHeader.Typ.get -> string?
+Supabase.Gotrue.Claims.JwtHeader.Typ.init -> void
 Supabase.Gotrue.Client
 Supabase.Gotrue.Client.AddDebugListener(System.Action<string!, System.Exception?>! listener) -> void
 Supabase.Gotrue.Client.AddStateChangedListener(Supabase.Gotrue.Interfaces.IGotrueClient<Supabase.Gotrue.User!, Supabase.Gotrue.Session!>.AuthEventHandler! authEventHandler) -> void
@@ -91,6 +173,7 @@ Supabase.Gotrue.Client.Debug(string! message, System.Exception? e = null) -> voi
 Supabase.Gotrue.Client.Enroll(Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.Client.ExchangeCodeForSession(string! codeVerifier, string! authCode) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Client.GetAuthenticatorAssuranceLevel() -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaGetAuthenticatorAssuranceLevelResponse?>!
+Supabase.Gotrue.Client.GetClaimsAsync(string? jwt = null, Supabase.Gotrue.Claims.GetClaimsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.GetClaimsResponse!>!
 Supabase.Gotrue.Client.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Gotrue.Client.GetHeaders.set -> void
 Supabase.Gotrue.Client.GetSessionFromUrl(System.Uri! uri, bool storeSession = true) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
@@ -126,6 +209,7 @@ Supabase.Gotrue.Client.SignInAnonymously(Supabase.Gotrue.SignInAnonymouslyOption
 Supabase.Gotrue.Client.SignInWithIdToken(Supabase.Gotrue.Constants.Provider provider, string! idToken, string? accessToken = null, string? nonce = null, string? captchaToken = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Client.SignInWithOtp(Supabase.Gotrue.SignInWithPasswordlessEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.PasswordlessSignInState!>!
 Supabase.Gotrue.Client.SignInWithOtp(Supabase.Gotrue.SignInWithPasswordlessPhoneOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.PasswordlessSignInState!>!
+Supabase.Gotrue.Client.SignInWithPassword(Supabase.Gotrue.Constants.SignInType type, string! identifier, string! password, Supabase.Gotrue.SignInWithPasswordOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Client.SignInWithPassword(string! email, string! password) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Client.SignInWithSSO(System.Guid providerId, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Client.SignInWithSSO(string! domain, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
@@ -229,6 +313,7 @@ Supabase.Gotrue.Exceptions.FailureHint.Reason.BadSessionUrl = 15 -> Supabase.Got
 Supabase.Gotrue.Exceptions.FailureHint.Reason.CloudflareNetworkError = 21 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.ExpiredRefreshToken = 12 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidFlowType = 16 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
+Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidJwt = 22 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidRefreshToken = 11 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.MfaChallengeUnverified = 19 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.NetworkError = 20 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
@@ -306,8 +391,10 @@ Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteUser(string! uid, s
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Enroll(string! jwt, Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ExchangeCodeForSession(string! codeVerifier, string! authCode) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GenerateLink(string! jwt, Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetJwksAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.Jwks?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUriForProvider(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions? options = null) -> Supabase.Gotrue.ProviderAuthState!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUser(string! jwt) -> System.Threading.Tasks.Task<TUser?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUserAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUserById(string! jwt, string! userId) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.InviteUserByEmail(string! email, string! jwt, Supabase.Gotrue.InviteUserByEmailOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.LinkIdentity(string! token, Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ProviderAuthState!>!
@@ -323,10 +410,12 @@ Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SendMobileOTP(string! pho
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Settings() -> System.Threading.Tasks.Task<Supabase.Gotrue.Settings?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInAnonymously(Supabase.Gotrue.SignInAnonymouslyOptions? options = null) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithEmail(string! email, string! password) -> System.Threading.Tasks.Task<TSession?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithEmail(string! email, string! password, Supabase.Gotrue.SignInWithPasswordOptions! options) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithIdToken(Supabase.Gotrue.Constants.Provider provider, string! idToken, string? accessToken = null, string? nonce = null, string? captchaToken = null) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithOtp(Supabase.Gotrue.SignInWithPasswordlessEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.PasswordlessSignInState!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithOtp(Supabase.Gotrue.SignInWithPasswordlessPhoneOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.PasswordlessSignInState!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithPhone(string! phone, string! password) -> System.Threading.Tasks.Task<TSession?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithPhone(string! phone, string! password, Supabase.Gotrue.SignInWithPasswordOptions! options) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithSSO(System.Guid providerId, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithSSO(string! domain, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignOut(string! jwt, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -352,6 +441,7 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Debug(string! message,
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Enroll(Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ExchangeCodeForSession(string! codeVerifier, string! authCode) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetAuthenticatorAssuranceLevel() -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaGetAuthenticatorAssuranceLevelResponse?>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetClaimsAsync(string? jwt = null, Supabase.Gotrue.Claims.GetClaimsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.GetClaimsResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetSessionFromUrl(System.Uri! uri, bool storeSession = true) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetUser(string! jwt) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.LinkIdentity(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ProviderAuthState!>!
@@ -384,6 +474,7 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInAnonymously(Supa
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithIdToken(Supabase.Gotrue.Constants.Provider provider, string! idToken, string? accessToken = null, string? nonce = null, string? captchaToken = null) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithOtp(Supabase.Gotrue.SignInWithPasswordlessEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.PasswordlessSignInState!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithOtp(Supabase.Gotrue.SignInWithPasswordlessPhoneOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.PasswordlessSignInState!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithPassword(Supabase.Gotrue.Constants.SignInType type, string! identifier, string! password, Supabase.Gotrue.SignInWithPasswordOptions! options) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithPassword(string! email, string! password) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithSSO(System.Guid providerId, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithSSO(string! domain, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
@@ -431,9 +522,11 @@ Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SendMagicLink
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.Settings(Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Settings?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignIn(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignInOptions? signInOptions = null) -> Supabase.Gotrue.ProviderAuthState!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignIn(Supabase.Gotrue.Constants.SignInType type, string! identifierOrToken, string? password = null, Supabase.Gotrue.StatelessClient.StatelessClientOptions? options = null) -> System.Threading.Tasks.Task<TSession?>!
+Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignIn(Supabase.Gotrue.Constants.SignInType type, string! identifierOrToken, string? password, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignInWithPasswordOptions! signInOptions) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignIn(string! email, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignInOptions? signInOptions = null) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignIn(string! email, string! password, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignOut(string! accessToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignOut(string! accessToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.Constants.SignOutScope scope) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignUp(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignUpOptions? signUpOptions = null) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.SignUp(string! email, string! password, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignUpOptions? signUpOptions = null) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueStatelessClient<TUser, TSession>.Unenroll(string! jwt, Supabase.Gotrue.Mfa.MfaUnenrollParams! mfaUnenrollParams, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaUnenrollResponse?>!
@@ -693,6 +786,10 @@ Supabase.Gotrue.SignInOptions.RedirectTo.set -> void
 Supabase.Gotrue.SignInOptions.Scopes.get -> string?
 Supabase.Gotrue.SignInOptions.Scopes.set -> void
 Supabase.Gotrue.SignInOptions.SignInOptions() -> void
+Supabase.Gotrue.SignInWithPasswordOptions
+Supabase.Gotrue.SignInWithPasswordOptions.CaptchaToken.get -> string?
+Supabase.Gotrue.SignInWithPasswordOptions.CaptchaToken.init -> void
+Supabase.Gotrue.SignInWithPasswordOptions.SignInWithPasswordOptions() -> void
 Supabase.Gotrue.SignInWithPasswordlessEmailOptions
 Supabase.Gotrue.SignInWithPasswordlessEmailOptions.Email.get -> string!
 Supabase.Gotrue.SignInWithPasswordlessEmailOptions.EmailRedirectTo.get -> string?
@@ -721,6 +818,8 @@ Supabase.Gotrue.SignInWithSSOOptions.CaptchaToken.get -> string?
 Supabase.Gotrue.SignInWithSSOOptions.CaptchaToken.set -> void
 Supabase.Gotrue.SignInWithSSOOptions.SignInWithSSOOptions() -> void
 Supabase.Gotrue.SignUpOptions
+Supabase.Gotrue.SignUpOptions.CaptchaToken.get -> string?
+Supabase.Gotrue.SignUpOptions.CaptchaToken.set -> void
 Supabase.Gotrue.SignUpOptions.Data.get -> System.Collections.Generic.Dictionary<string!, object!>?
 Supabase.Gotrue.SignUpOptions.Data.set -> void
 Supabase.Gotrue.SignUpOptions.SignUpOptions() -> void
@@ -747,9 +846,11 @@ Supabase.Gotrue.StatelessClient.SendMagicLink(string! email, Supabase.Gotrue.Sta
 Supabase.Gotrue.StatelessClient.Settings(Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Settings?>!
 Supabase.Gotrue.StatelessClient.SignIn(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignInOptions? signInOptions = null) -> Supabase.Gotrue.ProviderAuthState!
 Supabase.Gotrue.StatelessClient.SignIn(Supabase.Gotrue.Constants.SignInType type, string! identifierOrToken, string? password = null, Supabase.Gotrue.StatelessClient.StatelessClientOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
+Supabase.Gotrue.StatelessClient.SignIn(Supabase.Gotrue.Constants.SignInType type, string! identifierOrToken, string? password, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignInWithPasswordOptions! signInOptions) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.StatelessClient.SignIn(string! email, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignInOptions? signInOptions = null) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.StatelessClient.SignIn(string! email, string! password, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.StatelessClient.SignOut(string! accessToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.StatelessClient.SignOut(string! accessToken, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.Constants.SignOutScope scope) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.StatelessClient.SignUp(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignUpOptions? signUpOptions = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.StatelessClient.SignUp(string! email, string! password, Supabase.Gotrue.StatelessClient.StatelessClientOptions! options, Supabase.Gotrue.SignUpOptions? signUpOptions = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.StatelessClient.StatelessClient() -> void
@@ -872,7 +973,37 @@ const Supabase.Gotrue.Constants.EXPIRY_MARGIN = 60000 -> int
 const Supabase.Gotrue.Constants.GOTRUE_URL = "http://localhost:9999" -> string!
 const Supabase.Gotrue.Constants.STORAGE_KEY = "supabase.auth.token" -> string!
 const Supabase.Gotrue.GotrueDiagnostics.SourceName = "Supabase.Gotrue" -> string!
+override Supabase.Gotrue.Claims.GetClaimsOptions.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.GetClaimsOptions.GetHashCode() -> int
+override Supabase.Gotrue.Claims.GetClaimsOptions.ToString() -> string!
+override Supabase.Gotrue.Claims.GetClaimsResponse.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.GetClaimsResponse.GetHashCode() -> int
+override Supabase.Gotrue.Claims.GetClaimsResponse.ToString() -> string!
+override Supabase.Gotrue.Claims.Jwk.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.Jwk.GetHashCode() -> int
+override Supabase.Gotrue.Claims.Jwk.ToString() -> string!
+override Supabase.Gotrue.Claims.Jwks.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.Jwks.GetHashCode() -> int
+override Supabase.Gotrue.Claims.Jwks.ToString() -> string!
+override Supabase.Gotrue.Claims.JwtClaims.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.JwtClaims.GetHashCode() -> int
+override Supabase.Gotrue.Claims.JwtClaims.ToString() -> string!
+override Supabase.Gotrue.Claims.JwtHeader.Equals(object? obj) -> bool
+override Supabase.Gotrue.Claims.JwtHeader.GetHashCode() -> int
+override Supabase.Gotrue.Claims.JwtHeader.ToString() -> string!
 readonly Supabase.Gotrue.StatelessClient.StatelessClientOptions.Headers -> System.Collections.Generic.Dictionary<string!, string!>!
+static Supabase.Gotrue.Claims.GetClaimsOptions.operator !=(Supabase.Gotrue.Claims.GetClaimsOptions? left, Supabase.Gotrue.Claims.GetClaimsOptions? right) -> bool
+static Supabase.Gotrue.Claims.GetClaimsOptions.operator ==(Supabase.Gotrue.Claims.GetClaimsOptions? left, Supabase.Gotrue.Claims.GetClaimsOptions? right) -> bool
+static Supabase.Gotrue.Claims.GetClaimsResponse.operator !=(Supabase.Gotrue.Claims.GetClaimsResponse? left, Supabase.Gotrue.Claims.GetClaimsResponse? right) -> bool
+static Supabase.Gotrue.Claims.GetClaimsResponse.operator ==(Supabase.Gotrue.Claims.GetClaimsResponse? left, Supabase.Gotrue.Claims.GetClaimsResponse? right) -> bool
+static Supabase.Gotrue.Claims.Jwk.operator !=(Supabase.Gotrue.Claims.Jwk? left, Supabase.Gotrue.Claims.Jwk? right) -> bool
+static Supabase.Gotrue.Claims.Jwk.operator ==(Supabase.Gotrue.Claims.Jwk? left, Supabase.Gotrue.Claims.Jwk? right) -> bool
+static Supabase.Gotrue.Claims.Jwks.operator !=(Supabase.Gotrue.Claims.Jwks? left, Supabase.Gotrue.Claims.Jwks? right) -> bool
+static Supabase.Gotrue.Claims.Jwks.operator ==(Supabase.Gotrue.Claims.Jwks? left, Supabase.Gotrue.Claims.Jwks? right) -> bool
+static Supabase.Gotrue.Claims.JwtClaims.operator !=(Supabase.Gotrue.Claims.JwtClaims? left, Supabase.Gotrue.Claims.JwtClaims? right) -> bool
+static Supabase.Gotrue.Claims.JwtClaims.operator ==(Supabase.Gotrue.Claims.JwtClaims? left, Supabase.Gotrue.Claims.JwtClaims? right) -> bool
+static Supabase.Gotrue.Claims.JwtHeader.operator !=(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
+static Supabase.Gotrue.Claims.JwtHeader.operator ==(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
 static Supabase.Gotrue.Exceptions.FailureHint.DetectReason(Supabase.Gotrue.Exceptions.GotrueException! gte) -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 static Supabase.Gotrue.Helpers.GenerateNonce() -> string!
 static Supabase.Gotrue.Helpers.GeneratePKCENonceVerifier(string! codeVerifier) -> string!
