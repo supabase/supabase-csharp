@@ -75,4 +75,31 @@ public class PostgresChangesModelTests
         var act = () => model.Update<Todo>();
         (await act.Should().ThrowAsync<PostgrestException>()).Which.Message.Should().Contain("BaseUrl");
     }
+
+    /// <summary>
+    ///     supabase-csharp#486: a record column named like a <c>SocketResponsePayload</c> member (here a numeric
+    ///     <c>type</c> vs. the payload's string <c>ActionType</c>) used to fail the strict System.Text.Json token
+    ///     check while decoding the frame, so <c>RealtimeChannel.HandleSocketMessage</c> dropped the event.
+    /// </summary>
+    [TestMethod]
+    public void Decode_ShouldNotFail_GivenRecordColumnCollidesWithPayloadMember()
+    {
+        const string json =
+            "{\"topic\":\"realtime:public:things\",\"event\":\"postgres_changes\",\"payload\":{\"data\":{" +
+            "\"schema\":\"public\",\"table\":\"things\",\"type\":\"INSERT\"," +
+            "\"record\":{\"id\":1,\"type\":2,\"name\":\"first\"}}," +
+            "\"ids\":[1]},\"ref\":null}";
+        var settings = Wire.Settings();
+
+        var response = JsonSerializer.Deserialize<PostgresChangesResponse>(json, settings)!;
+        response.Json = json;
+        response.SerializerSettings = settings;
+
+        response.Payload!.Data.Should().NotBeNull();
+
+        var model = response.Model<Thing>()!;
+        model.Id.Should().Be(1);
+        model.Type.Should().Be(2);
+        model.Name.Should().Be("first");
+    }
 }

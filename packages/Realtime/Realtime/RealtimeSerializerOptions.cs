@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -5,6 +7,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Supabase.Postgrest.Attributes;
 using Supabase.Realtime.Converters;
+using Supabase.Realtime.Socket;
 
 namespace Supabase.Realtime;
 
@@ -54,6 +57,7 @@ internal static class RealtimeSerializerOptions
         if (typeInfo.Kind != JsonTypeInfoKind.Object)
             return;
 
+        DropUntypedRecordProjection(typeInfo);
         foreach (var property in typeInfo.Properties)
         {
             if (property.AttributeProvider is not MemberInfo member)
@@ -75,6 +79,18 @@ internal static class RealtimeSerializerOptions
                 var shouldInsert = primaryKeyAttribute.ShouldInsert;
                 property.ShouldSerialize = (_, _) => shouldInsert;
             }
+        }
+    }
+
+    private static void DropUntypedRecordProjection(JsonTypeInfo typeInfo)
+    {
+        if (typeInfo.Type != typeof(SocketResponsePayload<SocketResponsePayload>))
+            return;
+
+        for (var i = typeInfo.Properties.Count - 1; i >= 0; i--)
+        {
+            if (typeInfo.Properties[i].Name is "record" or "old_record")
+                typeInfo.Properties.RemoveAt(i);
         }
     }
 }

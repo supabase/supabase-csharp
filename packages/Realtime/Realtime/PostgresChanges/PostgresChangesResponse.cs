@@ -46,18 +46,14 @@ public class PostgresChangesResponse : SocketResponse<PostgresChangesPayload<Soc
     /// <returns></returns>
     public virtual TModel? Model<TModel>() where TModel : BaseModel, new()
     {
-        if (this.Json != null && this.Payload != null && this.Payload.Data?.Record != null)
-        {
-            var response = JsonSerializer.Deserialize<PostgresChangesResponse<TModel>>(this.Json, this.SerializerSettings);
-            var model = response?.Payload?.Data?.Record;
-            if (model != null)
-                this.PostgrestClient?.Attach(model);
-            return model;
-        }
-        else
-        {
-            return default;
-        }
+        if (this.Json == null || this.Payload?.Data == null)
+            return null;
+
+        var response = JsonSerializer.Deserialize<PostgresChangesResponse<TModel>>(this.Json, this.SerializerSettings);
+        var model = response?.Payload?.Data?.Record;
+        if (model != null)
+            this.PostgrestClient?.Attach(model);
+        return model;
     }
 
     /// <summary>
@@ -69,18 +65,14 @@ public class PostgresChangesResponse : SocketResponse<PostgresChangesPayload<Soc
     /// <returns></returns>
     public virtual TModel? OldModel<TModel>() where TModel : BaseModel, new()
     {
-        if (this.Json != null && this.Payload != null && this.Payload.Data?.OldRecord != null)
-        {
-            var response = JsonSerializer.Deserialize<PostgresChangesResponse<TModel>>(this.Json, this.SerializerSettings);
-            var model = response?.Payload?.Data?.OldRecord;
-            if (model != null)
-                this.PostgrestClient?.Attach(model);
-            return model;
-        }
-        else
-        {
-            return default;
-        }
+        if (this.Json == null || this.Payload?.Data == null)
+            return null;
+
+        var response = JsonSerializer.Deserialize<PostgresChangesResponse<TModel>>(this.Json, this.SerializerSettings);
+        var model = response?.Payload?.Data?.OldRecord;
+        if (model != null)
+            this.PostgrestClient?.Attach(model);
+        return model;
     }
 }
 
