@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core;
@@ -112,22 +111,22 @@ public class Api : IGotrueApi<User, Session>
     private async Task<Session?> PostSignUp(string endpoint, Dictionary<string, object> body)
     {
         var response = await this.MakeRequestAsync(HttpMethod.Post, endpoint, body, this.Headers).ConfigureAwait(false);
-        return ReadSignUpResponse(response.Content);
+        return ReadSignUpResponse(response);
     }
 
     /// <summary>Reads a sign-up response: a session, the bare user returned while confirmation is pending, or null.</summary>
-    private static Session? ReadSignUpResponse(string? content)
+    private static Session? ReadSignUpResponse(BaseResponse response)
     {
-        if (string.IsNullOrEmpty(content))
+        if (string.IsNullOrEmpty(response.Content))
         {
             return null;
         }
 
-        var session = JsonSerializer.Deserialize<Session>(content, Helpers.SerializerOptions);
+        var session = Helpers.DeserializeBody<Session>(response);
         if (session is { User: null })
         {
             // An acknowledgement such as { msg, code } must not become an empty User.
-            var user = JsonSerializer.Deserialize<User>(content, Helpers.SerializerOptions);
+            var user = Helpers.DeserializeBody<User>(response);
             session.User = user?.Id != null ? user : null;
             if (session.User == null && session.AccessToken == null)
             {
@@ -646,11 +645,11 @@ public class Api : IGotrueApi<User, Session>
         var uri = Helpers.AddQueryParams(state.Uri.ToString(), new Dictionary<string, string> { { "skip_http_redirect", "true" } });
         var response = await this.MakeRequestAsync(HttpMethod.Get, uri.ToString(), null, this.CreateAuthedRequestHeaders(token));
 
-        var content = response?.Content;
+        var content = response.Content;
 
         Dictionary<string, string>? payload = null;
         if (!string.IsNullOrEmpty(content))
-            payload = JsonSerializer.Deserialize<Dictionary<string, string>>(content);
+            payload = Helpers.DeserializeBody<Dictionary<string, string>>(response);
 
         if (payload == null || !payload.TryGetValue("url", out var url) || string.IsNullOrEmpty(url))
             throw new GotrueException("Gotrue did not return a provider authorization url for the identity link.", FailureHint.Reason.BadSessionUrl);

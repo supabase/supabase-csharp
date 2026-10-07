@@ -189,8 +189,18 @@ public static class Helpers
         where T : class
     {
         var baseResponse = await MakeRequestAsync(method, url, data, headers, httpClient, retry, cancellationToken);
-        return baseResponse.Content != null ? JsonSerializer.Deserialize<T>(baseResponse.Content, SerializerOptions) : default;
+        return baseResponse.Content != null ? DeserializeBody<T>(baseResponse) : default;
     }
+
+    /// <summary>
+    /// Deserializes a 2xx body and throws a GotrueException when it can't be read, e.g. a proxy's HTML page.
+    /// </summary>
+    internal static T? DeserializeBody<T>(BaseResponse response) =>
+        JsonBodyReader.Deserialize<T>(response.Content!, SerializerOptions, e => new GotrueException(e.Message, e)
+        {
+            Response = response.ResponseMessage,
+            StatusCode = (int) (response.ResponseMessage?.StatusCode ?? 0)
+        });
 
     /// <summary>
     /// Helper to make a request using the defined parameters to an API Endpoint.
