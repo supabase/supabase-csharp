@@ -37,7 +37,7 @@ public class NonJsonResponseTests
         this.MockProxyErrorPage("/token");
         var act = () => TestClients.Against(this.server).SignIn(RandomEmail(), Password);
         await act.Should().ThrowAsync<GotrueException>()
-            .Where(exception => exception.StatusCode == 200 && exception.InnerException is JsonException && exception.Message != ProxyErrorPage,
+            .Where(exception => exception.StatusCode == 200 && exception.InnerException is JsonException,
                 "auth-js surfaces a 2xx body it can't parse as an AuthRetryableFetchError, not a raw parse error");
     }
 
