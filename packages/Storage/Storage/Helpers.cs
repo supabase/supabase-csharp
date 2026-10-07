@@ -74,7 +74,12 @@ internal static class Helpers
         var response = await MakeRequestAsync(httpClient, retry, method, url, data, headers, cancellationToken);
         var content = await response.Content.ReadAsStringAsync();
 
-        return JsonSerializer.Deserialize<T>(content, SerializerOptions);
+        return JsonBodyReader.Deserialize<T>(content, SerializerOptions, e => new SupabaseStorageException(e.Message, e)
+        {
+            Content = content,
+            Response = response,
+            StatusCode = (int) response.StatusCode,
+        });
     }
 
     /// <summary>
