@@ -43,5 +43,6 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Core.Tests" />
+		<InternalsVisibleTo Include="Supabase.Postgrest" />
 	</ItemGroup>
 </Project>

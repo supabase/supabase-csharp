@@ -4,10 +4,10 @@ using System.Text.Json;
 namespace Supabase.Core.Http;
 
 /// <summary>Deserializes JSON response bodies.</summary>
-public static class JsonBody
+internal static class JsonBodyReader
 {
     /// <summary>Deserializes the body, wrapping JSON errors with the supplied exception factory.</summary>
-    public static T? Deserialize<T>(string body, JsonSerializerOptions options, Func<JsonException, Exception> exceptionFactory)
+    internal static T? Deserialize<T>(string body, JsonSerializerOptions options, Func<JsonException, Exception> exceptionFactory)
     {
         try
         {
