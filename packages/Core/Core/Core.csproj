@@ -43,6 +43,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Core.Tests" />
+		<InternalsVisibleTo Include="Supabase.Extensions.DependencyInjection" />
 		<InternalsVisibleTo Include="Supabase.Gotrue" />
 		<InternalsVisibleTo Include="Supabase.Postgrest" />
 		<InternalsVisibleTo Include="Supabase.Storage" />

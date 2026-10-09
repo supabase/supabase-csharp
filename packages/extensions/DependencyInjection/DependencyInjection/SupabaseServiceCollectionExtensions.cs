@@ -1,7 +1,7 @@
 using System;
-using System.Net;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Supabase.Core.Http;
 
 namespace Supabase.Extensions.DependencyInjection;
 
@@ -52,18 +52,18 @@ public static class SupabaseServiceCollectionExtensions
         configureOptions?.Invoke(seed);
 
         services.AddHttpClient(HttpClientName)
-            .ConfigurePrimaryHttpMessageHandler(() => CreateHandler(seed.Proxy));
+            .ConfigurePrimaryHttpMessageHandler(() => DefaultHttpClientFactory.CreateHandler(seed.Proxy));
 
         services.AddHttpClient(StorageRequestHttpClientName)
-            .ConfigurePrimaryHttpMessageHandler(() => CreateHandler(seed.StorageClientOptions.Proxy))
+            .ConfigurePrimaryHttpMessageHandler(() => DefaultHttpClientFactory.CreateHandler(seed.StorageClientOptions.Proxy))
             .ConfigureHttpClient(c => c.Timeout = seed.StorageClientOptions.HttpRequestTimeout);
 
         services.AddHttpClient(StorageUploadHttpClientName)
-            .ConfigurePrimaryHttpMessageHandler(() => CreateHandler(seed.StorageClientOptions.Proxy))
+            .ConfigurePrimaryHttpMessageHandler(() => DefaultHttpClientFactory.CreateHandler(seed.StorageClientOptions.Proxy))
             .ConfigureHttpClient(c => c.Timeout = seed.StorageClientOptions.HttpUploadTimeout);
 
         services.AddHttpClient(StorageDownloadHttpClientName)
-            .ConfigurePrimaryHttpMessageHandler(() => CreateHandler(seed.StorageClientOptions.Proxy))
+            .ConfigurePrimaryHttpMessageHandler(() => DefaultHttpClientFactory.CreateHandler(seed.StorageClientOptions.Proxy))
             .ConfigureHttpClient(c => c.Timeout = seed.StorageClientOptions.HttpDownloadTimeout);
 
         services.AddScoped(sp =>
@@ -88,7 +88,4 @@ public static class SupabaseServiceCollectionExtensions
 
         return services;
     }
-
-    private static HttpClientHandler CreateHandler(IWebProxy? proxy) =>
-        new() { Proxy = proxy, UseProxy = proxy != null };
 }

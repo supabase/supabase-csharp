@@ -44,6 +44,7 @@ app.MapGet("/todos", async (IPostgrestClient postgrest) =>
     await postgrest.Table<Todo>().Get());
 ```
 
-Any `HttpClient`/proxy set directly via `configureOptions` is overwritten — this package
+Any `HttpClient` set directly via `configureOptions` is overwritten — this package
 supplies those from `IHttpClientFactory` so every client's traffic goes through the pooled,
-DI-managed handlers instead of a handler the SDK builds and owns itself.
+DI-managed handlers instead of a handler the SDK builds and owns itself. A proxy set via
+`configureOptions` (`Proxy`, `StorageClientOptions.Proxy`) is kept and applied to those handlers.

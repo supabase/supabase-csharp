@@ -106,6 +106,21 @@ public class SupabaseServiceCollectionExtensionsTests
             "that pooling is the actual socket-exhaustion fix this package exists for");
     }
 
+    [TestMethod]
+    public void AddSupabase_ShouldKeepTheDefaultUseProxy_GivenNoProxy()
+    {
+        HttpMessageHandler? primary = null;
+        var services = new ServiceCollection();
+        services.AddSupabase(SupabaseUrl, SupabaseKey);
+        services.AddHttpClient("Supabase").ConfigurePrimaryHttpMessageHandler((handler, _) => primary = handler);
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        _ = scope.ServiceProvider.GetRequiredService<Client>();
+
+        primary.Should().BeOfType<HttpClientHandler>().Which.UseProxy.Should().BeTrue(
+            "UseProxy must stay at its default without a proxy, setting it throws on Blazor WebAssembly and iOS (#484)");
+    }
+
     private sealed class CountingHandler : DelegatingHandler
     {
         public static int ConstructedCount;
