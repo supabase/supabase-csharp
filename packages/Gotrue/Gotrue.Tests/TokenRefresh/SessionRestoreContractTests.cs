@@ -177,6 +177,33 @@ public class SessionRestoreContractTests
     }
 
     [TestMethod]
+    public async Task StopAutoRefresh_ShouldHoldTheTimerUntilStart_GivenAnExpiredSession()
+    {
+        var handler = new UnreachableHandler();
+        var client = TestClients.Against(this.server, autoRefreshToken: true, new HttpClient(handler));
+        client.StopAutoRefresh();
+        this.persistence.SaveSession(new Session { AccessToken = "an-access-token", RefreshToken = "a-refresh-token", ExpiresIn = 60, CreatedAt = DateTime.UtcNow.AddHours(-1) });
+        this.Restore(client);
+        await Task.Delay(250);
+        handler.Attempts.Should().Be(0, "a stopped client must not refresh, even when the session is due");
+        client.StartAutoRefresh();
+        await handler.Started;
+        handler.Attempts.Should().Be(1, "Start resumes the refresh, and a session that expired while stopped is due at once");
+    }
+
+    [TestMethod]
+    public async Task StartAutoRefresh_ShouldRefreshAtOnce_GivenAnExpiredSessionAndTheOptionOff()
+    {
+        var handler = new UnreachableHandler();
+        var client = TestClients.Against(this.server, autoRefreshToken: false, new HttpClient(handler));
+        this.persistence.SaveSession(new Session { AccessToken = "an-access-token", RefreshToken = "a-refresh-token", ExpiresIn = 60, CreatedAt = DateTime.UtcNow.AddHours(-1) });
+        this.Restore(client);
+        client.StartAutoRefresh();
+        await handler.Started;
+        handler.Attempts.Should().Be(1, "StartAutoRefresh arms the timer even with the AutoRefreshToken option off");
+    }
+
+    [TestMethod]
     public async Task RefreshToken_ShouldShareOneAttempt_GivenConcurrentCallers()
     {
         var handler = new GatedHandler();

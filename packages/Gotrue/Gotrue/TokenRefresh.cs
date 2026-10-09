@@ -33,7 +33,7 @@ public class TokenRefresh
     private Timer? _refreshTimer;
 
     /// <summary>
-    /// Set by Shutdown, so a tick or refresh still in flight cannot bring the timer back.
+    /// Set by Stop, so nothing re-arms the timer before Start.
     /// </summary>
     private volatile bool stopped;
 
@@ -67,8 +67,7 @@ public class TokenRefresh
                 this.StopTimer();
                 break;
             case Shutdown:
-                this.stopped = true;
-                this.StopTimer();
+                this.Stop();
                 break;
             case UserUpdated:
                 if (this.Debug)
@@ -87,6 +86,20 @@ public class TokenRefresh
                 break;
             default: throw new ArgumentOutOfRangeException(nameof(stateChanged), stateChanged, null);
         }
+    }
+
+    /// <summary>Arms the refresh timer and undoes <see cref="Stop"/>.</summary>
+    internal void Start()
+    {
+        this.stopped = false;
+        this.CreateNewTimer();
+    }
+
+    /// <summary>Stops the refresh timer until <see cref="Start"/>.</summary>
+    internal void Stop()
+    {
+        this.stopped = true;
+        this.StopTimer();
     }
 
     private void StopTimer()

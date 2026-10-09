@@ -107,16 +107,13 @@ public class Client : IGotrueClient<User, Session>
         this.Options = options;
         this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry);
         if (options.AutoRefreshToken)
-        {
-            this.TokenRefresh = new TokenRefresh(this);
-            this.authEventHandlers.Add(this.TokenRefresh.ManageAutoRefresh);
-        }
+            this.StartAutoRefresh();
     }
 
     /// <summary>
     ///     Get the TokenRefresh object, if it exists
     /// </summary>
-    public TokenRefresh? TokenRefresh { get; }
+    public TokenRefresh? TokenRefresh { get; private set; }
 
     /// <inheritdoc />
     public void SetPersistence(IGotrueSessionPersistence<Session> persistence) =>
@@ -981,6 +978,17 @@ public class Client : IGotrueClient<User, Session>
 
     /// <inheritdoc />
     public void Shutdown() => this.NotifyAuthStateChange(AuthState.Shutdown);
+
+    /// <inheritdoc />
+    public void StartAutoRefresh()
+    {
+        this.TokenRefresh ??= new TokenRefresh(this);
+        this.AddStateChangedListener(this.TokenRefresh.ManageAutoRefresh);
+        this.TokenRefresh.Start();
+    }
+
+    /// <inheritdoc />
+    public void StopAutoRefresh() => this.TokenRefresh?.Stop();
 
     /// <inheritdoc />
     public async Task<MfaEnrollResponse?> Enroll(MfaEnrollParams mfaEnrollParams)

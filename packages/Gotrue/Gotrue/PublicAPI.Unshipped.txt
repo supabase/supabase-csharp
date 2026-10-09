@@ -1,1 +1,5 @@
 #nullable enable
+Supabase.Gotrue.Client.StartAutoRefresh() -> void
+Supabase.Gotrue.Client.StopAutoRefresh() -> void
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.StartAutoRefresh() -> void
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.StopAutoRefresh() -> void
