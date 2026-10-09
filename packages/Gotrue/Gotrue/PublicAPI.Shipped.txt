@@ -334,6 +334,7 @@ Supabase.Gotrue.Exceptions.FailureHint.Reason.UserTooManyRequests = 10 -> Supaba
 Supabase.Gotrue.Exceptions.GotrueException
 Supabase.Gotrue.Exceptions.GotrueException.AddReason() -> void
 Supabase.Gotrue.Exceptions.GotrueException.Content.get -> string?
+Supabase.Gotrue.Exceptions.GotrueException.ErrorCode.get -> string?
 Supabase.Gotrue.Exceptions.GotrueException.GotrueException(string! message, Supabase.Gotrue.Exceptions.FailureHint.Reason reason, System.Exception? innerException) -> void
 Supabase.Gotrue.Exceptions.GotrueException.GotrueException(string? message) -> void
 Supabase.Gotrue.Exceptions.GotrueException.GotrueException(string? message, Supabase.Gotrue.Exceptions.FailureHint.Reason reason) -> void
@@ -1005,6 +1006,7 @@ static Supabase.Gotrue.Claims.JwtClaims.operator ==(Supabase.Gotrue.Claims.JwtCl
 static Supabase.Gotrue.Claims.JwtHeader.operator !=(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
 static Supabase.Gotrue.Claims.JwtHeader.operator ==(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
 static Supabase.Gotrue.Exceptions.FailureHint.DetectReason(Supabase.Gotrue.Exceptions.GotrueException! gte) -> Supabase.Gotrue.Exceptions.FailureHint.Reason
+static Supabase.Gotrue.Exceptions.FailureHint.ParseErrorCode(string? content) -> string?
 static Supabase.Gotrue.Helpers.GenerateNonce() -> string!
 static Supabase.Gotrue.Helpers.GeneratePKCENonceVerifier(string! codeVerifier) -> string!
 static Supabase.Gotrue.Helpers.GenerateSHA256NonceFromRawNonce(string! rawNonce) -> string!

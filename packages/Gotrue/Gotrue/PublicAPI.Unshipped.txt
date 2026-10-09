@@ -1,3 +1,1 @@
 #nullable enable
-Supabase.Gotrue.Exceptions.GotrueException.ErrorCode.get -> string?
-static Supabase.Gotrue.Exceptions.FailureHint.ParseErrorCode(string? content) -> string?
