@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.3.1](https://github.com/supabase/supabase-csharp/compare/v8.3.0...v8.3.1) (2026-10-09)
+
+
+### Bug Fixes
+
+* **gotrue:** classify auth errors by error_code ([#431](https://github.com/supabase/supabase-csharp/issues/431)) ([4d61db6](https://github.com/supabase/supabase-csharp/commit/4d61db6d22a1f7d42356b1c0dea6aa58f8b190b2))
+* **gotrue:** reuse the HttpClient when a proxy is set ([#478](https://github.com/supabase/supabase-csharp/issues/478)) ([9993ea0](https://github.com/supabase/supabase-csharp/commit/9993ea0a236300952566b7611506924d4751c42a))
+* **gotrue:** throw a GotrueException for a non-JSON 2xx body ([#494](https://github.com/supabase/supabase-csharp/issues/494)) ([19ad898](https://github.com/supabase/supabase-csharp/commit/19ad89810641f1800c8ccae63d7b7e53daae5e5c))
+* **gotrue:** verify ES256 tokens on the server when the platform has no ECDsa ([#482](https://github.com/supabase/supabase-csharp/issues/482)) ([9b68791](https://github.com/supabase/supabase-csharp/commit/9b687918b31002fb7e8fd5632c0c1c9b400f3102))
+* **postgrest:** reuse the HttpClient when a proxy is set ([#477](https://github.com/supabase/supabase-csharp/issues/477)) ([8552e15](https://github.com/supabase/supabase-csharp/commit/8552e15e4faf1ca760f38a701716476f3093045a))
+* **realtime:** fail subscribe when the join times out ([#480](https://github.com/supabase/supabase-csharp/issues/480)) ([9b80ab2](https://github.com/supabase/supabase-csharp/commit/9b80ab27532474943843de153be37a0aea799171))
+* **realtime:** stop deserializing `postgres_change` into the typed payload ([#491](https://github.com/supabase/supabase-csharp/issues/491)) ([718313d](https://github.com/supabase/supabase-csharp/commit/718313d838fc8492ba1ebad39a742d807af5bf05))
+* **storage:** finish an empty resumable upload at the create ([#500](https://github.com/supabase/supabase-csharp/issues/500)) ([b68300d](https://github.com/supabase/supabase-csharp/commit/b68300d8e69e5c94dac5e1a4e641a98ab579b657))
+* **storage:** reuse the client's HttpClients in From ([#476](https://github.com/supabase/supabase-csharp/issues/476)) ([d122da0](https://github.com/supabase/supabase-csharp/commit/d122da080d2c19f044738bfb1ff76920be220734))
+* **storage:** throw a SupabaseStorageException for a non-JSON 2xx body ([#495](https://github.com/supabase/supabase-csharp/issues/495)) ([9ead331](https://github.com/supabase/supabase-csharp/commit/9ead331cc193e98ae96d9decfe61aee961fb27d0))
+* **storage:** throw when a resumable upload chunk is cancelled or fails ([#475](https://github.com/supabase/supabase-csharp/issues/475)) ([b298f95](https://github.com/supabase/supabase-csharp/commit/b298f95a22522ebbb922c3c51265bea7951e6880))
+
 ## [8.3.0](https://github.com/supabase/supabase-csharp/compare/v8.2.0...v8.3.0) (2026-10-05)
 
 
