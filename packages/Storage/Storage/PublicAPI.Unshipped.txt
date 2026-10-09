@@ -1,1 +1,27 @@
 #nullable enable
+Supabase.Storage.FileObject.Key.get -> string?
+Supabase.Storage.FileObject.Key.set -> void
+Supabase.Storage.Interfaces.IStorageFileApi<TFileObject>.ListV2Async(Supabase.Storage.SearchV2Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.SearchV2Result?>!
+Supabase.Storage.SearchV2Options
+Supabase.Storage.SearchV2Options.Cursor.get -> string?
+Supabase.Storage.SearchV2Options.Cursor.set -> void
+Supabase.Storage.SearchV2Options.Limit.get -> int?
+Supabase.Storage.SearchV2Options.Limit.set -> void
+Supabase.Storage.SearchV2Options.Prefix.get -> string?
+Supabase.Storage.SearchV2Options.Prefix.set -> void
+Supabase.Storage.SearchV2Options.SearchV2Options() -> void
+Supabase.Storage.SearchV2Options.SortBy.get -> Supabase.Storage.SortBy?
+Supabase.Storage.SearchV2Options.SortBy.set -> void
+Supabase.Storage.SearchV2Options.WithDelimiter.get -> bool
+Supabase.Storage.SearchV2Options.WithDelimiter.set -> void
+Supabase.Storage.SearchV2Result
+Supabase.Storage.SearchV2Result.Folders.get -> System.Collections.Generic.List<Supabase.Storage.FileObject!>!
+Supabase.Storage.SearchV2Result.Folders.set -> void
+Supabase.Storage.SearchV2Result.HasNext.get -> bool
+Supabase.Storage.SearchV2Result.HasNext.set -> void
+Supabase.Storage.SearchV2Result.NextCursor.get -> string?
+Supabase.Storage.SearchV2Result.NextCursor.set -> void
+Supabase.Storage.SearchV2Result.Objects.get -> System.Collections.Generic.List<Supabase.Storage.FileObject!>!
+Supabase.Storage.SearchV2Result.Objects.set -> void
+Supabase.Storage.SearchV2Result.SearchV2Result() -> void
+Supabase.Storage.StorageFileApi.ListV2Async(Supabase.Storage.SearchV2Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.SearchV2Result?>!

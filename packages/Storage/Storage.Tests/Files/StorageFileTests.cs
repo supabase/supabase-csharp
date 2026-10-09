@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Storage;
 using Supabase.Storage.Interfaces;
@@ -367,6 +368,36 @@ public class StorageFileTests : StorageE2EFixture
         foreach (var name in names)
             await this.bucket.Upload(new byte[] { 0x0, 0x0, 0x0 }, name);
         return names;
+    }
+
+    [TestMethod]
+    public async Task ListV2Async_ShouldPageThroughEveryObjectUnderThePrefix()
+    {
+        await this.bucket.Upload(new byte[] { 1 }, "nested/a.txt");
+        await this.bucket.Upload(new byte[] { 1 }, "nested/sub/b.txt");
+        var first = await this.bucket.ListV2Async(new SearchV2Options { Prefix = "nested/", Limit = 1 });
+        var second = await this.bucket.ListV2Async(new SearchV2Options { Prefix = "nested/", Cursor = first!.NextCursor });
+        using (new AssertionScope())
+        {
+            first.HasNext.Should().BeTrue();
+            second!.HasNext.Should().BeFalse();
+            first.Objects.Concat(second.Objects).Select(item => item.Name).Should().BeEquivalentTo("nested/a.txt", "nested/sub/b.txt");
+        }
+    }
+
+    [TestMethod]
+    public async Task ListV2Async_ShouldStopAtSubFolders_GivenADelimiter()
+    {
+        await this.bucket.Upload(new byte[] { 1 }, "nested/a.txt");
+        await this.bucket.Upload(new byte[] { 1 }, "nested/sub/b.txt");
+        var page = await this.bucket.ListV2Async(new SearchV2Options { Prefix = "nested/", WithDelimiter = true });
+        using (new AssertionScope())
+        {
+            var file = page!.Objects.Should().ContainSingle().Subject;
+            file.Name.Should().Be("nested/a.txt");
+            file.Key.Should().Be("a.txt");
+            page.Folders.Should().ContainSingle().Which.Name.Should().Be("nested/sub/");
+        }
     }
 
     private static byte[] RandomBytes(int length)

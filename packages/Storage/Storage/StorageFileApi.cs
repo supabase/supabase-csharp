@@ -289,6 +289,20 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     }
 
     /// <summary>
+    /// Lists the objects under a prefix, one page at a time.
+    /// </summary>
+    public Task<SearchV2Result?> ListV2Async(SearchV2Options? options = null, CancellationToken cancellationToken = default) =>
+        Helpers.MakeRequestAsync<SearchV2Result>(
+            this.requestClient,
+            this.Options.Retry,
+            HttpMethod.Post,
+            $"{this.Url}/object/list-v2/{this.BucketId}",
+            options ?? new SearchV2Options(),
+            this.Headers,
+            cancellationToken
+        );
+
+    /// <summary>
     /// Retrieves the details of an existing file.
     /// </summary>
     /// <param name="path"></param>
