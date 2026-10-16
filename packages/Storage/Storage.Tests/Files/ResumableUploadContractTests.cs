@@ -163,6 +163,18 @@ namespace Storage.Tests.Files
             await act.Should().ThrowAsync<SupabaseStorageException>("TUS acknowledges a chunk with 204 only (issue #474)");
         }
 
+        [TestMethod]
+        public async Task UploadOrResume_ShouldThrow_GivenACreateResponseWithoutLocation()
+        {
+            this.server.Given(Request.Create().UsingPost())
+                .RespondWith(Response.Create().WithStatusCode(201).WithHeader("Tus-Resumable", "1.0.0"));
+
+            var act = () => this.client.From(Bucket).UploadOrResume(Payload, FileName, new FileOptions());
+
+            (await act.Should().ThrowAsync<SupabaseStorageException>("a create reply without a Location header leaves nothing to patch"))
+                .WithMessage("*Location*");
+        }
+
         private void StubTusEndpoints()
         {
             var length = Payload.Length.ToString(CultureInfo.InvariantCulture);

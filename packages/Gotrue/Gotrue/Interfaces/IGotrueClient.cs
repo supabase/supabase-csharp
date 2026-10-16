@@ -529,6 +529,19 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     void Shutdown();
 
     /// <summary>
+    ///     Starts the background refresh, or resumes it after <see cref="StopAutoRefresh" />. Runs at
+    ///     construction when <see cref="ClientOptions.AutoRefreshToken" /> is set. Call it when the app
+    ///     returns to the foreground. An expired session is refreshed at once.
+    /// </summary>
+    void StartAutoRefresh();
+
+    /// <summary>
+    ///     Stops the background refresh until <see cref="StartAutoRefresh" />. The session is kept and a
+    ///     later sign-in does not restart the refresh. Call it when the app goes to the background.
+    /// </summary>
+    void StopAutoRefresh();
+
+    /// <summary>
     ///     Refreshes a Token using the current session.
     /// </summary>
     /// <returns></returns>

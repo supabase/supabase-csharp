@@ -11,7 +11,7 @@ public partial class Client
     /// <summary>
     /// Options that can be supplied to a function invocation.
     ///
-    /// Note: If Headers.Authorization is set, it can be later overriden if a token is supplied in the method call.
+    /// Note: If Headers.Authorization is set, it can be later overriden if a token is supplied in the method call or set with SetAuth.
     /// </summary>
     public class InvokeFunctionOptions
     {

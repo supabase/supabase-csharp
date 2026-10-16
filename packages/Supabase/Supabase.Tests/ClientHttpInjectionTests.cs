@@ -61,6 +61,11 @@ public class ClientHttpInjectionTests
     }
 
     [TestMethod]
+    public void Client_ShouldMirrorPostgrestTimeoutToPostgrest() =>
+        new Client("http://localhost:54321", "test-key", new SupabaseOptions { PostgrestTimeout = TimeSpan.FromSeconds(5) })
+            .Postgrest.Options.Timeout.Should().Be(TimeSpan.FromSeconds(5));
+
+    [TestMethod]
     public void Client_ShouldMirrorWebSocketFactoryToRealtime()
     {
         var factory = new FakeWebSocketFactory();

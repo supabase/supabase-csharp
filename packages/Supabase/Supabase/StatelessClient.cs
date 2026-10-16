@@ -56,6 +56,7 @@ public static class StatelessClient
             Schema = options.Schema,
             Headers = headers,
             Retry = options.PostgrestRetry,
+            Timeout = options.PostgrestTimeout,
             HttpClient = options.HttpClient,
             Proxy = options.Proxy
         };

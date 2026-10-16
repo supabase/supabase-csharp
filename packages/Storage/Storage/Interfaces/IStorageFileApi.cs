@@ -64,6 +64,8 @@ namespace Supabase.Storage.Interfaces
             DownloadOptions? options = null
         );
         Task<List<TFileObject>?> List(string path = "", SearchOptions? options = null);
+        /// <summary>Lists the objects under a prefix, one page at a time.</summary>
+        Task<SearchV2Result?> ListV2Async(SearchV2Options? options = null, CancellationToken cancellationToken = default);
         Task<FileObjectV2?> Info(string path);
         Task<bool> Move(string fromPath, string toPath, DestinationOptions? options = null);
         Task<bool> Copy(string fromPath, string toPath, DestinationOptions? options = null);

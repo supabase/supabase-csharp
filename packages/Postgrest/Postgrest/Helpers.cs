@@ -147,9 +147,12 @@ internal static class Helpers
         int? statusCode = null;
         string? errorType = null;
 
+        using var timeoutCts = new CancellationTokenSource(clientOptions.Timeout ?? Timeout.InfiniteTimeSpan);
+        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+
         try
         {
-            using var response = await RetryExecutor.SendAsync(httpClient ?? Client, CreateRequest, clientOptions.Retry, cancellationToken).ConfigureAwait(false);
+            using var response = await RetryExecutor.SendAsync(httpClient ?? Client, CreateRequest, clientOptions.Retry, linkedCts.Token).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 
@@ -167,6 +170,13 @@ internal static class Helpers
             };
             exception.AddReason();
             throw exception;
+        }
+        catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested && !cancellationToken.IsCancellationRequested)
+        {
+            var timeoutException = new TimeoutException($"The request timed out after {clientOptions.Timeout}.");
+            errorType = timeoutException.GetType().FullName;
+            activity.SetFailure(timeoutException);
+            throw new TaskCanceledException(timeoutException.Message, timeoutException, cancellationToken);
         }
         catch (Exception e) when (e is not PostgrestException)
         {

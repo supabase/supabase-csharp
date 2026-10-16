@@ -60,4 +60,11 @@ public class ReadTests
             .Filter("status", Operator.Equals, "ONLINE").Get(default, CountType.Exact);
         response.Count.Should().BeGreaterThan(-1);
     }
+
+    [TestMethod]
+    public async Task Get_ShouldLeaveNullValuesOut_GivenStripNulls()
+    {
+        var response = await LocalStack.Client().Table<User>().StripNulls().Get();
+        response.Content.Should().NotContain(":null", "the seeded users have null columns");
+    }
 }

@@ -14,6 +14,10 @@ public class FileObject
     [JsonPropertyName("name")]
     public string? Name { get; set; }
 
+    /// <summary>The name relative to the listed prefix. Null unless listed with a delimiter.</summary>
+    [JsonPropertyName("key")]
+    public string? Key { get; set; }
+
     [JsonPropertyName("bucket_id")]
     public string? BucketId { get; set; }
 

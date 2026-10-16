@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -35,6 +36,12 @@ public class ClientOptions
 
     /// <summary>Retry policy applied to each request. Default (<see cref="RetryOptions.MaxRetries"/> 0) sends once, unretried.</summary>
     public RetryOptions Retry { get; set; } = new RetryOptions();
+
+    /// <summary>
+    /// Fails a request that runs longer than this, retries included, with a TaskCanceledException.
+    /// The HttpClient timeout, 100 seconds by default, still applies.
+    /// </summary>
+    public TimeSpan? Timeout { get; set; }
 
     /// <summary>An HttpClient to send requests through. When null, the client builds and owns its own.</summary>
     public HttpClient? HttpClient { get; set; }

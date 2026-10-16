@@ -1,5 +1,23 @@
 # Changelog
 
+## [8.4.0](https://github.com/supabase/supabase-csharp/compare/v8.3.1...v8.4.0) (2026-10-16)
+
+
+### Features
+
+* **functions:** add SetAuth ([#510](https://github.com/supabase/supabase-csharp/issues/510)) ([32ab403](https://github.com/supabase/supabase-csharp/commit/32ab403ce9ac318283499496f1a776e3f5a6f7b0))
+* **gotrue:** add StartAutoRefresh and StopAutoRefresh ([#505](https://github.com/supabase/supabase-csharp/issues/505)) ([3ff0b95](https://github.com/supabase/supabase-csharp/commit/3ff0b95bcfc8bd4fef116991fab643c4551bf187))
+* **postgrest:** add a request timeout ([#512](https://github.com/supabase/supabase-csharp/issues/512)) ([ed0f93c](https://github.com/supabase/supabase-csharp/commit/ed0f93ca93e42053ba5c6685d7ef8f191f2d5df7))
+* **postgrest:** add StripNulls ([#509](https://github.com/supabase/supabase-csharp/issues/509)) ([b89c83e](https://github.com/supabase/supabase-csharp/commit/b89c83eba7f8eb98652252bc0c2db1f104f21628))
+* **postgrest:** report a 414 as UriTooLong ([#513](https://github.com/supabase/supabase-csharp/issues/513)) ([800777d](https://github.com/supabase/supabase-csharp/commit/800777d6e88b8a84d688cf214da743a412709150))
+* **storage:** add ListV2Async for paged listing ([#504](https://github.com/supabase/supabase-csharp/issues/504)) ([a83801b](https://github.com/supabase/supabase-csharp/commit/a83801bc1265e68ceb5b2c99680a169da5e8e94a))
+
+
+### Bug Fixes
+
+* **dependency-injection:** avoid setting proxy when it's null ([#503](https://github.com/supabase/supabase-csharp/issues/503)) ([611c6eb](https://github.com/supabase/supabase-csharp/commit/611c6ebae1788e1a382c606ede243ac75ad341f7))
+* **storage:** throw SupabaseStorageException when TusException has no response ([#508](https://github.com/supabase/supabase-csharp/issues/508)) ([ac9c67a](https://github.com/supabase/supabase-csharp/commit/ac9c67ace7f9609e1df93aba29b0a517e697fe94))
+
 ## [8.3.1](https://github.com/supabase/supabase-csharp/compare/v8.3.0...v8.3.1) (2026-10-09)
 
 

@@ -200,6 +200,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
         {
             Schema = schema,
             Retry = this.options.PostgrestRetry,
+            Timeout = this.options.PostgrestTimeout,
             HttpClient = this.options.HttpClient,
             Proxy = this.options.Proxy
         });

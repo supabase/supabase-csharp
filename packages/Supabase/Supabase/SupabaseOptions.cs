@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -52,6 +53,11 @@ public class SupabaseOptions
     /// Retry policy passed to the Postgrest client. Defaults to no retries.
     /// </summary>
     public Supabase.Core.Http.RetryOptions PostgrestRetry { get; set; } = new();
+
+    /// <summary>
+    /// Timeout passed to the Postgrest client. Defaults to none.
+    /// </summary>
+    public TimeSpan? PostgrestTimeout { get; set; }
 
     /// <summary>
     /// Retry policy passed to the Auth client. Defaults to no retries.

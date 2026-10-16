@@ -81,6 +81,11 @@ public class StatelessClientTests
     }
 
     [TestMethod]
+    public void GetRestOptions_ShouldForwardPostgrestTimeout_GivenATimeout() =>
+        GetRestOptions("my-key", new Supabase.SupabaseOptions { PostgrestTimeout = TimeSpan.FromSeconds(5) })
+            .Timeout.Should().Be(TimeSpan.FromSeconds(5), "the timeout must reach the Postgrest client");
+
+    [TestMethod]
     public void Functions_ShouldCarryDeveloperHeadersToClient_GivenCustomHeader()
     {
         var options = FormatOptions();

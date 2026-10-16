@@ -441,6 +441,11 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     IPostgrestTable<TModel> Set(Expression<Func<TModel, KeyValuePair<object, object?>>> keyValuePairExpression);
 
     /// <summary>
+    /// Leaves null values out of the returned rows. Needs PostgREST 11.2 or later.
+    /// </summary>
+    IPostgrestTable<TModel> StripNulls();
+
+    /// <summary>
     /// Calls an Update function after `Set` has been called.
     /// </summary>
     /// <param name="options"></param>

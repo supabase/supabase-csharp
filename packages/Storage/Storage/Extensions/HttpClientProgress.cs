@@ -373,7 +373,7 @@ internal static class HttpClientProgress
                     fileLocation = responseCreate.FileLocation;
                     UploadMemoryCache.Set(cacheKey, fileLocation.ToString());
                 }
-                catch (TusException error)
+                catch (TusException error) when (error.OriginHttpResponse != null)
                 {
                     statusCode = (int) error.OriginHttpResponse.StatusCode;
                     errorType = statusCode.Value.ToString();
@@ -426,6 +426,10 @@ internal static class HttpClientProgress
         {
             errorType = e.GetType().FullName;
             activity.SetFailure(e);
+            // BirdMessenger reports a missing header, such as Location on the create reply, with a
+            // TusException that has no response.
+            if (e is TusException tus)
+                throw new SupabaseStorageException($"The resumable upload failed: {tus.Message}.", tus);
             throw;
         }
         finally

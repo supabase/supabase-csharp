@@ -65,6 +65,25 @@ public class StorageFileApiContractTests
     }
 
     [TestMethod]
+    public async Task ListV2Async_ShouldPostToTheListV2PathAndMapThePage()
+    {
+        this.Respond($"/storage/v1/object/list-v2/{Bucket}", "POST", 200,
+            "{\"hasNext\":true,\"nextCursor\":\"abc\",\"folders\":[{\"name\":\"folder/sub/\",\"key\":\"sub\"}],\"objects\":[{\"name\":\"folder/a.png\",\"id\":\"1\"}]}");
+        var page = await this.client.From(Bucket).ListV2Async(new SearchV2Options { Prefix = "folder/", WithDelimiter = true, Limit = 1 });
+        using (new AssertionScope())
+        {
+            var request = this.SingleRequest();
+            request.Path.Should().Be($"/storage/v1/object/list-v2/{Bucket}");
+            request.Body.Should().Contain("\"prefix\":\"folder/\"").And.Contain("\"with_delimiter\":true").And.Contain("\"limit\":1")
+                .And.NotContain("\"cursor\"").And.NotContain("\"sortBy\"");
+            page!.HasNext.Should().BeTrue();
+            page.NextCursor.Should().Be("abc");
+            page.Objects.Should().ContainSingle().Which.Name.Should().Be("folder/a.png");
+            page.Folders.Should().ContainSingle().Which.IsFolder.Should().BeTrue();
+        }
+    }
+
+    [TestMethod]
     public async Task Info_ShouldGetTheInfoPath()
     {
         this.Respond($"/storage/v1/object/info/{Bucket}/a.png", "GET", 200, "{\"name\":\"a.png\"}");

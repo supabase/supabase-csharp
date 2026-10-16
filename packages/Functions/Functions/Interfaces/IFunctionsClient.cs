@@ -50,4 +50,10 @@ public interface IFunctionsClient : IGettableHeaders
     /// <param name="cancellationToken">Cancels the request and error-body reads. Cancel successful body reads separately.</param>
     /// <returns>The response, which the caller must dispose.</returns>
     Task<HttpResponseMessage> InvokeStream(string url, string? token = null, Client.InvokeFunctionOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Sets the bearer token for calls that pass no token. It replaces any other Authorization header,
+    /// including the session token that Supabase.Client sends.
+    /// </summary>
+    void SetAuth(string token);
 }

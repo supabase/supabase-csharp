@@ -117,6 +117,24 @@ public class ClientContractTests
     }
 
     [TestMethod]
+    public async Task Invoke_ShouldSendTheSetAuthToken_GivenNoToken()
+    {
+        this.client.SetAuth("the-session");
+        this.RespondWith(200, "ok");
+        await this.client.Invoke(FunctionName);
+        this.HeaderOf("Authorization").Should().Be("Bearer the-session");
+    }
+
+    [TestMethod]
+    public async Task Invoke_ShouldPreferTheGivenToken_GivenSetAuth()
+    {
+        this.client.SetAuth("the-session");
+        this.RespondWith(200, "ok");
+        await this.client.Invoke(FunctionName, "the-token");
+        this.HeaderOf("Authorization").Should().Be("Bearer the-token");
+    }
+
+    [TestMethod]
     public async Task Invoke_ShouldSendClientInfoHeader()
     {
         this.RespondWith(200, "ok");

@@ -70,6 +70,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
     private string? onConflict;
 
+    private bool stripNulls;
+
     #endregion
 
     /// <summary>
@@ -442,6 +444,14 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     {
         this.offset = offset;
         this.offsetForeignKey = foreignTableName;
+        return this;
+    }
+
+
+    /// <inheritdoc />
+    public IPostgrestTable<TModel> StripNulls()
+    {
+        this.stripNulls = true;
         return this;
     }
 
@@ -928,6 +938,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         this.offset = int.MinValue;
         this.offsetForeignKey = null;
         this.onConflict = null;
+        this.stripNulls = false;
     }
 
 
@@ -989,6 +1000,9 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
         if (this.GetHeaders != null)
             requestHeaders = this.GetHeaders().MergeLeft(requestHeaders);
+
+        if (this.stripNulls)
+            requestHeaders.TryAdd("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
 
         var url = this.GenerateUrl();
         var preparedData = this.PrepareRequestData(data, isInsert, isUpdate, isUpsert);
