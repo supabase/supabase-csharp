@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Postgrest.Models;
@@ -79,6 +80,7 @@ public class Client : IPostgrestClient
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.query.from_table")]
     public IPostgrestTable<T> Table<T>() where T : BaseModel, new() =>
         new Table<T>(this.BaseUrl, SerializerSettings(this.Options), this.Options)
         {

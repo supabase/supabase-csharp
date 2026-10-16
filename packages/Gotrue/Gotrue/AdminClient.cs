@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Supabase.Core.Attributes;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
@@ -54,12 +55,14 @@ public class AdminClient : IGotrueAdminClient<User>
     private readonly string serviceKey;
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.get_user")]
     public Task<User?> GetUserById(string userId) => this.api.GetUserById(this.serviceKey, userId);
 
     /// <inheritdoc />
     public Task<User?> GetUser(string jwt) => this.api.GetUser(jwt);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.invite_user")]
     public async Task<bool> InviteUserByEmail(string email, InviteUserByEmailOptions? options = null)
     {
         var response = await this.api.InviteUserByEmail(email, this.serviceKey, options);
@@ -68,6 +71,7 @@ public class AdminClient : IGotrueAdminClient<User>
     }
 
     /// <inheritdoc />
+    [PartialCapability("auth.admin.delete_user", "Hard-delete only; no shouldSoftDelete flag (JS deleteUser(id, shouldSoftDelete)).")]
     public async Task<bool> DeleteUser(string uid, bool shouldSoftDelete = false)
     {
         var result = await this.api.DeleteUser(uid, this.serviceKey, shouldSoftDelete);
@@ -76,6 +80,7 @@ public class AdminClient : IGotrueAdminClient<User>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.create_user")]
     public Task<User?> CreateUser(string email, string password, AdminUserAttributes? attributes = null)
     {
         attributes ??= new AdminUserAttributes();
@@ -89,12 +94,15 @@ public class AdminClient : IGotrueAdminClient<User>
     public Task<User?> CreateUser(AdminUserAttributes attributes) => this.api.CreateUser(this.serviceKey, attributes);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.list_users")]
     public Task<UserList<User>?> ListUsers(string? filter = null, string? sortBy = null, Constants.SortOrder sortOrder = Constants.SortOrder.Descending, int? page = null, int? perPage = null) => this.api.ListUsers(this.serviceKey, filter, sortBy, sortOrder, page, perPage);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.update_user")]
     public Task<User?> UpdateUserById(string userId, AdminUserAttributes userData) => this.api.UpdateUserById(this.serviceKey, userId, userData);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.generate_link")]
     public async Task<GenerateLinkResponse?> GenerateLink(GenerateLinkOptions options)
     {
         var response = await this.api.GenerateLink(this.serviceKey, options);
@@ -107,6 +115,7 @@ public class AdminClient : IGotrueAdminClient<User>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.list_mfa_factors")]
     public async Task<MfaAdminListFactorsResponse?> ListFactors(MfaAdminListFactorsParams listFactorsParams)
     {
         var response = await this.api.ListFactors(this.serviceKey, listFactorsParams);
@@ -124,6 +133,7 @@ public class AdminClient : IGotrueAdminClient<User>
         return listFactorsResponse;
     }
 
+    [ImplementedCapability("auth.admin.delete_mfa_factor")]
     public async Task<MfaAdminDeleteFactorResponse?> DeleteFactor(MfaAdminDeleteFactorParams deleteFactorParams) => await this.api.DeleteFactor(this.serviceKey, deleteFactorParams);
 
     /// <inheritdoc />

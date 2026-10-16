@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Supabase.Core;
+using Supabase.Core.Attributes;
 using Supabase.Functions.Interfaces;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
@@ -273,10 +274,12 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
     /// </summary>
     /// <typeparam name="TModel"></typeparam>
     /// <returns></returns>
+    [ImplementedCapability("database.query.from_table")]
     public ISupabaseTable<TModel, RealtimeChannel> From<TModel>() where TModel : BaseModel, new() =>
         new SupabaseTable<TModel>(this.Postgrest, this.Realtime);
 
     /// <inheritdoc />
+    [PartialCapability("database.query.rpc", "Invocation works (typed + untyped) but Rpc is terminal — no post-filtering/transform chaining on the result like JS rpc().")]
     public Task<BaseResponse> Rpc(string procedureName, object? parameters) => this.postgrest.Rpc(procedureName, parameters);
 
     /// <inheritdoc />
@@ -290,6 +293,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
     /// stand-in for an absent session — only the <c>apikey</c> header carries it. Used by the Edge
     /// Functions path, whose gateway rejects opaque keys parsed as a JWT.
     /// </param>
+    [ImplementedCapability("client.authentication_integration.cross_client_token_sync", "Umbrella Client listens to auth state changes and injects the current JWT into every sub-client via a shared GetAuthHeaders callback.")]
     internal Dictionary<string, string> GetAuthHeaders(bool omitApiKeyAsBearer = false)
     {
         var headers = CaseInsensitiveHeaders();

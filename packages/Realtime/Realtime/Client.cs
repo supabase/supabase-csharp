@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Supabase.Core.Attributes;
 using Supabase.Realtime.Channel;
 using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
@@ -31,6 +32,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Exposes all Realtime RealtimeChannel Subscriptions for R/O public consumption 
     /// </summary>
+    [PartialCapability("realtime.client.get_channels", "Active channels exposed as a Subscriptions dictionary; no getChannels() method.")]
     public ReadOnlyDictionary<string, RealtimeChannel> Subscriptions => new(this.subscriptions);
 
     /// <summary>
@@ -113,6 +115,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// Returns when socket has successfully connected.
     /// </summary>
     /// <returns></returns>
+    [ImplementedCapability("realtime.client.connect")]
     public async Task<IRealtimeClient<RealtimeSocket, RealtimeChannel>> ConnectAsync()
     {
         var tsc = new TaskCompletionSource<IRealtimeClient<RealtimeSocket, RealtimeChannel>>();
@@ -164,6 +167,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <param name="callback"></param>
     /// <returns></returns>
     [Obsolete("Please use ConnectAsync() instead.")]
+    [ImplementedCapability("realtime.client.connect")]
     public IRealtimeClient<RealtimeSocket, RealtimeChannel> Connect(
         Action<IRealtimeClient<RealtimeSocket, RealtimeChannel>, RealtimeException?>? callback = null)
     {
@@ -209,6 +213,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Adds a listener to be notified when the socket state changes.
     /// </summary>
+    [PartialCapability("realtime.client.connection_state", "Socket state delivered via SocketStateEventHandler events; no synchronous connection-state getter on the client.")]
     public void AddStateChangedHandler(
         IRealtimeClient<RealtimeSocket, RealtimeChannel>.SocketStateEventHandler handler)
     {
@@ -252,6 +257,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// Adds a debug handler, likely used within a logging solution of some kind.
     /// </summary>
     /// <param name="handler"></param>
+    [PartialCapability("realtime.configuration.custom_logger", "Diagnostics routed through a debug handler hook; no custom logging function with a log-level filter.")]
     public void AddDebugHandler(IRealtimeDebugger.DebugEventHandler handler) =>
         Debugger.Instance.AddDebugHandler(handler);
 
@@ -284,6 +290,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <param name="code">Status Code</param>
     /// <param name="reason">Reason for disconnect</param>
     /// <returns></returns>
+    [ImplementedCapability("realtime.client.disconnect")]
     public IRealtimeClient<RealtimeSocket, RealtimeChannel> Disconnect(
         WebSocketCloseStatus code = WebSocketCloseStatus.NormalClosure, string reason = "Programmatic Disconnect")
     {
@@ -303,6 +310,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// Ref: https://github.com/supabase/realtime-js/pull/117 | https://github.com/supabase/realtime-js/pull/117
     /// </summary>
     /// <param name="jwt"></param>
+    [ImplementedCapability("realtime.client.set_auth_token")]
     public void SetAuth(string jwt)
     {
         this.AccessToken = jwt;
@@ -332,6 +340,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// </param>
     /// <returns></returns>
     /// <exception cref="Exception"></exception>
+    [ImplementedCapability("realtime.client.channel", "Plain-topic form plus a typed convenience overload Channel(db, schema, table, col, value).")]
     public RealtimeChannel Channel(string channelName) =>
         this.Channel(channelName, ChannelOptions.Public(this.Options, () => this.AccessToken, this.SerializerSettings));
 
@@ -400,6 +409,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// Removes a channel subscription.
     /// </summary>
     /// <param name="channel"></param>
+    [ImplementedCapability("realtime.client.remove_channel")]
     public void Remove(RealtimeChannel channel)
     {
         if (this.subscriptions.ContainsKey(channel.Topic))

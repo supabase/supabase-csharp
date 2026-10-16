@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Supabase.Core.Attributes;
 using Supabase.Realtime.Channel;
 using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
@@ -21,17 +22,20 @@ namespace Supabase.Realtime;
 /// If a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state.
 /// </summary>
 /// <typeparam name="TPresenceModel">A model representing expected payload.</typeparam>
+[PartialCapability("realtime.subscriptions.subscribe_presence", "Join/leave/sync handlers exist, but the presence sync diverges from JS (see realtime.presence.presence_state).")]
 public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenceModel : BasePresence
 {
     /// <summary>
     /// The Last State of this Presence instance.
     /// </summary>
+    [PartialCapability("realtime.presence.presence_state", "Typed CurrentState/LastState exist, but the initial presence snapshot is dropped, so any client that joins after others undercounts everyone — a behavioral gap, not just a shape gap.")]
     public Dictionary<string, List<TPresenceModel>> LastState { get; private set; } =
         new();
 
     /// <summary>
     /// The Current State of this Presence instance.
     /// </summary>
+    [PartialCapability("realtime.presence.presence_state", "Typed CurrentState/LastState exist, but the initial presence snapshot is dropped, so any client that joins after others undercounts everyone — a behavioral gap, not just a shape gap.")]
     public Dictionary<string, List<TPresenceModel>> CurrentState { get; } = new();
 
     private PresenceOptions options;
@@ -152,6 +156,7 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     /// </summary>
     /// <param name="payload"></param>
     /// <param name="timeoutMs"></param>
+    [ImplementedCapability("realtime.presence.track")]
     public Task<Push> Track(object? payload, int timeoutMs = DefaultTimeout)
     {
         var eventName = Core.Helpers.GetMappedToAttr(ChannelEventName.Presence).Mapping;
@@ -179,6 +184,7 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     /// <summary>
     /// Untracks an event.
     /// </summary>
+    [ImplementedCapability("realtime.presence.untrack")]
     public Task<Push> Untrack()
     {
         var eventName = Core.Helpers.GetMappedToAttr(ChannelEventName.Presence).Mapping;

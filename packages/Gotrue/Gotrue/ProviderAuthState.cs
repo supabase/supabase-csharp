@@ -1,4 +1,5 @@
 using System;
+using Supabase.Core.Attributes;
 namespace Supabase.Gotrue;
 
 /// <summary>
@@ -6,6 +7,7 @@ namespace Supabase.Gotrue;
 ///
 /// For use with Provider Auth, PKCE Auth, and ID Token auth.
 /// </summary>
+[ImplementedCapability("auth.sign_in.sign_in_with_oauth")]
 public class ProviderAuthState
 {
     /// <summary>

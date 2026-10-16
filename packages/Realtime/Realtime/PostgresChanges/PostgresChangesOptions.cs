@@ -69,6 +69,7 @@ public class PostgresChangesOptions
     /// </summary>
     [JsonPropertyName("filter")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [ImplementedCapability("realtime.subscriptions.postgres_changes_filter", "Filter is a hand-built PostgREST string (e.g. 'user_id=eq.{id}'), untied to the model.")]
     public string? Filter { get; set; }
 
     /// <summary>

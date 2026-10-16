@@ -100,6 +100,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_filters.eq")]
     public IPostgrestTable<TModel> Filter<TCriterion>(Expression<Func<TModel, object>> predicate, Operator op,
         TCriterion? criterion)
     {
@@ -179,6 +180,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_filters.not")]
+    [ImplementedCapability("database.using_filters.not_in", "Composed via the Not(column, Operator.In, list) overload.")]
     public IPostgrestTable<TModel> Not(IPostgrestQueryFilter filter)
     {
         this.filters.Add(new QueryFilter(Operator.Not, filter));
@@ -251,6 +254,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_filters.or")]
     public IPostgrestTable<TModel> Or(List<IPostgrestQueryFilter> filters)
     {
         this.filters.Add(new QueryFilter(Operator.Or, filters));
@@ -258,6 +262,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_filters.match")]
     public IPostgrestTable<TModel> Match(TModel model)
     {
         foreach (var kvp in model.PrimaryKey)
@@ -280,6 +285,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.order", "Capability at parity, but the primary Order(\"col\", ...) form is stringly-typed (breaks silently on a property rename).")]
     public IPostgrestTable<TModel> Order(Expression<Func<TModel, object>> predicate, Ordering ordering,
         NullPosition nullPosition = NullPosition.First)
     {
@@ -312,6 +318,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.range")]
     public IPostgrestTable<TModel> Range(int from)
     {
         this.rangeFrom = from;
@@ -327,6 +334,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.query.select")]
+    [PartialCapability("database.using_modifiers.relationship_embed", "Embeds expressible via PostgREST string syntax in Select(); no typed relationship builder (LINQ embed mapping is weak).")]
     public IPostgrestTable<TModel> Select(string columnQuery)
     {
         this.method = HttpMethod.Get;
@@ -348,6 +357,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_filters.eq")]
     public IPostgrestTable<TModel> Where(Expression<Func<TModel, bool>> predicate)
     {
         var visitor = new WhereExpressionVisitor();
@@ -370,6 +380,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.limit")]
     public IPostgrestTable<TModel> Limit(int limit, string? foreignTableName = null)
     {
         this.limit = limit;
@@ -379,6 +390,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.upsert")]
     public IPostgrestTable<TModel> OnConflict(string columnName)
     {
         this.onConflict = columnName;
@@ -425,6 +437,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.limit")]
     public IPostgrestTable<TModel> Offset(int offset, string? foreignTableName = null)
     {
         this.offset = offset;
@@ -434,6 +447,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.insert")]
     public Task<ModeledResponse<TModel>> Insert(TModel model, QueryOptions? options = null,
         CancellationToken cancellationToken = default) =>
         this.PerformInsert(model, options, cancellationToken);
@@ -446,6 +460,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.upsert")]
     public Task<ModeledResponse<TModel>> Upsert(TModel model, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
@@ -472,6 +487,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.update")]
     public IPostgrestTable<TModel> Set(Expression<Func<TModel, object>> keySelector, object? value)
     {
         var visitor = new SetExpressionVisitor();
@@ -515,6 +531,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.update")]
     public Task<ModeledResponse<TModel>> Update(QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
@@ -547,6 +564,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.delete")]
     public Task<ModeledResponse<TModel>> Delete(QueryOptions? options = null, CancellationToken cancellationToken = default)
     {
         options ??= new QueryOptions();
@@ -590,6 +608,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.single_row")]
     public async Task<TModel?> Single(CancellationToken cancellationToken = default)
     {
         this.method = HttpMethod.Get;
@@ -612,6 +631,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.request_cancellation", "Every terminal (Get/Insert/Update/Delete/Single/Count) accepts a CancellationToken.")]
     public Task<ModeledResponse<TModel>> Get(CancellationToken cancellationToken = default, CountType type = CountType.Estimated)
     {
         var attr = type.GetAttribute<MapToAttribute>();

@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Supabase.Core.Attributes;
 using Supabase.Gotrue.Mfa;
 
 #endregion
@@ -44,6 +45,7 @@ public class User
     public string? Id { get; set; }
 
     [JsonPropertyName("identities")]
+    [PartialCapability("auth.identities.list_identities", "No dedicated getUserIdentities method; linked identities are reachable only via the User.Identities property.")]
     public List<UserIdentity> Identities { get; set; } = new List<UserIdentity>();
 
     [JsonPropertyName("invited_at")]

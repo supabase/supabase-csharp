@@ -11,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using Supabase.Core;
+using Supabase.Core.Attributes;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Extensions;
 using Supabase.Core.Http;
@@ -44,6 +45,7 @@ public partial class Client : IFunctionsClient
     ///
     /// Headers specified in the method parameters will ALWAYS take precedence over headers returned by this function.
     /// </summary>
+    [PartialCapability("functions.invocation.set_auth_token", "No stateful SetAuth; bearer token is supplied per invocation or via a GetHeaders provider hook, not stored for all subsequent calls.")]
     public Func<Dictionary<string, string>>? GetHeaders { get; set; }
 
     /// <summary>The options this client was constructed with.</summary>
@@ -71,6 +73,7 @@ public partial class Client : IFunctionsClient
     /// <param name="options">Options</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [ImplementedCapability("functions.invocation.invoke", "Three return shapes — string, deserialized T, and raw HttpContent.")]
     public async Task<HttpContent> RawInvoke(
         string functionName,
         string? token = null,
@@ -92,6 +95,7 @@ public partial class Client : IFunctionsClient
     /// <param name="options">Invocation options.</param>
     /// <param name="cancellationToken">Cancels the request and error-body reads. Cancel successful body reads separately.</param>
     /// <returns>The response, which the caller must dispose.</returns>
+    [ImplementedCapability("functions.invocation.streaming_response", "InvokeStream returns response bodies for incremental reading.")]
     public Task<HttpResponseMessage> InvokeStream(
         string functionName,
         string? token = null,
@@ -107,6 +111,7 @@ public partial class Client : IFunctionsClient
     /// <param name="options">Options</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [ImplementedCapability("functions.invocation.invoke", "Three return shapes — string, deserialized T, and raw HttpContent.")]
     public async Task<string> Invoke(
         string functionName,
         string? token = null,

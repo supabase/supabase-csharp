@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Timers;
+using Supabase.Core.Attributes;
 using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Channel;
 using Supabase.Realtime.Exceptions;
@@ -99,6 +100,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// Returns the <see cref="IRealtimeBroadcast"/> instance.
     /// </summary>
     /// <returns></returns>
+    [ImplementedCapability("realtime.subscriptions.broadcast", "Typed broadcast payloads via generics; better-typed than JS on('broadcast', ...).")]
     public IRealtimeBroadcast? Broadcast() => this.broadcast;
 
     /// <summary>
@@ -200,6 +202,9 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="broadcastAck">instructs server to acknowledge that broadcast message was received</param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
+    [ImplementedCapability("realtime.presence.presence_key", "Set via Channel.Register<TPresence>(presenceKey).")]
+    [ImplementedCapability("realtime.subscriptions.broadcast", "Typed broadcast payloads via generics; better-typed than JS on('broadcast', ...).")]
+    [ImplementedCapability("realtime.subscriptions.postgres_changes", "Model-typed path via SupabaseTable.On (blessed) plus the low-level Channel().Register(PostgresChangesOptions).")]
     public RealtimeBroadcast<TBroadcastResponse> Register<TBroadcastResponse>(bool broadcastSelf = false,
         bool broadcastAck = false) where TBroadcastResponse : BaseBroadcast =>
         this.Register<TBroadcastResponse>(new BroadcastOptions(broadcastSelf, broadcastAck));
@@ -364,6 +369,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="listenType">The type of event this callback should process.</param>
     /// <param name="postgresChangeHandler"></param>
     [Obsolete("Favor OnPostgresChange instead.")]
+    [ImplementedCapability("realtime.subscriptions.postgres_changes", "Model-typed path via SupabaseTable.On (blessed) plus the low-level Channel().Register(PostgresChangesOptions).")]
     public void AddPostgresChangeHandler(ListenType listenType, PostgresChangesHandler postgresChangeHandler) => this.BindPostgresChangesHandler(listenType, postgresChangeHandler);
 
     /// <summary>
@@ -469,6 +475,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// Subscribes to the channel given supplied Options/params.
     /// </summary>
     /// <param name="timeoutMs"></param>
+    [ImplementedCapability("realtime.channel.subscribe")]
     public Task<IRealtimeChannel> Subscribe(int timeoutMs = DefaultTimeout)
     {
         var tsc = new TaskCompletionSource<IRealtimeChannel>();
@@ -533,6 +540,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <summary>
     /// Unsubscribes from the channel.
     /// </summary>
+    [ImplementedCapability("realtime.channel.unsubscribe")]
     public IRealtimeChannel Unsubscribe()
     {
         this.IsSubscribed = false;
@@ -556,6 +564,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="type"></param>
     /// <param name="payload"></param>
     /// <param name="timeoutMs"></param>
+    [ImplementedCapability("realtime.channel.broadcast")]
     public Push Push(string eventName, string? type = null, object? payload = null, int timeoutMs = DefaultTimeout)
     {
         if (!this.hasJoinedOnce)
@@ -580,6 +589,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="type"></param>
     /// <param name="payload"></param>
     /// <param name="timeoutMs"></param>
+    [ImplementedCapability("realtime.channel.broadcast")]
     public Task<bool> Send(ChannelEventName eventName, string? type, object payload, int timeoutMs = DefaultTimeout)
     {
         var push = this.Push(Core.Helpers.GetMappedToAttr(eventName).Mapping, type, payload, timeoutMs);

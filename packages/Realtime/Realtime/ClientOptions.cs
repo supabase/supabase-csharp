@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Supabase.Core.Attributes;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Realtime.Socket;
 using Supabase.Realtime.Sockets;
@@ -40,11 +41,13 @@ public class ClientOptions
     /// <summary>
     /// The interval to send a heartbeat message
     /// </summary>
+    [ImplementedCapability("realtime.configuration.heartbeat_interval")]
     public TimeSpan HeartbeatInterval { get; set; } = TimeSpan.FromSeconds(20);
 
     /// <summary>
     /// The interval to reconnect
     /// </summary>
+    [ImplementedCapability("realtime.configuration.reconnect_backoff")]
     public Func<int, TimeSpan> ReconnectAfterInterval { get; set; } = (tries) =>
     {
         var intervals = new[] { 30, 45, 60, 120 };

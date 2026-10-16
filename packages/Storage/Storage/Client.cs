@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Supabase.Core.Attributes;
 using Supabase.Storage.Interfaces;
 
 namespace Supabase.Storage;
@@ -16,6 +17,7 @@ public class Client : StorageBucketApi, IStorageClient<Bucket, FileObject>
     /// </summary>
     /// <param name="id">Bucket Id</param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.access_bucket")]
     public IStorageFileApi<FileObject> From(string id) =>
         new StorageFileApi(this.Url, id, this.Options, this.Headers, this.requestClient, this.uploadClient, this.downloadClient);
 }

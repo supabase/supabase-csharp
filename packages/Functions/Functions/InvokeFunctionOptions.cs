@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json.Serialization;
+using Supabase.Core.Attributes;
 
 namespace Supabase.Functions;
 
@@ -30,22 +31,26 @@ public partial class Client
         /// Timout value for HttpClient Requests, defaults to 100s.
         /// https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.timeout?view=net-8.0#remarks
         /// </summary>
+        [PartialCapability("functions.invocation.timeout", "Per-invoke HttpTimeout exists, but it is not composable with a caller-supplied cancellation signal (Invoke accepts no CancellationToken).")]
         public TimeSpan HttpTimeout { get; set; } = TimeSpan.FromSeconds(100);
 
         /// <summary>
         /// Http method of the Request
         /// </summary>
+        [ImplementedCapability("functions.invocation.method_override", "InvokeFunctionOptions.HttpMethod is wired into the request (default POST). [feature-parity.md called this POST-only; the source disagrees as of 2026-06-29.]")]
         public HttpMethod HttpMethod { get; set; } = HttpMethod.Post;
 
         /// <summary>
         /// Region of the request
         /// </summary>
+        [ImplementedCapability("functions.invocation.region_selection", "Full AWS region list; per-call override or client default; emits x-region.")]
         public FunctionRegion? FunctionRegion { get; set; } = null;
     }
 
     /// <summary>
     /// Define the region for requests
     /// </summary>
+    [ImplementedCapability("functions.invocation.region_selection", "Full AWS region list; per-call override or client default; emits x-region.")]
     public class FunctionRegion : IEquatable<FunctionRegion>
     {
         private readonly string region;
