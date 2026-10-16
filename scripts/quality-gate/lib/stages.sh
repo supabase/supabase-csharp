@@ -433,11 +433,12 @@ stage_coverage() {
 
 # ============================================================= 3  mutation
 # Opt-in (--mutation). Reads the report a separate CI job's `dotnet stryker` produced
-# and FAILs on a mutant left alive (Survived/NoCoverage) in a file this diff changed —
+# and FAILs on a mutant left alive (Survived/NoCoverage) on a line this diff changed —
 # "no new survivors". Never runs Stryker; run-fixtures.sh drives it with canned reports.
 # A missing report is SKIP (couldn't check ≠ passed), which makes --mutation exit 2.
 MUTATION_UNDETECTED='.status=="Survived" or .status=="NoCoverage"'
 _MUT_CHANGED=()
+_MUT_CHANGED_LINES=()
 
 _mutation_report() {  # GATE_MUTATION_REPORT override, then .mutationReport, then newest on disk
   if [[ -n "${GATE_MUTATION_REPORT:-}" ]]; then
@@ -455,6 +456,45 @@ _mutation_file_changed() {  # <path>
   local p="$1" c
   for c in "${_MUT_CHANGED[@]}"; do
     [[ "$c" == "$p" || "$c" == */"$p" || "$p" == */"$c" ]] && return 0
+  done
+  return 1
+}
+
+# Changed-line ranges per file, each entry "relpath\tstart\tend", mirroring the diff
+# sources of changed_cs_files: committed (base...HEAD), working tree (HEAD), and
+# untracked (whole file is new). --unified=0 so each hunk header's +c,d maps straight
+# to the new-file line range c..c+d-1; a pure deletion (d=0) contributes no new lines.
+_build_changed_line_ranges() {
+  _MUT_CHANGED_LINES=()
+  local root base entry
+  root="$(git -C "$SCOPE_DIR" rev-parse --show-toplevel 2>/dev/null)" || return 0
+  base="$(default_base_ref)"
+  local parse='
+    /^\+\+\+ /{ f=$2; sub(/^b\//,"",f); next }
+    /^@@ /{
+      m=$3; sub(/^\+/,"",m); n=split(m,p,",");
+      start=p[1]+0; len=(n>1)?p[2]+0:1;
+      if (len>0 && f!="/dev/null") print f"\t"start"\t"(start+len-1);
+    }'
+  while IFS= read -r entry; do [[ -n "$entry" ]] && _MUT_CHANGED_LINES+=("$entry"); done < <(
+    { [[ -n "$base" ]] && git -C "$root" diff --unified=0 --diff-filter=ACMR "$base"...HEAD -- '*.cs' 2>/dev/null
+      git -C "$root" diff --unified=0 --diff-filter=ACMR HEAD -- '*.cs' 2>/dev/null
+    } | awk "$parse"
+    git -C "$root" ls-files --others --exclude-standard -- '*.cs' 2>/dev/null \
+      | while IFS= read -r entry; do [[ -n "$entry" ]] && printf '%s\t1\t2147483647\n' "$entry"; done
+  )
+}
+
+# True if <report-path> has a changed-line range covering <line>. Same bidirectional
+# suffix match as _mutation_file_changed, since report paths and diff paths are rooted
+# differently across Stryker versions. Caller has already confirmed the file changed.
+_mutation_line_changed() {  # <report-path> <line>
+  local p="$1" ln="$2" entry ef rest es ee
+  [[ "$ln" =~ ^[0-9]+$ ]] || return 1
+  for entry in "${_MUT_CHANGED_LINES[@]}"; do
+    ef="${entry%%$'\t'*}"; rest="${entry#*$'\t'}"; es="${rest%%$'\t'*}"; ee="${rest##*$'\t'}"
+    [[ "$ef" == "$p" || "$ef" == */"$p" || "$p" == */"$ef" ]] || continue
+    (( ln >= es && ln <= ee )) && return 0
   done
   return 1
 }
@@ -477,6 +517,7 @@ stage_mutation() {
   root="$(git -C "$SCOPE_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
   _MUT_CHANGED=()
   [[ -n "$root" ]] && while IFS= read -r rel; do [[ -n "$rel" ]] && _MUT_CHANGED+=("$rel"); done < <(changed_cs_files)
+  _build_changed_line_ranges
 
   for i in "${!PKG_DIR[@]}"; do
     _use_pkg "$i"
@@ -499,6 +540,7 @@ stage_mutation() {
       [[ -n "$f" ]] || continue
       normf="$f"; [[ "$normf" == /* && -n "$root" ]] && normf="${normf#"$root"/}"
       _mutation_file_changed "$normf" || continue
+      _mutation_line_changed "$normf" "$line" || continue
       count=$((count + 1)); echo "$status  $normf:$line" >> "$log"
       [[ -z "$first" ]] && first="$normf:$line ($status)"
     done < <(jq -r ".files | to_entries[] | .key as \$f | .value.mutants[] | select($MUTATION_UNDETECTED) | \"\(\$f)\t\(.status)\t\(.location.start.line // 0)\"" "$report")
@@ -506,7 +548,7 @@ stage_mutation() {
     if [[ $count -gt 0 ]]; then
       add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" FAIL "$count new survivor(s) — first: $first" "$log"
     else
-      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" PASS "no survivors in changed code" "$report"
+      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" PASS "no survivors on changed lines" "$report"
     fi
   done
 }

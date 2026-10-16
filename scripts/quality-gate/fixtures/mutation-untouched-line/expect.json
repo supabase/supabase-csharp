@@ -1,0 +1,9 @@
+{
+  "description": "A survivor sits on line 5 (the pre-existing Add) of a file this diff only ADDED line 6 to. Stryker mutates the whole changed file, but the survivor is not on a changed line, so it's this file's existing debt — not this change's regression. The stage PASSes.",
+  "mode": "--mutation",
+  "exit": 0,
+  "verdict": "PASS",
+  "stages": [
+    { "id": "3", "status": "PASS" }
+  ]
+}

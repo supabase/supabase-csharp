@@ -236,6 +236,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Quality Gate", "Quality Gate", "{B7F880FB-DCBF-4EE7-82F3-C8D2127984F7}"
 	ProjectSection(SolutionItems) = preProject
 		scripts\quality-gate\gate.sh = scripts\quality-gate\gate.sh
+		scripts\quality-gate\README.md = scripts\quality-gate\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Public API", "Public API", "{77474E39-B8A1-46A4-BF35-C042DAFCAE4B}"

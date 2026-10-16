@@ -1,13 +1,5 @@
 name: Mutation
 
-# Separate from build-and-test on purpose: release.yml waits only on build-and-test, so
-# this never delays a release. It runs in parallel with build-and-test on the PR; making
-# it block a merge is a branch-protection choice (mark the `mutation` check required).
-#
-# `dotnet stryker --since:origin/master` mutates only the changed diff (hermetic — E2E is
-# filtered out in each stryker-config.json), then gate.sh --mutation fails on any new
-# survivor. Only changed packages are mutated, so an unchanged package costs nothing.
-
 on:
   pull_request:
     branches: [master]
