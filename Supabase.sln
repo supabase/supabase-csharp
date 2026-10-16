@@ -19,6 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{
 		.github\workflows\build-documentation.yaml = .github\workflows\build-documentation.yaml
 		.github\workflows\release.yml = .github\workflows\release.yml
 		.github\workflows\format-master.yml = .github\workflows\format-master.yml
+		.github\workflows\mutation.yml = .github\workflows\mutation.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Release-Please", "Release-Please", "{21D282EA-837A-4D3F-829B-F3C2043BC73A}"
