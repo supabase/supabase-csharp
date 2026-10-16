@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Supabase.Core.Attributes;
 
@@ -13,6 +14,7 @@ namespace Supabase.Core.Attributes;
 /// <see cref="ImplementedCapabilityAttribute" /> or
 /// <see cref="PartialCapabilityAttribute" />.
 /// </remarks>
+[ExcludeFromCodeCoverage]
 internal abstract class CapabilityAttribute : Attribute
 {
     /// <summary>
@@ -44,6 +46,7 @@ internal abstract class CapabilityAttribute : Attribute
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum |
     AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field,
     AllowMultiple = true)]
+[ExcludeFromCodeCoverage]
 internal sealed class ImplementedCapabilityAttribute : CapabilityAttribute
 {
     /// <param name="key">The capability-matrix feature id this member implements.</param>
@@ -66,6 +69,7 @@ internal sealed class ImplementedCapabilityAttribute : CapabilityAttribute
     AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum |
     AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field,
     AllowMultiple = true)]
+[ExcludeFromCodeCoverage]
 internal sealed class PartialCapabilityAttribute : CapabilityAttribute
 {
     /// <param name="key">The capability-matrix feature id this member partially implements.</param>
