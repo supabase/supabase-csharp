@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Supabase.Core.Attributes;
 using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Models;
@@ -20,6 +21,7 @@ namespace Supabase.Realtime;
 /// A common use-case is sharing a user's cursor position with other clients in an online game.
 /// </summary>
 /// <typeparam name="TBroadcastModel">A model representing expected payload.</typeparam>
+[ImplementedCapability("realtime.subscriptions.broadcast", "Typed broadcast payloads via generics; better-typed than JS on('broadcast', ...).")]
 public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroadcastModel : BaseBroadcast
 {
     private readonly RealtimeChannel channel;

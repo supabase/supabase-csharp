@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using Supabase.Core.Attributes;
 using Supabase.Core.Http;
 using static Supabase.Gotrue.Constants;
 
@@ -39,6 +40,7 @@ public class ClientOptions
     /// <summary>
     /// Should the Client automatically handle refreshing the User's Token?
     /// </summary>
+    [PartialCapability("auth.session.auto_refresh", "Refreshes on an internal background timer (ClientOptions.AutoRefreshToken), but does not expose JS's explicit startAutoRefresh/stopAutoRefresh control. Implicit-only.")]
     public bool AutoRefreshToken { get; set; } = true;
 
     /// <summary>

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Supabase.Core.Attributes;
 using static Supabase.Gotrue.Constants;
 
 namespace Supabase.Gotrue;
@@ -52,5 +53,6 @@ public class SignInOptions
     ///
     /// PKCE is recommended for mobile and server-side applications.
     /// </summary>
+    [PartialCapability("client.authentication_integration.oauth_flow_type", "Flow type (PKCE/Implicit) is chosen per sign-in via SignInOptions.FlowType, not as a single construction-time client setting.")]
     public OAuthFlowType FlowType { get; set; } = OAuthFlowType.Implicit;
 }

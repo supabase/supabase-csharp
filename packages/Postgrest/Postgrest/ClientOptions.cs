@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
+using Supabase.Core.Attributes;
 using Supabase.Core.Http;
 #pragma warning disable CS1591
 namespace Supabase.Postgrest;
@@ -13,6 +14,7 @@ namespace Supabase.Postgrest;
 /// </summary>
 public class ClientOptions
 {
+    [PartialCapability("database.query.schema_selection", "Schema is set once at construction (ClientOptions.Schema); no per-query schema switch like JS client.schema(name).")]
     public string Schema { get; set; } = "public";
 
     public readonly DateTimeStyles DateTimeStyles = DateTimeStyles.AdjustToUniversal;

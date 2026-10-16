@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core;
+using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Extensions;
@@ -73,6 +74,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// Retrieves the details of all Storage buckets within an existing product.
     /// </summary>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.list_file_buckets")]
     public Task<List<Bucket>?> ListBuckets() =>
          Helpers.MakeRequestAsync<List<Bucket>>(this.requestClient, this.Options.Retry, HttpMethod.Get, $"{this.Url}/bucket", null, this.Headers);
 
@@ -81,6 +83,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.get_bucket")]
     public async Task<Bucket?> GetBucket(string id)
     {
         try
@@ -103,6 +106,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// <param name="id"></param>
     /// <param name="options"></param>
     /// <returns>Bucket Id</returns>
+    [ImplementedCapability("storage.file_buckets.create_file_bucket")]
     public async Task<string> CreateBucket(string id, BucketUpsertOptions? options = null)
     {
         options ??= new BucketUpsertOptions();
@@ -127,6 +131,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// <param name="id"></param>
     /// <param name="options"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.update_bucket")]
     public async Task<Bucket?> UpdateBucket(string id, BucketUpsertOptions? options = null)
     {
         options ??= new BucketUpsertOptions();
@@ -149,6 +154,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.empty_bucket")]
     public Task<GenericResponse?> EmptyBucket(string id) =>
         Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Post, $"{this.Url}/bucket/{id}/empty", null, this.Headers);
 
@@ -158,6 +164,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.delete_file_bucket")]
     public Task<GenericResponse?> DeleteBucket(string id) =>
         Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Delete, $"{this.Url}/bucket/{id}", null, this.Headers);
 

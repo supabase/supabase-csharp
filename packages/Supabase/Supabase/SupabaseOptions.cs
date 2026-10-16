@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using Supabase.Core.Attributes;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Realtime.Sockets;
@@ -33,11 +34,14 @@ public class SupabaseOptions
     /// 
     /// **By default these do nothing for persistence.**
     /// </summary>
+    [ImplementedCapability("client.session_management.custom_storage")]
+    [PartialCapability("client.session_management.persist_session", "No boolean persist toggle; in-memory-only behavior is achievable only by supplying a no-op IGotrueSessionPersistence handler.")]
     public IGotrueSessionPersistence<Session> SessionHandler { get; set; } = new DefaultSupabaseSessionHandler();
 
     /// <summary>
     /// Allows developer to specify options that will be passed to all child Supabase clients.
     /// </summary>
+    [ImplementedCapability("client.request_configuration.global_headers")]
     public Dictionary<string, string> Headers = new();
 
     /// <summary>

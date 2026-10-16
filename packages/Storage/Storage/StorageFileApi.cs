@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using BirdMessenger.Collections;
+using Supabase.Core.Attributes;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Extensions;
 using Supabase.Storage.Interfaces;
@@ -139,6 +140,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="transformOptions"></param>
     /// <param name="downloadOptions"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.get_public_url", "Transform + download options present. Footgun: passing an empty TransformOptions() routes to the image-render endpoint instead of the plain object URL.")]
     public string GetPublicUrl(
         string path,
         TransformOptions? transformOptions,
@@ -173,6 +175,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="transformOptions"></param>
     /// <param name="downloadOptions"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.create_signed_url")]
     public async Task<string> CreateSignedUrl(
         string path,
         int expiresIn,
@@ -222,6 +225,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="expiresIn">The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.</param>
     /// <param name="downloadOptions"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.create_signed_urls")]
     public async Task<List<CreateSignedUrlsResponse>?> CreateSignedUrls(
         List<string> paths,
         int expiresIn,
@@ -266,6 +270,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="path"></param>
     /// <param name="options"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.list_files")]
     public async Task<List<FileObject>?> List(string path = "", SearchOptions? options = null)
     {
         options ??= new SearchOptions();
@@ -307,6 +312,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.file_info")]
     public async Task<FileObjectV2?> Info(string path)
     {
         var response = await Helpers.MakeRequestAsync<FileObjectV2>(
@@ -337,6 +343,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="inferContentType"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.upload", "File-path and byte[] overloads; onProgress + FileOptions (content-type, cache-control, upsert).")]
     public async Task<string> Upload(
         string localFilePath,
         string supabasePath,
@@ -415,6 +422,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="onProgress"></param>
     /// <param name="inferContentType"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.upload_with_signed_url")]
     public async Task<string> UploadToSignedUrl(
         string localFilePath,
         UploadSignedUrl signedUrl,
@@ -516,6 +524,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="options">HTTP headers.</param>
     /// <param name="onProgress"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.update_file")]
     public Task<string> Update(
         string localFilePath,
         string supabasePath,
@@ -555,6 +564,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="onProgress">An optional event handler for tracking and reporting upload progress as a percentage.</param>
     /// <param name="cancellationToken">Cancellation token to observe while waiting for the task to complete.</param>
     /// <returns>Returns a task that resolves to a string representing the URL or path of the uploaded file in the storage.</returns>
+    [ImplementedCapability("storage.file_buckets.upload", "File-path and byte[] overloads; onProgress + FileOptions (content-type, cache-control, upsert).")]
     public Task UploadOrResume(
         string localPath,
         string fileName,
@@ -602,6 +612,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="toPath">The target file path, including the new file name (e.g., `folder/image-copy.png`).</param>
     /// <param name="options">Optional parameters for specifying the destination bucket and other settings.</param>
     /// <returns>Returns a boolean value indicating whether the operation was successful.</returns>
+    [ImplementedCapability("storage.file_buckets.move")]
+    [ImplementedCapability("storage.file_buckets.move_cross_bucket")]
     public async Task<bool> Move(
         string fromPath,
         string toPath,
@@ -633,6 +645,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="toPath">The destination path for the copied file/object.</param>
     /// <param name="options">Optional parameters such as the destination bucket.</param>
     /// <returns>True if the copy operation was successful.</returns>
+    [ImplementedCapability("storage.file_buckets.copy")]
+    [ImplementedCapability("storage.file_buckets.copy_cross_bucket")]
     public async Task<bool> Copy(
         string fromPath,
         string toPath,
@@ -670,6 +684,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="cancellationToken"></param>
     /// <param name="cacheNonce"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.download")]
+    [ImplementedCapability("storage.file_buckets.download_with_transform", "Image transforms applied inline via the TransformOptions argument on Download/DownloadPublicFile.")]
     public Task<string> Download(
         string supabasePath,
         string localPath,
@@ -751,6 +767,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <param name="cancellationToken"></param>
     /// <param name="cacheNonce"></param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.download")]
     public Task<string> DownloadPublicFile(
         string supabasePath,
         string localPath,
@@ -790,6 +807,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// </summary>
     /// <param name="path">A path to delete, for example, `folder/image.png`.</param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.remove")]
     public async Task<FileObject?> Remove(string path)
     {
         var result = await this.Remove([path]);
@@ -821,6 +839,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// </summary>
     /// <param name="supabasePath">The file path, including the current file name. For example, `folder/image.png`.</param>
     /// <returns></returns>
+    [ImplementedCapability("storage.file_buckets.create_signed_upload_url")]
     public async Task<UploadSignedUrl> CreateUploadSignedUrl(string supabasePath)
     {
         var path = this.GetFinalPath(supabasePath);

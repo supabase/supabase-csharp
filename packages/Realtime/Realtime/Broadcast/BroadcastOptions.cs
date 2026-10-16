@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Supabase.Core.Attributes;
 
 namespace Supabase.Realtime.Broadcast;
 
@@ -12,12 +13,14 @@ public class BroadcastOptions
     /// self option enables client to receive message it broadcast
     /// </summary>
     [JsonPropertyName("self")]
+    [ImplementedCapability("realtime.subscriptions.broadcast_self")]
     public bool BroadcastSelf { get; set; } = false;
 
     /// <summary>
     /// ack option instructs server to acknowledge that broadcast message was received
     /// </summary>
     [JsonPropertyName("ack")]
+    [ImplementedCapability("realtime.subscriptions.broadcast_ack")]
     public bool BroadcastAck { get; set; } = false;
 
     /// <summary>
