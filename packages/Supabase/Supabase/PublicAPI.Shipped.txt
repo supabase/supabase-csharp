@@ -66,6 +66,8 @@ Supabase.SupabaseOptions.HttpClient.get -> System.Net.Http.HttpClient?
 Supabase.SupabaseOptions.HttpClient.set -> void
 Supabase.SupabaseOptions.PostgrestRetry.get -> Supabase.Core.Http.RetryOptions!
 Supabase.SupabaseOptions.PostgrestRetry.set -> void
+Supabase.SupabaseOptions.PostgrestTimeout.get -> System.TimeSpan?
+Supabase.SupabaseOptions.PostgrestTimeout.set -> void
 Supabase.SupabaseOptions.Proxy.get -> System.Net.IWebProxy?
 Supabase.SupabaseOptions.Proxy.set -> void
 Supabase.SupabaseOptions.RealtimeUrlFormat.get -> string!

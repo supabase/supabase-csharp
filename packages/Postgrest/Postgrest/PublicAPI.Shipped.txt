@@ -62,6 +62,8 @@ Supabase.Postgrest.ClientOptions.Schema.get -> string!
 Supabase.Postgrest.ClientOptions.Schema.set -> void
 Supabase.Postgrest.ClientOptions.SerializeEnumsAsStrings.get -> bool
 Supabase.Postgrest.ClientOptions.SerializeEnumsAsStrings.set -> void
+Supabase.Postgrest.ClientOptions.Timeout.get -> System.TimeSpan?
+Supabase.Postgrest.ClientOptions.Timeout.set -> void
 Supabase.Postgrest.Constants
 Supabase.Postgrest.Constants.CountType
 Supabase.Postgrest.Constants.CountType.Estimated = 2 -> Supabase.Postgrest.Constants.CountType
@@ -117,6 +119,7 @@ Supabase.Postgrest.Exceptions.FailureHint.Reason.UndefinedFunction = 6 -> Supaba
 Supabase.Postgrest.Exceptions.FailureHint.Reason.UndefinedTable = 5 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.UniquenessViolation = 3 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.Unknown = 0 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
+Supabase.Postgrest.Exceptions.FailureHint.Reason.UriTooLong = 8 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.PostgrestException
 Supabase.Postgrest.Exceptions.PostgrestException.AddReason() -> void
 Supabase.Postgrest.Exceptions.PostgrestException.Content.get -> string?
@@ -212,6 +215,7 @@ Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Select(string! columnQuery
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, System.Collections.Generic.KeyValuePair<object!, object?>>!>! keyValuePairExpression) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! keySelector, object? value) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Single(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel?>!
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.StripNulls() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.TableName.get -> string!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Update(Supabase.Postgrest.QueryOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.Responses.ModeledResponse<TModel!>!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Update(TModel! model, Supabase.Postgrest.QueryOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.Responses.ModeledResponse<TModel!>!>!
@@ -350,6 +354,7 @@ Supabase.Postgrest.Table<TModel>.Select(string! columnQuery) -> Supabase.Postgre
 Supabase.Postgrest.Table<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, System.Collections.Generic.KeyValuePair<object!, object?>>!>! keyValuePairExpression) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! keySelector, object? value) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Single(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel?>!
+Supabase.Postgrest.Table<TModel>.StripNulls() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Table(string! baseUrl, System.Text.Json.JsonSerializerOptions! serializerSettings, Supabase.Postgrest.ClientOptions? options = null) -> void
 Supabase.Postgrest.Table<TModel>.TableName.get -> string!
 Supabase.Postgrest.Table<TModel>.Update(Supabase.Postgrest.QueryOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.Responses.ModeledResponse<TModel!>!>!

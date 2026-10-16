@@ -27,6 +27,7 @@ Supabase.Functions.Client.InvokeStream(string! functionName, string? token = nul
 Supabase.Functions.Client.Options.get -> Supabase.Functions.ClientOptions!
 Supabase.Functions.Client.RawInvoke(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null) -> System.Threading.Tasks.Task<System.Net.Http.HttpContent!>!
 Supabase.Functions.Client.RawInvoke(string! functionName, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Net.Http.HttpContent!>!
+Supabase.Functions.Client.SetAuth(string! token) -> void
 Supabase.Functions.ClientOptions
 Supabase.Functions.ClientOptions.<Clone>$() -> Supabase.Functions.ClientOptions!
 Supabase.Functions.ClientOptions.ClientOptions() -> void
@@ -59,6 +60,7 @@ Supabase.Functions.Interfaces.IFunctionsClient.Invoke<T>(string! url, string? to
 Supabase.Functions.Interfaces.IFunctionsClient.InvokeStream(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Net.Http.HttpResponseMessage!>!
 Supabase.Functions.Interfaces.IFunctionsClient.RawInvoke(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null) -> System.Threading.Tasks.Task<System.Net.Http.HttpContent!>!
 Supabase.Functions.Interfaces.IFunctionsClient.RawInvoke(string! url, string? token = null, Supabase.Functions.Client.InvokeFunctionOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Net.Http.HttpContent!>!
+Supabase.Functions.Interfaces.IFunctionsClient.SetAuth(string! token) -> void
 Supabase.Functions.Responses.BaseResponse
 Supabase.Functions.Responses.BaseResponse.BaseResponse() -> void
 Supabase.Functions.Responses.BaseResponse.Content.get -> string?

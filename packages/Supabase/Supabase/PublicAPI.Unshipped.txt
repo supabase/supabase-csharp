@@ -1,3 +1,1 @@
 #nullable enable
-Supabase.SupabaseOptions.PostgrestTimeout.get -> System.TimeSpan?
-Supabase.SupabaseOptions.PostgrestTimeout.set -> void

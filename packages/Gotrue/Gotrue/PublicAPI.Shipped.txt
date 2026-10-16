@@ -216,6 +216,8 @@ Supabase.Gotrue.Client.SignInWithSSO(string! domain, Supabase.Gotrue.SignInWithS
 Supabase.Gotrue.Client.SignOut(Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Client.SignUp(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Client.SignUp(string! email, string! password, Supabase.Gotrue.SignUpOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
+Supabase.Gotrue.Client.StartAutoRefresh() -> void
+Supabase.Gotrue.Client.StopAutoRefresh() -> void
 Supabase.Gotrue.Client.TokenRefresh.get -> Supabase.Gotrue.TokenRefresh?
 Supabase.Gotrue.Client.Unenroll(Supabase.Gotrue.Mfa.MfaUnenrollParams! mfaUnenrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaUnenrollResponse?>!
 Supabase.Gotrue.Client.UnlinkIdentity(Supabase.Gotrue.UserIdentity! userIdentity) -> System.Threading.Tasks.Task<bool>!
@@ -482,6 +484,8 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithSSO(string! 
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignOut(Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignUp(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignUp(string! email, string! password, Supabase.Gotrue.SignUpOptions? options = null) -> System.Threading.Tasks.Task<TSession?>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.StartAutoRefresh() -> void
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.StopAutoRefresh() -> void
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Unenroll(Supabase.Gotrue.Mfa.MfaUnenrollParams! mfaUnenrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaUnenrollResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.UnlinkIdentity(Supabase.Gotrue.UserIdentity! userIdentity) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Update(Supabase.Gotrue.UserAttributes! attributes) -> System.Threading.Tasks.Task<TUser?>!
