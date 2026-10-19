@@ -29,7 +29,7 @@ public class UtilTests
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldReportDotnetRuntime() =>
-        Util.GetAssemblyVersion(typeof(Util)).Should().Contain("; runtime=dotnet");
+        HeaderWith(NoFrameworks).Should().Contain("; runtime=dotnet");
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldReportRuntimeVersion() =>
@@ -47,6 +47,42 @@ public class UtilTests
         {
             result.Should().NotMatchRegex(@"=\s*;", "every metadata key must carry a value");
             result.Should().NotMatchRegex(@"=$", "the header must not end on an empty value");
+        }
+    }
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldNotAllocate_GivenRepeatedCalls()
+    {
+        _ = Util.GetAssemblyVersion(typeof(Util));
+        var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+        _ = Util.GetAssemblyVersion(typeof(Util));
+        (GC.GetAllocatedBytesForCurrentThread() - allocatedBefore).Should().Be(0,
+            "the header is sent with every request, and rebuilding it reflects over every loaded assembly (#523)");
+    }
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldReuseHostMetadata_GivenAnotherClientType()
+    {
+        _ = Util.GetAssemblyVersion(typeof(Util));
+        var allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+        _ = Util.GetAssemblyVersion(typeof(Util), RuntimeInformation.OSDescription, RuntimeInformation.IsOSPlatform, AppDomain.CurrentDomain.GetAssemblies());
+        var fullBuildBytes = GC.GetAllocatedBytesForCurrentThread() - allocatedBefore;
+        // No other test asks for the MSTest assembly's header, so this call misses the per-type cache.
+        allocatedBefore = GC.GetAllocatedBytesForCurrentThread();
+        _ = Util.GetAssemblyVersion(typeof(Assert));
+        (GC.GetAllocatedBytesForCurrentThread() - allocatedBefore).Should().BeLessThan(fullBuildBytes / 4,
+            "a full build allocates {0} bytes, nearly all of it for host metadata that does not depend on the client type and is built once per process (#523)",
+            fullBuildBytes);
+    }
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldNameEachClient_GivenClientsFromDifferentAssemblies()
+    {
+        using (new AssertionScope())
+        {
+            Util.GetAssemblyVersion(typeof(Util)).Should().StartWith("supabase.core-csharp/");
+            Util.GetAssemblyVersion(typeof(UtilTests)).Should().StartWith("core.tests-csharp/",
+                "the header is reused per client type, so each client assembly still reports its own name");
         }
     }
 
