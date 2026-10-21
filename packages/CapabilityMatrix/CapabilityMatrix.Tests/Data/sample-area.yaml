@@ -1,0 +1,14 @@
+area: auth
+title: Authentication
+groups:
+  - id: sign_in
+    title: Sign-in
+  - id: session
+    title: Session
+features:
+  - id: auth.sign_in.sign_up
+    group: sign_in
+  - id: auth.sign_in.sign_in_with_password
+    group: sign_in
+  - id: auth.session.get_user
+    group: session

@@ -1,0 +1,13 @@
+using Supabase.Core.Attributes;
+
+namespace Supabase.Gotrue
+{
+    public class Client
+    {
+        [ImplementedCapability("auth.sign_in.sign_up")]
+        public void SignUp() { }
+
+        [ImplementedCapability("auth.session.get_user")]
+        public string CurrentUser => "";
+    }
+}

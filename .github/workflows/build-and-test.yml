@@ -71,3 +71,30 @@ jobs:
           body: |
             Refreshes the quality-gate baseline after a merge to master.
 
+  # Validates the in-code capability annotations against the canonical matrix spec:
+  # catches a mistyped feature key or a feature reported with conflicting statuses.
+  capability-matrix:
+    name: Validate capability annotations
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout capability spec
+        uses: actions/checkout@v4
+        with:
+          repository: supabase/sdk
+          path: _sdk-spec
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Validate annotations against the canonical spec
+        run: |
+          dotnet run --project packages/CapabilityMatrix/CapabilityMatrix/CapabilityMatrix.csproj -- \
+            validate --root . --spec _sdk-spec/packages/capability-matrix/capabilities
+

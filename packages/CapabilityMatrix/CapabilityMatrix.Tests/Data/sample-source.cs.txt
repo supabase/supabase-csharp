@@ -1,0 +1,45 @@
+using Supabase.Core.Attributes;
+
+namespace Supabase.Gotrue
+{
+    [ImplementedCapability("realtime.subscriptions.broadcast")]
+    public class RealtimeBroadcast { }
+
+    public class Client
+    {
+        public Client() { }
+
+        [PartialCapability("auth.sign_in.sign_up", "Session not adopted on a confirmations-off sign-up.")]
+        public void SignUp() { }
+
+        [ImplementedCapability("auth.session.get_user")]
+        public string CurrentUser => "";
+
+        [ImplementedCapability("client.authentication_integration.cross_client_token_sync", "Injected into sub-clients via a shared callback.")]
+        internal string GetAuthHeaders() => "";
+
+        [Supabase.Core.Attributes.ImplementedCapability(key: "functions.invocation.invoke", note: "Three return shapes.")]
+        public void Invoke() { }
+    }
+
+    public class Options
+    {
+        [ImplementedCapability("client.request_configuration.global_headers")]
+        public string Headers = "";
+    }
+
+    public interface IRealtimeClient
+    {
+        [ImplementedCapability("realtime.client.connect")]
+        void Connect();
+    }
+
+    public static class Constants
+    {
+        public enum Operator
+        {
+            [ImplementedCapability("database.using_filters.eq")]
+            Equals,
+        }
+    }
+}

@@ -28,4 +28,8 @@
     <ProjectReference Include="..\CapabilityMatrix\CapabilityMatrix.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Data\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
