@@ -12,10 +12,7 @@ concurrency:
 
 jobs:
   sync:
-    if: >-
-      !startsWith(github.event.head_commit.message, 'chore(capability-matrix)') &&
-      !startsWith(github.event.head_commit.message, 'chore(format)') &&
-      !startsWith(github.event.head_commit.message, 'chore(quality-gate)')
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore(') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
