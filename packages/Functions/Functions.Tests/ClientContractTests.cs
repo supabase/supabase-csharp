@@ -198,6 +198,20 @@ public class ClientContractTests
     }
 
     [TestMethod]
+    public async Task Invoke_ShouldSendTheCurrentToken_GivenReusedOptions()
+    {
+        var token = "first-token";
+        this.client.GetHeaders = () => new Dictionary<string, string> { { "Authorization", $"Bearer {token}" } };
+        this.RespondWith(200, "ok");
+        var options = new InvokeFunctionOptions();
+        await this.client.Invoke(FunctionName, options: options);
+        token = "refreshed-token";
+        this.server.ResetLogEntries();
+        await this.client.Invoke(FunctionName, options: options);
+        this.HeaderOf("Authorization").Should().Be("Bearer refreshed-token", "the Supabase client refreshes the token behind GetHeaders");
+    }
+
+    [TestMethod]
     public async Task Invoke_ShouldSendOptionContentType_GivenLowercaseHeaderName()
     {
         this.RespondWith(200, "ok");

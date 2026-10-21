@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
+using Supabase.Realtime.Channel;
 using Supabase.Realtime.Exceptions;
 using static Supabase.Realtime.Constants;
 
@@ -44,5 +45,16 @@ public class ChannelLifecycleTests
         channel.Unsubscribe();
         states.Should().ContainInOrder(ChannelState.Leaving, ChannelState.Closed);
         channel.IsClosed.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public void LeavePush_ShouldCarryTheJoinRef_GivenASentJoin()
+    {
+        var channel = Wire.Channel();
+        channel.JoinPush = channel.GenerateJoinPush();
+        channel.JoinPush.Send();
+        var leave = new Push(channel.Socket, channel, ChannelEventLeave);
+        leave.Send();
+        leave.Message!.JoinRef.Should().Be(channel.JoinPush.Ref, "Realtime ignores a phx_leave without the join ref (issue #125)");
     }
 }

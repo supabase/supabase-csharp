@@ -474,7 +474,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     public Task<ModeledResponse<TModel>> Upsert(TModel model, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        options ??= new QueryOptions();
+        options = options?.Clone() ?? new QueryOptions();
 
         // Enforce Upsert
         options.Upsert = true;
@@ -487,7 +487,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     public Task<ModeledResponse<TModel>> Upsert(ICollection<TModel> model, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        options ??= new QueryOptions();
+        options = options?.Clone() ?? new QueryOptions();
 
         // Enforce Upsert
         options.Upsert = true;

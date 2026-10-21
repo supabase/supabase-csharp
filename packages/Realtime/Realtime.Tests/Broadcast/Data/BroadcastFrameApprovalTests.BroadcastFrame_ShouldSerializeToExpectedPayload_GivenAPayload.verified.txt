@@ -1,1 +1,1 @@
-﻿{"type":"cursor-move","topic":"realtime:room:1","event":"broadcast","payload":{"x":12,"y":34},"ref":"1"}
+﻿{"type":"cursor-move","topic":"realtime:room:1","event":"broadcast","payload":{"x":12,"y":34},"ref":"1","join_ref":"1"}

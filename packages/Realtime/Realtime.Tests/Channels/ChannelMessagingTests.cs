@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -49,6 +50,24 @@ public class ChannelMessagingTests
         await channel.Subscribe();
         channel.Unsubscribe();
         Assert.IsTrue(await tsc.Task);
+    }
+
+    [TestMethod]
+    public async Task Unsubscribe_ShouldStopPostgresChanges()
+    {
+        var changedAfterLeave = false;
+        var watcherSawInsert = new TaskCompletionSource<bool>();
+        var channel = this.socketClient.Channel("realtime", "public", "todos");
+        channel.OnPostgresChange((_, _) => changedAfterLeave = true, ListenType.Inserts, new PostgresChangesFilter { Table = "todos" });
+        var watcher = this.socketClient.Channel("todos-watcher");
+        watcher.OnPostgresChange((_, _) => watcherSawInsert.TrySetResult(true), ListenType.Inserts, new PostgresChangesFilter { Table = "todos" });
+        await channel.Subscribe();
+        await watcher.Subscribe();
+        channel.Unsubscribe();
+        await this.restClient.Table<Todo>().Insert(new Todo { UserId = 1 });
+        await watcherSawInsert.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        await Task.Delay(500);
+        Assert.IsFalse(changedAfterLeave, "the server must stop sending changes after Unsubscribe (issue #125)");
     }
 
     [TestMethod]

@@ -176,23 +176,20 @@ public partial class Client : IFunctionsClient
     {
         options ??= new InvokeFunctionOptions();
 
-        if (this.GetHeaders != null)
-        {
-            options.Headers = this.GetHeaders().MergeLeft(options.Headers);
-        }
+        var headers = (this.GetHeaders?.Invoke() ?? new Dictionary<string, string>()).MergeLeft(options.Headers);
 
         token ??= this.token;
         if (!string.IsNullOrEmpty(token))
         {
-            options.Headers["Authorization"] = $"Bearer {token}";
+            headers["Authorization"] = $"Bearer {token}";
         }
 
-        options.Headers["X-Client-Info"] = Util.GetAssemblyVersion(typeof(Client));
+        headers["X-Client-Info"] = Util.GetAssemblyVersion(typeof(Client));
 
         var region = options.FunctionRegion ?? this.region;
         if (region != FunctionRegion.Any)
         {
-            options.Headers["x-region"] = region.ToString();
+            headers["x-region"] = region.ToString();
         }
 
         var uri = BuildUri(url);
@@ -207,7 +204,7 @@ public partial class Client : IFunctionsClient
 
         try
         {
-            var response = await RetryExecutor.SendAsync(this.httpClient, () => BuildRequestMessage(options, uri), this.Options.Retry, completionOption, linkedCts.Token);
+            var response = await RetryExecutor.SendAsync(this.httpClient, () => BuildRequestMessage(options, headers, uri), this.Options.Retry, completionOption, linkedCts.Token).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             var isRelayError = response.Headers.Contains("x-relay-error");
             activity.SetHttpResponseTags(statusCode.Value);
@@ -293,12 +290,12 @@ public partial class Client : IFunctionsClient
         return builder.Uri;
     }
 
-    private static HttpRequestMessage BuildRequestMessage(InvokeFunctionOptions options, Uri uri)
+    private static HttpRequestMessage BuildRequestMessage(InvokeFunctionOptions options, Dictionary<string, string> headers, Uri uri)
     {
         var content = new StringContent(JsonSerializer.Serialize(options.Body, SerializerOptions), Encoding.UTF8, "application/json");
         var request = new HttpRequestMessage(options.HttpMethod, uri) { Content = content };
 
-        foreach (var kvp in options.Headers)
+        foreach (var kvp in headers)
         {
             if (string.Equals(kvp.Key, "Content-Type", StringComparison.OrdinalIgnoreCase))
             {

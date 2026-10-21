@@ -1,8 +1,8 @@
-﻿using Supabase.Realtime.Interfaces;
-using Supabase.Realtime.Socket;
 using System;
 using System.Collections.Generic;
 using System.Timers;
+using Supabase.Realtime.Interfaces;
+using Supabase.Realtime.Socket;
 
 namespace Supabase.Realtime.Channel;
 
@@ -61,7 +61,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     private readonly Timer _timer;
 
     private readonly IRealtimeSocket _socket;
-        
+
     /// <summary>
     /// Handlers for notifications of message events.
     /// </summary>
@@ -79,17 +79,17 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     public Push(IRealtimeSocket socket, RealtimeChannel channel, string eventName, string? type = null,
         object? payload = null, int timeoutMs = Constants.DefaultTimeout)
     {
-        _socket = socket;
-        _timeoutMs = timeoutMs;
-        _timer = new Timer(_timeoutMs);
-        _timer.Elapsed += HandleTimeoutElapsed;
-            
-        Channel = channel;
-        Type = type;
-        EventName = eventName;
-        Payload = payload;
+        this._socket = socket;
+        this._timeoutMs = timeoutMs;
+        this._timer = new Timer(this._timeoutMs);
+        this._timer.Elapsed += this.HandleTimeoutElapsed;
 
-        socket.AddMessageReceivedHandler(HandleSocketMessageReceived);
+        this.Channel = channel;
+        this.Type = type;
+        this.EventName = eventName;
+        this.Payload = payload;
+
+        socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
     }
 
     /// <summary>
@@ -99,11 +99,11 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     public void Resend(int timeoutMs = Constants.DefaultTimeout)
     {
         this._timer.Interval = timeoutMs;
-        Ref = null;
-        _msgRefEvent = null;
+        this.Ref = null;
+        this._msgRefEvent = null;
 
-        IsSent = false;
-        Send();
+        this.IsSent = false;
+        this.Send();
     }
 
     /// <summary>
@@ -111,20 +111,20 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// </summary>
     public void Send()
     {
-        StartTimeout();
-        IsSent = true;
+        this.StartTimeout();
+        this.IsSent = true;
 
-        Message = new SocketRequest
+        this.Message = new SocketRequest
         {
-            Topic = Channel.Topic,
-            Type = Type,
-            Event = EventName,
-            Payload = Payload,
-            Ref = Ref,
-            JoinRef = EventName == Constants.ChannelEventJoin ? Ref : null,
+            Topic = this.Channel.Topic,
+            Type = this.Type,
+            Event = this.EventName,
+            Payload = this.Payload,
+            Ref = this.Ref,
+            JoinRef = this.Channel.JoinPush?.Ref,
         };
-            
-        _socket.Push(Message);
+
+        this._socket.Push(this.Message);
     }
 
     /// <summary>
@@ -132,10 +132,10 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// </summary>
     internal void StartTimeout()
     {
-        _timer.Stop();
-        _timer.Start();
-        Ref = _socket.MakeMsgRef();
-        _msgRefEvent = _socket.ReplyEventName(Ref);
+        this._timer.Stop();
+        this._timer.Start();
+        this.Ref = this._socket.MakeMsgRef();
+        this._msgRefEvent = this._socket.ReplyEventName(this.Ref);
     }
 
     /// <summary>
@@ -150,56 +150,56 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
         // the message was used to stop timeout handler
         // All tests still work on version before 2.34.21
         var isPresenceDiff = message is { Event: Constants.EventType.PresenceDiff };
-        if (!isPresenceDiff && message.Ref != Ref) return; 
+        if (!isPresenceDiff && message.Ref != this.Ref) return;
 
-        CancelTimeout();
-        Response = message;
-        NotifyMessageReceived(message);
+        this.CancelTimeout();
+        this.Response = message;
+        this.NotifyMessageReceived(message);
 
-        sender.RemoveMessageReceivedHandler(HandleSocketMessageReceived);
+        sender.RemoveMessageReceivedHandler(this.HandleSocketMessageReceived);
     }
-        
+
     /// <summary>
     /// Adds a listener to be notified when a message is received.
     /// </summary>
     /// <param name="handler"></param>
     public void AddMessageReceivedHandler(IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler handler)
     {
-        if (_messageEventHandlers.Contains(handler))
+        if (this._messageEventHandlers.Contains(handler))
             return;
 
-        _messageEventHandlers.Add(handler);
+        this._messageEventHandlers.Add(handler);
     }
-        
+
     /// <summary>
     /// Removes a specified listener from messages received.
     /// </summary>
     /// <param name="handler"></param>
     public void RemoveMessageReceivedHandler(IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler handler)
     {
-        if (!_messageEventHandlers.Contains(handler))
+        if (!this._messageEventHandlers.Contains(handler))
             return;
 
-        _messageEventHandlers.Remove(handler);
+        this._messageEventHandlers.Remove(handler);
     }
-        
+
     /// <summary>
     /// Notifies all listeners that the socket has received a message
     /// </summary>
     /// <param name="messageResponse"></param>
     private void NotifyMessageReceived(SocketResponse messageResponse)
     {
-        foreach (var handler in _messageEventHandlers.ToArray())
+        foreach (var handler in this._messageEventHandlers.ToArray())
             handler.Invoke(this, messageResponse);
     }
-        
+
     /// <summary>
     /// Clears all of the listeners from receiving event state changes.
     /// </summary>
     public void ClearMessageReceivedHandler() =>
-        _messageEventHandlers.Clear();
+        this._messageEventHandlers.Clear();
 
     private void HandleTimeoutElapsed(object sender, ElapsedEventArgs e) => OnTimeout?.Invoke(this, null);
 
-    private void CancelTimeout() => _timer.Stop();
+    private void CancelTimeout() => this._timer.Stop();
 }

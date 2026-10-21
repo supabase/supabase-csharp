@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
@@ -140,9 +141,24 @@ namespace Supabase.Postgrest.Requests
         }
 
         /// <summary>
+        /// Loads the remote models in the background. Nothing awaits this, so a failure is logged instead of thrown.
+        /// </summary>
+        internal async Task InvokeAsync()
+        {
+            try
+            {
+                await this.LoadRemoteAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Instance.Log(this, ex.Message, ex as PostgrestException);
+            }
+        }
+
+        /// <summary>
         /// Invokes the stored <see cref="_remoteRequestAction"/>
         /// </summary>
-        internal async void Invoke()
+        private async Task LoadRemoteAsync()
         {
             var result = await _remoteRequestAction.Invoke();
             await Cache(result);

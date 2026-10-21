@@ -37,7 +37,7 @@ public class TableWithCache<T> : Table<T>, IPostgrestTableWithCache<T> where T :
         var cacheModel = new CacheBackedRequest<T>(this, this.CacheProvider, action);
         await cacheModel.TryLoadFromCache();
 
-        cacheModel.Invoke();
+        _ = cacheModel.InvokeAsync();
 
         return cacheModel;
     }

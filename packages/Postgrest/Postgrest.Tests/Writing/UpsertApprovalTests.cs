@@ -1,7 +1,10 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Postgrest.Tests.Models;
 using Postgrest.Tests.Support;
+using Supabase.Postgrest;
 
 namespace Postgrest.Tests.Writing;
 
@@ -27,5 +30,19 @@ public class UpsertApprovalTests : RequestApprovalFixture
         await this.Client.Table<KitchenSink>().OnConflict("unique_value")
             .Upsert(new KitchenSink { UniqueValue = "unique", StringValue = "text" });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
+
+    [TestMethod]
+    public async Task Upsert_ShouldLeaveOptionsUnchanged_GivenReusedOptions()
+    {
+        var options = new QueryOptions { DuplicateResolution = QueryOptions.DuplicateResolutionType.IgnoreDuplicates };
+        var todo = new Todo { Id = 7, Name = "walk the dog" };
+        await this.Client.Table<Todo>().Upsert(todo, options);
+        await this.Client.Table<Todo>().Upsert(new List<Todo> { todo }, options);
+        await this.Client.Table<Todo>().Insert(todo, options);
+        this.EmittedPreferHeaders.Should().Equal(
+            "resolution=ignore-duplicates,return=representation",
+            "resolution=ignore-duplicates,return=representation",
+            "return=representation");
     }
 }
