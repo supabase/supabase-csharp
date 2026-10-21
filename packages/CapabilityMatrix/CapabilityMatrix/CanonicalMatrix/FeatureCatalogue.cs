@@ -29,6 +29,9 @@ public sealed class FeatureCatalogue
 
     public bool Knows(string featureKey) => this.knownKeys.Contains(featureKey);
 
+    /// <summary>How many features the matrix defines in total, across every area.</summary>
+    public int FeatureCount => this.knownKeys.Count;
+
     public static FeatureCatalogue From(IEnumerable<string> areaDocuments)
     {
         var yaml = new DeserializerBuilder()

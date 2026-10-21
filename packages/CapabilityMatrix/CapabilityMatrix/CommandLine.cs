@@ -34,7 +34,7 @@ public static class CommandLine
             return command switch
             {
                 "generate" => Generate(options, output, error),
-                "validate" => Validate(options, error),
+                "validate" => Validate(options, output, error),
                 _ => Unknown(command, error),
             };
         }
@@ -63,17 +63,44 @@ public static class CommandLine
         return ExitCode.Success;
     }
 
-    private static ExitCode Validate(Options options, TextWriter error) =>
-        options.Spec is null
-            ? MissingSpec("validate", error)
-            : Report(DeclarationReview.Of(DeclarationsUnder(options.Root), CatalogueFrom(options.Spec)), error);
+    private static ExitCode Validate(Options options, TextWriter output, TextWriter error)
+    {
+        if (options.Spec is null)
+            return MissingSpec("validate", error);
+
+        var declarations = DeclarationsUnder(options.Root);
+        var catalogue = CatalogueFrom(options.Spec);
+
+        var problems = DeclarationReview.Of(declarations, catalogue);
+        if (problems.Count > 0)
+            return Report(problems, error);
+
+        output.WriteLine(Summary(declarations, catalogue));
+        output.WriteLine(
+            "Every feature id is known to the matrix, no feature mixes statuses, " +
+            "and every non-public declaration carries a note.");
+        return ExitCode.Success;
+    }
+
+    private static string Summary(IReadOnlyList<DeclaredCapability> declarations, FeatureCatalogue catalogue)
+    {
+        var features = declarations.Select(declaration => declaration.FeatureKey).Distinct(StringComparer.Ordinal).Count();
+        var symbols = declarations.Select(declaration => declaration.Symbol).Distinct(StringComparer.Ordinal).Count();
+        return $"Validated {Count(declarations.Count, "capability annotation")} on {Count(symbols, "symbol")}, " +
+               $"covering {features} of {catalogue.FeatureCount} matrix features.";
+    }
 
     private static ExitCode Report(IReadOnlyList<DeclarationProblem> problems, TextWriter error)
     {
+        if (problems.Count > 0)
+            error.WriteLine($"{Count(problems.Count, "problem")} in the capability annotations:");
         foreach (var problem in problems)
-            error.WriteLine(problem.Message);
+            error.WriteLine($"  - {problem.Message}");
         return problems.Count == 0 ? ExitCode.Success : ExitCode.ProblemsFound;
     }
+
+    private static string Count(int number, string noun) =>
+        $"{number} {noun}{(number == 1 ? "" : "s")}";
 
     private static IReadOnlyList<DeclaredCapability> DeclarationsUnder(string root)
     {

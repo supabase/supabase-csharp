@@ -48,4 +48,22 @@ public class CommandLineTests
         using var repository = SampleRepository.Drifted();
         Run("validate", "--root", repository.Root, "--spec", repository.Spec).Should().Be(ExitCode.ProblemsFound);
     }
+
+    [TestMethod]
+    public void Run_ShouldSummariseWhatItChecked_GivenValidateOnACleanRepository()
+    {
+        using var repository = SampleRepository.Create();
+        var output = new StringWriter();
+        CommandLine.Run(["validate", "--root", repository.Root, "--spec", repository.Spec], output, TextWriter.Null);
+        output.ToString().Should().Contain("Validated").And.Contain("matrix features");
+    }
+
+    [TestMethod]
+    public void Run_ShouldReportEachProblem_GivenValidateOnADriftedRepository()
+    {
+        using var repository = SampleRepository.Drifted();
+        var error = new StringWriter();
+        CommandLine.Run(["validate", "--root", repository.Root, "--spec", repository.Spec], TextWriter.Null, error);
+        error.ToString().Should().Contain("in the capability annotations:");
+    }
 }
