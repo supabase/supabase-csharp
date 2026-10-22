@@ -1,18 +1,28 @@
 sdk: csharp
 features:
 
-  # ── Auth ───────────────────────────────────────────────────────────────────
+  # ── Authentication ─────────────────────────────────────────────────────────
 
-  auth.sign_in.sign_up:
-    status: partially_implemented
-    note: "API mirrors signUp, but on a session-returning sign-up (confirmations off) C# does NOT adopt the session — CurrentUser/CurrentSession stay null, so 'signed up' != 'signed in' as in JS."
-    symbols:
-      - Client.SignUp
-  auth.sign_in.sign_in_with_password:
+  auth.sign_in.exchange_code_for_session:
     status: implemented
     symbols:
-      - Client.SignInWithPassword
-      - Client.SignIn
+      - Client.ExchangeCodeForSession
+  auth.sign_in.reauthenticate:
+    status: implemented
+    symbols:
+      - Client.Reauthenticate
+  auth.sign_in.send_password_reset_email:
+    status: implemented
+    symbols:
+      - Client.ResetPasswordForEmail
+  auth.sign_in.sign_in_anonymously:
+    status: implemented
+    symbols:
+      - Client.SignInAnonymously
+  auth.sign_in.sign_in_with_id_token:
+    status: implemented
+    symbols:
+      - Client.SignInWithIdToken
   auth.sign_in.sign_in_with_oauth:
     status: implemented
     symbols:
@@ -21,49 +31,44 @@ features:
   auth.sign_in.sign_in_with_otp:
     status: implemented
     symbols:
-      - Client.SignInWithOtp
       - Client.SendMagicLink
+      - Client.SignInWithOtp
+  auth.sign_in.sign_in_with_password:
+    status: implemented
+    symbols:
+      - Client.SignIn
+      - Client.SignInWithPassword
   auth.sign_in.sign_in_with_sso:
     status: implemented
     symbols:
       - Client.SignInWithSSO
-  auth.sign_in.sign_in_with_id_token:
-    status: implemented
+  auth.sign_in.sign_up:
+    status: partially_implemented
+    note: "API mirrors signUp, but on a session-returning sign-up (confirmations off) C# does NOT adopt the session — CurrentUser/CurrentSession stay null, so 'signed up' != 'signed in' as in JS."
     symbols:
-      - Client.SignInWithIdToken
-  auth.sign_in.sign_in_anonymously:
-    status: implemented
-    symbols:
-      - Client.SignInAnonymously
+      - Client.SignUp
   auth.sign_in.verify_otp:
     status: implemented
     symbols:
       - Client.VerifyOTP
       - Client.VerifyTokenHash
-  auth.sign_in.send_password_reset_email:
-    status: implemented
-    symbols:
-      - Client.ResetPasswordForEmail
-  auth.sign_in.reauthenticate:
-    status: implemented
-    symbols:
-      - Client.Reauthenticate
-  auth.sign_in.exchange_code_for_session:
-    status: implemented
-    symbols:
-      - Client.ExchangeCodeForSession
 
+  auth.session.auto_refresh:
+    status: partially_implemented
+    note: "Refreshes on an internal background timer (ClientOptions.AutoRefreshToken), but does not expose JS's explicit startAutoRefresh/stopAutoRefresh control. Implicit-only."
+    symbols:
+      - ClientOptions.AutoRefreshToken
   auth.session.get_session:
     status: implemented
     symbols:
-      - Client.RetrieveSessionAsync
       - Client.CurrentSession
       - Client.LoadSession
+      - Client.RetrieveSessionAsync
   auth.session.get_user:
     status: implemented
     symbols:
-      - Client.GetUser
       - Client.CurrentUser
+      - Client.GetUser
   auth.session.refresh_session:
     status: implemented
     symbols:
@@ -81,58 +86,56 @@ features:
     status: implemented
     symbols:
       - Client.AddStateChangedListener
-      - Client.RemoveStateChangedListener
       - Client.NotifyAuthStateChange
+      - Client.RemoveStateChangedListener
   auth.session.update_user:
     status: implemented
     symbols:
       - Client.Update
-  auth.session.auto_refresh:
-    status: partially_implemented
-    note: "Refreshes on an internal background timer (ClientOptions.AutoRefreshToken), but does not expose JS's explicit startAutoRefresh/stopAutoRefresh control. Implicit-only."
-    symbols:
-      - ClientOptions.AutoRefreshToken
+
   auth.identities.link_identity:
     status: implemented
     symbols:
       - Client.LinkIdentity
-  auth.identities.unlink_identity:
-    status: implemented
-    symbols:
-      - Client.UnlinkIdentity
   auth.identities.list_identities:
     status: partially_implemented
     note: "No dedicated getUserIdentities method; linked identities are reachable only via the User.Identities property."
     symbols:
       - User.Identities
-  auth.mfa.enroll:
+  auth.identities.unlink_identity:
     status: implemented
     symbols:
-      - Client.Enroll
+      - Client.UnlinkIdentity
+
   auth.mfa.challenge:
     status: implemented
     symbols:
       - Client.Challenge
-  auth.mfa.verify:
-    status: implemented
-    symbols:
-      - Client.Verify
-  auth.mfa.unenroll:
-    status: implemented
-    symbols:
-      - Client.Unenroll
   auth.mfa.challenge_and_verify:
     status: implemented
     symbols:
       - Client.ChallengeAndVerify
-  auth.mfa.list_factors:
+  auth.mfa.enroll:
     status: implemented
     symbols:
-      - Client.ListFactors
+      - Client.Enroll
   auth.mfa.get_authenticator_assurance_level:
     status: implemented
     symbols:
       - Client.GetAuthenticatorAssuranceLevel
+  auth.mfa.list_factors:
+    status: implemented
+    symbols:
+      - Client.ListFactors
+  auth.mfa.unenroll:
+    status: implemented
+    symbols:
+      - Client.Unenroll
+  auth.mfa.verify:
+    status: implemented
+    symbols:
+      - Client.Verify
+
   auth.admin.create_user:
     status: implemented
     symbols:
@@ -142,85 +145,90 @@ features:
     note: "Hard-delete only; no shouldSoftDelete flag (JS deleteUser(id, shouldSoftDelete))."
     symbols:
       - AdminClient.DeleteUser
-  auth.admin.update_user:
-    status: implemented
-    symbols:
-      - AdminClient.UpdateUserById
-  auth.admin.get_user:
-    status: implemented
-    symbols:
-      - AdminClient.GetUserById
-  auth.admin.list_users:
-    status: implemented
-    symbols:
-      - AdminClient.ListUsers
-  auth.admin.invite_user:
-    status: implemented
-    symbols:
-      - AdminClient.InviteUserByEmail
   auth.admin.generate_link:
     status: implemented
     symbols:
       - AdminClient.GenerateLink
-  auth.admin.list_mfa_factors:
+  auth.admin.get_user:
     status: implemented
     symbols:
-      - AdminClient.ListFactors
+      - AdminClient.GetUserById
+  auth.admin.invite_user:
+    status: implemented
+    symbols:
+      - AdminClient.InviteUserByEmail
+  auth.admin.list_users:
+    status: implemented
+    symbols:
+      - AdminClient.ListUsers
+  auth.admin.update_user:
+    status: implemented
+    symbols:
+      - AdminClient.UpdateUserById
+
   auth.admin.delete_mfa_factor:
     status: implemented
     symbols:
       - AdminClient.DeleteFactor
+  auth.admin.list_mfa_factors:
+    status: implemented
+    symbols:
+      - AdminClient.ListFactors
 
-  # ── Client ─────────────────────────────────────────────────────────────────
+  # ── Client Initialization ──────────────────────────────────────────────────
 
   client.authentication_integration.cross_client_token_sync:
     status: implemented
+    no_public_symbols: true
     note: "Umbrella Client listens to auth state changes and injects the current JWT into every sub-client via a shared GetAuthHeaders callback."
-    symbols:
-      - Client.GetAuthHeaders
   client.authentication_integration.oauth_flow_type:
     status: partially_implemented
     note: "Flow type (PKCE/Implicit) is chosen per sign-in via SignInOptions.FlowType, not as a single construction-time client setting."
     symbols:
       - SignInOptions.FlowType
-      - Constants.OAuthFlowType
+
   client.session_management.custom_storage:
     status: implemented
     symbols:
-      - SupabaseOptions.SessionHandler
       - Client.SetPersistence
+      - SupabaseOptions.SessionHandler
   client.session_management.persist_session:
     status: partially_implemented
     note: "No boolean persist toggle; in-memory-only behavior is achievable only by supplying a no-op IGotrueSessionPersistence handler."
     symbols:
       - SupabaseOptions.SessionHandler
+
   client.request_configuration.global_headers:
     status: implemented
     symbols:
       - SupabaseOptions.Headers
 
-
-  # ── Database ───────────────────────────────────────────────────────────────
+  # ── Database (PostgREST) ───────────────────────────────────────────────────
 
   database.query.from_table:
     status: implemented
     symbols:
-      - Client.Table
       - Client.From
-  database.query.select:
-    status: implemented
-    symbols:
-      - Table.Select
-  database.query.schema_selection:
-    status: partially_implemented
-    note: "Schema is set once at construction (ClientOptions.Schema); no per-query schema switch like JS client.schema(name)."
-    symbols:
-      - ClientOptions.Schema
+      - Client.Table
   database.query.rpc:
     status: partially_implemented
     note: "Invocation works (typed + untyped) but Rpc is terminal — no post-filtering/transform chaining on the result like JS rpc()."
     symbols:
       - Client.Rpc
+  database.query.schema_selection:
+    status: partially_implemented
+    note: "Schema is set once at construction (ClientOptions.Schema); no per-query schema switch like JS client.schema(name)."
+    symbols:
+      - ClientOptions.Schema
+  database.query.select:
+    status: implemented
+    symbols:
+      - Table.Select
+
+  database.mutate.delete:
+    status: implemented
+    symbols:
+      - Table.Delete
   database.mutate.insert:
     status: implemented
     symbols:
@@ -228,32 +236,28 @@ features:
   database.mutate.update:
     status: implemented
     symbols:
-      - Table.Update
       - Table.Set
+      - Table.Update
   database.mutate.upsert:
     status: implemented
     symbols:
-      - Table.Upsert
       - Table.OnConflict
-  database.mutate.delete:
+      - Table.Upsert
+
+  database.using_filters.contained_by:
     status: implemented
     symbols:
-      - Table.Delete
-  database.mutate.select_after_mutation:
+      - Constants.Operator.ContainedIn
+  database.using_filters.contains:
     status: implemented
-    note: "Mutations return the affected rows by default (QueryOptions.Returning = Representation)."
     symbols:
-      - QueryOptions.Returning
+      - Constants.Operator.Contains
   database.using_filters.eq:
     status: implemented
     symbols:
+      - Constants.Operator.Equals
       - Table.Filter
       - Table.Where
-      - Constants.Operator.Equals
-  database.using_filters.neq:
-    status: implemented
-    symbols:
-      - Constants.Operator.NotEqual
   database.using_filters.gt:
     status: implemented
     symbols:
@@ -262,6 +266,22 @@ features:
     status: implemented
     symbols:
       - Constants.Operator.GreaterThanOrEqual
+  database.using_filters.ilike:
+    status: implemented
+    symbols:
+      - Constants.Operator.ILike
+  database.using_filters.in:
+    status: implemented
+    symbols:
+      - Constants.Operator.In
+  database.using_filters.is:
+    status: implemented
+    symbols:
+      - Constants.Operator.Is
+  database.using_filters.like:
+    status: implemented
+    symbols:
+      - Constants.Operator.Like
   database.using_filters.lt:
     status: implemented
     symbols:
@@ -270,30 +290,37 @@ features:
     status: implemented
     symbols:
       - Constants.Operator.LessThanOrEqual
-  database.using_filters.like:
+  database.using_filters.match:
     status: implemented
     symbols:
-      - Constants.Operator.Like
-  database.using_filters.ilike:
+      - Table.Match
+  database.using_filters.neq:
     status: implemented
     symbols:
-      - Constants.Operator.ILike
-  database.using_filters.is:
+      - Constants.Operator.NotEqual
+  database.using_filters.not:
     status: implemented
     symbols:
-      - Constants.Operator.Is
-  database.using_filters.in:
+      - Constants.Operator.Not
+      - Table.Not
+  database.using_filters.not_in:
+    status: implemented
+    note: "Composed via the Not(column, Operator.In, list) overload."
+    symbols:
+      - Table.Not
+  database.using_filters.or:
     status: implemented
     symbols:
-      - Constants.Operator.In
-  database.using_filters.contains:
+      - Constants.Operator.Or
+      - Table.Or
+  database.using_filters.overlaps:
     status: implemented
     symbols:
-      - Constants.Operator.Contains
-  database.using_filters.contained_by:
+      - Constants.Operator.Overlap
+  database.using_filters.range_adjacent:
     status: implemented
     symbols:
-      - Constants.Operator.ContainedIn
+      - Constants.Operator.Adjacent
   database.using_filters.range_gt:
     status: implemented
     symbols:
@@ -310,51 +337,30 @@ features:
     status: implemented
     symbols:
       - Constants.Operator.NotRightOf
-  database.using_filters.range_adjacent:
-    status: implemented
-    symbols:
-      - Constants.Operator.Adjacent
-  database.using_filters.overlaps:
-    status: implemented
-    symbols:
-      - Constants.Operator.Overlap
   database.using_filters.text_search:
     status: implemented
     note: "FTS family: fts/plfts/phfts/wfts."
     symbols:
       - Constants.Operator.FTS
-      - Constants.Operator.PLFTS
       - Constants.Operator.PHFTS
+      - Constants.Operator.PLFTS
       - Constants.Operator.WFTS
-  database.using_filters.match:
+
+  database.mutate.select_after_mutation:
     status: implemented
+    note: "Mutations return the affected rows by default (QueryOptions.Returning = Representation)."
     symbols:
-      - Table.Match
-  database.using_filters.not:
-    status: implemented
-    symbols:
-      - Table.Not
-      - Constants.Operator.Not
-  database.using_filters.or:
-    status: implemented
-    symbols:
-      - Table.Or
-      - Constants.Operator.Or
-  database.using_filters.not_in:
-    status: implemented
-    note: "Composed via the Not(column, Operator.In, list) overload."
-    symbols:
-      - Table.Not
-  database.using_modifiers.order:
-    status: implemented
-    note: "Capability at parity, but the primary Order(\"col\", ...) form is stringly-typed (breaks silently on a property rename)."
-    symbols:
-      - Table.Order
+      - QueryOptions.Returning
   database.using_modifiers.limit:
     status: implemented
     symbols:
       - Table.Limit
       - Table.Offset
+  database.using_modifiers.order:
+    status: implemented
+    note: "Capability at parity, but the primary Order(\"col\", ...) form is stringly-typed (breaks silently on a property rename)."
+    symbols:
+      - Table.Order
   database.using_modifiers.range:
     status: implemented
     symbols:
@@ -374,7 +380,7 @@ features:
     symbols:
       - Table.Select
 
-  # ── Functions ──────────────────────────────────────────────────────────────
+  # ── Edge Functions ─────────────────────────────────────────────────────────
 
   functions.invocation.invoke:
     status: implemented
@@ -382,68 +388,74 @@ features:
     symbols:
       - Client.Invoke
       - Client.RawInvoke
-  functions.invocation.set_auth_token:
-    status: partially_implemented
-    note: "No stateful SetAuth; bearer token is supplied per invocation or via a GetHeaders provider hook, not stored for all subsequent calls."
-    symbols:
-      - Client.GetHeaders
   functions.invocation.method_override:
     status: implemented
     note: "InvokeFunctionOptions.HttpMethod is wired into the request (default POST). [feature-parity.md called this POST-only; the source disagrees as of 2026-06-29.]"
     symbols:
-      - InvokeFunctionOptions.HttpMethod
+      - Client.InvokeFunctionOptions.HttpMethod
   functions.invocation.streaming_response:
     status: implemented
     note: "InvokeStream returns response bodies for incremental reading."
     symbols:
       - Client.InvokeStream
+
+  functions.invocation.set_auth_token:
+    status: partially_implemented
+    note: "No stateful SetAuth; bearer token is supplied per invocation or via a GetHeaders provider hook, not stored for all subsequent calls."
+    symbols:
+      - Client.GetHeaders
   functions.invocation.region_selection:
     status: implemented
     note: "Full AWS region list; per-call override or client default; emits x-region."
     symbols:
-      - InvokeFunctionOptions.FunctionRegion
-      - FunctionRegion
+      - Client.FunctionRegion
+      - Client.InvokeFunctionOptions.FunctionRegion
   functions.invocation.timeout:
     status: partially_implemented
     note: "Per-invoke HttpTimeout exists, but it is not composable with a caller-supplied cancellation signal (Invoke accepts no CancellationToken)."
     symbols:
-      - InvokeFunctionOptions.HttpTimeout
+      - Client.InvokeFunctionOptions.HttpTimeout
 
   # ── Realtime ───────────────────────────────────────────────────────────────
 
-  realtime.client.connect:
-    status: implemented
-    symbols:
-      - RealtimeClient.Connect
-      - RealtimeClient.ConnectAsync
-  realtime.client.disconnect:
-    status: implemented
-    symbols:
-      - RealtimeClient.Disconnect
   realtime.client.channel:
     status: implemented
     note: "Plain-topic form plus a typed convenience overload Channel(db, schema, table, col, value)."
     symbols:
-      - RealtimeClient.Channel
+      - Client.Channel
+  realtime.client.connect:
+    status: implemented
+    symbols:
+      - Client.Connect
+      - Client.ConnectAsync
   realtime.client.connection_state:
     status: partially_implemented
     note: "Socket state delivered via SocketStateEventHandler events; no synchronous connection-state getter on the client."
     symbols:
-      - RealtimeClient.AddStateChangedHandler
+      - Client.AddStateChangedHandler
+  realtime.client.disconnect:
+    status: implemented
+    symbols:
+      - Client.Disconnect
   realtime.client.get_channels:
     status: partially_implemented
     note: "Active channels exposed as a Subscriptions dictionary; no getChannels() method."
     symbols:
-      - RealtimeClient.Subscriptions
+      - Client.Subscriptions
   realtime.client.remove_channel:
     status: implemented
     symbols:
-      - RealtimeClient.Remove
+      - Client.Remove
   realtime.client.set_auth_token:
     status: implemented
     symbols:
-      - RealtimeClient.SetAuth
+      - Client.SetAuth
 
+  realtime.channel.broadcast:
+    status: implemented
+    symbols:
+      - RealtimeChannel.Push
+      - RealtimeChannel.Send
   realtime.channel.subscribe:
     status: implemented
     symbols:
@@ -452,25 +464,21 @@ features:
     status: implemented
     symbols:
       - RealtimeChannel.Unsubscribe
-  realtime.channel.broadcast:
-    status: implemented
-    symbols:
-      - RealtimeChannel.Send
-      - RealtimeChannel.Push
+
   realtime.subscriptions.broadcast:
     status: implemented
     note: "Typed broadcast payloads via generics; better-typed than JS on('broadcast', ...)."
     symbols:
-      - RealtimeChannel.Register
-      - RealtimeChannel.Broadcast
       - RealtimeBroadcast
+      - RealtimeChannel.Broadcast
+      - RealtimeChannel.Register
   realtime.subscriptions.postgres_changes:
     status: implemented
     note: "Model-typed path via SupabaseTable.On (blessed) plus the low-level Channel().Register(PostgresChangesOptions)."
     symbols:
-      - SupabaseTable.On
-      - RealtimeChannel.Register
       - RealtimeChannel.AddPostgresChangeHandler
+      - RealtimeChannel.Register
+      - SupabaseTable.On
   realtime.subscriptions.subscribe_presence:
     status: partially_implemented
     note: "Join/leave/sync handlers exist, but the presence sync diverges from JS (see realtime.presence.presence_state)."
@@ -489,6 +497,18 @@ features:
     status: implemented
     symbols:
       - BroadcastOptions.BroadcastAck
+  realtime.presence.presence_key:
+    status: implemented
+    note: "Set via Channel.Register<TPresence>(presenceKey)."
+    symbols:
+      - RealtimeChannel.Register
+
+  realtime.presence.presence_state:
+    status: partially_implemented
+    note: "Typed CurrentState/LastState exist, but the initial presence snapshot is dropped, so any client that joins after others undercounts everyone — a behavioral gap, not just a shape gap."
+    symbols:
+      - RealtimePresence.CurrentState
+      - RealtimePresence.LastState
   realtime.presence.track:
     status: implemented
     symbols:
@@ -497,17 +517,7 @@ features:
     status: implemented
     symbols:
       - RealtimePresence.Untrack
-  realtime.presence.presence_state:
-    status: partially_implemented
-    note: "Typed CurrentState/LastState exist, but the initial presence snapshot is dropped, so any client that joins after others undercounts everyone — a behavioral gap, not just a shape gap."
-    symbols:
-      - RealtimePresence.CurrentState
-      - RealtimePresence.LastState
-  realtime.presence.presence_key:
-    status: implemented
-    note: "Set via Channel.Register<TPresence>(presenceKey)."
-    symbols:
-      - RealtimeChannel.Register
+
   realtime.configuration.reconnect_backoff:
     status: implemented
     symbols:
@@ -520,70 +530,26 @@ features:
     status: partially_implemented
     note: "Diagnostics routed through a debug handler hook; no custom logging function with a log-level filter."
     symbols:
-      - RealtimeClient.AddDebugHandler
+      - Client.AddDebugHandler
 
   # ── Storage ────────────────────────────────────────────────────────────────
 
-  storage.file_buckets.create_file_bucket:
-    status: implemented
-    symbols:
-      - StorageBucketApi.CreateBucket
-  storage.file_buckets.get_bucket:
-    status: implemented
-    symbols:
-      - StorageBucketApi.GetBucket
-  storage.file_buckets.list_file_buckets:
-    status: implemented
-    symbols:
-      - StorageBucketApi.ListBuckets
-  storage.file_buckets.update_bucket:
-    status: implemented
-    symbols:
-      - StorageBucketApi.UpdateBucket
-  storage.file_buckets.delete_file_bucket:
-    status: implemented
-    symbols:
-      - StorageBucketApi.DeleteBucket
-  storage.file_buckets.empty_bucket:
-    status: implemented
-    symbols:
-      - StorageBucketApi.EmptyBucket
   storage.file_buckets.access_bucket:
     status: implemented
     symbols:
-      - StorageClient.From
-  storage.file_buckets.upload:
-    status: implemented
-    note: "File-path and byte[] overloads; onProgress + FileOptions (content-type, cache-control, upsert)."
-    symbols:
-      - StorageFileApi.Upload
-      - StorageFileApi.UploadOrResume
-  storage.file_buckets.download:
-    status: implemented
-    symbols:
-      - StorageFileApi.Download
-      - StorageFileApi.DownloadPublicFile
-  storage.file_buckets.list_files:
-    status: implemented
-    symbols:
-      - StorageFileApi.List
-  storage.file_buckets.move:
-    status: implemented
-    symbols:
-      - StorageFileApi.Move
+      - Client.From
   storage.file_buckets.copy:
     status: implemented
     symbols:
       - StorageFileApi.Copy
-  storage.file_buckets.remove:
+  storage.file_buckets.create_file_bucket:
     status: implemented
     symbols:
-      - StorageFileApi.Remove
-  storage.file_buckets.get_public_url:
+      - StorageBucketApi.CreateBucket
+  storage.file_buckets.create_signed_upload_url:
     status: implemented
-    note: "Transform + download options present. Footgun: passing an empty TransformOptions() routes to the image-render endpoint instead of the plain object URL."
     symbols:
-      - StorageFileApi.GetPublicUrl
+      - StorageFileApi.CreateUploadSignedUrl
   storage.file_buckets.create_signed_url:
     status: implemented
     symbols:
@@ -592,22 +558,66 @@ features:
     status: implemented
     symbols:
       - StorageFileApi.CreateSignedUrls
-  storage.file_buckets.create_signed_upload_url:
+  storage.file_buckets.delete_file_bucket:
     status: implemented
     symbols:
-      - StorageFileApi.CreateUploadSignedUrl
-  storage.file_buckets.upload_with_signed_url:
+      - StorageBucketApi.DeleteBucket
+  storage.file_buckets.download:
     status: implemented
     symbols:
-      - StorageFileApi.UploadToSignedUrl
-  storage.file_buckets.update_file:
+      - StorageFileApi.Download
+      - StorageFileApi.DownloadPublicFile
+  storage.file_buckets.empty_bucket:
     status: implemented
     symbols:
-      - StorageFileApi.Update
+      - StorageBucketApi.EmptyBucket
   storage.file_buckets.file_info:
     status: implemented
     symbols:
       - StorageFileApi.Info
+  storage.file_buckets.get_bucket:
+    status: implemented
+    symbols:
+      - StorageBucketApi.GetBucket
+  storage.file_buckets.get_public_url:
+    status: implemented
+    note: "Transform + download options present. Footgun: passing an empty TransformOptions() routes to the image-render endpoint instead of the plain object URL."
+    symbols:
+      - StorageFileApi.GetPublicUrl
+  storage.file_buckets.list_file_buckets:
+    status: implemented
+    symbols:
+      - StorageBucketApi.ListBuckets
+  storage.file_buckets.list_files:
+    status: implemented
+    symbols:
+      - StorageFileApi.List
+  storage.file_buckets.move:
+    status: implemented
+    symbols:
+      - StorageFileApi.Move
+  storage.file_buckets.remove:
+    status: implemented
+    symbols:
+      - StorageFileApi.Remove
+  storage.file_buckets.update_bucket:
+    status: implemented
+    symbols:
+      - StorageBucketApi.UpdateBucket
+  storage.file_buckets.update_file:
+    status: implemented
+    symbols:
+      - StorageFileApi.Update
+  storage.file_buckets.upload:
+    status: implemented
+    note: "File-path and byte[] overloads; onProgress + FileOptions (content-type, cache-control, upsert)."
+    symbols:
+      - StorageFileApi.Upload
+      - StorageFileApi.UploadOrResume
+  storage.file_buckets.upload_with_signed_url:
+    status: implemented
+    symbols:
+      - StorageFileApi.UploadToSignedUrl
   storage.file_buckets.download_with_transform:
     status: implemented
     note: "Image transforms applied inline via the TransformOptions argument on Download/DownloadPublicFile."
@@ -616,16 +626,16 @@ features:
   storage.file_buckets.copy_cross_bucket:
     status: implemented
     symbols:
-      - StorageFileApi.Copy
       - DestinationOptions.DestinationBucket
+      - StorageFileApi.Copy
   storage.file_buckets.move_cross_bucket:
     status: implemented
     symbols:
-      - StorageFileApi.Move
       - DestinationOptions.DestinationBucket
+      - StorageFileApi.Move
   storage.file_buckets.upload_with_metadata:
     status: implemented
     symbols:
-      - FileOptions.Metadata
       - FileOptions.CacheControl
       - FileOptions.ContentType
+      - FileOptions.Metadata
