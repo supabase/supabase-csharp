@@ -83,7 +83,7 @@ coverage_verdict() {
 
 # Written whenever $COV_PCT improves on the baseline beyond the epsilon, or when
 # the baseline has no coverage key yet. Uses a targeted jq merge — touching only
-# .coverage.hermeticLine — rather than reconstructing the whole file from a
+# .coverage.hermeticLine and .updated — rather than reconstructing the whole file from a
 # heredoc the way save_baseline (warnings) does: that approach only knows about
 # schema/package/project/testProject/warnings/updated and silently drops any
 # other key (mutationScore, e2eHealthUrl, formatBaseRef) whenever it fires. Since
@@ -97,7 +97,8 @@ save_coverage_baseline() {
   local base; base="$(bget .coverage.hermeticLine)"
   [[ -n "$COV_PCT" ]] || return 0
   if [[ -z "$base" ]] || awk -v c="$COV_PCT" -v b="$base" -v e="$COVERAGE_EPSILON" 'BEGIN{exit !(c>b+e)}'; then
-    jq --argjson line "$COV_PCT" '.coverage.hermeticLine = $line' "$BASELINE" > "$BASELINE.tmp" && mv "$BASELINE.tmp" "$BASELINE"
+    jq --argjson line "$COV_PCT" --arg now "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      '.coverage.hermeticLine = $line | .updated = $now' "$BASELINE" > "$BASELINE.tmp" && mv "$BASELINE.tmp" "$BASELINE"
     echo "${GRN}baseline raised${OFF} (coverage ${base:-–}%→$COV_PCT%) ${DIM}— commit $BASELINE${OFF}"
   fi
 }
