@@ -23,39 +23,46 @@ public static class Constants
         { "lifetime", 60 * 60 * 8 },
         { "domain", "" },
         { "path", "/" },
-        { "sameSite", "lax" }
+        { "sameSite", "lax" },
     };
 
     public enum SortOrder
     {
         [MapTo("asc")]
         Ascending,
+
         [MapTo("desc")]
-        Descending
+        Descending,
     }
 
     public enum MobileOtpType
     {
         [MapTo("sms")]
         SMS,
+
         [MapTo("phone_change")]
-        PhoneChange
+        PhoneChange,
     }
 
     public enum EmailOtpType
     {
         [MapTo("signup")]
         Signup,
+
         [MapTo("invite")]
         Invite,
+
         [MapTo("magiclink")]
         MagicLink,
+
         [MapTo("recovery")]
         Recovery,
+
         [MapTo("email_change")]
         EmailChange,
+
         [MapTo("email")]
-        Email
+        Email,
     }
 
     /// <summary>
@@ -66,48 +73,69 @@ public static class Constants
     {
         [MapTo("anonymous_users")]
         AnonymousUsers,
+
         [MapTo("apple")]
         Apple,
+
         [MapTo("azure")]
         Azure,
+
         [MapTo("bitbucket")]
         Bitbucket,
+
         [MapTo("discord")]
         Discord,
+
         [MapTo("facebook")]
         Facebook,
+
         [MapTo("figma")]
         Figma,
+
         [MapTo("fly")]
         Fly,
+
         [MapTo("github")]
         Github,
+
         [MapTo("gitlab")]
         Gitlab,
+
         [MapTo("google")]
         Google,
+
         [MapTo("kakao")]
         Kakao,
+
         [MapTo("keycloak")]
         KeyCloak,
+
         [MapTo("linkedin")]
         LinkedIn,
+
         [MapTo("linkedin_oidc")]
         LinkedInOIDC,
+
         [MapTo("notion")]
         Notion,
+
         [MapTo("slack")]
         Slack,
+
         [MapTo("spotify")]
         Spotify,
+
         [MapTo("twitch")]
         Twitch,
+
         [MapTo("twitter")]
         Twitter,
+
         [MapTo("workos")]
         WorkOS,
+
         [MapTo("zoom")]
-        Zoom
+        Zoom,
     }
 
     /// <summary>
@@ -121,7 +149,7 @@ public static class Constants
         PasswordRecovery,
         TokenRefreshed,
         Shutdown,
-        MfaChallengeVerified
+        MfaChallengeVerified,
     }
 
     /// <summary>
@@ -131,19 +159,19 @@ public static class Constants
     {
         Email,
         Phone,
-        RefreshToken
+        RefreshToken,
     }
 
     /// <summary>
     /// Represents an OAuth Flow type
     /// </summary>
-    [PartialCapability("client.authentication_integration.oauth_flow_type", "Flow type (PKCE/Implicit) is chosen per sign-in via SignInOptions.FlowType, not as a single construction-time client setting.")]
     public enum OAuthFlowType
     {
         [MapTo("implicit")]
         Implicit,
+
         [MapTo("pkce")]
-        PKCE
+        PKCE,
     }
 
     /// <summary>
@@ -152,16 +180,18 @@ public static class Constants
     public enum SignUpType
     {
         Email,
-        Phone
+        Phone,
     }
 
     public enum SignOutScope
     {
         [MapTo("global")]
         Global,
+
         [MapTo("local")]
         Local,
+
         [MapTo("others")]
-        Others
+        Others,
     }
 }

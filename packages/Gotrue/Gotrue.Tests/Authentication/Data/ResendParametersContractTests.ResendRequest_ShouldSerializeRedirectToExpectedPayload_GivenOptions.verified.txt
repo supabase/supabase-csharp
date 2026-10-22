@@ -1,0 +1,1 @@
+﻿{"type":"signup","email":"user@supabase.com","gotrue_meta_security":{"captcha_token":"captcha-token"}}

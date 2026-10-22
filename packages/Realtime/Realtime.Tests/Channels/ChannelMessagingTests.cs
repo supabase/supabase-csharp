@@ -133,4 +133,47 @@ public class ChannelMessagingTests
         await channel.Subscribe();
         await Task.Delay(500);
     }
+
+    [TestMethod]
+    public async Task Channel_ShouldDeliverToTheNewHandler_GivenResubscribeAfterUnsubscribe()
+    {
+        var oldHandlerFired = false;
+        var newHandlerFired = new TaskCompletionSource<bool>();
+        var first = this.socketClient.Channel("resubscribe");
+        first.OnPostgresChange((_, _) => oldHandlerFired = true, ListenType.Inserts, new PostgresChangesFilter { Table = "todos" });
+        await first.Subscribe();
+        first.Unsubscribe();
+        var second = this.socketClient.Channel("resubscribe");
+        second.OnPostgresChange((_, _) => newHandlerFired.TrySetResult(true), ListenType.Inserts, new PostgresChangesFilter { Table = "todos" });
+        await second.Subscribe();
+        await this.restClient.Table<Todo>().Insert(new Todo { UserId = 1 });
+        await newHandlerFired.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        Assert.IsFalse(oldHandlerFired, "the handler from before Unsubscribe must not fire");
+    }
+
+    [TestMethod]
+    public async Task Channel_ShouldAllowPresenceAgain_GivenResubscribeAfterUnsubscribe()
+    {
+        var first = this.socketClient.Channel("presence-again");
+        first.Register<PresenceExample>("user-1");
+        await first.Subscribe();
+        first.Unsubscribe();
+        var second = this.socketClient.Channel("presence-again");
+        second.Register<PresenceExample>("user-1");
+        await second.Subscribe();
+        Assert.IsTrue(second.IsJoined);
+    }
+
+    [TestMethod]
+    public async Task Subscribe_ShouldStillDeliver_GivenTheSameInstanceAfterUnsubscribe()
+    {
+        var fired = new TaskCompletionSource<bool>();
+        var channel = this.socketClient.Channel("same-instance");
+        channel.OnPostgresChange((_, _) => fired.TrySetResult(true), ListenType.Inserts, new PostgresChangesFilter { Table = "todos" });
+        await channel.Subscribe();
+        channel.Unsubscribe();
+        await channel.Subscribe();
+        await this.restClient.Table<Todo>().Insert(new Todo { UserId = 1 });
+        Assert.IsTrue(await fired.Task.WaitAsync(TimeSpan.FromSeconds(10)));
+    }
 }

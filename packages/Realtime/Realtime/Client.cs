@@ -367,6 +367,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             throw new Exception("Socket must exist, was `Connect` called?");
 
         var subscription = new RealtimeChannel(this.Socket!, topic, options);
+        subscription.AddStateChangedHandler(this.HandleChannelStateChanged);
         this.subscriptions.Add(topic, subscription);
 
         return subscription;
@@ -399,10 +400,21 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
         var subscription = new RealtimeChannel(this.Socket!, key, options);
         subscription.RegisterPostgresChangesOptions(changesOptions);
+        subscription.AddStateChangedHandler(this.HandleChannelStateChanged);
 
         this.subscriptions.Add(key, subscription);
 
         return subscription;
+    }
+
+    // Forget a closed channel so Channel(name) returns a fresh one. If the old one joins again, it comes back.
+    private void HandleChannelStateChanged(IRealtimeChannel sender, ChannelState state)
+    {
+        var channel = (RealtimeChannel) sender;
+        if (state == ChannelState.Closed && this.subscriptions.TryGetValue(channel.Topic, out var current) && current == channel)
+            this.subscriptions.Remove(channel.Topic);
+        else if (state == ChannelState.Joining)
+            this.subscriptions.TryAdd(channel.Topic, channel);
     }
 
     /// <summary>

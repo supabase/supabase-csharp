@@ -1,0 +1,1 @@
+﻿{"type":"email_change","email":"user@supabase.com"}

@@ -42,4 +42,12 @@ public abstract class RequestApprovalFixture : VerifyBase
     ///     own method so the snapshot file lands next to the test (domain-first layout), not beside this fixture.
     /// </summary>
     protected string EmittedRequestBody => this.server.VerifySingleReceivedRequest().RawBody;
+
+    /// <summary>
+    ///     Check for the request query parameter.
+    /// </summary>
+    /// <param name="name">Query parameter name</param>
+    /// <param name="expected">Value expected</param>
+    protected void ValidateQueryParameters(string name, string expected) => this.server.VerifySingleReceivedRequest()
+        .WithQueryParam(name, expected);
 }
