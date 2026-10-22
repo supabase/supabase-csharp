@@ -96,5 +96,5 @@ jobs:
       - name: Validate annotations against the canonical spec
         run: |
           dotnet run --project packages/CapabilityMatrix/CapabilityMatrix/CapabilityMatrix.csproj -- \
-            validate --root . --spec _sdk-spec/packages/capability-matrix/capabilities
+            validate --spec _sdk-spec/packages/capability-matrix/capabilities
 

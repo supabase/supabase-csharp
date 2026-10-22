@@ -2,18 +2,23 @@ namespace Supabase.CapabilityMatrix.Tests;
 
 /// <summary>
 /// A throwaway on-disk repository — one annotated SDK file and one capability-area spec,
-/// both from <c>Data/</c> — for exercising the command line end to end. Deletes itself.
+/// both from <c>Data/</c> — for exercising the command line end to end. Makes itself the
+/// working directory for its lifetime (the tool reads <c>./packages</c>), then deletes itself.
 /// </summary>
 internal sealed class SampleRepository : IDisposable
 {
+    private readonly string previousDirectory;
+
     public string Root { get; }
     public string Spec { get; }
     public string Output => Path.Combine(this.Root, "sdk-compliance.yaml");
 
     private SampleRepository(string root)
     {
+        this.previousDirectory = Directory.GetCurrentDirectory();
         this.Root = root;
         this.Spec = Path.Combine(root, "spec");
+        Directory.SetCurrentDirectory(root);
     }
 
     public static SampleRepository Create() => From("repo-source.cs.txt");
@@ -31,5 +36,9 @@ internal sealed class SampleRepository : IDisposable
         return new SampleRepository(root);
     }
 
-    public void Dispose() => Directory.Delete(this.Root, recursive: true);
+    public void Dispose()
+    {
+        Directory.SetCurrentDirectory(this.previousDirectory);
+        Directory.Delete(this.Root, recursive: true);
+    }
 }

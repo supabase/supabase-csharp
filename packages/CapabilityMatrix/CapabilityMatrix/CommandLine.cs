@@ -134,26 +134,28 @@ public static class CommandLine
 
     private const string Usage =
         """
-        Usage: Supabase.CapabilityMatrix <generate|validate> --spec <dir> [--root <dir>] [--out <file>]
+        Usage: Supabase.CapabilityMatrix <generate|validate> --spec <dir>
 
-          generate   Write sdk-compliance.yaml from the capabilities declared in the SDK source.
+          generate   Write ./sdk-compliance.yaml from the capabilities declared in the SDK source.
           validate   Report declarations that name an unknown feature, conflict, or lack a required note.
 
+        Run from the repository root: the SDK source is read from ./packages and
+        generate writes ./sdk-compliance.yaml (the only location the matrix accepts).
+
           --spec   Canonical capabilities/ directory (required).
-          --root   Repository root (default: current directory).
-          --out    Output path for generate (default: <root>/sdk-compliance.yaml).
         """;
 
-    private sealed record Options(string Root, string? Spec, string Output)
+    private sealed record Options(string Root, string? Spec)
     {
+        public string Output => Path.Combine(this.Root, "sdk-compliance.yaml");
+
         public static Options From(IReadOnlyList<string> arguments)
         {
             var flags = Enumerable.Range(0, arguments.Count)
                 .Where(index => arguments[index].StartsWith("--", StringComparison.Ordinal) && index + 1 < arguments.Count)
                 .ToDictionary(index => arguments[index][2..], index => arguments[index + 1]);
 
-            var root = flags.GetValueOrDefault("root") ?? Directory.GetCurrentDirectory();
-            return new Options(root, flags.GetValueOrDefault("spec"), flags.GetValueOrDefault("out") ?? Path.Combine(root, "sdk-compliance.yaml"));
+            return new Options(Directory.GetCurrentDirectory(), flags.GetValueOrDefault("spec"));
         }
     }
 }

@@ -20,18 +20,18 @@ public class CommandLineTests
 
     [TestMethod]
     public void Run_ShouldReturnUsageError_GivenGenerateWithoutASpec() =>
-        Run("generate", "--root", ".").Should().Be(ExitCode.UsageError);
+        Run("generate").Should().Be(ExitCode.UsageError);
 
     [TestMethod]
     public void Run_ShouldReturnUsageError_GivenAMissingSpecDirectory() =>
-        Run("generate", "--root", Path.GetTempPath(), "--spec", Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()))
+        Run("generate", "--spec", Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()))
             .Should().Be(ExitCode.UsageError);
 
     [TestMethod]
     public void Run_ShouldWriteTheComplianceFile_GivenGenerateOnASampleRepository()
     {
         using var repository = SampleRepository.Create();
-        Run("generate", "--root", repository.Root, "--spec", repository.Spec, "--out", repository.Output);
+        Run("generate", "--spec", repository.Spec);
         File.ReadAllText(repository.Output).Should().Contain("auth.sign_in.sign_up:");
     }
 
@@ -39,14 +39,14 @@ public class CommandLineTests
     public void Run_ShouldReturnSuccess_GivenValidateOnACleanRepository()
     {
         using var repository = SampleRepository.Create();
-        Run("validate", "--root", repository.Root, "--spec", repository.Spec).Should().Be(ExitCode.Success);
+        Run("validate", "--spec", repository.Spec).Should().Be(ExitCode.Success);
     }
 
     [TestMethod]
     public void Run_ShouldReturnProblemsFound_GivenValidateOnADriftedRepository()
     {
         using var repository = SampleRepository.Drifted();
-        Run("validate", "--root", repository.Root, "--spec", repository.Spec).Should().Be(ExitCode.ProblemsFound);
+        Run("validate", "--spec", repository.Spec).Should().Be(ExitCode.ProblemsFound);
     }
 
     [TestMethod]
@@ -54,7 +54,7 @@ public class CommandLineTests
     {
         using var repository = SampleRepository.Create();
         var output = new StringWriter();
-        CommandLine.Run(["validate", "--root", repository.Root, "--spec", repository.Spec], output, TextWriter.Null);
+        CommandLine.Run(["validate", "--spec", repository.Spec], output, TextWriter.Null);
         output.ToString().Should().Contain("Validated").And.Contain("matrix features");
     }
 
@@ -63,7 +63,7 @@ public class CommandLineTests
     {
         using var repository = SampleRepository.Drifted();
         var error = new StringWriter();
-        CommandLine.Run(["validate", "--root", repository.Root, "--spec", repository.Spec], TextWriter.Null, error);
+        CommandLine.Run(["validate", "--spec", repository.Spec], TextWriter.Null, error);
         error.ToString().Should().Contain("in the capability annotations:");
     }
 }
