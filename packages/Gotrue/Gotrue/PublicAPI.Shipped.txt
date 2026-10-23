@@ -56,6 +56,7 @@ Supabase.Gotrue.Api.ListFactors(string! jwt, Supabase.Gotrue.Mfa.MfaAdminListFac
 Supabase.Gotrue.Api.ListUsers(string! jwt, string? filter = null, string? sortBy = null, Supabase.Gotrue.Constants.SortOrder sortOrder = Supabase.Gotrue.Constants.SortOrder.Descending, int? page = null, int? perPage = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.UserList<Supabase.Gotrue.User!>?>!
 Supabase.Gotrue.Api.Reauthenticate(string! userJwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.RefreshAccessToken(string! accessToken, string! refreshToken) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
+Supabase.Gotrue.Api.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.ResetPasswordForEmail(Supabase.Gotrue.ResetPasswordForEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ResetPasswordForEmailState!>!
 Supabase.Gotrue.Api.ResetPasswordForEmail(string! email) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.SendMagicLinkEmail(string! email, Supabase.Gotrue.SignInOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -193,6 +194,7 @@ Supabase.Gotrue.Client.RefreshSession() -> System.Threading.Tasks.Task<Supabase.
 Supabase.Gotrue.Client.RefreshToken() -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Client.RefreshToken(string! accessToken, string! refreshToken) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Client.RemoveStateChangedListener(Supabase.Gotrue.Interfaces.IGotrueClient<Supabase.Gotrue.User!, Supabase.Gotrue.Session!>.AuthEventHandler! authEventHandler) -> void
+Supabase.Gotrue.Client.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Client.ResetPasswordForEmail(Supabase.Gotrue.ResetPasswordForEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ResetPasswordForEmailState!>!
 Supabase.Gotrue.Client.ResetPasswordForEmail(string! email) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Client.RetrieveSessionAsync() -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
@@ -406,6 +408,7 @@ Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListFactors(string! jwt, 
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListUsers(string! jwt, string? filter = null, string? sortBy = null, Supabase.Gotrue.Constants.SortOrder sortOrder = Supabase.Gotrue.Constants.SortOrder.Descending, int? page = null, int? perPage = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.UserList<TUser!>?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Reauthenticate(string! userJwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RefreshAccessToken(string! accessToken, string! refreshToken) -> System.Threading.Tasks.Task<TSession?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ResetPasswordForEmail(Supabase.Gotrue.ResetPasswordForEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ResetPasswordForEmailState!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ResetPasswordForEmail(string! email) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SendMagicLinkEmail(string! email, Supabase.Gotrue.SignInOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -461,6 +464,7 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Reauthenticate() -> Sy
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RefreshSession() -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RefreshToken() -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RefreshToken(string! accessToken, string! refreshToken) -> System.Threading.Tasks.Task!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ResetPasswordForEmail(Supabase.Gotrue.ResetPasswordForEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ResetPasswordForEmailState!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ResetPasswordForEmail(string! email) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RetrieveSessionAsync() -> System.Threading.Tasks.Task<TSession?>!
@@ -706,6 +710,22 @@ Supabase.Gotrue.ProviderAuthState.PKCEVerifier.set -> void
 Supabase.Gotrue.ProviderAuthState.ProviderAuthState(System.Uri! uri) -> void
 Supabase.Gotrue.ProviderAuthState.Uri.get -> System.Uri!
 Supabase.Gotrue.ProviderAuthState.Uri.set -> void
+Supabase.Gotrue.Resend.ResendOptions
+Supabase.Gotrue.Resend.ResendOptions.CaptchaToken.get -> string?
+Supabase.Gotrue.Resend.ResendOptions.EmailRedirectTo.get -> string?
+Supabase.Gotrue.Resend.ResendOptions.ResendOptions(string? captchaToken, string? emailRedirectTo) -> void
+Supabase.Gotrue.Resend.ResendParameters
+Supabase.Gotrue.Resend.ResendParameters.Email.get -> string?
+Supabase.Gotrue.Resend.ResendParameters.Options.get -> Supabase.Gotrue.Resend.ResendOptions?
+Supabase.Gotrue.Resend.ResendParameters.Phone.get -> string?
+Supabase.Gotrue.Resend.ResendParameters.ResendParameters(Supabase.Gotrue.Resend.ResendType type, string? email, string? phone, Supabase.Gotrue.Resend.ResendOptions? options) -> void
+Supabase.Gotrue.Resend.ResendParameters.ToDictionary() -> System.Collections.Generic.Dictionary<string!, object!>!
+Supabase.Gotrue.Resend.ResendParameters.Type.get -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.EmailChange = 3 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.PhoneChange = 2 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.SignUp = 0 -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendType.Sms = 1 -> Supabase.Gotrue.Resend.ResendType
 Supabase.Gotrue.ResetPasswordForEmailOptions
 Supabase.Gotrue.ResetPasswordForEmailOptions.CaptchaToken.get -> string?
 Supabase.Gotrue.ResetPasswordForEmailOptions.CaptchaToken.set -> void
