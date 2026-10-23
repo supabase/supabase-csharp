@@ -81,7 +81,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     {
         this._socket = socket;
         this._timeoutMs = timeoutMs;
-        this._timer = new Timer(this._timeoutMs);
+        this._timer = new Timer(this._timeoutMs) { AutoReset = false };
         this._timer.Elapsed += this.HandleTimeoutElapsed;
 
         this.Channel = channel;
@@ -134,6 +134,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     {
         this._timer.Stop();
         this._timer.Start();
+        this._socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
         this.Ref = this._socket.MakeMsgRef();
         this._msgRefEvent = this._socket.ReplyEventName(this.Ref);
     }
@@ -199,7 +200,11 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     public void ClearMessageReceivedHandler() =>
         this._messageEventHandlers.Clear();
 
-    private void HandleTimeoutElapsed(object sender, ElapsedEventArgs e) => OnTimeout?.Invoke(this, null);
+    private void HandleTimeoutElapsed(object sender, ElapsedEventArgs e)
+    {
+        this._socket.RemoveMessageReceivedHandler(this.HandleSocketMessageReceived);
+        OnTimeout?.Invoke(this, null);
+    }
 
     private void CancelTimeout() => this._timer.Stop();
 }
