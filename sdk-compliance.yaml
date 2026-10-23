@@ -11,6 +11,10 @@ features:
     status: implemented
     symbols:
       - Client.Reauthenticate
+  auth.sign_in.resend_confirmation:
+    status: implemented
+    symbols:
+      - Client.Resend
   auth.sign_in.send_password_reset_email:
     status: implemented
     symbols:
@@ -54,10 +58,15 @@ features:
       - Client.VerifyTokenHash
 
   auth.session.auto_refresh:
-    status: partially_implemented
-    note: "Refreshes on an internal background timer (ClientOptions.AutoRefreshToken), but does not expose JS's explicit startAutoRefresh/stopAutoRefresh control. Implicit-only."
+    status: implemented
     symbols:
+      - Client.StartAutoRefresh
+      - Client.StopAutoRefresh
       - ClientOptions.AutoRefreshToken
+  auth.session.get_claims:
+    status: implemented
+    symbols:
+      - Client.GetClaimsAsync
   auth.session.get_session:
     status: implemented
     symbols:
@@ -141,8 +150,7 @@ features:
     symbols:
       - AdminClient.CreateUser
   auth.admin.delete_user:
-    status: partially_implemented
-    note: "Hard-delete only; no shouldSoftDelete flag (JS deleteUser(id, shouldSoftDelete))."
+    status: implemented
     symbols:
       - AdminClient.DeleteUser
   auth.admin.generate_link:
@@ -356,6 +364,10 @@ features:
     symbols:
       - Table.Limit
       - Table.Offset
+  database.using_modifiers.maybe_single_row:
+    status: implemented
+    symbols:
+      - Table.Single
   database.using_modifiers.order:
     status: implemented
     note: "Capability at parity, but the primary Order(\"col\", ...) form is stringly-typed (breaks silently on a property rename)."
@@ -365,10 +377,10 @@ features:
     status: implemented
     symbols:
       - Table.Range
-  database.using_modifiers.single_row:
+  database.using_modifiers.strip_nulls:
     status: implemented
     symbols:
-      - Table.Single
+      - Table.StripNulls
   database.using_modifiers.request_cancellation:
     status: implemented
     note: "Every terminal (Get/Insert/Update/Delete/Single/Count) accepts a CancellationToken."
@@ -379,6 +391,11 @@ features:
     note: "Embeds expressible via PostgREST string syntax in Select(); no typed relationship builder (LINQ embed mapping is weak)."
     symbols:
       - Table.Select
+
+  database.configuration.request_timeout:
+    status: implemented
+    symbols:
+      - ClientOptions.Timeout
 
   # ── Edge Functions ─────────────────────────────────────────────────────────
 
@@ -400,10 +417,9 @@ features:
       - Client.InvokeStream
 
   functions.invocation.set_auth_token:
-    status: partially_implemented
-    note: "No stateful SetAuth; bearer token is supplied per invocation or via a GetHeaders provider hook, not stored for all subsequent calls."
+    status: implemented
     symbols:
-      - Client.GetHeaders
+      - Client.SetAuth
   functions.invocation.region_selection:
     status: implemented
     note: "Full AWS region list; per-call override or client default; emits x-region."
@@ -411,10 +427,15 @@ features:
       - Client.FunctionRegion
       - Client.InvokeFunctionOptions.FunctionRegion
   functions.invocation.timeout:
-    status: partially_implemented
-    note: "Per-invoke HttpTimeout exists, but it is not composable with a caller-supplied cancellation signal (Invoke accepts no CancellationToken)."
+    status: implemented
+    note: "Per-invoke HttpTimeout, linked with the caller's CancellationToken."
     symbols:
       - Client.InvokeFunctionOptions.HttpTimeout
+  functions.invocation.request_cancellation:
+    status: implemented
+    note: "Every invoke method (Invoke/Invoke<T>/RawInvoke/InvokeStream) accepts a CancellationToken."
+    symbols:
+      - Client.Invoke
 
   # ── Realtime ───────────────────────────────────────────────────────────────
 
@@ -489,6 +510,10 @@ features:
     note: "Filter is a hand-built PostgREST string (e.g. 'user_id=eq.{id}'), untied to the model."
     symbols:
       - PostgresChangesOptions.Filter
+  realtime.subscriptions.private_channel:
+    status: implemented
+    symbols:
+      - ChannelOptions.Private
   realtime.subscriptions.broadcast_self:
     status: implemented
     symbols:
@@ -497,6 +522,10 @@ features:
     status: implemented
     symbols:
       - BroadcastOptions.BroadcastAck
+  realtime.subscriptions.broadcast_replay:
+    status: implemented
+    symbols:
+      - BroadcastOptions.Replay
   realtime.presence.presence_key:
     status: implemented
     note: "Set via Channel.Register<TPresence>(presenceKey)."
@@ -518,6 +547,10 @@ features:
     symbols:
       - RealtimePresence.Untrack
 
+  realtime.configuration.custom_websocket_transport:
+    status: implemented
+    symbols:
+      - ClientOptions.WebSocketFactory
   realtime.configuration.reconnect_backoff:
     status: implemented
     symbols:
@@ -592,6 +625,7 @@ features:
     status: implemented
     symbols:
       - StorageFileApi.List
+      - StorageFileApi.ListV2Async
   storage.file_buckets.move:
     status: implemented
     symbols:
@@ -639,3 +673,15 @@ features:
       - FileOptions.CacheControl
       - FileOptions.ContentType
       - FileOptions.Metadata
+  storage.file_buckets.url_cache_nonce:
+    status: implemented
+    symbols:
+      - DownloadOptions.CacheNonce
+  storage.file_buckets.purge_cache:
+    status: implemented
+    symbols:
+      - StorageFileApi.PurgeCache
+  storage.file_buckets.purge_bucket_cache:
+    status: implemented
+    symbols:
+      - StorageBucketApi.PurgeBucketCache
