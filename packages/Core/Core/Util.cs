@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace Supabase.Core;
 
@@ -12,25 +14,41 @@ namespace Supabase.Core;
 /// </summary>
 public static class Util
 {
+    // The header is sent with every request (#523). Its host metadata (platform, runtime and framework) does not
+    // depend on the client type, but building it reflects over every loaded assembly (on Unity, over each one's
+    // custom attributes), so it is built once per process and shared by every client type. PublicationOnly, unlike
+    // the default mode, does not cache an exception, so a build that throws is retried on the next call.
+    private static readonly Lazy<string> HostMetadata = new(
+        static () => BuildMetadata(RuntimeInformation.OSDescription, RuntimeInformation.IsOSPlatform, AppDomain.CurrentDomain.GetAssemblies()),
+        LazyThreadSafetyMode.PublicationOnly);
+
+    // Each client type adds only its own name and version to the shared metadata; the result is kept per type.
+    private static readonly ConcurrentDictionary<Type, string> ClientInfoByType = new();
+
     /// <summary>
     /// Builds the <c>X-Client-Info</c> header value for the given client type.
     /// </summary>
     /// <remarks>
     /// Format: <c>name-csharp/version[; key=value ...]</c><br/>
     /// Appended metadata includes platform, platform version, runtime, runtime version,
-    /// and framework (when detectable).
+    /// and framework (when detectable). The metadata is built once per process, on the first call,
+    /// and shared by every client type; each client type's value is built on its first call and reused afterwards.
     /// </remarks>
     /// <param name="clientType">A type belonging to the client assembly, used to resolve the assembly name and version.</param>
     /// <returns>A structured header value identifying the client library and its host environment.</returns>
     public static string GetAssemblyVersion(Type clientType) =>
-        GetAssemblyVersion(clientType, RuntimeInformation.OSDescription, RuntimeInformation.IsOSPlatform, AppDomain.CurrentDomain.GetAssemblies());
+        ClientInfoByType.GetOrAdd(clientType, static type => ComposeHeader(type, HostMetadata.Value));
 
     // Testability seam: the platform and framework probes read process-wide ambient state
     // (RuntimeInformation, the loaded assembly set) that a host cannot vary at runtime. This
-    // overload takes those reads as parameters, so every branch is reachable hermetically; the
-    // public entry point above supplies the real values. Internal — not part of the public API.
+    // overload takes those reads as parameters and builds the metadata from them on every call, so
+    // every branch is reachable hermetically; the public entry point above builds it once from the
+    // real values. Internal — not part of the public API.
     internal static string GetAssemblyVersion(Type clientType, string osDescription, Func<OSPlatform, bool> isOsPlatform, IReadOnlyCollection<Assembly> loadedAssemblies) =>
-        $"{GetClientName(clientType)}-csharp/{GetClientVersion(clientType)}{BuildMetadata(osDescription, isOsPlatform, loadedAssemblies)}";
+        ComposeHeader(clientType, BuildMetadata(osDescription, isOsPlatform, loadedAssemblies));
+
+    private static string ComposeHeader(Type clientType, string metadata) =>
+        $"{GetClientName(clientType)}-csharp/{GetClientVersion(clientType)}{metadata}";
 
     private static string GetClientName(Type clientType) => clientType.Assembly.GetName().Name.ToLower();
 
