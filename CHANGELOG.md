@@ -1,5 +1,27 @@
 # Changelog
 
+## [8.5.0](https://github.com/supabase/supabase-csharp/compare/v8.4.0...v8.5.0) (2026-10-23)
+
+
+### Features
+
+* **capability-matrix:** add attributes to flag capabilities on public members ([#520](https://github.com/supabase/supabase-csharp/issues/520)) ([72413f6](https://github.com/supabase/supabase-csharp/commit/72413f6496307c364d4e8fb43944a604025a20cb))
+* **gotrue:** add resend api to request confirmation code ([#435](https://github.com/supabase/supabase-csharp/issues/435)) ([10295e1](https://github.com/supabase/supabase-csharp/commit/10295e11481a5f28e0468aca685a6ce881b60378))
+* **realtime:** optionally disconnect when the last channel closes ([#540](https://github.com/supabase/supabase-csharp/issues/540)) ([03eead9](https://github.com/supabase/supabase-csharp/commit/03eead990cb894f234d8a52e9da70d844efb03eb))
+
+
+### Bug Fixes
+
+* **functions:** stop writing request headers into the caller's options ([#521](https://github.com/supabase/supabase-csharp/issues/521)) ([f02ac89](https://github.com/supabase/supabase-csharp/commit/f02ac89dbe0486c349376aa63a95c0083342b3da))
+* **postgrest:** stop a failed cached Get from crashing the app ([#525](https://github.com/supabase/supabase-csharp/issues/525)) ([8cfbc2b](https://github.com/supabase/supabase-csharp/commit/8cfbc2b505dcd9c496b01f4ed10e0f4f744c6a43))
+* **postgrest:** stop setting Upsert on the caller's options ([#522](https://github.com/supabase/supabase-csharp/issues/522)) ([a6299f1](https://github.com/supabase/supabase-csharp/commit/a6299f16fd52d62f5c00b7a101d2a974f2be1207))
+* **realtime:** fire every matching postgres changes handler ([#539](https://github.com/supabase/supabase-csharp/issues/539)) ([0b4baca](https://github.com/supabase/supabase-csharp/commit/0b4baca01b3b020757a4210945ff5e5a3a7e6db3))
+* **realtime:** forget a channel on Unsubscribe ([#527](https://github.com/supabase/supabase-csharp/issues/527)) ([3c870ba](https://github.com/supabase/supabase-csharp/commit/3c870ba9fc39e03f8c859abc8a1240c9045b0a6e))
+* **realtime:** keep the socket when ConnectAsync is called again ([#541](https://github.com/supabase/supabase-csharp/issues/541)) ([58e0010](https://github.com/supabase/supabase-csharp/commit/58e0010036246f9ead7a3cad86a26bd97d01487b))
+* **realtime:** send the join ref with every channel push ([#526](https://github.com/supabase/supabase-csharp/issues/526)) ([f6ae616](https://github.com/supabase/supabase-csharp/commit/f6ae616c288421adedbb7fb5477f82d5f5a5ea80))
+* **realtime:** stop timed out pushes from leaking ([#543](https://github.com/supabase/supabase-csharp/issues/543)) ([bca182f](https://github.com/supabase/supabase-csharp/commit/bca182fbedc305b0ff80bdd098a81a02bb4fbb64))
+* **supabase:** reset the Realtime token to the API key on sign-out ([#532](https://github.com/supabase/supabase-csharp/issues/532)) ([29333a3](https://github.com/supabase/supabase-csharp/commit/29333a391a57726958becc7d7d7ac3814761f133))
+
 ## [8.4.0](https://github.com/supabase/supabase-csharp/compare/v8.3.1...v8.4.0) (2026-10-16)
 
 
