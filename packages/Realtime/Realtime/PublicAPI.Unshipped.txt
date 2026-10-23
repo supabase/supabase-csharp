@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.Realtime.ClientOptions.DisconnectOnEmptyChannelsAfter.get -> System.TimeSpan?
+Supabase.Realtime.ClientOptions.DisconnectOnEmptyChannelsAfter.set -> void

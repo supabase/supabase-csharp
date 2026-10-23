@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Realtime.Channel;
@@ -90,6 +91,8 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// Values are of type `RealtimeChannel<T> where T : BaseModel, new()`;
     /// </summary>
     private readonly Dictionary<string, RealtimeChannel> subscriptions;
+
+    private int disconnectGeneration;
 
     /// <summary>
     /// Initializes a Client instance, this method should be called prior to any other method.
@@ -412,9 +415,22 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     {
         var channel = (RealtimeChannel) sender;
         if (state == ChannelState.Closed && this.subscriptions.TryGetValue(channel.Topic, out var current) && current == channel)
+        {
             this.subscriptions.Remove(channel.Topic);
+            if (this.subscriptions.Count == 0 && this.Options.DisconnectOnEmptyChannelsAfter is { } delay)
+                _ = this.DisconnectWhenStillEmptyAsync(delay);
+        }
         else if (state == ChannelState.Joining)
             this.subscriptions.TryAdd(channel.Topic, channel);
+    }
+
+    private async Task DisconnectWhenStillEmptyAsync(TimeSpan delay)
+    {
+        var socket = this.Socket;
+        var generation = Interlocked.Increment(ref this.disconnectGeneration);
+        await Task.Delay(delay).ConfigureAwait(false);
+        if (generation == this.disconnectGeneration && this.Socket == socket && this.subscriptions.Count == 0)
+            this.Disconnect();
     }
 
     /// <summary>

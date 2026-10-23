@@ -45,6 +45,12 @@ public class ClientOptions
     public TimeSpan HeartbeatInterval { get; set; } = TimeSpan.FromSeconds(20);
 
     /// <summary>
+    /// When set, the socket disconnects once the last channel has been closed for this long. Call
+    /// <c>ConnectAsync</c> again before creating new channels. Left null, the socket stays open.
+    /// </summary>
+    public TimeSpan? DisconnectOnEmptyChannelsAfter { get; set; }
+
+    /// <summary>
     /// The interval to reconnect
     /// </summary>
     [ImplementedCapability("realtime.configuration.reconnect_backoff")]
