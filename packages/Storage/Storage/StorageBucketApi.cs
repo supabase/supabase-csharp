@@ -169,6 +169,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
         Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Delete, $"{this.Url}/bucket/{id}", null, this.Headers);
 
     /// <inheritdoc />
+    [ImplementedCapability("storage.file_buckets.purge_bucket_cache")]
     public Task<GenericResponse?> PurgeBucketCache(
         string id,
         PurgeCacheOptions? options = null,

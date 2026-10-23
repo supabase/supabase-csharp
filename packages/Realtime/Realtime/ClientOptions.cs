@@ -92,5 +92,6 @@ public class ClientOptions
     /// before this option existed. Set this to swap in a platform-specific transport (e.g. a browser-native
     /// adapter for Unity IL2CPP/WebGL builds).
     /// </summary>
+    [ImplementedCapability("realtime.configuration.custom_websocket_transport")]
     public IWebSocketFactory? WebSocketFactory { get; set; }
 }

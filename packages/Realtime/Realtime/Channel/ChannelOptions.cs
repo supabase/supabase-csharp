@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using Supabase.Core.Attributes;
 
 namespace Supabase.Realtime.Channel;
 
@@ -86,6 +87,7 @@ public class ChannelOptions
     /// <param name="clientOptions">The client configuration options.</param>
     /// <param name="retrieveAccessToken">A function that returns the current access token.</param>
     /// <param name="serializerSettings">The JSON serializer settings to be used for message serialization.</param>
+    [ImplementedCapability("realtime.subscriptions.private_channel")]
     public static ChannelOptions Private(
         ClientOptions clientOptions,
         Func<string?> retrieveAccessToken,

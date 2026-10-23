@@ -71,7 +71,7 @@ public class AdminClient : IGotrueAdminClient<User>
     }
 
     /// <inheritdoc />
-    [PartialCapability("auth.admin.delete_user", "Hard-delete only; no shouldSoftDelete flag (JS deleteUser(id, shouldSoftDelete)).")]
+    [ImplementedCapability("auth.admin.delete_user")]
     public async Task<bool> DeleteUser(string uid, bool shouldSoftDelete = false)
     {
         var result = await this.api.DeleteUser(uid, this.serviceKey, shouldSoftDelete);

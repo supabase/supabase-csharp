@@ -31,7 +31,7 @@ public partial class Client
         /// Timout value for HttpClient Requests, defaults to 100s.
         /// https://learn.microsoft.com/en-us/dotnet/api/system.net.http.httpclient.timeout?view=net-8.0#remarks
         /// </summary>
-        [PartialCapability("functions.invocation.timeout", "Per-invoke HttpTimeout exists, but it is not composable with a caller-supplied cancellation signal (Invoke accepts no CancellationToken).")]
+        [ImplementedCapability("functions.invocation.timeout", "Per-invoke HttpTimeout, linked with the caller's CancellationToken.")]
         public TimeSpan HttpTimeout { get; set; } = TimeSpan.FromSeconds(100);
 
         /// <summary>

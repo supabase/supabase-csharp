@@ -41,6 +41,7 @@ public class ClientOptions
     /// Fails a request that runs longer than this, retries included, with a TaskCanceledException.
     /// The HttpClient timeout, 100 seconds by default, still applies.
     /// </summary>
+    [ImplementedCapability("database.configuration.request_timeout")]
     public TimeSpan? Timeout { get; set; }
 
     /// <summary>An HttpClient to send requests through. When null, the client builds and owns its own.</summary>

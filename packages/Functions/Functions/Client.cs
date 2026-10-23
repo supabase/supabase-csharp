@@ -46,7 +46,6 @@ public partial class Client : IFunctionsClient
     ///
     /// Headers specified in the method parameters will ALWAYS take precedence over headers returned by this function.
     /// </summary>
-    [PartialCapability("functions.invocation.set_auth_token", "No stateful SetAuth; bearer token is supplied per invocation or via a GetHeaders provider hook, not stored for all subsequent calls.")]
     public Func<Dictionary<string, string>>? GetHeaders { get; set; }
 
     /// <summary>The options this client was constructed with.</summary>
@@ -67,6 +66,7 @@ public partial class Client : IFunctionsClient
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("functions.invocation.set_auth_token")]
     public void SetAuth(string token) => this.token = token;
 
     /// <summary>
@@ -116,6 +116,7 @@ public partial class Client : IFunctionsClient
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     [ImplementedCapability("functions.invocation.invoke", "Three return shapes — string, deserialized T, and raw HttpContent.")]
+    [ImplementedCapability("functions.invocation.request_cancellation", "Every invoke method (Invoke/Invoke<T>/RawInvoke/InvokeStream) accepts a CancellationToken.")]
     public async Task<string> Invoke(
         string functionName,
         string? token = null,

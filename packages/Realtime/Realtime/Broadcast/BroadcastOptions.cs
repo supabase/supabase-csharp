@@ -28,6 +28,7 @@ public class BroadcastOptions
     /// </summary>
     [JsonPropertyName("replay")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [ImplementedCapability("realtime.subscriptions.broadcast_replay")]
     public ReplayOptions? Replay { get; set; }
 
     /// <summary>

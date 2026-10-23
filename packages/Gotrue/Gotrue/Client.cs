@@ -1013,9 +1013,11 @@ public class Client : IGotrueClient<User, Session>
     public void Shutdown() => this.NotifyAuthStateChange(AuthState.Shutdown);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.sign_in.resend_confirmation")]
     public Task<BaseResponse> Resend(ResendParameters resendParameters) => this.api.Resend(resendParameters);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.session.auto_refresh")]
     public void StartAutoRefresh()
     {
         this.TokenRefresh ??= new TokenRefresh(this);
@@ -1024,6 +1026,7 @@ public class Client : IGotrueClient<User, Session>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.session.auto_refresh")]
     public void StopAutoRefresh() => this.TokenRefresh?.Stop();
 
     /// <inheritdoc />
@@ -1194,6 +1197,7 @@ public class Client : IGotrueClient<User, Session>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.session.get_claims")]
     public async Task<GetClaimsResponse> GetClaimsAsync(string? jwt = null, GetClaimsOptions? options = null, CancellationToken cancellationToken = default)
     {
         var token = jwt ?? this.CurrentSession?.AccessToken;

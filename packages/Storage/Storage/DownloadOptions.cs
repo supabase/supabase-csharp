@@ -1,3 +1,5 @@
+using Supabase.Core.Attributes;
+
 namespace Supabase.Storage;
 
 public class DownloadOptions
@@ -17,5 +19,6 @@ public class DownloadOptions
     /// <summary>
     /// Append a cache nonce parameter to the URL to invalidate the cache
     /// </summary>
+    [ImplementedCapability("storage.file_buckets.url_cache_nonce")]
     public string? CacheNonce { get; set; }
 }

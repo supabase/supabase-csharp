@@ -449,6 +449,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.strip_nulls")]
     public IPostgrestTable<TModel> StripNulls()
     {
         this.stripNulls = true;
@@ -618,7 +619,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
-    [ImplementedCapability("database.using_modifiers.single_row")]
+    [ImplementedCapability("database.using_modifiers.maybe_single_row")]
     public async Task<TModel?> Single(CancellationToken cancellationToken = default)
     {
         this.method = HttpMethod.Get;

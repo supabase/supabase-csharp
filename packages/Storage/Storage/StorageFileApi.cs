@@ -296,6 +296,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     /// <summary>
     /// Lists the objects under a prefix, one page at a time.
     /// </summary>
+    [ImplementedCapability("storage.file_buckets.list_files")]
     public Task<SearchV2Result?> ListV2Async(SearchV2Options? options = null, CancellationToken cancellationToken = default) =>
         Helpers.MakeRequestAsync<SearchV2Result>(
             this.requestClient,
@@ -871,6 +872,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("storage.file_buckets.purge_cache")]
     public Task<GenericResponse?> PurgeCache(
         string path,
         PurgeCacheOptions? options = null,
