@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Reactive.Subjects;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Supabase.Realtime;
 using Supabase.Realtime.Sockets;
@@ -65,10 +66,24 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     /// <summary>Completes when the socket sends its first frame, the heartbeat that starts on open.</summary>
     public TaskCompletionSource FirstSend { get; } = new();
 
+    /// <summary>When set, every heartbeat gets its reply, as from a healthy server.</summary>
+    public bool AnswerHeartbeats { get; init; }
+
+    /// <summary>Completes when the socket forces a reconnect.</summary>
+    public TaskCompletionSource Reconnected { get; } = new();
+
     public bool Send(string message)
     {
         this.FirstSend.TrySetResult();
+        if (this.AnswerHeartbeats && JsonNode.Parse(message) is { } frame && (string?) frame["event"] == "heartbeat")
+            this.Receive("""{"topic":"phoenix","event":"phx_reply","ref":"REF","payload":{"status":"ok","response":{}}}""".Replace("REF", (string?) frame["ref"]));
         return true;
+    }
+
+    public Task Reconnect()
+    {
+        this.Reconnected.TrySetResult();
+        return Task.CompletedTask;
     }
 
     /// <summary>Delivers a frame as if the server had sent it.</summary>
@@ -92,7 +107,6 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     public ClientWebSocket NativeClient => throw new NotImplementedException();
     public Task Start() => throw new NotImplementedException();
     public Task<bool> StopOrFail(WebSocketCloseStatus status, string reason) => throw new NotImplementedException();
-    public Task Reconnect() => throw new NotImplementedException();
     public Task ReconnectOrFail() => throw new NotImplementedException();
     public bool Send(byte[] message) => throw new NotImplementedException();
     public bool Send(ArraySegment<byte> message) => throw new NotImplementedException();

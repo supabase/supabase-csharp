@@ -332,10 +332,11 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         {
             this.hasPendingHeartbeat = false;
             Debugger.Instance.Log(this, "Socket Heartbeat Timeout: Attempting to re-establish a connection.");
-            this.connection.Stop(WebSocketCloseStatus.EndpointUnavailable, "heartbeat timeout");
+            _ = this.connection.Reconnect();
             return;
         }
 
+        this.hasPendingHeartbeat = true;
         this.pendingHeartbeatRef = this.MakeMsgRef();
 
         this.Push(new SocketRequest
@@ -425,6 +426,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
             // Send Separate heartbeat event
             if (decoded!.Ref == this.pendingHeartbeatRef)
             {
+                this.hasPendingHeartbeat = false;
                 this.NotifyHeartbeatReceived(decoded);
                 return;
             }
