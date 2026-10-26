@@ -49,6 +49,7 @@ public class QueryOptions
     /// <summary>
     /// Count algorithm to use to count rows in a table.
     /// </summary>
+    [ImplementedCapability("database.mutate.count", "Applied to Insert/Upsert/Update/Delete; the count is read back from ModeledResponse.Count.")]
     public CountType Count { get; set; } = CountType.None;
 
     /// <summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using Supabase.Core.Attributes;
 
 namespace Supabase.Storage.Exceptions;
 
@@ -17,6 +18,7 @@ public class SupabaseStorageException : Exception
     /// <summary>
     /// Gets the error code returned by the Storage service, if available.
     /// </summary>
+    [ImplementedCapability("storage.errors.error_codes")]
     public string? Code { get; internal set; }
 
     public FailureHint.Reason Reason { get; private set; }
