@@ -1,5 +1,13 @@
 # Changelog
 
+## [8.5.1](https://github.com/supabase/supabase-csharp/compare/v8.5.0...v8.5.1) (2026-10-26)
+
+
+### Bug Fixes
+
+* **core:** cache X-Client-Info header per client assembly ([#548](https://github.com/supabase/supabase-csharp/issues/548)) ([731e1f8](https://github.com/supabase/supabase-csharp/commit/731e1f827d0b525b5af7a153b37685021002037a))
+* **realtime:** reconnect when a heartbeat goes unanswered ([#547](https://github.com/supabase/supabase-csharp/issues/547)) ([7ee329b](https://github.com/supabase/supabase-csharp/commit/7ee329b01dff4871e960bc80b580d6a3bb3ecf03))
+
 ## [8.5.0](https://github.com/supabase/supabase-csharp/compare/v8.4.0...v8.5.0) (2026-10-23)
 
 
