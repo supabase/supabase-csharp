@@ -19,6 +19,9 @@ namespace Gotrue.Tests.Support;
 /// </summary>
 public abstract class RequestApprovalFixture : VerifyBase
 {
+    /// <summary>A redirect carrying its own query and fragment, which survive only when <c>redirect_to</c> is URL-encoded.</summary>
+    protected const string RedirectWithOwnQuery = "https://app.example/callback?next=/home&tab=2#section";
+
     private MockGotrueServer server = null!;
 
     /// <summary>The client under test, pointed at the hermetic server.</summary>

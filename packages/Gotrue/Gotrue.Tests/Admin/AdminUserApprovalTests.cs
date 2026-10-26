@@ -43,6 +43,21 @@ public class AdminUserApprovalTests : RequestApprovalFixture
     }
 
     [TestMethod]
+    public async Task InviteUserRequest_ShouldSendRedirectToIntact_GivenRedirectWithOwnQuery()
+    {
+        await this.Api.InviteUserByEmail("user@example.com", "service-jwt", new InviteUserByEmailOptions { RedirectTo = RedirectWithOwnQuery });
+        this.ValidateQueryParameters("redirect_to", RedirectWithOwnQuery);
+    }
+
+    [TestMethod]
+    public async Task GenerateLinkRequest_ShouldSendRedirectToIntact_GivenRedirectWithOwnQuery()
+    {
+        await this.Api.GenerateLink("service-jwt",
+            new GenerateLinkOptions(GenerateLinkOptions.LinkType.MagicLink, "user@example.com") { RedirectTo = RedirectWithOwnQuery });
+        this.ValidateQueryParameters("redirect_to", RedirectWithOwnQuery);
+    }
+
+    [TestMethod]
     public async Task GenerateLinkRequest_ShouldSerializeToExpectedPayload_GivenMagicLinkType()
     {
         await this.Api.GenerateLink("service-jwt",

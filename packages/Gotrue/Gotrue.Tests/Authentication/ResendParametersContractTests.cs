@@ -102,4 +102,19 @@ public class ResendParametersContractTests : RequestApprovalFixture
         this.ValidateQueryParameters("redirect_to", "https://google.com");
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
+
+    [TestMethod]
+    public async Task ResendRequest_ShouldSendRedirectToIntact_GivenRedirectWithOwnQuery()
+    {
+        var resend = new ResendParameters(
+            type: ResendType.SignUp,
+            email: "user@supabase.com",
+            phone: null,
+            options: new ResendOptions(captchaToken: null, emailRedirectTo: RedirectWithOwnQuery)
+        );
+
+        await this.Api.Resend(resend);
+
+        this.ValidateQueryParameters("redirect_to", RedirectWithOwnQuery);
+    }
 }
