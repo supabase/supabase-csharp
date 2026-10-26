@@ -30,4 +30,11 @@ public class PasswordRecoveryApprovalTests : RequestApprovalFixture
         await this.Api.ResetPasswordForEmail(new ResetPasswordForEmailOptions("user@example.com") { RedirectTo = RedirectWithOwnQuery });
         this.ValidateQueryParameters("redirect_to", RedirectWithOwnQuery);
     }
+
+    [TestMethod]
+    public async Task ResetPasswordRequest_ShouldOmitRedirectTo_GivenNoRedirect()
+    {
+        await this.Api.ResetPasswordForEmail(new ResetPasswordForEmailOptions("user@example.com"));
+        this.ValidateNoQueryParameter("redirect_to");
+    }
 }

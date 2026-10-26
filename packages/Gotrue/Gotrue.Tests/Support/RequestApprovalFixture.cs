@@ -53,4 +53,11 @@ public abstract class RequestApprovalFixture : VerifyBase
     /// <param name="expected">Value expected</param>
     protected void ValidateQueryParameters(string name, string expected) => this.server.VerifySingleReceivedRequest()
         .WithQueryParam(name, expected);
+
+    /// <summary>
+    ///     Check the request query parameter was not sent.
+    /// </summary>
+    /// <param name="name">Query parameter name</param>
+    protected void ValidateNoQueryParameter(string name) => this.server.VerifySingleReceivedRequest()
+        .WithoutQueryParam(name);
 }

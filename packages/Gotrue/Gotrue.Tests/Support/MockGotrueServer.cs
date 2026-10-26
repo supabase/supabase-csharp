@@ -80,6 +80,12 @@ internal sealed class ReceivedRequest
         return this;
     }
 
+    internal ReceivedRequest WithoutQueryParam(string name)
+    {
+        this.request.Query.Should().NotContainKey(name, $"'{name}' should not have been sent");
+        return this;
+    }
+
     internal ReceivedRequest WithHeader(string name, string expected)
     {
         this.request.Headers.Should().ContainKey(name).WhoseValue.Single().Should().Be(expected);
