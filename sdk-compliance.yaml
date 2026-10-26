@@ -233,6 +233,11 @@ features:
     symbols:
       - Table.Select
 
+  database.mutate.count:
+    status: implemented
+    note: "Applied to Insert/Upsert/Update/Delete; the count is read back from ModeledResponse.Count."
+    symbols:
+      - QueryOptions.Count
   database.mutate.delete:
     status: implemented
     symbols:
@@ -559,6 +564,11 @@ features:
     status: implemented
     symbols:
       - ClientOptions.HeartbeatInterval
+  realtime.configuration.deferred_disconnect:
+    status: partially_implemented
+    note: "Opt-in (null by default, socket otherwise stays open); after the deferred disconnect the caller must call ConnectAsync again before creating channels, there is no automatic reconnect."
+    symbols:
+      - ClientOptions.DisconnectOnEmptyChannelsAfter
   realtime.configuration.custom_logger:
     status: partially_implemented
     note: "Diagnostics routed through a debug handler hook; no custom logging function with a log-level filter."
@@ -685,3 +695,8 @@ features:
     status: implemented
     symbols:
       - StorageBucketApi.PurgeBucketCache
+
+  storage.errors.error_codes:
+    status: implemented
+    symbols:
+      - SupabaseStorageException.Code
