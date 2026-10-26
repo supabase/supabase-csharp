@@ -74,6 +74,8 @@ Supabase.Realtime.ClientOptions.DateTimeFormat.get -> string!
 Supabase.Realtime.ClientOptions.DateTimeFormat.set -> void
 Supabase.Realtime.ClientOptions.Decode.get -> System.Action<string!, System.Action<Supabase.Realtime.Socket.SocketResponse?>!>?
 Supabase.Realtime.ClientOptions.Decode.set -> void
+Supabase.Realtime.ClientOptions.DisconnectOnEmptyChannelsAfter.get -> System.TimeSpan?
+Supabase.Realtime.ClientOptions.DisconnectOnEmptyChannelsAfter.set -> void
 Supabase.Realtime.ClientOptions.Encode.get -> System.Action<object!, System.Action<string!>!>?
 Supabase.Realtime.ClientOptions.Encode.set -> void
 Supabase.Realtime.ClientOptions.EventsPerSecond.get -> int
