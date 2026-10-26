@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -23,6 +24,13 @@ public static class Util
     /// <param name="clientType">A type belonging to the client assembly, used to resolve the assembly name and version.</param>
     /// <returns>A structured header value identifying the client library and its host environment.</returns>
     public static string GetAssemblyVersion(Type clientType) =>
+        ClientInfoCache.GetOrAdd(clientType.Assembly, static (_, type) => BuildClientInfo(type), clientType);
+
+    // The header is process-invariant, yet callers stamp it on every request; building it scans
+    // every loaded assembly (and, on Unity, every assembly's attributes), so it is built once per client assembly.
+    private static readonly ConcurrentDictionary<Assembly, string> ClientInfoCache = new();
+
+    private static string BuildClientInfo(Type clientType) =>
         GetAssemblyVersion(clientType, RuntimeInformation.OSDescription, RuntimeInformation.IsOSPlatform, AppDomain.CurrentDomain.GetAssemblies());
 
     // Testability seam: the platform and framework probes read process-wide ambient state

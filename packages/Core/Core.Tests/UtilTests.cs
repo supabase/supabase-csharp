@@ -51,6 +51,15 @@ public class UtilTests
     }
 
     [TestMethod]
+    public void GetAssemblyVersion_ShouldReuseCachedValue_GivenAssemblyIsAlreadyGenerated()
+    {
+        Util.GetAssemblyVersion(typeof(Util));
+        var allocated = GC.GetAllocatedBytesForCurrentThread();
+        Util.GetAssemblyVersion(typeof(Util));
+        GC.GetAllocatedBytesForCurrentThread().Should().Be(allocated);
+    }
+
+    [TestMethod]
     public void GetAssemblyVersion_ShouldReportBrowserPlatform_GivenBrowserOsDescription() =>
         HeaderFor("Browser", NoPlatform).Should().Contain("; platform=browser;");
 
