@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Core.Tests.TestDoubles;
@@ -20,8 +19,15 @@ namespace Core.Tests;
 [TestCategory("Unit")]
 public class UtilTests
 {
-    private static readonly Func<OSPlatform, bool> NoPlatform = _ => false;
-    private static readonly IReadOnlyCollection<Assembly> NoFrameworks = [];
+    private static readonly HostEnvironment PlainHost = new(
+        OsDescription: "any",
+        IsOsPlatform: _ => false,
+        LoadedAssemblies: [],
+        FrameworkDescription: ".NET 10.0.0",
+        UnityVersion: () => null,
+        UnityPlatform: () => null);
+
+    private static readonly HostEnvironment UnityHost = PlainHost with { LoadedAssemblies = [FakeAssembly.Named("UnityEngine.CoreModule")] };
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldStartWithClientNameAndVersion() =>
@@ -61,7 +67,7 @@ public class UtilTests
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldReportBrowserPlatform_GivenBrowserOsDescription() =>
-        HeaderFor("Browser", NoPlatform).Should().Contain("; platform=browser;");
+        HeaderFor("Browser", PlainHost.IsOsPlatform).Should().Contain("; platform=browser;");
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldReportWindowsPlatform_GivenWindows() =>
@@ -85,41 +91,87 @@ public class UtilTests
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldFallBackToOsDescription_GivenUnrecognizedPlatform() =>
-        HeaderFor("Solaris 11", NoPlatform).Should().Contain("; platform=Solaris 11;");
+        HeaderFor("Solaris 11", PlainHost.IsOsPlatform).Should().Contain("; platform=Solaris 11;");
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldReportUnknownFramework_GivenNoKnownFrameworkAssembly() =>
-        HeaderWith(NoFrameworks).Should().Contain("; framework=unknown");
+        Header(PlainHost).Should().Contain("; framework=unknown");
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldReportMauiFramework_GivenMauiAssembly() =>
-        HeaderWith([FakeAssembly.Named("Microsoft.Maui")]).Should().Contain("; framework=maui");
+        HeaderWith(FakeAssembly.Named("Microsoft.Maui")).Should().Contain("; framework=maui");
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldReportBlazorFramework_GivenBlazorAssembly() =>
-        HeaderWith([FakeAssembly.Named("Microsoft.AspNetCore.Components")]).Should().Contain("; framework=blazor");
+        HeaderWith(FakeAssembly.Named("Microsoft.AspNetCore.Components")).Should().Contain("; framework=blazor");
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldPreferMauiOverBlazor_GivenBothAssemblies() =>
-        HeaderWith([FakeAssembly.Named("Microsoft.AspNetCore.Components"), FakeAssembly.Named("Microsoft.Maui")])
+        HeaderWith(FakeAssembly.Named("Microsoft.AspNetCore.Components"), FakeAssembly.Named("Microsoft.Maui"))
             .Should().Contain("; framework=maui", "MAUI wins over Blazor in hybrid apps where both are present");
 
     [TestMethod]
     public void GetAssemblyVersion_ShouldReportUnityFrameworkWithVersion_GivenUnityAssembly() =>
-        HeaderWith([FakeAssembly.Named("UnityEngine.CoreModule"), typeof(UtilTests).Assembly])
-            .Should().Contain("; framework=unity; framework-version=2022.3.5f1");
+        Header(UnityHost with { UnityVersion = () => "6000.3.21f1" })
+            .Should().Contain("; framework=unity; framework-version=6000.3.21f1");
 
     [TestMethod]
-    public void GetAssemblyVersion_ShouldReportUnityFrameworkWithoutVersion_GivenNoUnityVersionAttribute() =>
-        HeaderWith([FakeAssembly.Named("UnityEngine.CoreModule")])
+    public void GetAssemblyVersion_ShouldReportUnityFrameworkWithoutVersion_GivenUnityVersionIsUnavailable() =>
+        Header(UnityHost)
             .Should().Contain("; framework=unity").And.NotContain("framework-version",
-                "an absent Unity version attribute must resolve to no version, not throw");
+                "a stripped Application.unityVersion must resolve to no version, not throw");
+
+    [TestMethod]
+    [DataRow("Android", "Android")]
+    [DataRow("IPhonePlayer", "iOS")]
+    [DataRow("WebGLPlayer", "browser")]
+    [DataRow("WindowsPlayer", "Windows")]
+    [DataRow("WSAPlayerARM", "Windows")]
+    [DataRow("OSXEditor", "macOS")]
+    [DataRow("LinuxServer", "Linux")]
+    [DataRow("EmbeddedLinuxArm64", "Linux")]
+    [DataRow("Switch", "Switch")]
+    public void GetAssemblyVersion_ShouldReportUnityPlatform_GivenUnityRuntimePlatform(string runtimePlatform, string expected) =>
+        Header(UnityHost with { OsDescription = "Unix 5.15.189.13", UnityPlatform = () => runtimePlatform })
+            .Should().Contain($"; platform={expected};");
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldFallBackToOsPlatform_GivenUnityPlatformIsUnavailable() =>
+        Header(UnityHost with { OsDescription = "Unix 5.15.189.13" })
+            .Should().Contain("; platform=Unix 5.15.189.13;");
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldIgnoreUnityPlatform_GivenNoUnityAssembly() =>
+        Header(PlainHost with { OsDescription = "Solaris 11", UnityPlatform = () => "Android" })
+            .Should().Contain("; platform=Solaris 11;");
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldReportMonoRuntimeVersion_GivenUnityOnMono() =>
+        Header(UnityHost with { FrameworkDescription = "Mono 6.13.0 (Visual Studio built mono)" })
+            .Should().Contain("; runtime=mono; runtime-version=6.13.0;");
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldReportIl2CppRuntimeWithoutVersion_GivenUnityOnIl2Cpp() =>
+        Header(UnityHost with { FrameworkDescription = "Mono Unity IL2CPP(Oct  1 2025 10:00:00)" })
+            .Should().Contain("; runtime=il2cpp; framework=unity");
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldReportDotnetRuntime_GivenUnityWithUnrecognizedFrameworkDescription() =>
+        Header(UnityHost with { FrameworkDescription = ".NET 10.0.0" })
+            .Should().MatchRegex("; runtime=dotnet; runtime-version=[^;]+; framework=unity");
+
+    [TestMethod]
+    public void GetAssemblyVersion_ShouldReportDotnetRuntime_GivenMonoOutsideUnity() =>
+        Header(PlainHost with { FrameworkDescription = "Mono 6.13.0 (Visual Studio built mono)" })
+            .Should().Contain("; runtime=dotnet;");
+
+    private static string Header(HostEnvironment host) => Util.GetAssemblyVersion(typeof(Util), host);
 
     private static string HeaderFor(string osDescription, Func<OSPlatform, bool> isOsPlatform) =>
-        Util.GetAssemblyVersion(typeof(Util), osDescription, isOsPlatform, NoFrameworks);
+        Header(PlainHost with { OsDescription = osDescription, IsOsPlatform = isOsPlatform });
 
-    private static string HeaderWith(IReadOnlyCollection<Assembly> loadedAssemblies) =>
-        Util.GetAssemblyVersion(typeof(Util), "any", NoPlatform, loadedAssemblies);
+    private static string HeaderWith(params Assembly[] loadedAssemblies) =>
+        Header(PlainHost with { LoadedAssemblies = loadedAssemblies });
 
     private static Func<OSPlatform, bool> OnlyPlatform(OSPlatform platform) => p => p == platform;
 }
