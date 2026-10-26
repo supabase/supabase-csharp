@@ -26,6 +26,13 @@ public class PasswordlessApprovalTests : RequestApprovalFixture
     }
 
     [TestMethod]
+    public async Task OtpRequest_ShouldSendRedirectToIntact_GivenRedirectWithOwnQuery()
+    {
+        await this.Api.SignInWithOtp(new SignInWithPasswordlessEmailOptions("user@example.com") { EmailRedirectTo = RedirectWithOwnQuery });
+        this.ValidateQueryParameters("redirect_to", RedirectWithOwnQuery);
+    }
+
+    [TestMethod]
     public async Task OtpRequest_ShouldSerializeToExpectedPayload_GivenPhone()
     {
         await this.Api.SignInWithOtp(new SignInWithPasswordlessPhoneOptions("+15555550123"));

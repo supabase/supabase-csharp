@@ -63,13 +63,7 @@ public class ResendParameters
     internal string ApplyRedirectTo(string url)
     {
         var newUrl = $"{url}/resend";
-        if (!this.IsEmail())
-            return newUrl;
-
-        if (!string.IsNullOrWhiteSpace(this.Options?.EmailRedirectTo))
-            newUrl = $"{url}/resend?redirect_to={this.Options.EmailRedirectTo}";
-
-        return newUrl;
+        return this.IsEmail() ? Helpers.WithRedirectTo(newUrl, this.Options?.EmailRedirectTo) : newUrl;
     }
 
     private bool IsEmail() => this.Type is ResendType.EmailChange or ResendType.SignUp;

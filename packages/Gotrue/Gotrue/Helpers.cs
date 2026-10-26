@@ -164,6 +164,15 @@ public static class Helpers
     }
 
     /// <summary>
+    /// Appends <paramref name="redirectTo"/> as a URL-encoded <c>redirect_to</c> query parameter, or returns
+    /// <paramref name="url"/> unchanged when there is none.
+    /// </summary>
+    internal static string WithRedirectTo(string url, string? redirectTo) =>
+        string.IsNullOrWhiteSpace(redirectTo)
+            ? url
+            : AddQueryParams(url, new Dictionary<string, string> { { "redirect_to", redirectTo! } }).ToString();
+
+    /// <summary>
     /// Adds query params to a given Url
     /// </summary>
     /// <param name="url"></param>

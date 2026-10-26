@@ -3,6 +3,7 @@
 using System.Threading.Tasks;
 using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Supabase.Gotrue;
 
 #endregion
 
@@ -21,5 +22,19 @@ public class PasswordRecoveryApprovalTests : RequestApprovalFixture
     {
         await this.Api.ResetPasswordForEmail("user@example.com");
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
+
+    [TestMethod]
+    public async Task ResetPasswordRequest_ShouldSendRedirectToIntact_GivenRedirectWithOwnQuery()
+    {
+        await this.Api.ResetPasswordForEmail(new ResetPasswordForEmailOptions("user@example.com") { RedirectTo = RedirectWithOwnQuery });
+        this.ValidateQueryParameters("redirect_to", RedirectWithOwnQuery);
+    }
+
+    [TestMethod]
+    public async Task ResetPasswordRequest_ShouldOmitRedirectTo_GivenNoRedirect()
+    {
+        await this.Api.ResetPasswordForEmail(new ResetPasswordForEmailOptions("user@example.com"));
+        this.ValidateNoQueryParameter("redirect_to");
     }
 }

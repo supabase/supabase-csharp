@@ -179,7 +179,7 @@ public class Api : IGotrueApi<User, Session>
     /// <returns></returns>
     public async Task<PasswordlessSignInState> SignInWithOtp(SignInWithPasswordlessEmailOptions options)
     {
-        var url = string.IsNullOrEmpty(options.EmailRedirectTo) ? $"{this.Url}/otp" : $"{this.Url}/otp?redirect_to={options.EmailRedirectTo}";
+        var url = Helpers.WithRedirectTo($"{this.Url}/otp", options.EmailRedirectTo);
         string? verifier = null;
 
         var body = new Dictionary<string, object>
@@ -374,7 +374,7 @@ public class Api : IGotrueApi<User, Session>
     /// <returns></returns>
     public Task<BaseResponse> InviteUserByEmail(string email, string jwt, InviteUserByEmailOptions? options = null)
     {
-        var url = options == null || string.IsNullOrEmpty(options.RedirectTo) ? $"{this.Url}/invite" : $"{this.Url}/invite?redirect_to={options.RedirectTo}";
+        var url = Helpers.WithRedirectTo($"{this.Url}/invite", options?.RedirectTo);
         var body = new Dictionary<string, object> { { "email", email } };
 
         if (options?.Data != null)
@@ -533,7 +533,7 @@ public class Api : IGotrueApi<User, Session>
     /// <returns></returns>
     public async Task<ResetPasswordForEmailState> ResetPasswordForEmail(ResetPasswordForEmailOptions options)
     {
-        var url = string.IsNullOrEmpty(options.RedirectTo) ? $"{this.Url}/recover" : $"{this.Url}/recover?redirect_to={options.RedirectTo}";
+        var url = Helpers.WithRedirectTo($"{this.Url}/recover", options.RedirectTo);
         string? verifier = null;
 
         var body = new Dictionary<string, object>
@@ -864,7 +864,7 @@ public class Api : IGotrueApi<User, Session>
     /// <returns></returns>
     public Task<BaseResponse> GenerateLink(string jwt, GenerateLinkOptions options)
     {
-        var url = string.IsNullOrEmpty(options.RedirectTo) ? $"{this.Url}/admin/generate_link" : $"{this.Url}/admin/generate_link?redirect_to={options.RedirectTo}";
+        var url = Helpers.WithRedirectTo($"{this.Url}/admin/generate_link", options.RedirectTo);
 
         return this.MakeRequestAsync(HttpMethod.Post, url, options, this.CreateAuthedRequestHeaders(jwt));
     }

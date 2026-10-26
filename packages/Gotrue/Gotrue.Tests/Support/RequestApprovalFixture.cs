@@ -19,6 +19,9 @@ namespace Gotrue.Tests.Support;
 /// </summary>
 public abstract class RequestApprovalFixture : VerifyBase
 {
+    /// <summary>A redirect carrying its own query and fragment, which survive only when <c>redirect_to</c> is URL-encoded.</summary>
+    protected const string RedirectWithOwnQuery = "https://app.example/callback?next=/home&tab=2#section";
+
     private MockGotrueServer server = null!;
 
     /// <summary>The client under test, pointed at the hermetic server.</summary>
@@ -50,4 +53,11 @@ public abstract class RequestApprovalFixture : VerifyBase
     /// <param name="expected">Value expected</param>
     protected void ValidateQueryParameters(string name, string expected) => this.server.VerifySingleReceivedRequest()
         .WithQueryParam(name, expected);
+
+    /// <summary>
+    ///     Check the request query parameter was not sent.
+    /// </summary>
+    /// <param name="name">Query parameter name</param>
+    protected void ValidateNoQueryParameter(string name) => this.server.VerifySingleReceivedRequest()
+        .WithoutQueryParam(name);
 }
