@@ -13,6 +13,17 @@ updates:
       - dependency-name: "FluentAssertions"
       - dependency-name: "NSubstitute"
       - dependency-name: "Npgsql"
+      # Shipped-library floor: consumer compatibility (Unity, net8 apps), patches only
+      - dependency-name: "System.Text.Json"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "System.Diagnostics.DiagnosticSource"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "Microsoft.Extensions.Http"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "Microsoft.Extensions.DependencyInjection"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "System.IdentityModel.Tokens.Jwt"
+        update-types: ["version-update:semver-major"]
     groups:
       test-tooling:
         patterns: ["MSTest.*", "FluentAssertions*", "NSubstitute*", "Verify*", "Microsoft.NET.Test.Sdk", "coverlet*", "WireMock.Net"]
