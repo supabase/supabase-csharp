@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels: ["dependencies", "nuget"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    ignore:
+      - dependency-name: "FluentAssertions"
+      - dependency-name: "NSubstitute"
+      - dependency-name: "Npgsql"
+    groups:
+      test-tooling:
+        patterns: ["MSTest.*", "FluentAssertions*", "NSubstitute*", "Verify*", "Microsoft.NET.Test.Sdk", "coverlet*", "WireMock.Net"]
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies", "github-actions"]
+    commit-message:
+      prefix: "chore"
+      include: "scope"
