@@ -27,7 +27,7 @@
     </PackageVersion>
     <PackageVersion Include="System.Text.Json" Version="8.0.5" />
     <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
-    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
     <PackageVersion Include="Websocket.Client" Version="5.5.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.303" />
     <!-- Tooling dependencies (CapabilityMatrix generator — unreleased, not packed) -->
