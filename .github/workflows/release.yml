@@ -48,7 +48,7 @@ jobs:
           global-json-file: global.json
 
       - name: Wait for tests to succeed
-        uses: lewagon/wait-on-check-action@v1.3.1
+        uses: lewagon/wait-on-check-action@v1.9.1
         with:
           ref: ${{ github.ref }}
           check-name: build-and-test
