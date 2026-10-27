@@ -13,7 +13,9 @@
 
     <ItemGroup>
         <PackageReference Include="FluentAssertions" />
+        <PackageReference Include="Microsoft.IdentityModel.Tokens" VersionOverride="6.36.0" />
         <PackageReference Include="NSubstitute" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" VersionOverride="6.36.0" />
         <PackageReference Include="Verify.MSTest" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
         <PackageReference Include="MSTest.TestAdapter" />
