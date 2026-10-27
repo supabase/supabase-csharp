@@ -18,7 +18,7 @@ jobs:
       pull-requests: write   # open the post-merge baseline-refresh PR
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The gate's format stage diffs changed .cs files against origin/master,
           # so it needs full history rather than a shallow clone.
@@ -79,10 +79,10 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Checkout capability spec
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: supabase/sdk
           path: _sdk-spec

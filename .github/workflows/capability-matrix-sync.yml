@@ -19,10 +19,10 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Checkout capability spec
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: supabase/sdk
           path: _sdk-spec
