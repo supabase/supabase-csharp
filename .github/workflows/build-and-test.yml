@@ -59,7 +59,7 @@ jobs:
 
       - name: Refresh baseline on master
         if: always() && github.event_name == 'push'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.PAT_AUTOMATION_STEPS }}
           add-paths: packages/*/.gate-baseline.json
