@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0   # --since and the gate's diff both need origin/master
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
