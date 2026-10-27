@@ -99,7 +99,7 @@ jobs:
         run: ./scripts/quality-gate/mark-api-shipped.sh packages
 
       - name: Open PR to mark shipped API
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ steps.app-token.outputs.token }}
           add-paths: packages/*/PublicAPI.*.txt
