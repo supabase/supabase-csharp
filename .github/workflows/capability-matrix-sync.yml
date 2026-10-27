@@ -19,17 +19,17 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Checkout capability spec
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: supabase/sdk
           path: _sdk-spec
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -39,7 +39,7 @@ jobs:
             generate --spec _sdk-spec/packages/capability-matrix/capabilities
 
       - name: Open PR with the regenerated compliance file
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.PAT_AUTOMATION_STEPS }}
           add-paths: sdk-compliance.yaml

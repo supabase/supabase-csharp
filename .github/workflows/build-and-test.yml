@@ -18,14 +18,14 @@ jobs:
       pull-requests: write   # open the post-merge baseline-refresh PR
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # The gate's format stage diffs changed .cs files against origin/master,
           # so it needs full history rather than a shallow clone.
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
@@ -59,7 +59,7 @@ jobs:
 
       - name: Refresh baseline on master
         if: always() && github.event_name == 'push'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.PAT_AUTOMATION_STEPS }}
           add-paths: packages/*/.gate-baseline.json
@@ -79,17 +79,17 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Checkout capability spec
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: supabase/sdk
           path: _sdk-spec
           persist-credentials: false
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
 
