@@ -32,6 +32,24 @@ See the [wiki](https://github.com/supabase/supabase-csharp/wiki) for platform-sp
 dotnet add package Supabase
 ```
 
+## Supabase Service Compatibility
+
+The Supabase C# SDK only guarantees compatibility with the latest release of each Supabase service,
+unless a minimum supported version is explicitly listed below.
+
+Older service releases are supported on a best-effort basis, but compatibility is not guaranteed.
+
+If you self-host Supabase, we recommend upgrading your services to their latest releases when
+upgrading the SDK.
+
+| Service   | SDK package                                  | Server releases                                                            | Lowest supported version |
+| --------- | -------------------------------------------- | -------------------------------------------------------------------------- | ------------------------ |
+| Auth      | [`Supabase.Gotrue`](./packages/Gotrue)       | [supabase/auth](https://github.com/supabase/auth/releases)                 | Latest release           |
+| Storage   | [`Supabase.Storage`](./packages/Storage)     | [supabase/storage](https://github.com/supabase/storage/releases)           | Latest release           |
+| Functions | [`Supabase.Functions`](./packages/Functions) | [supabase/edge-runtime](https://github.com/supabase/edge-runtime/releases) | Latest release           |
+| PostgREST | [`Supabase.Postgrest`](./packages/Postgrest) | [PostgREST/postgrest](https://github.com/PostgREST/postgrest/releases)     | Latest release           |
+| Realtime  | [`Supabase.Realtime`](./packages/Realtime)   | [supabase/realtime](https://github.com/supabase/realtime/releases)         | Latest release           |
+
 ## Quickstart
 
 ```csharp

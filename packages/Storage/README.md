@@ -19,6 +19,15 @@ dotnet add package Supabase.Storage
 
 Targets .NET Standard 2.0.
 
+## Supabase Service Compatibility
+
+`Supabase.Storage` only guarantees compatibility with the [latest Supabase Storage
+release](https://github.com/supabase/storage/releases). Older Supabase Storage releases are
+supported on a best-effort basis, but compatibility is not guaranteed.
+
+If you self-host Supabase Storage, we recommend upgrading to the latest release when upgrading this
+SDK.
+
 ## Getting started
 
 Create a client pointed at your project's Storage URL, passing your key as a header:

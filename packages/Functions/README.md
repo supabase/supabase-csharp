@@ -18,6 +18,15 @@ dotnet add package Supabase.Functions
 
 Targets .NET Standard 2.0.
 
+## Supabase Service Compatibility
+
+`Supabase.Functions` only guarantees compatibility with the [latest Supabase Edge Runtime
+release](https://github.com/supabase/edge-runtime/releases). Older Supabase Edge Runtime releases
+are supported on a best-effort basis, but compatibility is not guaranteed.
+
+If you self-host the Supabase Edge Runtime, we recommend upgrading to the latest release when
+upgrading this SDK.
+
 ## Getting started
 
 Create a client pointed at your project's Functions URL, then invoke a function by name:
