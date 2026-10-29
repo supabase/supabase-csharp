@@ -145,6 +145,10 @@ features:
     symbols:
       - Client.Verify
 
+  auth.admin.create_provider:
+    status: implemented
+    symbols:
+      - AdminClient.CreateCustomProviderAsync
   auth.admin.create_user:
     status: implemented
     symbols:
