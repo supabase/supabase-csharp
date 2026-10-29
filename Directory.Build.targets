@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    Mutation runs (STRYKER_MUTATION=true, set by mutation.yml) compile code Stryker instruments, and that
+    instrumentation trips nullable flow analysis (CS8600/CS8602/CS8603). Under warnings-as-errors Stryker
+    then discards the mutants as compile errors — on Gotrue, about half of them — and those lines are never
+    tested. Warnings stay warnings for those runs only; every other build keeps the project's settings.
+    A .targets file is imported after the project body, so it overrides what each csproj declares.
+  -->
+  <PropertyGroup Condition="'$(STRYKER_MUTATION)' == 'true'">
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningsAsErrors></WarningsAsErrors>
+  </PropertyGroup>
+</Project>
