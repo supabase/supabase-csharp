@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
@@ -91,6 +92,16 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null.</exception>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<CustomProvider> CreateCustomProviderAsync(string jwt, NewCustomProvider provider, CustomProviderOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the custom OAuth/OIDC providers, optionally only those of one type.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="type">Only providers of this type; every provider when null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The providers.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(string jwt, CustomProviderType? type = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Links an oauth identity to an existing user.
