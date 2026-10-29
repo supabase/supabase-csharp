@@ -149,6 +149,10 @@ features:
     status: implemented
     symbols:
       - AdminClient.CreateUser
+  auth.admin.delete_provider:
+    status: implemented
+    symbols:
+      - AdminClient.DeleteCustomProviderAsync
   auth.admin.delete_user:
     status: implemented
     symbols:
