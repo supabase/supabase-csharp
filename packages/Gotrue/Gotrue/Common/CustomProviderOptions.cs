@@ -5,7 +5,7 @@ namespace Supabase.Gotrue.Common;
 
 /// <summary>
 /// Optional settings of a custom provider. A member left null is not sent: the server applies its default when
-/// the provider is created.
+/// the provider is created, and keeps the current value when it is updated.
 /// </summary>
 public sealed record CustomProviderOptions
 {

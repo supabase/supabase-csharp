@@ -11,6 +11,9 @@ override Supabase.Gotrue.Common.OidcDiscoveryDocument.ToString() -> string!
 override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Equals(object? obj) -> bool
 override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.GetHashCode() -> int
 override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.ToString() -> string!
+override Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Equals(object? obj) -> bool
+override Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.GetHashCode() -> int
+override Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ToString() -> string!
 static Supabase.Gotrue.Common.CustomProvider.operator !=(Supabase.Gotrue.Common.CustomProvider? left, Supabase.Gotrue.Common.CustomProvider? right) -> bool
 static Supabase.Gotrue.Common.CustomProvider.operator ==(Supabase.Gotrue.Common.CustomProvider? left, Supabase.Gotrue.Common.CustomProvider? right) -> bool
 static Supabase.Gotrue.Common.CustomProviderOptions.operator !=(Supabase.Gotrue.Common.CustomProviderOptions? left, Supabase.Gotrue.Common.CustomProviderOptions? right) -> bool
@@ -21,10 +24,15 @@ static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.OAuth2(string! ide
 static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Oidc(string! identifier, string! name, string! clientId, string! clientSecret, System.Uri! issuer) -> Supabase.Gotrue.CreateCustomProvider.NewCustomProvider!
 static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.operator !=(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? left, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? right) -> bool
 static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.operator ==(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? left, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? right) -> bool
+static Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.operator !=(Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? left, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? right) -> bool
+static Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.operator ==(Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? left, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? right) -> bool
 Supabase.Gotrue.AdminClient.CreateCustomProviderAsync(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.AdminClient.GetCustomProviderAsync(string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Api.CreateCustomProviderAsync(string! jwt, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Api.GetCustomProviderAsync(string! jwt, string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.AdminClient.UpdateCustomProviderAsync(string! identifier, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Api.CreateCustomProviderAsync(string! jwt, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Api.UpdateCustomProviderAsync(string! jwt, string! identifier, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Common.CustomProvider
 Supabase.Gotrue.Common.CustomProvider.<Clone>$() -> Supabase.Gotrue.Common.CustomProvider!
 Supabase.Gotrue.Common.CustomProvider.AcceptableClientIds.get -> System.Collections.Generic.IReadOnlyList<string!>!
@@ -140,9 +148,31 @@ Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Type.get -> Supabase.Gotr
 Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.UserInfoUrl.get -> System.Uri?
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateCustomProviderAsync(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GetCustomProviderAsync(string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.UpdateCustomProviderAsync(string! identifier, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateCustomProviderAsync(string! jwt, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.AdminClient.SignOutAsync(string! accessToken, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Api.SignOutAsync(string! jwt, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.SignOutAsync(string! accessToken, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignOutAsync(string! jwt, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetCustomProviderAsync(string! jwt, string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.UpdateCustomProviderAsync(string! jwt, string! identifier, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.<Clone>$() -> Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges!
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.AuthorizationUrl.get -> System.Uri?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.AuthorizationUrl.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ClientId.get -> string?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ClientId.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ClientSecret.get -> string?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ClientSecret.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.CustomProviderChanges() -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Equals(Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? other) -> bool
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Issuer.get -> System.Uri?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Issuer.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Name.get -> string?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Name.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Options.get -> Supabase.Gotrue.Common.CustomProviderOptions?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Options.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.TokenUrl.get -> System.Uri?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.TokenUrl.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.UserInfoUrl.get -> System.Uri?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.UserInfoUrl.init -> void
