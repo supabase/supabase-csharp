@@ -8,6 +8,7 @@ using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.UpdateCustomProvider;
 using static Supabase.Gotrue.Constants;
 
 #pragma warning disable CS1591
@@ -91,6 +92,19 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null.</exception>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<CustomProvider> CreateCustomProviderAsync(string jwt, NewCustomProvider provider, CustomProviderOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates a custom OAuth/OIDC provider.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="identifier">The provider identifier, starting with <c>custom:</c>.</param>
+    /// <param name="changes">The changes; members left null keep their current value.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The updated provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="changes" /> is null.</exception>
+    /// <exception cref="ArgumentException">The identifier lacks the <c>custom:</c> prefix or contains <c>/</c>, <c>\</c>, <c>?</c>, <c>#</c> or <c>%</c>.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<CustomProvider> UpdateCustomProviderAsync(string jwt, string identifier, CustomProviderChanges changes, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Links an oauth identity to an existing user.
