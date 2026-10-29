@@ -207,7 +207,7 @@ public static class Helpers
         HttpClient? httpClient = null, RetryOptions? retry = null, CancellationToken cancellationToken = default)
         where T : class
     {
-        var baseResponse = await MakeRequestAsync(method, url, data, headers, httpClient, retry, cancellationToken);
+        var baseResponse = await MakeRequestAsync(method, url, data, headers, httpClient, retry, cancellationToken).ConfigureAwait(false);
         return baseResponse.Content != null ? DeserializeBody<T>(baseResponse) : default;
     }
 

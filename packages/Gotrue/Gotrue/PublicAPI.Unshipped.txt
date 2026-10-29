@@ -1,1 +1,140 @@
 #nullable enable
+override Supabase.Gotrue.Common.CustomProvider.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.CustomProvider.GetHashCode() -> int
+override Supabase.Gotrue.Common.CustomProvider.ToString() -> string!
+override Supabase.Gotrue.Common.CustomProviderOptions.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.CustomProviderOptions.GetHashCode() -> int
+override Supabase.Gotrue.Common.CustomProviderOptions.ToString() -> string!
+override Supabase.Gotrue.Common.OidcDiscoveryDocument.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.OidcDiscoveryDocument.GetHashCode() -> int
+override Supabase.Gotrue.Common.OidcDiscoveryDocument.ToString() -> string!
+override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Equals(object? obj) -> bool
+override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.GetHashCode() -> int
+override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.ToString() -> string!
+static Supabase.Gotrue.Common.CustomProvider.operator !=(Supabase.Gotrue.Common.CustomProvider? left, Supabase.Gotrue.Common.CustomProvider? right) -> bool
+static Supabase.Gotrue.Common.CustomProvider.operator ==(Supabase.Gotrue.Common.CustomProvider? left, Supabase.Gotrue.Common.CustomProvider? right) -> bool
+static Supabase.Gotrue.Common.CustomProviderOptions.operator !=(Supabase.Gotrue.Common.CustomProviderOptions? left, Supabase.Gotrue.Common.CustomProviderOptions? right) -> bool
+static Supabase.Gotrue.Common.CustomProviderOptions.operator ==(Supabase.Gotrue.Common.CustomProviderOptions? left, Supabase.Gotrue.Common.CustomProviderOptions? right) -> bool
+static Supabase.Gotrue.Common.OidcDiscoveryDocument.operator !=(Supabase.Gotrue.Common.OidcDiscoveryDocument? left, Supabase.Gotrue.Common.OidcDiscoveryDocument? right) -> bool
+static Supabase.Gotrue.Common.OidcDiscoveryDocument.operator ==(Supabase.Gotrue.Common.OidcDiscoveryDocument? left, Supabase.Gotrue.Common.OidcDiscoveryDocument? right) -> bool
+static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.OAuth2(string! identifier, string! name, string! clientId, string! clientSecret, System.Uri! authorizationUrl, System.Uri! tokenUrl, System.Uri! userInfoUrl) -> Supabase.Gotrue.CreateCustomProvider.NewCustomProvider!
+static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Oidc(string! identifier, string! name, string! clientId, string! clientSecret, System.Uri! issuer) -> Supabase.Gotrue.CreateCustomProvider.NewCustomProvider!
+static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.operator !=(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? left, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? right) -> bool
+static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.operator ==(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? left, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? right) -> bool
+Supabase.Gotrue.AdminClient.CreateCustomProviderAsync(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Api.CreateCustomProviderAsync(string! jwt, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Common.CustomProvider
+Supabase.Gotrue.Common.CustomProvider.<Clone>$() -> Supabase.Gotrue.Common.CustomProvider!
+Supabase.Gotrue.Common.CustomProvider.AcceptableClientIds.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.CustomProvider.AcceptableClientIds.init -> void
+Supabase.Gotrue.Common.CustomProvider.AttributeMapping.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object!>!
+Supabase.Gotrue.Common.CustomProvider.AttributeMapping.init -> void
+Supabase.Gotrue.Common.CustomProvider.AuthorizationParameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Supabase.Gotrue.Common.CustomProvider.AuthorizationParameters.init -> void
+Supabase.Gotrue.Common.CustomProvider.AuthorizationUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.AuthorizationUrl.init -> void
+Supabase.Gotrue.Common.CustomProvider.ClientId.get -> string!
+Supabase.Gotrue.Common.CustomProvider.ClientId.init -> void
+Supabase.Gotrue.Common.CustomProvider.CreatedAt.get -> System.DateTime
+Supabase.Gotrue.Common.CustomProvider.CreatedAt.init -> void
+Supabase.Gotrue.Common.CustomProvider.CustomClaimsAllowlist.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.CustomProvider.CustomClaimsAllowlist.init -> void
+Supabase.Gotrue.Common.CustomProvider.CustomProvider() -> void
+Supabase.Gotrue.Common.CustomProvider.DiscoveryDocument.get -> Supabase.Gotrue.Common.OidcDiscoveryDocument?
+Supabase.Gotrue.Common.CustomProvider.DiscoveryDocument.init -> void
+Supabase.Gotrue.Common.CustomProvider.DiscoveryUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.DiscoveryUrl.init -> void
+Supabase.Gotrue.Common.CustomProvider.EmailOptional.get -> bool
+Supabase.Gotrue.Common.CustomProvider.EmailOptional.init -> void
+Supabase.Gotrue.Common.CustomProvider.Enabled.get -> bool
+Supabase.Gotrue.Common.CustomProvider.Enabled.init -> void
+Supabase.Gotrue.Common.CustomProvider.Equals(Supabase.Gotrue.Common.CustomProvider? other) -> bool
+Supabase.Gotrue.Common.CustomProvider.Id.get -> System.Guid
+Supabase.Gotrue.Common.CustomProvider.Id.init -> void
+Supabase.Gotrue.Common.CustomProvider.Identifier.get -> string!
+Supabase.Gotrue.Common.CustomProvider.Identifier.init -> void
+Supabase.Gotrue.Common.CustomProvider.Issuer.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.Issuer.init -> void
+Supabase.Gotrue.Common.CustomProvider.JwksUri.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.JwksUri.init -> void
+Supabase.Gotrue.Common.CustomProvider.Name.get -> string!
+Supabase.Gotrue.Common.CustomProvider.Name.init -> void
+Supabase.Gotrue.Common.CustomProvider.PkceEnabled.get -> bool
+Supabase.Gotrue.Common.CustomProvider.PkceEnabled.init -> void
+Supabase.Gotrue.Common.CustomProvider.Scopes.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.CustomProvider.Scopes.init -> void
+Supabase.Gotrue.Common.CustomProvider.SkipNonceCheck.get -> bool
+Supabase.Gotrue.Common.CustomProvider.SkipNonceCheck.init -> void
+Supabase.Gotrue.Common.CustomProvider.TokenUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.TokenUrl.init -> void
+Supabase.Gotrue.Common.CustomProvider.Type.get -> Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.Common.CustomProvider.Type.init -> void
+Supabase.Gotrue.Common.CustomProvider.UpdatedAt.get -> System.DateTime
+Supabase.Gotrue.Common.CustomProvider.UpdatedAt.init -> void
+Supabase.Gotrue.Common.CustomProvider.UserInfoUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.UserInfoUrl.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions
+Supabase.Gotrue.Common.CustomProviderOptions.<Clone>$() -> Supabase.Gotrue.Common.CustomProviderOptions!
+Supabase.Gotrue.Common.CustomProviderOptions.AcceptableClientIds.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Supabase.Gotrue.Common.CustomProviderOptions.AcceptableClientIds.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.AttributeMapping.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object!>?
+Supabase.Gotrue.Common.CustomProviderOptions.AttributeMapping.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.AuthorizationParameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
+Supabase.Gotrue.Common.CustomProviderOptions.AuthorizationParameters.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.CustomClaimsAllowlist.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Supabase.Gotrue.Common.CustomProviderOptions.CustomClaimsAllowlist.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.CustomProviderOptions() -> void
+Supabase.Gotrue.Common.CustomProviderOptions.DiscoveryUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProviderOptions.DiscoveryUrl.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.EmailOptional.get -> bool?
+Supabase.Gotrue.Common.CustomProviderOptions.EmailOptional.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.Enabled.get -> bool?
+Supabase.Gotrue.Common.CustomProviderOptions.Enabled.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.Equals(Supabase.Gotrue.Common.CustomProviderOptions? other) -> bool
+Supabase.Gotrue.Common.CustomProviderOptions.JwksUri.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProviderOptions.JwksUri.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.PkceEnabled.get -> bool?
+Supabase.Gotrue.Common.CustomProviderOptions.PkceEnabled.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.Scopes.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Supabase.Gotrue.Common.CustomProviderOptions.Scopes.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.SkipNonceCheck.get -> bool?
+Supabase.Gotrue.Common.CustomProviderOptions.SkipNonceCheck.init -> void
+Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.Common.CustomProviderType.OAuth2 = 0 -> Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.Common.CustomProviderType.Oidc = 1 -> Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.Common.OidcDiscoveryDocument
+Supabase.Gotrue.Common.OidcDiscoveryDocument.<Clone>$() -> Supabase.Gotrue.Common.OidcDiscoveryDocument!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.AuthorizationEndpoint.get -> System.Uri!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.AuthorizationEndpoint.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.Equals(Supabase.Gotrue.Common.OidcDiscoveryDocument? other) -> bool
+Supabase.Gotrue.Common.OidcDiscoveryDocument.GrantTypesSupported.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.GrantTypesSupported.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.Issuer.get -> System.Uri!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.Issuer.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.JwksUri.get -> System.Uri!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.JwksUri.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.OidcDiscoveryDocument() -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.ResponseTypesSupported.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.ResponseTypesSupported.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.ScopesSupported.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.ScopesSupported.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.SubjectTypesSupported.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.SubjectTypesSupported.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.TokenEndpoint.get -> System.Uri!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.TokenEndpoint.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.UserInfoEndpoint.get -> System.Uri?
+Supabase.Gotrue.Common.OidcDiscoveryDocument.UserInfoEndpoint.init -> void
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.<Clone>$() -> Supabase.Gotrue.CreateCustomProvider.NewCustomProvider!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.AuthorizationUrl.get -> System.Uri?
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.ClientId.get -> string!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.ClientSecret.get -> string!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Equals(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? other) -> bool
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Identifier.get -> string!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Issuer.get -> System.Uri?
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Name.get -> string!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.TokenUrl.get -> System.Uri?
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Type.get -> Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.UserInfoUrl.get -> System.Uri?
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateCustomProviderAsync(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateCustomProviderAsync(string! jwt, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!

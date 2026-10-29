@@ -9,6 +9,8 @@ using Supabase.Core;
 using Supabase.Core.Extensions;
 using Supabase.Core.Http;
 using Supabase.Gotrue.Claims;
+using Supabase.Gotrue.Common;
+using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
@@ -641,6 +643,14 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>
         this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<CustomProvider> CreateCustomProviderAsync(string jwt, NewCustomProvider provider, CustomProviderOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var body = CreateCustomProviderBody.For(provider, options);
+        var created = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Post, $"{this.Url}/admin/custom-providers", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return CustomProviderResponse.Read(created);
+    }
 
     /// <inheritdoc />
     public async Task<ProviderAuthState> LinkIdentity(string token, Provider provider, SignInOptions options)

@@ -41,6 +41,17 @@ public abstract class RequestApprovalFixture : VerifyBase
     public void DisposeApprovalServer() => this.server.Dispose();
 
     /// <summary>
+    ///     Answers requests to <paramref name="path" /> with <paramref name="body" /> instead of the empty object, for
+    ///     operations that read their response and reject <c>{}</c>.
+    /// </summary>
+    /// <param name="path">The request path to answer.</param>
+    /// <param name="body">The JSON response body.</param>
+    protected void RespondTo(string path, string body) =>
+        this.server.Given(Request.Create().WithPath(path).UsingAnyMethod()).AtPriority(0)
+            .RespondWith(Response.Create().WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json").WithBody(body));
+
+    /// <summary>
     ///     The exact bytes of the single request the SDK emitted. Tests pass this to <c>Verify</c> from their
     ///     own method so the snapshot file lands next to the test (domain-first layout), not beside this fixture.
     /// </summary>

@@ -1,0 +1,1 @@
+﻿{"provider_type":"oauth2","identifier":"custom:customauth","name":"Custom Auth Provider","client_id":"client-id","client_secret":"client-secret","authorization_url":"https://provider.example.com/oauth/authorize","token_url":"https://provider.example.com/oauth/token","userinfo_url":"https://provider.example.com/oauth/userinfo"}
