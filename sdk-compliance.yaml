@@ -177,6 +177,10 @@ features:
     status: implemented
     symbols:
       - AdminClient.InviteUserByEmail
+  auth.admin.list_providers:
+    status: implemented
+    symbols:
+      - AdminClient.ListCustomProvidersAsync
   auth.admin.list_users:
     status: implemented
     symbols:
