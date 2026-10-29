@@ -7,6 +7,8 @@ You are the orchestrator: you never implement a feature yourself. Lane agents do
 Resolve every key to its package and client interface (`sources.md`). Then:
 
 - Features that touch the **same client interface or group** go in the **same lane**, implemented one after another, one branch and one PR each. Parallel edits to one interface produce PRs that conflict with each other.
+- **Every PR is standalone: it branches off `master` and is reviewable, testable and mergeable on its own.** Never stack PRs (a PR whose base is another feature branch). CI only runs on PRs against `master`, and merging a stacked PR from GitHub lands it in the feature branch below it, not in `master`.
+- When a feature needs a type that another unmerged feature introduces, it waits. Ship the feature that introduces the type first, and branch the dependent features off `master` once it has merged. Features with no such dependency on each other can be open at the same time; they conflict only where each adds its member to the shared files (`Api`, the client, the interfaces, `PublicAPI.Unshipped.txt`), and whichever merges second rebases and keeps both sides.
 - Different interfaces or packages go in different lanes.
 - At most three lanes. More lanes add merge points and machine contention faster than they save time.
 

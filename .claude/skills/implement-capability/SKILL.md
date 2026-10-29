@@ -132,3 +132,5 @@ Then walk QUALITY_RUBRIC §8 item by item, and re-read the diff as the reviewer:
 - Edit `sdk-compliance.yaml`, a `.gate-baseline.json`, or analyzer severities to get green.
 - Suppress a warning, skip/ignore/re-categorize a test, or retry a flaky E2E.
 - Commit on the maintainer's checkout, push to master, or mark a PR ready for review.
+- Stack a PR on another feature branch. Every PR branches off `master` (references/parallel.md).
+- Call another capability's SDK method from a test before that capability is in `master`. Seed and verify through the service's API with a plain `HttpClient`, or assert on the method under test's own result.
