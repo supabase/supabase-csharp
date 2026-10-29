@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
+using Supabase.Gotrue.Common;
+using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
@@ -141,6 +143,11 @@ public class AdminClient : IGotrueAdminClient<User>
     [ImplementedCapability("auth.admin.delete_provider")]
     public Task DeleteCustomProviderAsync(string identifier, CancellationToken cancellationToken = default) =>
         this.api.DeleteCustomProviderAsync(this.serviceKey, identifier, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.admin.create_provider")]
+    public Task<CustomProvider> CreateCustomProviderAsync(NewCustomProvider provider, CustomProviderOptions? options = null, CancellationToken cancellationToken = default) =>
+        this.api.CreateCustomProviderAsync(this.serviceKey, provider, options, cancellationToken);
 
     /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)

@@ -1,0 +1,22 @@
+{
+  "id": "6ea7e0b6-ee41-4791-802c-ea0625ee8d6b",
+  "provider_type": "oauth2",
+  "identifier": "custom:customauth",
+  "name": "Custom Auth Provider",
+  "client_id": "client-id",
+  "acceptable_client_ids": [],
+  "scopes": [],
+  "pkce_enabled": true,
+  "attribute_mapping": {},
+  "custom_claims_allowlist": [],
+  "authorization_params": {},
+  "enabled": true,
+  "email_optional": false,
+  "skip_nonce_check": false,
+  "authorization_url": "https://provider.example.com/oauth/authorize",
+  "token_url": "https://provider.example.com/oauth/token",
+  "userinfo_url": "https://provider.example.com/oauth/userinfo",
+  "jwks_uri": "https://provider.example.com/oauth/jwks",
+  "created_at": "2026-10-29T13:20:39.8704Z",
+  "updated_at": "2026-10-29T13:20:39.8704Z"
+}

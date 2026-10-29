@@ -2,6 +2,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
+using Supabase.Gotrue.Common;
+using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 
@@ -132,4 +134,37 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task DeleteCustomProviderAsync(string identifier, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers a custom OAuth/OIDC provider users can sign in with. Requires a full-access API key, such as the
+    /// service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="provider">
+    /// The provider to register, built with <see cref="NewCustomProvider.OAuth2" /> or <see cref="NewCustomProvider.Oidc" />.
+    /// </param>
+    /// <param name="options">Optional settings, such as scopes or attribute mapping. The server applies its defaults to those left null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>conflict</c> when
+    /// a provider already has this identifier, <c>over_custom_provider_quota</c> when the project's provider limit
+    /// is reached, <c>validation_failed</c> when a setting is invalid (for example a URL that is not HTTPS, or an
+    /// OIDC issuer whose discovery document cannot be fetched), and <c>feature_disabled</c> when custom providers
+    /// are disabled on the project. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    /// using Supabase.Gotrue.CreateCustomProvider;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var provider = await admin.CreateCustomProviderAsync(
+    ///     NewCustomProvider.Oidc("custom:mycompany", "My Company SSO", clientId: "id", clientSecret: "secret",
+    ///         issuer: new Uri("https://accounts.mycompany.com")),
+    ///     new CustomProviderOptions { Scopes = new[] { "email", "profile" } });
+    /// </code>
+    /// </example>
+    Task<CustomProvider> CreateCustomProviderAsync(NewCustomProvider provider, CustomProviderOptions? options = null, CancellationToken cancellationToken = default);
 }
