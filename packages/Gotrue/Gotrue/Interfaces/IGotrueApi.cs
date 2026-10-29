@@ -60,6 +60,16 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams);
 
     /// <summary>
+    /// Deletes a custom OAuth/OIDC provider.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="identifier">The provider identifier, starting with <c>custom:</c>.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="ArgumentException">The identifier lacks the <c>custom:</c> prefix or contains <c>/</c>, <c>\</c>, <c>?</c>, <c>#</c> or <c>%</c>.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Links an oauth identity to an existing user.
     ///
     /// This method requires the PKCE flow.

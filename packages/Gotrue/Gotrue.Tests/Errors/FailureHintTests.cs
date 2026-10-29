@@ -71,6 +71,7 @@ public class FailureHintTests
     [DataRow("no_authorization", AdminTokenRequired, DisplayName = "no_authorization")]
     [DataRow("not_admin", AdminTokenRequired, DisplayName = "not_admin")]
     [DataRow("sso_provider_not_found", SsoProviderNotFound, DisplayName = "sso_provider_not_found")]
+    [DataRow("custom_provider_not_found", CustomProviderNotFound, DisplayName = "custom_provider_not_found")]
     [DataRow("mfa_verification_failed", MfaChallengeUnverified, DisplayName = "mfa_verification_failed")]
     [DataRow("mfa_verification_rejected", MfaChallengeUnverified, DisplayName = "mfa_verification_rejected")]
     [DataRow("mfa_challenge_expired", MfaChallengeUnverified, DisplayName = "mfa_challenge_expired")]

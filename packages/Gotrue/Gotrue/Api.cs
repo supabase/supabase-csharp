@@ -9,6 +9,7 @@ using Supabase.Core;
 using Supabase.Core.Extensions;
 using Supabase.Core.Http;
 using Supabase.Gotrue.Claims;
+using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
@@ -636,6 +637,10 @@ public class Api : IGotrueApi<User, Session>
 
     /// <inheritdoc />
     public Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams) => this.MakeRequestAsync<MfaAdminDeleteFactorResponse>(HttpMethod.Delete, $"{this.Url}/admin/users/{deleteFactorParams.UserId}/factors/{deleteFactorParams.Id}", null, this.CreateAuthedRequestHeaders(jwt));
+
+    /// <inheritdoc />
+    public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
     /// <inheritdoc />
     public async Task<ProviderAuthState> LinkIdentity(string token, Provider provider, SignInOptions options)

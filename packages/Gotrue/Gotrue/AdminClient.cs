@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Gotrue.Interfaces;
@@ -135,6 +136,11 @@ public class AdminClient : IGotrueAdminClient<User>
 
     [ImplementedCapability("auth.admin.delete_mfa_factor")]
     public async Task<MfaAdminDeleteFactorResponse?> DeleteFactor(MfaAdminDeleteFactorParams deleteFactorParams) => await this.api.DeleteFactor(this.serviceKey, deleteFactorParams);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.admin.delete_provider")]
+    public Task DeleteCustomProviderAsync(string identifier, CancellationToken cancellationToken = default) =>
+        this.api.DeleteCustomProviderAsync(this.serviceKey, identifier, cancellationToken);
 
     /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)

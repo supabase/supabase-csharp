@@ -130,6 +130,11 @@ public static class FailureHint
         /// The JWT is expired, malformed, or its signature did not verify.
         /// </summary>
         InvalidJwt,
+
+        /// <summary>
+        /// No custom OAuth/OIDC provider has the requested identifier.
+        /// </summary>
+        CustomProviderNotFound,
     }
 
     /// <summary>
@@ -156,6 +161,7 @@ public static class FailureHint
         ["no_authorization"] = AdminTokenRequired,
         ["not_admin"] = AdminTokenRequired,
         ["sso_provider_not_found"] = SsoProviderNotFound,
+        ["custom_provider_not_found"] = CustomProviderNotFound,
         ["mfa_verification_failed"] = MfaChallengeUnverified,
         ["mfa_verification_rejected"] = MfaChallengeUnverified,
         ["mfa_challenge_expired"] = MfaChallengeUnverified,
