@@ -3,6 +3,7 @@ Supabase.Gotrue.AdminClient
 Supabase.Gotrue.AdminClient.AdminClient(string! serviceKey, Supabase.Gotrue.ClientOptions? options = null) -> void
 Supabase.Gotrue.AdminClient.CreateUser(Supabase.Gotrue.AdminUserAttributes! attributes) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.AdminClient.CreateUser(string! email, string! password, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
+Supabase.Gotrue.AdminClient.DeleteCustomProviderAsync(string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.AdminClient.DeleteFactor(Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
 Supabase.Gotrue.AdminClient.DeleteUser(string! uid) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.AdminClient.DeleteUser(string! uid, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<bool>!
@@ -34,6 +35,7 @@ Supabase.Gotrue.Api.Api(string! url, System.Collections.Generic.Dictionary<strin
 Supabase.Gotrue.Api.Api(string! url, System.Collections.Generic.Dictionary<string!, string!>? headers = null, System.Net.Http.HttpClient? httpClient = null, Supabase.Core.Http.RetryOptions? retry = null) -> void
 Supabase.Gotrue.Api.Challenge(string! jwt, Supabase.Gotrue.Mfa.MfaChallengeParams! mfaChallengeParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaChallengeResponse?>!
 Supabase.Gotrue.Api.CreateUser(string! jwt, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
+Supabase.Gotrue.Api.DeleteCustomProviderAsync(string! jwt, string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Api.DeleteFactor(string! jwt, Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
 Supabase.Gotrue.Api.DeleteUser(string! uid, string! jwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.DeleteUser(string! uid, string! jwt, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -315,6 +317,7 @@ Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.AdminTokenRequired = 13 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.BadSessionUrl = 15 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.CloudflareNetworkError = 21 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
+Supabase.Gotrue.Exceptions.FailureHint.Reason.CustomProviderNotFound = 23 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.ExpiredRefreshToken = 12 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidFlowType = 16 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Exceptions.FailureHint.Reason.InvalidJwt = 22 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
@@ -376,6 +379,7 @@ Supabase.Gotrue.Helpers
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateUser(Supabase.Gotrue.AdminUserAttributes! attributes) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateUser(string! email, string! password, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<TUser?>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteCustomProviderAsync(string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteFactor(Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteUser(string! uid) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteUser(string! uid, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<bool>!
@@ -390,6 +394,7 @@ Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.UpdateUserById(string! user
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Challenge(string! jwt, Supabase.Gotrue.Mfa.MfaChallengeParams! mfaChallengeParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaChallengeResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateUser(string! jwt, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<TUser?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteCustomProviderAsync(string! jwt, string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteFactor(string! jwt, Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteUser(string! uid, string! jwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteUser(string! uid, string! jwt, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
