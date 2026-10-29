@@ -107,10 +107,9 @@ features:
     symbols:
       - Client.LinkIdentity
   auth.identities.list_identities:
-    status: partially_implemented
-    note: "No dedicated getUserIdentities method; linked identities are reachable only via the User.Identities property."
+    status: implemented
     symbols:
-      - User.Identities
+      - Client.GetUserIdentitiesAsync
   auth.identities.unlink_identity:
     status: implemented
     symbols:
