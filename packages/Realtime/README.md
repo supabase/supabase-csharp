@@ -20,6 +20,15 @@ dotnet add package Supabase.Realtime
 
 Targets .NET Standard 2.1.
 
+## Supabase Service Compatibility
+
+`Supabase.Realtime` only guarantees compatibility with the [latest Supabase Realtime
+release](https://github.com/supabase/realtime/releases). Older Supabase Realtime releases are
+supported on a best-effort basis, but compatibility is not guaranteed.
+
+If you self-host Supabase Realtime, we recommend upgrading to the latest release when upgrading this
+SDK.
+
 ## Getting started
 
 `ConnectAsync()` and `Subscribe()` are awaitable, so you can be sure a connection exists before

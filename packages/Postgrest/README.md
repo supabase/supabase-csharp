@@ -21,6 +21,14 @@ dotnet add package Supabase.Postgrest
 
 Targets .NET Standard 2.0.
 
+## Supabase Service Compatibility
+
+`Supabase.Postgrest` only guarantees compatibility with the [latest PostgREST
+release](https://github.com/PostgREST/postgrest/releases). Older PostgREST releases are supported on
+a best-effort basis, but compatibility is not guaranteed.
+
+If you self-host PostgREST, we recommend upgrading to the latest release when upgrading this SDK.
+
 ## Getting started
 
 Every table maps to a model deriving from `BaseModel`. Use `Table`, `PrimaryKey`, and `Column`

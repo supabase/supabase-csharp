@@ -20,6 +20,24 @@ dotnet add package Supabase
 Targets .NET Standard 2.1, so it runs on .NET Core / .NET 5+, Xamarin, MAUI, and Unity. See the
 [wiki](https://github.com/supabase/supabase-csharp/wiki) for platform-specific guides.
 
+## Supabase Service Compatibility
+
+`Supabase` only guarantees compatibility with the latest release of each Supabase service, unless a
+minimum supported version is explicitly listed below.
+
+Older service releases are supported on a best-effort basis, but compatibility is not guaranteed.
+
+If you self-host Supabase, we recommend upgrading your services to their latest releases when
+upgrading the SDK.
+
+| Service   | SDK package                                    | Server releases                                                            | Lowest supported version |
+| --------- | ---------------------------------------------- | -------------------------------------------------------------------------- | ------------------------ |
+| Auth      | [`Supabase.Gotrue`](../Gotrue/README.md)       | [supabase/auth](https://github.com/supabase/auth/releases)                 | Latest release           |
+| Storage   | [`Supabase.Storage`](../Storage/README.md)     | [supabase/storage](https://github.com/supabase/storage/releases)           | Latest release           |
+| Functions | [`Supabase.Functions`](../Functions/README.md) | [supabase/edge-runtime](https://github.com/supabase/edge-runtime/releases) | Latest release           |
+| PostgREST | [`Supabase.Postgrest`](../Postgrest/README.md) | [PostgREST/postgrest](https://github.com/PostgREST/postgrest/releases)     | Latest release           |
+| Realtime  | [`Supabase.Realtime`](../Realtime/README.md)   | [supabase/realtime](https://github.com/supabase/realtime/releases)         | Latest release           |
+
 ## Getting started
 
 Create a project in the [Supabase dashboard](https://app.supabase.com) and grab your project URL and

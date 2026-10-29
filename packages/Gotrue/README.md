@@ -20,6 +20,15 @@ dotnet add package Supabase.Gotrue
 
 Targets .NET Standard 2.1.
 
+## Supabase Service Compatibility
+
+`Supabase.Gotrue` only guarantees compatibility with the [latest Supabase Auth
+release](https://github.com/supabase/auth/releases). Older Supabase Auth releases are supported on a
+best-effort basis, but compatibility is not guaranteed.
+
+If you self-host Supabase Auth, we recommend upgrading to the latest release when upgrading this
+SDK.
+
 ## Getting started
 
 Against the Supabase hosted service, point the client at your project's auth URL and pass your
