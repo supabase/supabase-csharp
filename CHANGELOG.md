@@ -1,5 +1,19 @@
 # Changelog
 
+## [8.6.0](https://github.com/supabase/supabase-csharp/compare/v8.5.1...v8.6.0) (2026-10-29)
+
+
+### Features
+
+* **auth:** delete a custom OAuth/OIDC provider as an admin ([#581](https://github.com/supabase/supabase-csharp/issues/581)) ([37f7322](https://github.com/supabase/supabase-csharp/commit/37f7322849447c3bc4472c6f1cd5a883ba7f8081))
+
+
+### Bug Fixes
+
+* **auth:** keep caller-supplied ids inside one request path segment ([#586](https://github.com/supabase/supabase-csharp/issues/586)) ([7c6d452](https://github.com/supabase/supabase-csharp/commit/7c6d452911fdc4c8f72d22d0e2bd82ce11bd1163))
+* **auth:** URL-encode redirect_to on otp, recover, invite, generate_link and resend ([#552](https://github.com/supabase/supabase-csharp/issues/552)) ([b6fb44b](https://github.com/supabase/supabase-csharp/commit/b6fb44b557b255a8ed81e02ae4aa0c7acfe287cc))
+* **core:** report Unity version, platform and runtime in X-Client-Info ([#556](https://github.com/supabase/supabase-csharp/issues/556)) ([e1ede3f](https://github.com/supabase/supabase-csharp/commit/e1ede3f752c4194a21a637f12f1453ec8f9aafa4))
+
 ## [8.5.1](https://github.com/supabase/supabase-csharp/compare/v8.5.0...v8.5.1) (2026-10-26)
 
 
