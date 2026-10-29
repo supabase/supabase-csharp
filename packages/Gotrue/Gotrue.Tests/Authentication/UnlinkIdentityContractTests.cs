@@ -28,20 +28,28 @@ public class UnlinkIdentityContractTests
     [TestInitialize]
     public void TestInitializer()
     {
-        server = new MockGotrueServer();
-        api = new Api(server.Url);
+        this.server = new MockGotrueServer();
+        this.api = new Api(this.server.Url);
     }
 
     [TestCleanup]
-    public void TestCleanup() => server.Dispose();
+    public void TestCleanup() => this.server.Dispose();
 
     [TestMethod]
     public async Task UnlinkIdentity_ShouldDeleteAtTheIdentityPath_GivenUserIdentity()
     {
-        server.Given(Request.Create().UsingDelete()).RespondWith(Response.Create().WithStatusCode(200));
-        await api.UnlinkIdentity("access-token", new UserIdentity { IdentityId = "identity-123" });
-        server.VerifySingleReceivedRequest()
+        this.server.Given(Request.Create().UsingDelete()).RespondWith(Response.Create().WithStatusCode(200));
+        await this.api.UnlinkIdentity("access-token", new UserIdentity { IdentityId = "identity-123" });
+        this.server.VerifySingleReceivedRequest()
             .WithMethod(HttpMethod.Delete)
             .WithPath("/user/identities/identity-123");
+    }
+
+    [TestMethod]
+    public async Task UnlinkIdentity_ShouldKeepIdentityIdInOneSegment_GivenIdWithPathSeparators()
+    {
+        this.server.Given(Request.Create().UsingDelete()).RespondWith(Response.Create().WithStatusCode(200));
+        await this.api.UnlinkIdentity("access-token", new UserIdentity { IdentityId = "x/../../user" });
+        this.server.VerifySingleReceivedRequest().WithEncodedPath("/user/identities/x%2F..%2F..%2Fuser");
     }
 }

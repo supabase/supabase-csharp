@@ -68,6 +68,12 @@ internal sealed class ReceivedRequest
         return this;
     }
 
+    internal ReceivedRequest WithEncodedPath(string path)
+    {
+        new Uri(this.request.AbsoluteUrl).AbsolutePath.Should().Be(path, "the path as sent, before the server decodes it");
+        return this;
+    }
+
     internal ReceivedRequest WithMethod(HttpMethod method)
     {
         this.request.Method.Should().Be(method.ToString());

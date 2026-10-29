@@ -615,7 +615,7 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
-    public Task<MfaChallengeResponse?> Challenge(string jwt, MfaChallengeParams mfaChallengeParams) => this.MakeRequestAsync<MfaChallengeResponse>(HttpMethod.Post, $"{this.Url}/factors/{mfaChallengeParams.FactorId}/challenge", null, this.CreateAuthedRequestHeaders(jwt));
+    public Task<MfaChallengeResponse?> Challenge(string jwt, MfaChallengeParams mfaChallengeParams) => this.MakeRequestAsync<MfaChallengeResponse>(HttpMethod.Post, $"{this.Url}/factors/{PathSegment.Escape(mfaChallengeParams.FactorId)}/challenge", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
     public Task<MfaVerifyResponse?> Verify(string jwt, MfaVerifyParams mfaVerifyParams)
@@ -626,17 +626,17 @@ public class Api : IGotrueApi<User, Session>
             { "challenge_id", mfaVerifyParams.ChallengeId }
         };
 
-        return this.MakeRequestAsync<MfaVerifyResponse>(HttpMethod.Post, $"{this.Url}/factors/{mfaVerifyParams.FactorId}/verify", body, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync<MfaVerifyResponse>(HttpMethod.Post, $"{this.Url}/factors/{PathSegment.Escape(mfaVerifyParams.FactorId)}/verify", body, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <inheritdoc />
-    public Task<MfaUnenrollResponse?> Unenroll(string jwt, MfaUnenrollParams mfaUnenrollParams) => this.MakeRequestAsync<MfaUnenrollResponse>(HttpMethod.Delete, $"{this.Url}/factors/{mfaUnenrollParams.FactorId}", null, this.CreateAuthedRequestHeaders(jwt));
+    public Task<MfaUnenrollResponse?> Unenroll(string jwt, MfaUnenrollParams mfaUnenrollParams) => this.MakeRequestAsync<MfaUnenrollResponse>(HttpMethod.Delete, $"{this.Url}/factors/{PathSegment.Escape(mfaUnenrollParams.FactorId)}", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
-    public Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams) => this.MakeRequestAsync(HttpMethod.Get, $"{this.Url}/admin/users/{listFactorsParams.UserId}/factors", null, this.CreateAuthedRequestHeaders(jwt));
+    public Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams) => this.MakeRequestAsync(HttpMethod.Get, $"{this.Url}/admin/users/{PathSegment.Escape(listFactorsParams.UserId)}/factors", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
-    public Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams) => this.MakeRequestAsync<MfaAdminDeleteFactorResponse>(HttpMethod.Delete, $"{this.Url}/admin/users/{deleteFactorParams.UserId}/factors/{deleteFactorParams.Id}", null, this.CreateAuthedRequestHeaders(jwt));
+    public Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams) => this.MakeRequestAsync<MfaAdminDeleteFactorResponse>(HttpMethod.Delete, $"{this.Url}/admin/users/{PathSegment.Escape(deleteFactorParams.UserId)}/factors/{PathSegment.Escape(deleteFactorParams.Id)}", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
     public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>
@@ -703,7 +703,7 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public async Task<bool> UnlinkIdentity(string token, UserIdentity userIdentity)
     {
-        var result = await this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/user/identities/{userIdentity.IdentityId}", null, this.CreateAuthedRequestHeaders(token));
+        var result = await this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/user/identities/{PathSegment.Escape(userIdentity.IdentityId)}", null, this.CreateAuthedRequestHeaders(token));
         return result.ResponseMessage is { IsSuccessStatusCode: true };
     }
 
@@ -746,7 +746,7 @@ public class Api : IGotrueApi<User, Session>
     {
         var data = new Dictionary<string, string>();
 
-        return this.MakeRequestAsync<User>(HttpMethod.Get, $"{this.Url}/admin/users/{userId}", data, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync<User>(HttpMethod.Get, $"{this.Url}/admin/users/{PathSegment.Escape(userId)}", data, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
@@ -822,7 +822,7 @@ public class Api : IGotrueApi<User, Session>
     /// <param name="userId">userID</param>
     /// <param name="userData">User attributes e.g. email, password, etc.</param>
     /// <returns></returns>
-    public Task<User?> UpdateUserById(string jwt, string userId, UserAttributes userData) => this.MakeRequestAsync<User>(HttpMethod.Put, $"{this.Url}/admin/users/{userId}", userData, this.CreateAuthedRequestHeaders(jwt));
+    public Task<User?> UpdateUserById(string jwt, string userId, UserAttributes userData) => this.MakeRequestAsync<User>(HttpMethod.Put, $"{this.Url}/admin/users/{PathSegment.Escape(userId)}", userData, this.CreateAuthedRequestHeaders(jwt));
 
     /// <summary>
     /// Sends a re-authentication request, used for password changes.
@@ -843,7 +843,7 @@ public class Api : IGotrueApi<User, Session>
     public Task<BaseResponse> DeleteUser(string uid, string jwt, bool shouldSoftDelete = false)
     {
         var data = new Dictionary<string, object> { { "should_soft_delete", shouldSoftDelete } };
-        return this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/users/{uid}", data, this.CreateAuthedRequestHeaders(jwt));
+        return this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/users/{PathSegment.Escape(uid)}", data, this.CreateAuthedRequestHeaders(jwt));
     }
 
     /// <summary>
