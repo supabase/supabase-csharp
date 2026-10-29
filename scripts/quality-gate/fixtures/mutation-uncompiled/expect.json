@@ -1,0 +1,9 @@
+{
+  "description": "Every mutant on the changed line failed to compile, so none was tested. A report with no survivors would read as green; the mutation stage must SKIP instead, holding the run at INCOMPLETE.",
+  "mode": "--mutation",
+  "exit": 2,
+  "verdict": "INCOMPLETE",
+  "stages": [
+    { "id": "3", "status": "SKIP", "detailContains": "failed to compile, none tested" }
+  ]
+}

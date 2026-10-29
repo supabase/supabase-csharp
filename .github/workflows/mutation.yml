@@ -30,6 +30,10 @@ jobs:
         run: dotnet tool install --global dotnet-stryker
 
       - name: Mutate changed packages
+        env:
+          # Relaxes warnings-as-errors for the instrumented build (Directory.Build.targets) and
+          # compiles the E2E test files out of the test projects.
+          STRYKER_MUTATION: "true"
         run: |
           git diff --name-only origin/master...HEAD -- 'packages/**/*.cs' \
             | sed -E 's#(packages/[^/]+)/.*#\1#' | sort -u \

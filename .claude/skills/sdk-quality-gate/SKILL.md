@@ -25,12 +25,16 @@ e.g. `packages/Gotrue`, or `packages` for the whole solution. Run with
 
 **Mutation runs in its own workflow, on every PR.** `mutation.yml` runs Stryker
 `--since:origin/master` on changed packages, then `gate.sh packages --mutation`
-fails on any survivor on a changed line. To check locally before pushing:
+fails on any survivor on a changed line, and SKIPs when every mutant on the changed
+lines failed to compile. To check locally before pushing:
 
 ```
-(cd packages/<Name>/<Name>.Tests && dotnet stryker --since:origin/master)
+(cd packages/<Name>/<Name>.Tests && STRYKER_MUTATION=true dotnet stryker --since:origin/master)
 scripts/quality-gate/gate.sh packages/<Name> --mutation
 ```
+
+In a `git worktree`, `--since` finds no changes: pass the changed files with
+`-m '**/<File>.cs'` instead. Never trust a run that tested zero mutants.
 
 **CI runs the same command.** The `Build and Test` workflow
 (`.github/workflows/build-and-test.yml`) invokes `scripts/quality-gate/gate.sh`

@@ -436,7 +436,8 @@ stage_coverage() {
 # and FAILs on a mutant left alive (Survived/NoCoverage) on a line this diff changed —
 # "no new survivors". Never runs Stryker; run-fixtures.sh drives it with canned reports.
 # A missing report is SKIP (couldn't check ≠ passed), which makes --mutation exit 2.
-MUTATION_UNDETECTED='.status=="Survived" or .status=="NoCoverage"'
+# So is a report whose mutants on changed lines all failed to compile: none was tested.
+MUTATION_ON_CHANGED_LINES='.status=="Survived" or .status=="NoCoverage" or .status=="Killed" or .status=="Timeout" or .status=="CompileError"'
 _MUT_CHANGED=()
 _MUT_CHANGED_LINES=()
 
@@ -513,7 +514,7 @@ _pkg_is_tracked() {  # true if the package ships a stryker-config.json
 }
 
 stage_mutation() {
-  local i report log root rel first count f status line normf
+  local i report log root rel first count tested uncompiled f status line normf
   root="$(git -C "$SCOPE_DIR" rev-parse --show-toplevel 2>/dev/null || true)"
   _MUT_CHANGED=()
   [[ -n "$root" ]] && while IFS= read -r rel; do [[ -n "$rel" ]] && _MUT_CHANGED+=("$rel"); done < <(changed_cs_files)
@@ -535,20 +536,25 @@ stage_mutation() {
       add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" SKIP "no usable mutation report — run dotnet stryker" "${report:-}"; continue
     fi
 
-    : > "$log"; first=""; count=0
+    : > "$log"; first=""; count=0; tested=0; uncompiled=0
     while IFS=$'\t' read -r f status line; do
       [[ -n "$f" ]] || continue
       normf="$f"; [[ "$normf" == /* && -n "$root" ]] && normf="${normf#"$root"/}"
       _mutation_file_changed "$normf" || continue
       _mutation_line_changed "$normf" "$line" || continue
+      if [[ "$status" == "CompileError" ]]; then uncompiled=$((uncompiled + 1)); continue; fi
+      tested=$((tested + 1))
+      [[ "$status" == "Survived" || "$status" == "NoCoverage" ]] || continue
       count=$((count + 1)); echo "$status  $normf:$line" >> "$log"
       [[ -z "$first" ]] && first="$normf:$line ($status)"
-    done < <(jq -r ".files | to_entries[] | .key as \$f | .value.mutants[] | select($MUTATION_UNDETECTED) | \"\(\$f)\t\(.status)\t\(.location.start.line // 0)\"" "$report")
+    done < <(jq -r ".files | to_entries[] | .key as \$f | .value.mutants[] | select($MUTATION_ON_CHANGED_LINES) | \"\(\$f)\t\(.status)\t\(.location.start.line // 0)\"" "$report")
 
     if [[ $count -gt 0 ]]; then
       add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" FAIL "$count new survivor(s) — first: $first" "$log"
+    elif [[ $tested -eq 0 && $uncompiled -gt 0 ]]; then
+      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" SKIP "$uncompiled mutant(s) on changed lines failed to compile, none tested" "$report"
     else
-      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" PASS "no survivors on changed lines" "$report"
+      add 3 "Mutation (new survivors)" block "${PKG_NAME[$i]}" PASS "no survivors on changed lines ($tested tested)" "$report"
     fi
   done
 }
