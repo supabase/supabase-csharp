@@ -101,6 +101,7 @@ Tests are code a developer reads to learn the surface; they get the same care as
 - **Additive / opt-in only until v9.** New members/overloads/opt-in options with safe defaults. Changing a signature, default, serialized shape, or error contract on an existing member is breaking — batch it into the planned major with maintainer sign-off.
 - **New surface is built to the target now**, not to match the legacy code beside it.
 - **Deprecation discipline:** retire surface with `[Obsolete("… Favor <new API> instead.")]` pointing at the replacement, and record it in `MIGRATION_v9.md`.
+- Adding a member to a public interface is additive, not breaking: callers consume the SDK's interfaces, they do not implement them.
 - Expose capabilities on the interface, not only the concrete class. XML docs and `<example>` live on the interface member; the implementation uses `<inheritdoc/>`.
 - **Encapsulation by default.** Implementation classes, helpers and wire DTOs that callers never construct are `internal`. A type becomes public only when a caller needs to name it.
 
@@ -108,6 +109,8 @@ Tests are code a developer reads to learn the surface; they get the same care as
 
 **From:** `Dictionary<string, object>` bodies built inline and per-method deserialization.
 **v8:** reuse the package's existing transport helper; send typed request records, never dictionaries.
+
+- A caller-supplied value placed in a request path is escaped as one segment, or rejected before the request with `ArgumentException` when escaping would change what the server reads. Never interpolate it raw: `System.Uri` resolves `..` segments, so `x/../../users/<id>` reaches another route.
 **To (v9, Vonage shape):**
 
 - One generic transport — `HttpClient<TError>.SendAsync<TRequest, TResponse>(request)` — owns headers, base-URL composition, serialization, error mapping (§9), and OTel. Call sites describe *what*, not *how*.
@@ -117,7 +120,7 @@ Tests are code a developer reads to learn the surface; they get the same care as
 
 ## 9. Error model
 
-**v8 (current — all new surface follows this):** operation failures throw the package's typed exception (`GotrueException` with `FailureReason`, `SupabaseStorageException`, `PostgrestException`, `FunctionsException`, `RealtimeException`), mapped by the package's existing error-handling path. A new failure mode extends the existing reason/hint enum rather than inventing a new exception type. Argument misuse throws `ArgumentException` before any I/O.
+**v8 (current — all new surface follows this):** operation failures throw the package's typed exception (`GotrueException` with `FailureHint.Reason`, `SupabaseStorageException`, `PostgrestException`, `FunctionsException`, `RealtimeException`), mapped by the package's existing error-handling path. A new failure mode extends the existing reason/hint enum rather than inventing a new exception type. Argument misuse throws `ArgumentException` before any I/O.
 
 **v9 (target — do not introduce piecemeal):** failures are **values in the return type** — the Supabase `{ data, error }` house style as a `Result`-style return, with a typed failure hierarchy (Vonage-style: `HttpFailure`, `ParsingFailure`, `AuthenticationFailure`, …). It ships for the whole SDK at once in v9; shipping it on individual v8 methods would leave callers with two error contracts.
 - Never put secrets/tokens/full auth URLs in failures, spans, or logs — route URLs through `UrlSanitizer`.
