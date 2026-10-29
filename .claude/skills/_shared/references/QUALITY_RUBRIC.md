@@ -103,6 +103,7 @@ Done when:
 - [ ] Every changed production line covered by the inner loop; zero surviving mutants on changed lines.
 - [ ] Wire-shape approval snapshots reviewed — every payload diff is intended.
 - [ ] Tests assert behavior through the public surface; testability friction fixed in the design.
+- [ ] New code laid out by use case: each type in the folder of the use case that uses it, only shared types in the product's `Common/`, tests mirroring the tree (CONVENTIONS §2).
 - [ ] Format clean; zero new warnings; `PublicAPI.Unshipped.txt` updated.
 - [ ] Public surface minimal and documented; the entry point has an `<example>` on the interface, `<inheritdoc/>` on the implementation.
 - [ ] `ConfigureAwait(false)` on every new await; `CancellationToken` honored through the call path.

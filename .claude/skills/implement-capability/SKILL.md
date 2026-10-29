@@ -53,6 +53,7 @@ Present what a developer will see, and nothing else:
 
 ```
 Placement:   IGotrueAdminClient (Supabase.Gotrue) — next to <neighbour>
+Use case:    Gotrue/CreateCustomProvider/ — <its types>; Common/: <types shared with other use cases, or "none">
 Signature:   Task DeleteOAuthClientAsync(string clientId, CancellationToken cancellationToken = default);
 New types:   <public records/enums with their members, or "none">
 Throws:      GotrueException (Reason = FailureHint.Reason.X) when …; ArgumentException when …
@@ -86,13 +87,14 @@ Work only inside that worktree from here on. If the feature needs a service enab
    - **Unit** (`[TestCategory("Unit")]`): pure logic, checks before the wire.
 3. Every failure and edge in the contract has a test. A test that is awkward to write is design feedback: change the API, never expose an internal or add test-only production code.
 
-Test style: `Sut_ShouldConsequence_GivenScenario`; class named for the element under test, in the domain folder (`Admin/`, `Mfa/`); FluentAssertions fluent and inline; NSubstitute for collaborators; reason strings cite the spec; no magic numbers; no comments.
+Test style: `Sut_ShouldConsequence_GivenScenario`; class named for the element under test, in the use-case folder that mirrors production (`Gotrue.Tests/CreateCustomProvider/`, CONVENTIONS §2); FluentAssertions fluent and inline; NSubstitute for collaborators; reason strings cite the spec; no magic numbers; no comments.
 
 Inner loop: `scripts/quality-gate/gate.sh packages/<Name> --fast`.
 
 ## 6. Refine
 
 - Orchestration reads as named intent; mechanics in named private helpers. No comments in code.
+- Use-case layout (CONVENTIONS §2): every new type sits in the folder of the one use case that uses it; the product's `Common/` holds only what two or more use cases share. When a later capability needs a type an earlier one created, the later PR moves it to `Common/`.
 - XML `<summary>` on every new public member, `<example>` on the entry point — on the interface; the implementation uses `<inheritdoc/>`.
 - `ConfigureAwait(false)` on every await; the token reaches the HTTP call.
 - New I/O participates in the package's instrumentation.
