@@ -1,0 +1,5 @@
+{
+  "id": "user-id-123",
+  "aud": "authenticated",
+  "identities": null
+}

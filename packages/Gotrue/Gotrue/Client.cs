@@ -538,6 +538,20 @@ public class Client : IGotrueClient<User, Session>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.identities.list_identities")]
+    public async Task<IReadOnlyList<UserIdentity>> GetUserIdentitiesAsync(CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GetUserIdentities);
+        if (!this.Online)
+        {
+            throw new GotrueException("Only supported when online", Offline);
+        }
+        var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
+        var user = await this.api.GetUserAsync(accessToken, cancellationToken).ConfigureAwait(false);
+        return user?.Identities ?? new List<UserIdentity>();
+    }
+
+    /// <inheritdoc />
     [ImplementedCapability("auth.session.sign_out")]
     public async Task SignOut(SignOutScope scope = SignOutScope.Global)
     {
