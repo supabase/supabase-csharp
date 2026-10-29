@@ -18,6 +18,7 @@ using Supabase.Gotrue.ListCustomProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.UpdateCustomProvider;
 using static Supabase.Gotrue.Constants;
 
 namespace Supabase.Gotrue;
@@ -643,7 +644,7 @@ public class Api : IGotrueApi<User, Session>
 
     /// <inheritdoc />
     public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>
-        this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+        this.MakeRequestAsync(HttpMethod.Delete, this.CustomProviderUrl(identifier), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
     /// <inheritdoc />
     public async Task<CustomProvider> CreateCustomProviderAsync(string jwt, NewCustomProvider provider, CustomProviderOptions? options = null, CancellationToken cancellationToken = default)
@@ -654,11 +655,29 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
+    public async Task<CustomProvider> UpdateCustomProviderAsync(string jwt, string identifier, CustomProviderChanges changes, CancellationToken cancellationToken = default)
+    {
+        var body = UpdateCustomProviderBody.For(changes);
+        var updated = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Put, this.CustomProviderUrl(identifier), body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return CustomProviderResponse.Read(updated);
+    }
+
+    /// <inheritdoc />
+    public async Task<CustomProvider> GetCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default)
+    {
+        var provider = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Get, this.CustomProviderUrl(identifier), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return CustomProviderResponse.Read(provider);
+    }
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(string jwt, CustomProviderType? type = null, CancellationToken cancellationToken = default)
     {
         var listed = await this.MakeRequestAsync<CustomProviderListResponse>(HttpMethod.Get, $"{this.Url}/admin/custom-providers", ListCustomProvidersQuery.For(type), this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return CustomProviderListResponse.Read(listed);
     }
+
+    private string CustomProviderUrl(string identifier) =>
+        $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}";
 
     /// <inheritdoc />
     public async Task<ProviderAuthState> LinkIdentity(string token, Provider provider, SignInOptions options)
