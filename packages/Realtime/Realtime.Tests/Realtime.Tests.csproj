@@ -27,22 +27,6 @@
 		<ProjectReference Include="..\Realtime\Realtime.csproj" />
 	</ItemGroup>
 
-	<!--
-	  Mutation-harness scoping: Stryker cannot filter by [TestCategory], so when STRYKER_MUTATION=true we
-	  compile-exclude the E2E tests (which drive the live Supabase CLI stack, are slow, and are
-	  non-deterministic per-mutant). Stryker then runs only the fast, hermetic Unit tests once per mutant.
-	  The mutate scope is pinned in stryker-config.json. MSBuild resolves the environment variable
-	  automatically; Stryker's child build inherits it.
-	-->
-	<ItemGroup Condition="'$(STRYKER_MUTATION)' == 'true'">
-		<Compile Remove="Connection\ClientConnectionTests.cs" />
-		<Compile Remove="Channels\ChannelSubscriptionTests.cs" />
-		<Compile Remove="Channels\PrivateChannelAuthorizationTests.cs" />
-		<Compile Remove="Channels\ChannelMessagingTests.cs" />
-		<Compile Remove="PostgresChanges\PostgresChangesDeliveryTests.cs" />
-		<Compile Remove="Broadcast\BroadcastRelayTests.cs" />
-		<Compile Remove="Presence\PresenceTrackingTests.cs" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="Fixtures\**\*.json">
