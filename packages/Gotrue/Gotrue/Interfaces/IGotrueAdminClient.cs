@@ -50,6 +50,33 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     Task<TUser?> GetUser(string jwt);
 
     /// <summary>
+    /// Signs a user out on the server from their access token, revoking the refresh tokens of the sessions in
+    /// <paramref name="scope" />. Access tokens already issued stay valid until they expire. Call it from a server,
+    /// for example to end a user's sessions after a password reset or a ban.
+    /// </summary>
+    /// <param name="accessToken">The user's access token. It authenticates the request: the service key is not sent.</param>
+    /// <param name="scope">
+    /// Which sessions to revoke: <see cref="Constants.SignOutScope.Global" /> (the default) revokes every session of the
+    /// user, <see cref="Constants.SignOutScope.Local" /> only the token's session, and
+    /// <see cref="Constants.SignOutScope.Others" /> every session but the token's.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="ArgumentException"><paramref name="accessToken" /> is null, empty or whitespace. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the token. <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>session_not_found</c>
+    /// when the token's session was already revoked and <c>user_not_found</c> when its user was deleted;
+    /// <see cref="Exceptions.GotrueException.Reason" /> is <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" />
+    /// (error code <c>bad_jwt</c>) when the token is expired, malformed or not a user's token.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl, Headers = { ["apikey"] = anonKey } });
+    /// await admin.SignOutAsync(userAccessToken, Constants.SignOutScope.Global);
+    /// </code>
+    /// </example>
+    Task SignOutAsync(string accessToken, Constants.SignOutScope scope = Constants.SignOutScope.Global, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets a user by ID from the server using the admin key (not the anonymous key).
     /// </summary>
     /// <param name="userId"></param>

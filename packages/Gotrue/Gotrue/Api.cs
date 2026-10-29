@@ -723,12 +723,15 @@ public class Api : IGotrueApi<User, Session>
     /// <param name="jwt"></param>
     /// <param name="scope"></param>
     /// <returns></returns>
-    public Task<BaseResponse> SignOut(string jwt, SignOutScope scope = SignOutScope.Global)
-    {
-        var data = new Dictionary<string, string>();
+    public Task<BaseResponse> SignOut(string jwt, SignOutScope scope = SignOutScope.Global) => this.SendSignOut(jwt, scope, CancellationToken.None);
 
-        return this.MakeRequestAsync(HttpMethod.Post, $"{this.Url}/logout?scope={Core.Helpers.GetMappedToAttr(scope).Mapping}", data, this.CreateAuthedRequestHeaders(jwt));
-    }
+    /// <inheritdoc />
+    public Task SignOutAsync(string jwt, SignOutScope scope = SignOutScope.Global, CancellationToken cancellationToken = default) =>
+        this.SendSignOut(jwt, scope, cancellationToken);
+
+    private Task<BaseResponse> SendSignOut(string jwt, SignOutScope scope, CancellationToken cancellationToken) =>
+        this.MakeRequestAsync(HttpMethod.Post, $"{this.Url}/logout?scope={Core.Helpers.GetMappedToAttr(scope).Mapping}", new Dictionary<string, string>(),
+            this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
     /// <summary>
     /// Gets User Details

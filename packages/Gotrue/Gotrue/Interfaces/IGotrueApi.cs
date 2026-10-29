@@ -42,6 +42,15 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<SSOResponse?> SignInWithSSO(Guid providerId, SignInWithSSOOptions? options = null);
     Task<SSOResponse?> SignInWithSSO(string domain, SignInWithSSOOptions? options = null);
     Task<BaseResponse> SignOut(string jwt, SignOutScope scope = SignOutScope.Global);
+
+    /// <summary>
+    /// Revokes the sessions of the user who owns <paramref name="jwt" />, within <paramref name="scope" />.
+    /// </summary>
+    /// <param name="jwt">The user's access token.</param>
+    /// <param name="scope">Which of the user's sessions to revoke.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task SignOutAsync(string jwt, SignOutScope scope = SignOutScope.Global, CancellationToken cancellationToken = default);
     Task<TSession?> SignUpWithEmail(string email, string password, SignUpOptions? options = null);
     Task<TSession?> SignUpWithPhone(string phone, string password, SignUpOptions? options = null);
     Task<TUser?> UpdateUser(string jwt, UserAttributes attributes);
