@@ -654,18 +654,18 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
-    public async Task<CustomProvider> GetCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default)
-    {
-        var provider = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Get, this.CustomProviderUrl(identifier), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
-        return CustomProviderResponse.Read(provider);
-    }
-    
-    /// <inheritdoc />
     public async Task<CustomProvider> UpdateCustomProviderAsync(string jwt, string identifier, CustomProviderChanges changes, CancellationToken cancellationToken = default)
     {
         var body = UpdateCustomProviderBody.For(changes);
         var updated = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Put, this.CustomProviderUrl(identifier), body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return CustomProviderResponse.Read(updated);
+    }
+
+    /// <inheritdoc />
+    public async Task<CustomProvider> GetCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default)
+    {
+        var provider = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Get, this.CustomProviderUrl(identifier), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return CustomProviderResponse.Read(provider);
     }
 
     private string CustomProviderUrl(string identifier) =>
