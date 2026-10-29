@@ -1,6 +1,6 @@
 # C# SDK Workflows
 
-> **This is the rationale, not the runbook — and it is a mental model, not wired to skills.** The only mechanized flow that ships as a skill today is `sdk-quality-gate` (the `Verify` step of every flow below; it runs `scripts/quality-gate/gate.sh`). The earlier per-flow skills (`sdk-workflow`, `test-suite-refactor`) and the `_shared/five-step-library.md` file were never carried forward and no longer exist — the five-step model survives here as the *why*, applied by hand. Treat the steps as a way to think about a change, and reach for `sdk-quality-gate` when you get to Verify.
+> **This is the rationale, not the runbook.** Two flows ship as skills: `implement-capability` (the Feature / parity flow below, driven by a capability-matrix key) and `sdk-quality-gate` (the `Verify` step of every flow; it runs `scripts/quality-gate/gate.sh`). The other flows are applied by hand from this model. Invoke the skill; read this for the *why*.
 
 *How we work.* [CONVENTIONS.md](CONVENTIONS.md) says how code should look; [QUALITY_RUBRIC.md](QUALITY_RUBRIC.md) says when it's done and how the bar is enforced. This says **how a change moves from start to done** — and, deliberately, how the same pieces recompose for very different kinds of work.
 
@@ -25,7 +25,7 @@ Five steps. They do not change between flows. Each has a stable input/output so 
 `Drive` is always double-loop TDD (QUALITY_RUBRIC §2). `Refine` always enforces declarative composition and the design-feedback rule. `Verify` is always the same pipeline. That invariance is the point — it's what makes the pieces reusable.
 
 **`Establish-contract` has variants** (same output shape, different source of truth):
-- *Gap analysis* — read the matching supabase-js package (gotrue-js, realtime-js, storage-js, …), map the behavior the .NET surface is missing.
+- *Gap analysis* — assemble the capability's contract from the capability-matrix spec, the service's API spec and the matching supabase-js package (as behavioral inspiration, never as code to port), and map what the .NET surface is missing.
 - *Characterization* — pin the **current** behavior of existing code (wire-shape snapshots, E2E, mutation baseline) before anything is touched.
 - *Reproduce* — turn a bug's expected-vs-actual into a failing case.
 
@@ -44,7 +44,7 @@ Set those four and the same five steps become a different flow. The contract art
 
 | Flow | Source of truth | Done | A diff means | Primary gate | Entry variant |
 |---|---|---|---|---|---|
-| **Feature / parity** | supabase-js behavior | new behavior exists | feature | behavior-equivalence + full gauntlet | Gap analysis |
+| **Feature / parity** | capability contract (matrix spec + API spec, supabase-js as example) | new behavior exists | feature | behavior-equivalence + full gauntlet | Gap analysis |
 | **Production refactor** | current behavior | behavior frozen, shape better | **defect** | empty wire-snapshot + API diff | Characterization |
 | **Test-suite refactor** *(transitional — §5)* | E2E + snapshots (**not** the unit tests) | net ≥ old, reads better | n/a | **mutation score held** | Characterization |
 | **Bugfix** | expected-vs-actual in the report | failing case green, nothing else moves | regression | new test green + no other diff | Reproduce |

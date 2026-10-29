@@ -2,6 +2,8 @@
 
 The quality bar we are building **toward**. This is a target spec, benchmarked against best-in-class .NET SDKs (Azure SDK, Stripe.net) and the maintainer's Vonage .NET SDK, not a description of the code as it stands today. Where a rule and the existing code disagree, the rule is right and the code is debt: new and changed code meets the bar; untouched code is migrated deliberately, not churned.
 
+Some rules can only land with a breaking release. They are marked **v9** (the next major; v8 is current) and new v8 code follows the **v8** column instead — introducing them piecemeal would leave callers with two contracts side by side.
+
 > Companion: [QUALITY_RUBRIC.md](QUALITY_RUBRIC.md) defines when a change is *done*. Each section notes the **From → To** so the direction is explicit.
 
 ---
@@ -11,7 +13,7 @@ The quality bar we are building **toward**. This is a target spec, benchmarked a
 These decide any call the specific rules don't cover:
 
 1. **Developer experience is the top priority.** A developer must be able to use the SDK correctly from IntelliSense, without reading its source — via clear types, predictable patterns, and examples in the docs.
-2. **"Familiar" means the Supabase house style, expressed in idiomatic C#.** Familiar DX is *not* "throws like other .NET SDKs"; it's the transparent, `{ data, error }`-style contract Supabase developers know across every Supabase SDK, honored through C#'s type system (§9).
+2. **"Familiar" means the Supabase house style, expressed in idiomatic C#.** The end state is the transparent, `{ data, error }`-style contract Supabase developers know across every Supabase SDK, honored through C#'s type system (§9, v9). Until then, new surface stays consistent with the v8 surface beside it.
 3. **Lean on the type system.** Make illegal states unrepresentable: immutability by default, results and optionality expressed as types rather than nulls, exceptions, or convention. C# is a functional language — use it.
 4. **Typed contracts over stringly-typed anything.** Requests and responses are types, not dictionaries.
 5. **Code reads like a story.** Orchestration says *what* it does (intent), not *how*; mechanics live below in named helpers (§5.5). This is a first-class readability requirement, not a nicety.
@@ -19,13 +21,14 @@ These decide any call the specific rules don't cover:
 
 ## 1. Project & target frameworks
 
-- **The monorepo cutover is done and the major (v8) has shipped.** Packages now target `netstandard2.1` as the reach baseline plus `net10.0`. New code may assume the `netstandard2.1` feature set (`IAsyncEnumerable<T>`, full nullable annotations, `Span<T>`).
-- **Never assume net10-only APIs** in library code; guard with `#if` or use a `netstandard2.1` equivalent so the baseline target still compiles.
+- **The monorepo cutover is done and v8 has shipped.** Library packages target `netstandard2.1`; test projects target `net10.0`. New code may assume the `netstandard2.1` feature set (`IAsyncEnumerable<T>`, nullable annotations, `Span<T>`); `PolySharp` supplies `init`/`record` support.
+- **Never use APIs missing from `netstandard2.1`** in library code.
 
 ## 2. Solution & folder structure — vertical slices
 
 **From:** flat per-package folders (`Gotrue/*.cs`) mixing clients, models, and options.
-**To:** one folder per **operation** (Vonage-style vertical slices):
+**v8:** new types for a capability go in a folder named after the capability's group, next to the existing ones (`Gotrue/Mfa/`, `Gotrue/Claims/`, `Gotrue/Resend/`); the operation is exposed on the client interface that already owns that group.
+**To (v9):** one folder per **operation** (Vonage-style vertical slices):
 
 ```
 <Feature>/
@@ -62,7 +65,7 @@ These decide any call the specific rules don't cover:
 
 - **Immutable is mandatory.** Prefer `record` types (or `readonly struct` for small value-like requests, à la Vonage) with `init`-only members.
 - **Separate request and response types per operation** (§2). A single type for both is allowed only when it is *not* an anemic DTO — i.e. it carries real behavior/invariants.
-- A request owns its HTTP representation: implement `IRequest.BuildRequestMessage()` (§8).
+- **v9:** a request owns its HTTP representation via `IRequest.BuildRequestMessage()` (§8). **v8:** requests go through the package's existing transport helper (e.g. `Helpers.MakeRequestAsync` in Gotrue).
 - Collections are exposed read-only (`IReadOnlyList<T>`, `IReadOnlyDictionary<K,V>`) and never null.
 - **Domain primitives over raw strings** where the SDK validates anyway: `Email`, `PhoneNumber`, etc. — parse, don't stringly-type.
 - **Serializer is System.Text.Json.** The Newtonsoft → STJ migration is complete SDK-wide (no Newtonsoft references remain in `packages/`). Keep serialization at the model/transport boundary. Map wire names with the serializer's snake_case convention; the C# surface is PascalCase.
@@ -74,8 +77,8 @@ The single most important readability rule, and a defining trait of the Vonage S
 - **Orchestration methods read top-to-bottom as a sequence of named intentions**, not a wall of mechanics. The Vonage `SimSwapClient` is the reference: `request.Map(BuildAuthorizeRequest).BindAsync(SendAuthorizeRequest).Map(BuildAuthenticateResponse)` — each step names *what* happens; the *how* is a private method below.
 - **Push implementation details down.** Loops, parsing, header assembly, string building, null/absence handling — extract into well-named private methods/functions so the high-level method stays a narrative of intent.
 - **Name for intent, not mechanism** (`BuildAuthenticationHeader`, not `ConcatTokenString`).
-- This pairs with the return-based composition of §9 (`Map`/`Bind` pipelines) — the error model and the declarative style reinforce each other.
-- A method you can't read as prose without stepping into it is a signal to extract and rename, not to add a comment.
+- This pairs with the return-based composition of §9 (`Map`/`Bind` pipelines, v9) — the error model and the declarative style reinforce each other.
+- **No comments in code.** A method you can't read as prose without stepping into it is a signal to extract and rename, not to add a comment. XML docs on public surface are documentation, not comments, and are required (§11).
 
 ## 5.6. Test code — held to the production bar
 
@@ -91,33 +94,32 @@ Tests are code a developer reads to learn the surface; they get the same care as
 
 - Optional inputs go in an immutable `XxxOptions` (init-only), passed as a single defaulted parameter with safe defaults, so passing nothing reproduces prior behavior (keeps new options additive — §7).
 - **Core clients are constructable without a DI container.** A public constructor / factory, no service-locator assumptions — usable directly from a console app, Unity, or any host. **Core packages take no `Microsoft.Extensions.*` dependency** (DI, `IHttpClientFactory`, options binding): those drag in framework-flavored deps that make no sense outside ASP.NET. Container registration (`services.AddSupabase(...)`) ships as a separate `Supabase.Extensions.DependencyInjection` package (`packages/extensions/DependencyInjection`) that layers on top of these plain constructors — the constructability seam is what keeps that possible.
-- **Fluent builders with compile-time-safe mandatory fields** (the Vonage `[Builder]`/`[Mandatory]`/`[ValidationRule]` source generator) are the target ergonomics for request construction — **deferred until the error model lands (§9)**, because a builder must not throw. Until then: immutable requests with `init` + a result-returning validation step.
+- **Fluent builders with compile-time-safe mandatory fields** (the Vonage `[Builder]`/`[Mandatory]`/`[ValidationRule]` source generator) are the target ergonomics for request construction — **deferred to v9 with the error model (§9)**, because a builder must not throw. Until then: immutable `init`-only records.
 
 ## 7. Public API design (additive today, idiomatic always)
 
-- **Additive / opt-in only until the major.** New members/overloads/opt-in options with safe defaults. Changing a signature, default, serialized shape, or error contract on an existing member is breaking — batch it into the planned major with maintainer sign-off.
+- **Additive / opt-in only until v9.** New members/overloads/opt-in options with safe defaults. Changing a signature, default, serialized shape, or error contract on an existing member is breaking — batch it into the planned major with maintainer sign-off.
 - **New surface is built to the target now**, not to match the legacy code beside it.
-- **Deprecation discipline:** retire surface with `[Obsolete("… Favor <new API> instead.")]` pointing at the replacement, and record it in a per-major `MIGRATION_vN.md`. This is the mechanism that lets the return-based API (§9) coexist with the old exception surface until the major removes it.
-- Expose capabilities on the interface, not only the concrete class.
+- **Deprecation discipline:** retire surface with `[Obsolete("… Favor <new API> instead.")]` pointing at the replacement, and record it in `MIGRATION_v9.md`.
+- Expose capabilities on the interface, not only the concrete class. XML docs and `<example>` live on the interface member; the implementation uses `<inheritdoc/>`.
+- **Encapsulation by default.** Implementation classes, helpers and wire DTOs that callers never construct are `internal`. A type becomes public only when a caller needs to name it.
 
-## 8. Transport — typed, generic, centralized
+## 8. Transport — typed, generic, centralized (v9)
 
-**From:** `Dictionary<string, object>` bodies built inline and `JsonConvert.DeserializeObject<T>` per method.
-**To (Vonage shape):**
+**From:** `Dictionary<string, object>` bodies built inline and per-method deserialization.
+**v8:** reuse the package's existing transport helper; send typed request records, never dictionaries.
+**To (v9, Vonage shape):**
 
 - One generic transport — `HttpClient<TError>.SendAsync<TRequest, TResponse>(request)` — owns headers, base-URL composition, serialization, error mapping (§9), and OTel. Call sites describe *what*, not *how*.
 - Requests implement `IRequest.BuildRequestMessage()`; responses are typed models. No stringly-typed dictionaries in call implementations.
 - This layer is the seam the codegen objective plugs into — treat request/response types and transport as if they could be generated from OpenAPI.
 - Standard headers (`X-Client-Info` with assembly version) and dynamic per-request headers are the transport's concern.
 
-## 9. Error model — return-based & transparent (progressive)
+## 9. Error model
 
-This is a deliberate, phased shift. **Direction:** failures are **values in the return type**, not thrown — the Supabase `{ data, error }` house style, expressed with C#'s type system (a `Result`/monad-style return; exact type TBD when we build it). Rationale: transparency and composability, the same bet supabase-js made.
+**v8 (current — all new surface follows this):** operation failures throw the package's typed exception (`GotrueException` with `FailureReason`, `SupabaseStorageException`, `PostgrestException`, `FunctionsException`, `RealtimeException`), mapped by the package's existing error-handling path. A new failure mode extends the existing reason/hint enum rather than inventing a new exception type. Argument misuse throws `ArgumentException` before any I/O.
 
-- **Fallible operations return the result type; they do not throw for expected failures.** Validation returns a result (never throws) — this is why builders wait for it (§6).
-- **Typed failure hierarchy** (Vonage-style: `HttpFailure`, `ParsingFailure`, `AuthenticationFailure`, `DeserializationFailure`, …), each carrying enough to render a message, convert to an exception (escape hatch), or wrap into a result. Richer than a single `GotrueException`.
-- **Progressive adoption (phasing is a maintainer-confirmed plan, not yet final):** the return-based API is introduced in `Supabase.Core`, adopted by new features and newly-touched call paths; the existing exception-throwing surface is deprecated (§7) pointing to the new one and removed at the major. We do **not** maintain two error philosophies indefinitely.
-- Genuinely exceptional/programmer errors (misuse, argument validation of non-user input) may still throw `ArgumentException` etc.; the return type is for *operation* failures the caller is expected to handle.
+**v9 (target — do not introduce piecemeal):** failures are **values in the return type** — the Supabase `{ data, error }` house style as a `Result`-style return, with a typed failure hierarchy (Vonage-style: `HttpFailure`, `ParsingFailure`, `AuthenticationFailure`, …). It ships for the whole SDK at once in v9; shipping it on individual v8 methods would leave callers with two error contracts.
 - Never put secrets/tokens/full auth URLs in failures, spans, or logs — route URLs through `UrlSanitizer`.
 
 ## 10. Observability
@@ -131,10 +133,13 @@ This is a deliberate, phased shift. **Direction:** failures are **values in the 
 
 ## 12. Parity mapping principle
 
-Port from supabase-js — the reference monorepo (gotrue-js, realtime-js, storage-js, …) — for **behavior equivalence with an idiomatic .NET surface** — match what the reference *does*, not how its signatures look. JS callbacks → .NET events/`IAsyncEnumerable`; JS options bags → immutable `XxxOptions`; JS `{ data, error }` → the return-based result type (§9); JS loose unions → enums or overloads. Behavior is the spec; shape is ours.
+Behavior comes from the capability's **contract**: the capability-matrix spec when one exists, the service's API spec (OpenAPI) for the wire, and supabase-js (auth-js, storage-js, postgrest-js, realtime-js, functions-js) as a worked example of the SDK-layer behavior. Match what the reference *does*, not how it is written.
+
+- **supabase-js is inspiration, never source.** Do not port, transliterate or adapt JS code. Read it to learn the behavior (defaults, validation before the wire, state changes, edge cases), then design the C# from the contract. Not all of it meets this bar: where the JS is loose (stringly-typed unions, untyped bags, swallowed errors), the C# does better and the PR says so.
+- JS callbacks → .NET events/`IAsyncEnumerable`; JS options bags → immutable `XxxOptions` records; JS `{ data, error }` → the return value plus the typed exception (v8), the result type (v9); JS loose unions → enums or overloads.
 
 ## 13. Tooling & enforcement
 
-- Repo-wide `.editorconfig` (seeded from the Vonage SDK's) enforces formatting and naming; `dotnet format` is the tie-breaker for anything unstated here.
-- Analyzers (Roslynator/StyleCop) are enabled to guide toward these rules.
+- Repo-wide `.editorconfig` (seeded from the Vonage SDK's) and `.globalconfig` enforce formatting, naming and analyzer severities; `dotnet format` is the tie-breaker for anything unstated here.
+- Analyzers: the .NET analyzers at `AnalysisLevel` latest, plus `Microsoft.CodeAnalysis.PublicApiAnalyzers` tracking the public surface in `PublicAPI.Shipped.txt` / `PublicAPI.Unshipped.txt`.
 - **`TreatWarningsAsErrors` flips on per package once it reaches zero warnings** — already on for `Core`; the remaining packages still carry warning debt. New and changed code introduces **zero new warnings** so the debt only shrinks. See QUALITY_RUBRIC §4.
