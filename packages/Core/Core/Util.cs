@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -27,42 +26,42 @@ public static class Util
         ClientInfoCache.GetOrAdd(clientType.Assembly, static (_, type) => BuildClientInfo(type), clientType);
 
     // The header is process-invariant, yet callers stamp it on every request; building it scans
-    // every loaded assembly (and, on Unity, every assembly's attributes), so it is built once per client assembly.
+    // every loaded assembly, so it is built once per client assembly.
     private static readonly ConcurrentDictionary<Assembly, string> ClientInfoCache = new();
 
-    private static string BuildClientInfo(Type clientType) =>
-        GetAssemblyVersion(clientType, RuntimeInformation.OSDescription, RuntimeInformation.IsOSPlatform, AppDomain.CurrentDomain.GetAssemblies());
+    private static string BuildClientInfo(Type clientType) => GetAssemblyVersion(clientType, HostEnvironment.Current());
 
-    // Testability seam: the platform and framework probes read process-wide ambient state
-    // (RuntimeInformation, the loaded assembly set) that a host cannot vary at runtime. This
-    // overload takes those reads as parameters, so every branch is reachable hermetically; the
-    // public entry point above supplies the real values. Internal — not part of the public API.
-    internal static string GetAssemblyVersion(Type clientType, string osDescription, Func<OSPlatform, bool> isOsPlatform, IReadOnlyCollection<Assembly> loadedAssemblies) =>
-        $"{GetClientName(clientType)}-csharp/{GetClientVersion(clientType)}{BuildMetadata(osDescription, isOsPlatform, loadedAssemblies)}";
+    internal static string GetAssemblyVersion(Type clientType, HostEnvironment host) =>
+        $"{GetClientName(clientType)}-csharp/{GetClientVersion(clientType)}{BuildMetadata(host)}";
 
     private static string GetClientName(Type clientType) => clientType.Assembly.GetName().Name.ToLower();
 
     private static string? GetClientVersion(Type clientType) => GetInformationalVersion(clientType.Assembly);
 
-    private static string BuildMetadata(string osDescription, Func<OSPlatform, bool> isOsPlatform, IReadOnlyCollection<Assembly> loadedAssemblies) =>
-        string.Concat(GetPlatformInfo(osDescription, isOsPlatform).ToString(), GetRuntimeInfo().ToString(), GetFrameworkInfo(loadedAssemblies).ToString());
+    private static string BuildMetadata(HostEnvironment host)
+    {
+        var framework = GetFrameworkInfo(host);
+        var isUnityHost = framework.Value == "unity";
+        return string.Concat(GetPlatformInfo(host, isUnityHost).ToString(), GetRuntimeInfo(host, isUnityHost).ToString(), framework.ToString());
+    }
 
     private sealed class MetadataEntry
     {
         private readonly string key;
-        private readonly string value;
         private readonly string? version;
 
         internal MetadataEntry(string key, string value, string? version = null)
         {
             this.key = key;
-            this.value = value;
+            this.Value = value;
             this.version = version;
         }
 
+        internal string Value { get; }
+
         public override string ToString() => string.IsNullOrEmpty(this.version)
-            ? $"; {this.key}={this.value}"
-            : $"; {this.key}={this.value}; {this.key}-version={this.version}";
+            ? $"; {this.key}={this.Value}"
+            : $"; {this.key}={this.Value}; {this.key}-version={this.version}";
 
         internal static MetadataEntry Unknown(string key) => new(key, "unknown");
     }
@@ -78,22 +77,54 @@ public static class Util
         return osDescription;
     }
 
-    private static MetadataEntry GetPlatformInfo(string osDescription, Func<OSPlatform, bool> isOsPlatform) => new("platform", GetPlatform(osDescription, isOsPlatform), Environment.OSVersion.Version.ToString());
+    private static string? GetUnityPlatform(HostEnvironment host) =>
+        host.UnityPlatform() is { } runtimePlatform ? ToPlatformName(runtimePlatform) : null;
 
-    private static MetadataEntry GetRuntimeInfo() => new("runtime", "dotnet", Environment.Version.ToString());
+    private static string ToPlatformName(string unityRuntimePlatform) => unityRuntimePlatform switch
+    {
+        "IPhonePlayer" => "iOS",
+        "WebGLPlayer" => "browser",
+        _ when StartsWithAny(unityRuntimePlatform, "Windows", "WSAPlayer") => "Windows",
+        _ when StartsWithAny(unityRuntimePlatform, "OSX") => "macOS",
+        _ when StartsWithAny(unityRuntimePlatform, "Linux", "EmbeddedLinux") => "Linux",
+        _ => unityRuntimePlatform,
+    };
+
+    private static bool StartsWithAny(string value, params string[] prefixes) =>
+        prefixes.Any(prefix => value.StartsWith(prefix, StringComparison.Ordinal));
+
+    private static MetadataEntry GetPlatformInfo(HostEnvironment host, bool isUnityHost)
+    {
+        var platform = (isUnityHost ? GetUnityPlatform(host) : null) ?? GetPlatform(host.OsDescription, host.IsOsPlatform);
+        return new MetadataEntry("platform", platform, Environment.OSVersion.Version.ToString());
+    }
+
+    private static MetadataEntry GetRuntimeInfo(HostEnvironment host, bool isUnityHost) =>
+        (isUnityHost ? GetUnityRuntimeInfo(host.FrameworkDescription) : null) ?? new MetadataEntry("runtime", "dotnet", Environment.Version.ToString());
+
+    private const string MonoPrefix = "Mono ";
+
+    private static MetadataEntry? GetUnityRuntimeInfo(string frameworkDescription) => frameworkDescription switch
+    {
+        _ when frameworkDescription.Contains("IL2CPP", StringComparison.OrdinalIgnoreCase) => new MetadataEntry("runtime", "il2cpp"),
+        _ when frameworkDescription.StartsWith(MonoPrefix, StringComparison.Ordinal) => new MetadataEntry("runtime", "mono", ParseMonoVersion(frameworkDescription)),
+        _ => null,
+    };
+
+    private static string ParseMonoVersion(string frameworkDescription) =>
+        frameworkDescription.Substring(MonoPrefix.Length).Split(' ')[0];
 
     // Priority is explicit: MAUI wins over Blazor in hybrid apps where both assemblies are present.
-    // Unity version uses GetCustomAttributesData() rather than member reflection — safe under IL2CPP.
-    private static MetadataEntry GetFrameworkInfo(IReadOnlyCollection<Assembly> loadedAssemblies)
+    private static MetadataEntry GetFrameworkInfo(HostEnvironment host)
     {
-        var assemblies = loadedAssemblies
+        var assemblies = host.LoadedAssemblies
             .GroupBy(a => a.GetName().Name)
             .ToDictionary(g => g.Key, g => g.First());
 
         if (assemblies.TryGetValue("Microsoft.Maui", out var maui))
             return new MetadataEntry("framework", "maui", GetInformationalVersion(maui));
         if (assemblies.ContainsKey("UnityEngine.CoreModule"))
-            return new MetadataEntry("framework", "unity", GetUnityVersion(loadedAssemblies));
+            return new MetadataEntry("framework", "unity", host.UnityVersion());
         if (assemblies.TryGetValue("Microsoft.AspNetCore.Components", out var blazor))
             return new MetadataEntry("framework", "blazor", GetInformationalVersion(blazor));
         return MetadataEntry.Unknown("framework");
@@ -101,20 +132,4 @@ public static class Util
 
     private static string? GetInformationalVersion(Assembly assembly) =>
         assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
-
-    // Defensive: GetCustomAttributesData() can throw on exotic hosts (dynamic/reflection-emit assemblies); not reliably triggerable in a unit test.
-    [ExcludeFromCodeCoverage]
-    private static CustomAttributeData[] SafeGetCustomAttributesData(Assembly assembly)
-    {
-        try { return assembly.GetCustomAttributesData().ToArray(); }
-        catch { return []; }
-    }
-
-    private static string? GetUnityVersion(IReadOnlyCollection<Assembly> loadedAssemblies)
-    {
-        var attr = loadedAssemblies
-            .SelectMany(SafeGetCustomAttributesData)
-            .FirstOrDefault(d => d.AttributeType.Name == "UnityAPICompatibilityVersionAttribute");
-        return attr?.ConstructorArguments.Count > 0 ? attr.ConstructorArguments[0].Value as string : null;
-    }
 }
