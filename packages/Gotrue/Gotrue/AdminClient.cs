@@ -8,6 +8,7 @@ using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.UpdateCustomProvider;
 
 namespace Supabase.Gotrue;
 
@@ -158,6 +159,11 @@ public class AdminClient : IGotrueAdminClient<User>
     [ImplementedCapability("auth.admin.list_providers")]
     public Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(CustomProviderType? type = null, CancellationToken cancellationToken = default) =>
         this.api.ListCustomProvidersAsync(this.serviceKey, type, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.admin.update_provider")]
+    public Task<CustomProvider> UpdateCustomProviderAsync(string identifier, CustomProviderChanges changes, CancellationToken cancellationToken = default) =>
+        this.api.UpdateCustomProviderAsync(this.serviceKey, identifier, changes, cancellationToken);
 
     /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)
