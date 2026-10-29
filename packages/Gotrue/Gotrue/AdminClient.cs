@@ -155,6 +155,11 @@ public class AdminClient : IGotrueAdminClient<User>
         this.api.GetCustomProviderAsync(this.serviceKey, identifier, cancellationToken);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.list_providers")]
+    public Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(CustomProviderType? type = null, CancellationToken cancellationToken = default) =>
+        this.api.ListCustomProvidersAsync(this.serviceKey, type, cancellationToken);
+
+    /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)
     {
         var result = await this.api.UpdateUser(this.serviceKey, attributes);
