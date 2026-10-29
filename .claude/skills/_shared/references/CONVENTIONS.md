@@ -27,7 +27,28 @@ These decide any call the specific rules don't cover:
 ## 2. Solution & folder structure — vertical slices
 
 **From:** flat per-package folders (`Gotrue/*.cs`) mixing clients, models, and options.
-**v8:** new types for a capability go in a folder named after the capability's group, next to the existing ones (`Gotrue/Mfa/`, `Gotrue/Claims/`, `Gotrue/Resend/`); the operation is exposed on the client interface that already owns that group.
+**v8:** new code is laid out by **use case** (screaming architecture): what changes together lives together. The operation is still exposed on the client interface that already owns its group, but everything else it needs gets a folder named for the use case, in domain language (verb + noun: `RegisterCustomProvider/`, `UpdateCustomProvider/`, `ListCustomProviders/`), nested inside the feature folder:
+
+```
+CustomProviders/                    // feature: only what two or more use cases share
+  CustomProvider.cs                 //   the result every use case returns
+  CustomProviderIdentifier.cs       //   the check every by-identifier use case runs
+  RegisterCustomProvider/           // use case: only what registration needs
+    NewCustomProvider.cs            //   public input
+    RegisterCustomProviderBody.cs   //   internal wire body
+  UpdateCustomProvider/
+    CustomProviderChanges.cs
+    UpdateCustomProviderBody.cs
+```
+
+- **A type belongs to the use case that uses it.** Public inputs and outputs, internal wire DTOs, mapping and validation used by one use case go in its folder, not in the feature folder.
+- **Promote only what is shared.** A type moves up to the feature folder when a second use case needs it, never ahead of time. A type shared across features goes in the package's existing shared folder.
+- **No shared type serving several use cases through a mode switch.** One wire body per use case beats one body with `ForRegistration`/`ForChanges` factories: each use case can then change without touching the other. Share the common mapping as a helper in the feature folder instead.
+- **Namespaces follow folders** (`Supabase.Gotrue.CustomProviders.RegisterCustomProvider`), so a use case's public types sit in their own namespace. Name the folder for the use case, never after a type it contains (a folder named like a type in scope shadows it, `CS0118`).
+- **A use case with no types of its own needs no folder.** Its tests still get one.
+- **Tests mirror the same tree** (`Gotrue.Tests/CustomProviders/RegisterCustomProvider/`): the use case's E2E, contract, approval and unit test classes, with its `Data/` fixtures, sit together.
+- Shipped code is not moved to fit this layout; it is migrated deliberately, with its own PR.
+- The client classes (`Api`, `AdminClient`) stay where they are in v8. Their new members delegate to the use case's types and keep the use case's mechanics (body building, response mapping) out of the client.
 **To (v9):** one folder per **operation** (Vonage-style vertical slices):
 
 ```
