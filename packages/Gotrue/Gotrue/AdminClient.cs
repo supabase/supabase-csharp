@@ -65,6 +65,11 @@ public class AdminClient : IGotrueAdminClient<User>
     public Task<User?> GetUser(string jwt) => this.api.GetUser(jwt);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.admin.sign_out")]
+    public Task SignOutAsync(string accessToken, Constants.SignOutScope scope = Constants.SignOutScope.Global, CancellationToken cancellationToken = default) =>
+        this.api.SignOutAsync(RequireAccessToken(accessToken), scope, cancellationToken);
+
+    /// <inheritdoc />
     [ImplementedCapability("auth.admin.invite_user")]
     public async Task<bool> InviteUserByEmail(string email, InviteUserByEmailOptions? options = null)
     {
@@ -143,6 +148,11 @@ public class AdminClient : IGotrueAdminClient<User>
     [ImplementedCapability("auth.admin.delete_provider")]
     public Task DeleteCustomProviderAsync(string identifier, CancellationToken cancellationToken = default) =>
         this.api.DeleteCustomProviderAsync(this.serviceKey, identifier, cancellationToken);
+
+    private static string RequireAccessToken(string accessToken) =>
+        string.IsNullOrWhiteSpace(accessToken)
+            ? throw new ArgumentException("A user's access token is required to sign them out.", nameof(accessToken))
+            : accessToken;
 
     /// <inheritdoc />
     [ImplementedCapability("auth.admin.create_provider")]
