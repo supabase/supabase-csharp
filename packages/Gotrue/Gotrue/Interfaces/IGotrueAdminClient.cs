@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
@@ -257,4 +258,26 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<CustomProvider> GetCustomProviderAsync(string identifier, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the custom OAuth/OIDC providers registered on the project, optionally only those of one type.
+    /// Requires a full-access API key, such as the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="type">Only providers of this type; every provider when null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The providers, empty when none is registered. Their client secrets are never returned.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when custom providers are disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var oidcProviders = await admin.ListCustomProvidersAsync(CustomProviderType.Oidc);
+    /// </code>
+    /// </example>
+    Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(CustomProviderType? type = null, CancellationToken cancellationToken = default);
 }
