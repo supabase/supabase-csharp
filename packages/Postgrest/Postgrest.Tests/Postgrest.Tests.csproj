@@ -30,26 +30,4 @@
 		<ProjectReference Include="..\Postgrest\Postgrest.csproj" />
 	</ItemGroup>
 
-	<!--
-	  Mutation-harness scoping: Stryker cannot filter by [TestCategory], so when STRYKER_MUTATION=true we
-	  compile-exclude the E2E tests (which drive the live Supabase CLI stack, are slow, and are
-	  non-deterministic per-mutant). Stryker then runs only the fast, hermetic Unit + Contract tests once
-	  per mutant. The mutate scope is pinned in stryker-config.json. MSBuild resolves the environment
-	  variable automatically; Stryker's child build inherits it.
-	-->
-	<ItemGroup Condition="'$(STRYKER_MUTATION)' == 'true'">
-		<Compile Remove="Attaching\AttachedModelTests.cs" />
-		<Compile Remove="Caching\CachedTableTests.cs" />
-		<Compile Remove="Events\RequestLifecycleTests.cs" />
-		<Compile Remove="Filtering\FilterQueryTests.cs" />
-		<Compile Remove="Linq\LinqQueryTests.cs" />
-		<Compile Remove="Options\SchemaTests.cs" />
-		<Compile Remove="Paging\PagingQueryTests.cs" />
-		<Compile Remove="Reading\ReadTests.cs" />
-		<Compile Remove="References\ReferenceTests.cs" />
-		<Compile Remove="Rpc\StoredProcedureTests.cs" />
-		<Compile Remove="Serialization\CoercionTests.cs" />
-		<Compile Remove="Sorting\OrderingQueryTests.cs" />
-		<Compile Remove="Writing\WriteTests.cs" />
-	</ItemGroup>
 </Project>
