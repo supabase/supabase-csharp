@@ -120,6 +120,17 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenUserIdentitiesListing()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockUserSuccess();
+        await this.client.GetUserIdentitiesAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.get_user_identities").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "GET /user").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
     public async Task HttpSpan_ShouldBeMarkedError_GivenFailedRequest()
     {
         this.MockTokenFailure();
@@ -216,6 +227,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TokenRefresh", "Fixtures", "token_success.json"))));
+
+    private void MockUserSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/user").UsingGet())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Identities", "Data", "user_with_identities.json"))));
 
     private void MockTokenFailure() =>
         this.server

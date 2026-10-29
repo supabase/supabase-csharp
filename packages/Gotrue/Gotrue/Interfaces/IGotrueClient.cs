@@ -1,6 +1,7 @@
 #region
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
@@ -469,6 +470,29 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="userIdentity">Identity to be unlinked</param>
     /// <returns></returns>
     Task<bool> UnlinkIdentity(UserIdentity userIdentity);
+
+    /// <summary>
+    ///     Lists the external identities linked to the signed-in user, read from the server so identities linked
+    ///     or unlinked since sign-in are included. Returns an empty list when the user has none.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns>The identities linked to the signed-in user.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var identities = await client.GetUserIdentitiesAsync();
+    ///     var github = identities.FirstOrDefault(identity => identity.Provider == "github");
+    ///     if (github != null)
+    ///     {
+    ///         await client.UnlinkIdentity(github);
+    ///     }
+    ///     </code>
+    /// </example>
+    Task<IReadOnlyList<UserIdentity>> GetUserIdentitiesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Add a listener to get errors that occur outside of a typical Exception flow.
