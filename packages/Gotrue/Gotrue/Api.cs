@@ -18,6 +18,7 @@ using Supabase.Gotrue.ListCustomProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.UpdateCustomProvider;
 using static Supabase.Gotrue.Constants;
 
 namespace Supabase.Gotrue;
@@ -665,6 +666,14 @@ public class Api : IGotrueApi<User, Session>
     {
         var listed = await this.MakeRequestAsync<CustomProviderListResponse>(HttpMethod.Get, $"{this.Url}/admin/custom-providers", ListCustomProvidersQuery.For(type), this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return CustomProviderListResponse.Read(listed);
+    }
+
+    /// <inheritdoc />
+    public async Task<CustomProvider> UpdateCustomProviderAsync(string jwt, string identifier, CustomProviderChanges changes, CancellationToken cancellationToken = default)
+    {
+        var body = UpdateCustomProviderBody.For(changes);
+        var updated = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Put, this.CustomProviderUrl(identifier), body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return CustomProviderResponse.Read(updated);
     }
 
     private string CustomProviderUrl(string identifier) =>
