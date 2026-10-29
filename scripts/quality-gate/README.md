@@ -102,15 +102,31 @@ coupling it to the build.
 
 The split in responsibility:
 
-- The **workflow** runs `dotnet stryker --since:origin/master` on changed packages.
-  Stryker's granularity is the **file** — a file with any change gets *all* its mutants,
-  not just the ones on changed lines.
+- The **workflow** runs `dotnet stryker --since:origin/master` on changed packages, with
+  `STRYKER_MUTATION=true`. That variable relaxes warnings-as-errors for the instrumented
+  build (`Directory.Build.targets`): Stryker's instrumentation trips nullable analysis,
+  and under warnings-as-errors those mutants are discarded as compile errors instead of
+  tested. Stryker's granularity is the **file** — a file with any change gets *all* its
+  mutants, not just the ones on changed lines.
 - `gate.sh --mutation` then **narrows** that to survivors whose line falls inside a
   changed hunk, and FAILs on any new one. A pre-existing survivor on an untouched line of
   a file you edited is that file's existing debt, not your change's regression, so it does
   not block.
 
 A missing report is SKIP (couldn't check ≠ no survivors), which makes `--mutation` exit 2.
+So is a report whose mutants on changed lines all failed to compile: none of them was
+tested.
+
+Locally, from a regular checkout:
+
+```sh
+(cd packages/<Name>/<Name>.Tests && STRYKER_MUTATION=true dotnet stryker --since:origin/master)
+./scripts/quality-gate/gate.sh packages/<Name> --mutation
+```
+
+Inside a `git worktree`, `--since` finds no changed files (Stryker's git library does not
+resolve the worktree's `.git` file), so name the changed files instead:
+`dotnet stryker -m '**/<File>.cs' -m '**/<Other>.cs'`.
 
 ## Testing the gate itself
 

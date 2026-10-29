@@ -27,7 +27,8 @@ Resolve the key to its sources (`references/sources.md`):
 3. The service's API spec (OpenAPI) — the operations, request/response shapes, status codes and error codes. Present for most features even without a capability spec.
 4. The supabase-js implementation — read it to learn the behavior, not the code.
 5. The current C# surface: `grep -rn '"<key>"' packages` for an existing `[PartialCapability]`, the client interface that owns the group, neighbouring methods, the package's test `Support/` fixtures.
-6. Open issues: `gh issue list --repo supabase-community/supabase-csharp --search "<name>" --state all`.
+6. Open issues: `gh issue list --repo supabase/supabase-csharp --search "<name>" --state all`.
+7. Whether the local stack serves the feature: the service's own configuration defaults (for auth, `internal/conf` in supabase/auth), then what `supabase/config.toml` overrides. The CLI sets only what `config.toml` exposes, so a missing CLI option does not mean the feature is off. Confirm against the running stack before calling a path untestable.
 
 If the capability cannot apply to a .NET SDK (browser-only API, platform storage), stop and report why instead of building it.
 
@@ -54,7 +55,7 @@ Present what a developer will see, and nothing else:
 Placement:   IGotrueAdminClient (Supabase.Gotrue) — next to <neighbour>
 Signature:   Task DeleteOAuthClientAsync(string clientId, CancellationToken cancellationToken = default);
 New types:   <public records/enums with their members, or "none">
-Throws:      GotrueException (FailureReason.X) when …; ArgumentException when …
+Throws:      GotrueException (Reason = FailureHint.Reason.X) when …; ArgumentException when …
 Example:
     var admin = new AdminClient(serviceRoleKey, options);
     await admin.DeleteOAuthClientAsync("my-client-id");
@@ -78,7 +79,7 @@ Work only inside that worktree from here on. If the feature needs a service enab
 
 ## 5. Drive — double-loop TDD
 
-1. **Outer loop: a failing E2E** (`[TestCategory("E2E")]`) proving the approved example works against the real stack. Self-isolating: unique names, guaranteed teardown. Reuse the package's E2E fixture.
+1. **Outer loop: a failing E2E** (`[TestCategory("E2E")]`) proving the approved example works against the real stack. Self-isolating: unique names, guaranteed teardown. Reuse the package's E2E fixture. When the test needs state that another, unimplemented capability creates (a provider to delete, a client to update), seed it through the service's API from the test with a plain `HttpClient`, never through SDK code that does not exist yet.
 2. **Inner loop**, red → green → refactor, through the public surface only:
    - **Contract** (`[TestCategory("Contract")]`): the package's WireMock server pins method, path, headers, query and the mapping of every failure in the contract to its exception.
    - **Wire-shape approval** (`Contract`, the package's `RequestApprovalFixture` + Verify): snapshot the exact request body. Review the `.verified` file: the approved bytes must match the API spec.
@@ -96,14 +97,19 @@ Inner loop: `scripts/quality-gate/gate.sh packages/<Name> --fast`.
 - `ConfigureAwait(false)` on every await; the token reaches the HTTP call.
 - New I/O participates in the package's instrumentation.
 - Annotate the entry point: `[ImplementedCapability("<key>")]` — or swap an existing `[PartialCapability]` for it. Supporting types are not annotated. Never edit `sdk-compliance.yaml`; it is generated after merge.
-- Add the new public surface to the package's `PublicAPI.Unshipped.txt`.
+- Declare the new public surface with the analyzer, not by hand: `dotnet format analyzers packages/<Name>/<Name>/<Name>.csproj --severity info --diagnostics RS0016 RS0017`. It writes the exact entries (enum ordinals included) to `PublicAPI.Unshipped.txt`.
 
 ## 7. Verify
 
 All three, in this order; each must pass before the next:
 
 1. **Changed-line coverage — 100%.** `python3 -I .claude/skills/implement-capability/scripts/changed-lines-coverage.py packages/<Name>` exits 0. Each `UNCOVERED` line is either a missing test or dead code to delete.
-2. **Mutation — zero survivors on changed lines.** `(cd packages/<Name>/<Name>.Tests && dotnet stryker --since:origin/master)`, then `scripts/quality-gate/gate.sh packages/<Name> --mutation`. A survivor is a missing assertion, or code that does nothing.
+2. **Mutation — zero survivors on changed lines, and every changed line tested.** In the worktree, `--since` finds no changes, so name each changed production file:
+   ```
+   (cd packages/<Name>/<Name>.Tests && STRYKER_MUTATION=true dotnet stryker -m '**/<File>.cs' -m '**/<Other>.cs')
+   scripts/quality-gate/gate.sh packages/<Name> --mutation
+   ```
+   Then list the mutants on changed lines from `StrykerOutput/*/reports/mutation-report.json` with their status. A survivor is a missing assertion, or code that does nothing. A run that tested no mutant on the changed lines is not a pass, whatever the gate prints: find out why (compile errors, filters) and rerun.
 3. **Full gate** — invoke `sdk-quality-gate` on `packages/<Name>`. PASS is required. If the local stack is unavailable or shared with parallel work, the local verdict is INCOMPLETE; then the CI run on the draft PR is the gate (step 8).
 
 Then walk QUALITY_RUBRIC §8 item by item, and re-read the diff as the reviewer: anything that would draw a comment is fixed now.

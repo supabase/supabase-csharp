@@ -17,7 +17,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflows", "Workflows", "{25F079C3-6F7E-41D7-8C58-7C1D62B92BE0}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
-		.github\workflows\build-documentation.yaml = .github\workflows\build-documentation.yaml
 		.github\workflows\release.yml = .github\workflows\release.yml
 		.github\workflows\format-master.yml = .github\workflows\format-master.yml
 		.github\workflows\mutation.yml = .github\workflows\mutation.yml
