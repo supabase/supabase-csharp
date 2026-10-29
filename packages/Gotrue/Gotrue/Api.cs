@@ -642,7 +642,7 @@ public class Api : IGotrueApi<User, Session>
 
     /// <inheritdoc />
     public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>
-        this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+        this.MakeRequestAsync(HttpMethod.Delete, this.CustomProviderUrl(identifier), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
     /// <inheritdoc />
     public async Task<CustomProvider> CreateCustomProviderAsync(string jwt, NewCustomProvider provider, CustomProviderOptions? options = null, CancellationToken cancellationToken = default)
@@ -651,6 +651,16 @@ public class Api : IGotrueApi<User, Session>
         var created = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Post, $"{this.Url}/admin/custom-providers", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return CustomProviderResponse.Read(created);
     }
+
+    /// <inheritdoc />
+    public async Task<CustomProvider> GetCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default)
+    {
+        var provider = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Get, this.CustomProviderUrl(identifier), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return CustomProviderResponse.Read(provider);
+    }
+
+    private string CustomProviderUrl(string identifier) =>
+        $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}";
 
     /// <inheritdoc />
     public async Task<ProviderAuthState> LinkIdentity(string token, Provider provider, SignInOptions options)
