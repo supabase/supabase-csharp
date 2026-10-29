@@ -232,4 +232,29 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<CustomProvider> UpdateCustomProviderAsync(string identifier, CustomProviderChanges changes, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Fetches a custom OAuth/OIDC provider by its identifier. Requires a full-access API key, such as the
+    /// service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="identifier">The provider identifier, starting with <c>custom:</c> (for example <c>custom:mycompany</c>).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider. Its client secret is never returned.</returns>
+    /// <exception cref="ArgumentException">
+    /// The identifier lacks the <c>custom:</c> prefix or contains <c>/</c>, <c>\</c>, <c>?</c>, <c>#</c> or <c>%</c>.
+    /// Nothing is sent.
+    /// </exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.CustomProviderNotFound" /> when no provider has this identifier and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when custom providers are disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var provider = await admin.GetCustomProviderAsync("custom:mycompany");
+    /// </code>
+    /// </example>
+    Task<CustomProvider> GetCustomProviderAsync(string identifier, CancellationToken cancellationToken = default);
 }

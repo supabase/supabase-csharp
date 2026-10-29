@@ -661,6 +661,13 @@ public class Api : IGotrueApi<User, Session>
         return CustomProviderResponse.Read(updated);
     }
 
+    /// <inheritdoc />
+    public async Task<CustomProvider> GetCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default)
+    {
+        var provider = await this.MakeRequestAsync<CustomProviderResponse>(HttpMethod.Get, this.CustomProviderUrl(identifier), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return CustomProviderResponse.Read(provider);
+    }
+
     private string CustomProviderUrl(string identifier) =>
         $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}";
 

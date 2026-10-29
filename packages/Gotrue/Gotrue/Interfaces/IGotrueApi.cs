@@ -107,6 +107,17 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<CustomProvider> UpdateCustomProviderAsync(string jwt, string identifier, CustomProviderChanges changes, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Fetches a custom OAuth/OIDC provider by its identifier.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="identifier">The provider identifier, starting with <c>custom:</c>.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider.</returns>
+    /// <exception cref="ArgumentException">The identifier lacks the <c>custom:</c> prefix or contains <c>/</c>, <c>\</c>, <c>?</c>, <c>#</c> or <c>%</c>.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<CustomProvider> GetCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Links an oauth identity to an existing user.
     ///
     /// This method requires the PKCE flow.
