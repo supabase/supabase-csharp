@@ -177,6 +177,10 @@ features:
     status: implemented
     symbols:
       - AdminClient.ListUsers
+  auth.admin.sign_out:
+    status: implemented
+    symbols:
+      - AdminClient.SignOutAsync
   auth.admin.update_user:
     status: implemented
     symbols:
