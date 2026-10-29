@@ -1,3 +1,5 @@
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Mfa;
@@ -107,4 +109,27 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// <param name="listFactorParams">A <see cref="MfaAdminListFactorsParams"/> object that contains the user id.</param>
     /// <returns>A <see cref="MfaAdminDeleteFactorResponse"/> containing the deleted factor id.</returns>
     Task<MfaAdminDeleteFactorResponse?> DeleteFactor(MfaAdminDeleteFactorParams deleteFactorParams);
+
+    /// <summary>
+    /// Deletes a custom OAuth/OIDC provider. Requires a full-access API key, such as the service_role key:
+    /// call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="identifier">The provider identifier, starting with <c>custom:</c> (for example <c>custom:mycompany</c>).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="ArgumentException">
+    /// The identifier lacks the <c>custom:</c> prefix or contains <c>/</c>, <c>\</c>, <c>?</c>, <c>#</c> or <c>%</c>.
+    /// Nothing is sent.
+    /// </exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.CustomProviderNotFound" /> when no provider has this identifier;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when custom providers are disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// await admin.DeleteCustomProviderAsync("custom:mycompany");
+    /// </code>
+    /// </example>
+    Task DeleteCustomProviderAsync(string identifier, CancellationToken cancellationToken = default);
 }
