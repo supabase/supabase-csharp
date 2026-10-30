@@ -9,6 +9,7 @@ using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
+using Supabase.Gotrue.UpdateFactor;
 
 namespace Supabase.Gotrue;
 
@@ -144,6 +145,11 @@ public class AdminClient : IGotrueAdminClient<User>
 
     [ImplementedCapability("auth.admin.delete_mfa_factor")]
     public async Task<MfaAdminDeleteFactorResponse?> DeleteFactor(MfaAdminDeleteFactorParams deleteFactorParams) => await this.api.DeleteFactor(this.serviceKey, deleteFactorParams);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.admin.update_mfa_factor")]
+    public Task<Factor> UpdateFactorAsync(string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default) =>
+        this.api.UpdateFactorAsync(this.serviceKey, userId, factorId, changes, cancellationToken);
 
     /// <inheritdoc />
     [ImplementedCapability("auth.admin.delete_provider")]

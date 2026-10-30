@@ -229,7 +229,7 @@ verify_enabled = true
 
 # Configure MFA via Phone Messaging
 [auth.mfa.phone]
-enroll_enabled = false
+enroll_enabled = true
 verify_enabled = false
 otp_length = 6
 template = "Your code is {{ .Code }}"

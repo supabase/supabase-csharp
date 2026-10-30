@@ -10,6 +10,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
+using Supabase.Gotrue.UpdateFactor;
 using static Supabase.Gotrue.Constants;
 
 #pragma warning disable CS1591
@@ -71,6 +72,7 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<MfaUnenrollResponse?> Unenroll(string jwt, MfaUnenrollParams mfaVerifyParams);
     Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams);
     Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams);
+    Task<Factor> UpdateFactorAsync(string jwt, string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a custom OAuth/OIDC provider.

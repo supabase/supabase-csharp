@@ -18,11 +18,11 @@ namespace Gotrue.Tests.Mfa;
 public abstract class MfaFixture : AuthClientFixture
 {
     private IGotrueAdminClient<User>? admin;
-    protected IGotrueAdminClient<User> Admin => admin ??= TestClients.AdminAgainstCliStack();
+    protected IGotrueAdminClient<User> Admin => this.admin ??= TestClients.AdminAgainstCliStack();
 
-    protected async Task<MfaEnrollResponse> EnrollTotp()
+    protected async Task<MfaEnrollResponse> EnrollTotp(string friendlyName = "Enroll test")
     {
-        var enrollment = await this.Client.Enroll(new MfaEnrollParams { Issuer = "Supabase", FactorType = "totp", FriendlyName = "Enroll test" });
+        var enrollment = await this.Client.Enroll(new MfaEnrollParams { Issuer = "Supabase", FactorType = "totp", FriendlyName = friendlyName });
         enrollment.Should().NotBeNull();
         return enrollment!;
     }

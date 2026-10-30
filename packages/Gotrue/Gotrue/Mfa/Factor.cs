@@ -22,4 +22,11 @@ public class Factor
 
     [JsonPropertyName("updated_at")]
     public DateTime UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Phone factors only: the phone number codes are sent to, in E.164 format without the leading <c>+</c>. Null on other
+    /// factor types.
+    /// </summary>
+    [JsonPropertyName("phone")]
+    public string? Phone { get; set; }
 }
