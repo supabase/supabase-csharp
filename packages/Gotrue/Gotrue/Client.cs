@@ -12,6 +12,7 @@ using Supabase.Core.Attributes;
 using Supabase.Core.Diagnostics;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Exceptions;
+using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
@@ -1208,6 +1209,19 @@ public class Client : IGotrueClient<User, Session>
             CurrentAuthenticationMethods = currentAuthenticationMethods.ToArray(),
         };
         return Task.FromResult(response);
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.mfa_recovery_codes.get_status")]
+    public async Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GetRecoveryCodesStatus);
+        if (!this.Online)
+        {
+            throw new GotrueException("Only supported when online", Offline);
+        }
+        var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
+        return await this.api.GetRecoveryCodesStatusAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

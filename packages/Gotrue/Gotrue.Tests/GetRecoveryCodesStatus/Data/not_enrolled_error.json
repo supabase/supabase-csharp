@@ -1,0 +1,5 @@
+{
+  "code": 404,
+  "error_code": "mfa_factor_not_found",
+  "msg": "The user has not enrolled recovery codes"
+}
