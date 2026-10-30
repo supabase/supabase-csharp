@@ -143,6 +143,16 @@ FIXTURE_KEEP=1 ./scripts/quality-gate/fixtures/run-fixtures.sh   # keep work dir
 Change the gate's behavior → add or update the fixture that pins it. A behavior with no
 fixture is untested.
 
+## Baselines only tighten
+
+The gate reads the baseline it is given, so a PR that loosens one would pass the gate it
+just weakened. `baseline-tightened.sh` runs on every PR against each changed
+`.gate-baseline.json` and fails when warnings rose, coverage fell, an identity field
+changed or the file was deleted. The gate itself only ever writes a stricter baseline, so
+a looser one can only come from a hand edit.
+
+```sh
+./scripts/quality-gate/fixtures-baseline-tightened/run.sh   # its cases
 ## Which CI jobs a change needs
 
 `changed-areas.sh` classifies a diff, and each workflow skips the jobs it cannot affect:
@@ -170,7 +180,9 @@ lib/warnings.sh         analyzer warnings + per-package baseline I/O
 lib/coverage.sh         line coverage + per-package baseline I/O
 lib/stages.sh           one definition of each stage, used for both scopes
 format-suggest.sh       prints the format diff for a changed file (dev helper)
-changed-areas.sh        classifies a diff into the areas CI jobs care about
+baseline-tightened.sh   fails when a baseline got looser
 fixtures/               the gate's own test suite
+fixtures-baseline-tightened/  cases for baseline-tightened.sh
 fixtures-changed-areas/ cases for changed-areas.sh
+changed-areas.sh        classifies a diff into the areas CI jobs care about
 ```

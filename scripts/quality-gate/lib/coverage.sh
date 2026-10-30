@@ -83,12 +83,9 @@ coverage_verdict() {
 
 # Written whenever $COV_PCT improves on the baseline beyond the epsilon, or when
 # the baseline has no coverage key yet. Uses a targeted jq merge — touching only
-# .coverage.hermeticLine and .updated — rather than reconstructing the whole file from a
-# heredoc the way save_baseline (warnings) does: that approach only knows about
-# schema/package/project/testProject/warnings/updated and silently drops any
-# other key (mutationScore, e2eHealthUrl, formatBaseRef) whenever it fires. Since
-# save_baseline already ran earlier in the same gate.sh invocation (stage_build),
-# a merge here avoids stomping whatever it just wrote.
+# .coverage.hermeticLine and .updated — the same way save_baseline (warnings) merges
+# into an existing file. Since save_baseline already ran earlier in the same gate.sh
+# invocation (stage_build), a merge here avoids stomping whatever it just wrote.
 #
 # Must be called while $COV_PCT/$COV_COVERED/$COV_VALID still reflect the
 # HERMETIC report — stage_coverage re-parses the full (incl. E2E) report
