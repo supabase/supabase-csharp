@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Exceptions;
+using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -648,6 +649,35 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     user needs to be shown a screen to verify their MFA factors.
     /// </summary>
     Task<MfaGetAuthenticatorAssuranceLevelResponse?> GetAuthenticatorAssuranceLevel();
+
+    /// <summary>
+    ///     Returns how many of the signed-in user's MFA recovery codes remain unused, read from the server. The codes
+    ///     themselves are never returned. Works at any authenticator assurance level. Returns null when the user has
+    ///     not generated recovery codes.
+    ///     Recovery codes are experimental on the auth server.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The recovery codes status, or null when the user has no recovery codes.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />
+    ///     (<c>no_authorization</c> for an anonymous user).
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var status = await client.GetRecoveryCodesStatusAsync();
+    ///     if (status == null)
+    ///     {
+    ///         // offer to generate recovery codes
+    ///     }
+    ///     else if (status.Remaining == 0)
+    ///     {
+    ///         // every code is used: prompt the user to regenerate them
+    ///     }
+    ///     </code>
+    /// </example>
+    Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(CancellationToken cancellationToken = default);
 
     #endregion
 

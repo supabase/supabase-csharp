@@ -6,6 +6,7 @@ using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -70,6 +71,15 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<MfaChallengeResponse?> Challenge(string jwt, MfaChallengeParams mfaChallengeParams);
     Task<MfaVerifyResponse?> Verify(string jwt, MfaVerifyParams mfaVerifyParams);
     Task<MfaUnenrollResponse?> Unenroll(string jwt, MfaUnenrollParams mfaVerifyParams);
+
+    /// <summary>
+    /// Reads how many of the user's MFA recovery codes remain unused.
+    /// </summary>
+    /// <param name="jwt">The user's access token.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The recovery codes status, or null when the user has no recovery codes.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(string jwt, CancellationToken cancellationToken = default);
     Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams);
     Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams);
     Task<Factor> UpdateFactorAsync(string jwt, string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default);

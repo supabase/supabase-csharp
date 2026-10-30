@@ -13,6 +13,7 @@ using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
+using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
 using Supabase.Gotrue.Mfa;
@@ -636,6 +637,25 @@ public class Api : IGotrueApi<User, Session>
 
     /// <inheritdoc />
     public Task<MfaUnenrollResponse?> Unenroll(string jwt, MfaUnenrollParams mfaUnenrollParams) => this.MakeRequestAsync<MfaUnenrollResponse>(HttpMethod.Delete, $"{this.Url}/factors/{PathSegment.Escape(mfaUnenrollParams.FactorId)}", null, this.CreateAuthedRequestHeaders(jwt));
+
+    /// <inheritdoc />
+    public async Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var status = await this.RequestRecoveryCodesStatusAsync(jwt, cancellationToken).ConfigureAwait(false);
+        return RecoveryCodesStatusResponse.Read(status);
+    }
+
+    private async Task<RecoveryCodesStatusResponse?> RequestRecoveryCodesStatusAsync(string jwt, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await this.MakeRequestAsync<RecoveryCodesStatusResponse>(HttpMethod.Get, $"{this.Url}/factors/recovery-codes", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        }
+        catch (GotrueException rejection) when (RecoveryCodesStatusResponse.MeansNotEnrolled(rejection))
+        {
+            return RecoveryCodesStatusResponse.NotEnrolled;
+        }
+    }
 
     /// <inheritdoc />
     public Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams) => this.MakeRequestAsync(HttpMethod.Get, $"{this.Url}/admin/users/{PathSegment.Escape(listFactorsParams.UserId)}/factors", null, this.CreateAuthedRequestHeaders(jwt));

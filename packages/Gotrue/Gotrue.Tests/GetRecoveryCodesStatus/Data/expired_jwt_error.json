@@ -1,0 +1,5 @@
+{
+  "code": 403,
+  "error_code": "bad_jwt",
+  "msg": "invalid JWT: unable to parse or verify signature, token has invalid claims: token is expired"
+}
