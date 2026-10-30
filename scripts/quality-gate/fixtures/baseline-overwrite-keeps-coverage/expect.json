@@ -1,0 +1,11 @@
+{
+  "description": "baseline-overwrite with a coverage baseline already recorded: lowering warnings must rewrite only .warnings and .updated. Guards the ratchet slide where rewriting the whole file dropped coverage.hermeticLine and the next stage re-established it lower.",
+  "mode": "--fast --overwrite-baseline",
+  "exit": 0,
+  "verdict": "PARTIAL",
+  "baselineWrite": true,
+  "baselineKeeps": [".coverage.hermeticLine"],
+  "stages": [
+    { "id": "1a", "status": "PASS" }
+  ]
+}

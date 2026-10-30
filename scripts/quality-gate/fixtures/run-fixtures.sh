@@ -155,6 +155,14 @@ for fx in "${fixtures[@]}"; do
     fi
   fi
 
+  # Optional: keys a baseline write must leave as they were (expect.baselineKeeps: [jq paths]).
+  while IFS= read -r path; do
+    [[ -z "$path" ]] && continue
+    was="$(jq -c "$path" <<<"$bl_before")"
+    now="$(jq -c "$path" "$bl" 2>/dev/null || echo __ABSENT__)"
+    assert "baseline $path" "$was" "$now"
+  done < <(jq -r '.baselineKeeps // [] | .[]' "$exp")
+
   if [[ -z "$miss" ]]; then
     printf "  ${GRN}PASS${OFF}  %-18s ${DIM}%s${OFF}\n" "$name" "$(jq -r '.description // ""' "$exp")"
     PASS=$((PASS+1))

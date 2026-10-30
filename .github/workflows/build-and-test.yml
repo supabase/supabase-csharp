@@ -71,6 +71,32 @@ jobs:
           body: |
             Refreshes the quality-gate baseline after a merge to master.
 
+  # The gate reads the baseline it is given, so a PR that loosens a
+  # .gate-baseline.json would pass the gate it just weakened.
+  baseline-tightened:
+    name: Baseline only tightens
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Compare each changed baseline with the PR's base
+        run: |
+          verdict=0
+          while IFS= read -r file; do
+            before="$RUNNER_TEMP/before.json"
+            git show "$BASE:$file" > "$before" 2>/dev/null || rm -f "$before"
+            echo "== $file"
+            ./scripts/quality-gate/baseline-tightened.sh "$before" "$file" || verdict=1
+          done < <(git diff --name-only "$BASE"...HEAD -- 'packages/*/.gate-baseline.json')
+          exit "$verdict"
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+
   # Validates the in-code capability annotations against the canonical matrix spec:
   # catches a mistyped feature key or a feature reported with conflicting statuses.
   capability-matrix:

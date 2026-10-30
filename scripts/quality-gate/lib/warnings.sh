@@ -51,6 +51,30 @@ warn_verdict() {  # warn_verdict <codes-file>
   fi
 }
 
+# An existing baseline gets only .warnings and .updated replaced: every other key
+# (coverage.hermeticLine, mutationScore, e2eHealthUrl, formatBaseRef) is kept.
+# Rewriting the whole file dropped coverage.hermeticLine whenever warnings fell,
+# and save_coverage_baseline then re-established it from the current run, up to
+# COVERAGE_EPSILON lower: the ratchet slid down a little on every such merge.
+merge_warnings_into_baseline() {  # merge_warnings_into_baseline <total> <byCode-json>
+  jq --argjson total "$1" --argjson codes "$2" --arg now "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    '.warnings = {total: $total, byCode: $codes} | .updated = $now' \
+    "$BASELINE" > "$BASELINE.tmp" && mv "$BASELINE.tmp" "$BASELINE"
+}
+
+write_new_baseline() {  # write_new_baseline <total> <byCode-json>
+  cat > "$BASELINE" <<EOF
+{
+  "schema": 1,
+  "package": "$PACKAGE_NAME",
+  "project": "${PROJECT#$PACKAGE_DIR/}",
+  "testProject": "${TEST_PROJECT#$PACKAGE_DIR/}",
+  "warnings": { "total": $1, "byCode": $2 },
+  "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
+EOF
+}
+
 # Written whenever a measurement improves, or when the file doesn't exist yet.
 # Reads $BASELINE/$PACKAGE_NAME/$PROJECT/$TEST_PROJECT/$PACKAGE_DIR/$OUT — all set
 # by _use_pkg before this is called.
@@ -66,16 +90,11 @@ save_baseline() {
     '{printf "%s\"%s\":%s", (NR>1?",":""), $1, $2} END{print ""}' \
     "$OUT/warnings-by-code.txt" | sed 's/^/{/; s/$/}/')
 
-  cat > "$BASELINE" <<EOF
-{
-  "schema": 1,
-  "package": "$PACKAGE_NAME",
-  "project": "${PROJECT#$PACKAGE_DIR/}",
-  "testProject": "${TEST_PROJECT#$PACKAGE_DIR/}",
-  "warnings": { "total": $w, "byCode": $codes },
-  "updated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-}
-EOF
+  if [[ -f "$BASELINE" ]]; then
+    merge_warnings_into_baseline "$w" "$codes"
+  else
+    write_new_baseline "$w" "$codes"
+  fi
   if [[ -z "$base_w" ]]; then
     echo "${GRN}baseline created${OFF} $BASELINE ${DIM}— commit it${OFF}"
   else
