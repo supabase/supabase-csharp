@@ -88,6 +88,16 @@ public class UpdateFactorContractTests
     }
 
     [TestMethod]
+    public async Task UpdateFactorAsync_ShouldThrowWithErrorCode_GivenPhoneNotInE164()
+    {
+        this.AnswerWith(HttpStatusCode.BadRequest, """{"code":400,"error_code":"validation_failed","msg":"Invalid phone number format (E.164 required)"}""");
+        var update = () => this.Admin.UpdateFactorAsync(UserId, FactorId, new FactorChanges { Phone = "not-a-phone" });
+        await update.Should().ThrowExactlyAsync<GotrueException>()
+            .Where(failure => failure.ErrorCode == "validation_failed",
+                "the auth server answers 400 validation_failed to a phone number that is not E.164 on a phone factor");
+    }
+
+    [TestMethod]
     public async Task UpdateFactorAsync_ShouldThrowGotrueException_GivenNullResponseBody()
     {
         this.AnswerWith(HttpStatusCode.OK, "null");
