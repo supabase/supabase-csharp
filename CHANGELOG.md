@@ -1,5 +1,25 @@
 # Changelog
 
+## [8.7.0](https://github.com/supabase/supabase-csharp/compare/v8.6.0...v8.7.0) (2026-10-30)
+
+
+### Features
+
+* **auth:** fetch a custom OAuth/OIDC provider as an admin ([#591](https://github.com/supabase/supabase-csharp/issues/591)) ([f5cd18a](https://github.com/supabase/supabase-csharp/commit/f5cd18a205f5d9a20076db364989ff495f8b7f84))
+* **auth:** list custom OAuth/OIDC providers as an admin ([#599](https://github.com/supabase/supabase-csharp/issues/599)) ([2a9534d](https://github.com/supabase/supabase-csharp/commit/2a9534db3a8d3c5d0a77627ac460c40aa848ab46))
+* **auth:** list the identities linked to the signed-in user ([#606](https://github.com/supabase/supabase-csharp/issues/606)) ([eba25d5](https://github.com/supabase/supabase-csharp/commit/eba25d56e6989f540c3a360064995bdd596c6986))
+* **auth:** read how many MFA recovery codes the signed-in user has left ([#610](https://github.com/supabase/supabase-csharp/issues/610)) ([ab86bc3](https://github.com/supabase/supabase-csharp/commit/ab86bc379d5c54892459d07d50636d1fdadbb8f2))
+* **auth:** register a custom OAuth/OIDC provider as an admin ([#590](https://github.com/supabase/supabase-csharp/issues/590)) ([4c11610](https://github.com/supabase/supabase-csharp/commit/4c116105e321b2d54099c5fcceca2f3b99f70f8e))
+* **auth:** remove the signed-in user's MFA recovery codes ([#611](https://github.com/supabase/supabase-csharp/issues/611)) ([d4ea5eb](https://github.com/supabase/supabase-csharp/commit/d4ea5ebb8a689d191148c268203936cf84084728))
+* **auth:** sign a user out from their access token as an admin ([#594](https://github.com/supabase/supabase-csharp/issues/594)) ([540e40f](https://github.com/supabase/supabase-csharp/commit/540e40f85f61a9db1ca9e671085c3591a3879ff3))
+* **auth:** update a custom OAuth/OIDC provider as an admin ([#600](https://github.com/supabase/supabase-csharp/issues/600)) ([16a3d2a](https://github.com/supabase/supabase-csharp/commit/16a3d2a2d57ba0105452cb1d7084b4016d7c6e07))
+* **auth:** update a user's MFA factor as an admin ([#609](https://github.com/supabase/supabase-csharp/issues/609)) ([37bfcf9](https://github.com/supabase/supabase-csharp/commit/37bfcf9c5d241eb2b1ecb4746182cca5eef37141))
+
+
+### Bug Fixes
+
+* **quality-gate:** stop baselines from loosening ([#615](https://github.com/supabase/supabase-csharp/issues/615)) ([d333a89](https://github.com/supabase/supabase-csharp/commit/d333a8928f23dfc5ecedcc2b2ef47c780d0c4e70))
+
 ## [8.6.0](https://github.com/supabase/supabase-csharp/compare/v8.5.1...v8.6.0) (2026-10-29)
 
 
