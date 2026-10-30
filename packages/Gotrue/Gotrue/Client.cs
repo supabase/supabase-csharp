@@ -1225,6 +1225,19 @@ public class Client : IGotrueClient<User, Session>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.mfa_recovery_codes.unenroll")]
+    public async Task UnenrollRecoveryCodesAsync(CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.UnenrollRecoveryCodes);
+        if (!this.Online)
+        {
+            throw new GotrueException("Only supported when online", Offline);
+        }
+        var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
+        await this.api.UnenrollRecoveryCodesAsync(accessToken, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     [ImplementedCapability("auth.session.get_claims")]
     public async Task<GetClaimsResponse> GetClaimsAsync(string? jwt = null, GetClaimsOptions? options = null, CancellationToken cancellationToken = default)
     {

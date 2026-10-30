@@ -142,6 +142,17 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodesUnenrollment()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockRecoveryCodesUnenrollmentSuccess();
+        await this.client.UnenrollRecoveryCodesAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.unenroll_recovery_codes").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "DELETE /factors/recovery-codes").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
     public async Task HttpSpan_ShouldBeMarkedError_GivenFailedRequest()
     {
         this.MockTokenFailure();
@@ -254,6 +265,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GetRecoveryCodesStatus", "Data", "recovery_codes_status.json"))));
+
+    private void MockRecoveryCodesUnenrollmentSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/factors/recovery-codes").UsingDelete())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UnenrollRecoveryCodes", "Data", "unenrolled.json"))));
 
     private void MockTokenFailure() =>
         this.server
