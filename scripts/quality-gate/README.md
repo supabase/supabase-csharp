@@ -143,6 +143,23 @@ FIXTURE_KEEP=1 ./scripts/quality-gate/fixtures/run-fixtures.sh   # keep work dir
 Change the gate's behavior → add or update the fixture that pins it. A behavior with no
 fixture is untested.
 
+## Which CI jobs a change needs
+
+`changed-areas.sh` classifies a diff, and each workflow skips the jobs it cannot affect:
+
+| Output   | True when the diff touches                                                | Gates                                                |
+|----------|---------------------------------------------------------------------------|------------------------------------------------------|
+| `code`   | anything but `sdk-compliance.yaml`, `CHANGELOG.md`, `.gate-baseline.json` | the full gate                                        |
+| `csharp` | a `.cs` file                                                              | mutation, annotation validation, format, matrix sync |
+
+The decision comes from the files alone, never from the PR's author, title, branch or
+commit message: those are chosen by whoever opens the PR, so skipping on them would let
+any change skip the gate.
+
+```sh
+./scripts/quality-gate/fixtures-changed-areas/run.sh   # its cases
+```
+
 ## Layout
 
 ```
@@ -153,5 +170,7 @@ lib/warnings.sh         analyzer warnings + per-package baseline I/O
 lib/coverage.sh         line coverage + per-package baseline I/O
 lib/stages.sh           one definition of each stage, used for both scopes
 format-suggest.sh       prints the format diff for a changed file (dev helper)
+changed-areas.sh        classifies a diff into the areas CI jobs care about
 fixtures/               the gate's own test suite
+fixtures-changed-areas/ cases for changed-areas.sh
 ```
