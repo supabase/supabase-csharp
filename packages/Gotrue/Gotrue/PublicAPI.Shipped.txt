@@ -1,6 +1,7 @@
 #nullable enable
 Supabase.Gotrue.AdminClient
 Supabase.Gotrue.AdminClient.AdminClient(string! serviceKey, Supabase.Gotrue.ClientOptions? options = null) -> void
+Supabase.Gotrue.AdminClient.CreateCustomProviderAsync(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.AdminClient.CreateUser(Supabase.Gotrue.AdminUserAttributes! attributes) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.AdminClient.CreateUser(string! email, string! password, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.AdminClient.DeleteCustomProviderAsync(string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
@@ -8,15 +9,20 @@ Supabase.Gotrue.AdminClient.DeleteFactor(Supabase.Gotrue.Mfa.MfaAdminDeleteFacto
 Supabase.Gotrue.AdminClient.DeleteUser(string! uid) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.AdminClient.DeleteUser(string! uid, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.AdminClient.GenerateLink(Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.GenerateLinkResponse?>!
+Supabase.Gotrue.AdminClient.GetCustomProviderAsync(string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.AdminClient.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Gotrue.AdminClient.GetHeaders.set -> void
 Supabase.Gotrue.AdminClient.GetUser(string! jwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.AdminClient.GetUserById(string! userId) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.AdminClient.InviteUserByEmail(string! email, Supabase.Gotrue.InviteUserByEmailOptions? options = null) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.AdminClient.ListCustomProvidersAsync(Supabase.Gotrue.Common.CustomProviderType? type = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.CustomProvider!>!>!
 Supabase.Gotrue.AdminClient.ListFactors(Supabase.Gotrue.Mfa.MfaAdminListFactorsParams! listFactorsParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminListFactorsResponse?>!
 Supabase.Gotrue.AdminClient.ListUsers(string? filter = null, string? sortBy = null, Supabase.Gotrue.Constants.SortOrder sortOrder = Supabase.Gotrue.Constants.SortOrder.Descending, int? page = null, int? perPage = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.UserList<Supabase.Gotrue.User!>?>!
 Supabase.Gotrue.AdminClient.Options.get -> Supabase.Gotrue.ClientOptions!
+Supabase.Gotrue.AdminClient.SignOutAsync(string! accessToken, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.AdminClient.Update(Supabase.Gotrue.UserAttributes! attributes) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
+Supabase.Gotrue.AdminClient.UpdateCustomProviderAsync(string! identifier, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.AdminClient.UpdateFactorAsync(string! userId, string! factorId, Supabase.Gotrue.UpdateFactor.FactorChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.Factor!>!
 Supabase.Gotrue.AdminClient.UpdateUserById(string! userId, Supabase.Gotrue.AdminUserAttributes! userData) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.AdminUserAttributes
 Supabase.Gotrue.AdminUserAttributes.AdminUserAttributes() -> void
@@ -34,6 +40,7 @@ Supabase.Gotrue.Api
 Supabase.Gotrue.Api.Api(string! url, System.Collections.Generic.Dictionary<string!, string!>? headers = null) -> void
 Supabase.Gotrue.Api.Api(string! url, System.Collections.Generic.Dictionary<string!, string!>? headers = null, System.Net.Http.HttpClient? httpClient = null, Supabase.Core.Http.RetryOptions? retry = null) -> void
 Supabase.Gotrue.Api.Challenge(string! jwt, Supabase.Gotrue.Mfa.MfaChallengeParams! mfaChallengeParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaChallengeResponse?>!
+Supabase.Gotrue.Api.CreateCustomProviderAsync(string! jwt, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Api.CreateUser(string! jwt, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Api.DeleteCustomProviderAsync(string! jwt, string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Api.DeleteFactor(string! jwt, Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
@@ -42,9 +49,11 @@ Supabase.Gotrue.Api.DeleteUser(string! uid, string! jwt, bool shouldSoftDelete =
 Supabase.Gotrue.Api.Enroll(string! jwt, Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.Api.ExchangeCodeForSession(string! codeVerifier, string! authCode) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.GenerateLink(string! jwt, Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Api.GetCustomProviderAsync(string! jwt, string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Api.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Gotrue.Api.GetHeaders.set -> void
 Supabase.Gotrue.Api.GetJwksAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.Jwks?>!
+Supabase.Gotrue.Api.GetRecoveryCodesStatusAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus?>!
 Supabase.Gotrue.Api.GetUriForProvider(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions? options = null) -> Supabase.Gotrue.ProviderAuthState!
 Supabase.Gotrue.Api.GetUser(string! jwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Api.GetUserAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
@@ -54,6 +63,7 @@ Supabase.Gotrue.Api.Headers.set -> void
 Supabase.Gotrue.Api.InviteUserByEmail(string! email, string! jwt, Supabase.Gotrue.InviteUserByEmailOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.LinkIdentity(string! token, Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ProviderAuthState!>!
 Supabase.Gotrue.Api.LinkIdentityWithIdToken(string! token, Supabase.Gotrue.LinkIdentityWithIdTokenOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
+Supabase.Gotrue.Api.ListCustomProvidersAsync(string! jwt, Supabase.Gotrue.Common.CustomProviderType? type = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.CustomProvider!>!>!
 Supabase.Gotrue.Api.ListFactors(string! jwt, Supabase.Gotrue.Mfa.MfaAdminListFactorsParams! listFactorsParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.ListUsers(string! jwt, string? filter = null, string? sortBy = null, Supabase.Gotrue.Constants.SortOrder sortOrder = Supabase.Gotrue.Constants.SortOrder.Descending, int? page = null, int? perPage = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.UserList<Supabase.Gotrue.User!>?>!
 Supabase.Gotrue.Api.Reauthenticate(string! userJwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -75,10 +85,14 @@ Supabase.Gotrue.Api.SignInWithPhone(string! phone, string! password, Supabase.Go
 Supabase.Gotrue.Api.SignInWithSSO(System.Guid providerId, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Api.SignInWithSSO(string! domain, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Api.SignOut(string! jwt, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Api.SignOutAsync(string! jwt, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Api.SignUpWithEmail(string! email, string! password, Supabase.Gotrue.SignUpOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.SignUpWithPhone(string! phone, string! password, Supabase.Gotrue.SignUpOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Api.Unenroll(string! jwt, Supabase.Gotrue.Mfa.MfaUnenrollParams! mfaUnenrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaUnenrollResponse?>!
+Supabase.Gotrue.Api.UnenrollRecoveryCodesAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Api.UnlinkIdentity(string! token, Supabase.Gotrue.UserIdentity! userIdentity) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.Api.UpdateCustomProviderAsync(string! jwt, string! identifier, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Api.UpdateFactorAsync(string! jwt, string! userId, string! factorId, Supabase.Gotrue.UpdateFactor.FactorChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.Factor!>!
 Supabase.Gotrue.Api.UpdateUser(string! jwt, Supabase.Gotrue.UserAttributes! attributes) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Api.UpdateUserById(string! jwt, string! userId, Supabase.Gotrue.UserAttributes! userData) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Api.Verify(string! jwt, Supabase.Gotrue.Mfa.MfaVerifyParams! mfaVerifyParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaVerifyResponse?>!
@@ -179,8 +193,10 @@ Supabase.Gotrue.Client.GetAuthenticatorAssuranceLevel() -> System.Threading.Task
 Supabase.Gotrue.Client.GetClaimsAsync(string? jwt = null, Supabase.Gotrue.Claims.GetClaimsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.GetClaimsResponse!>!
 Supabase.Gotrue.Client.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Gotrue.Client.GetHeaders.set -> void
+Supabase.Gotrue.Client.GetRecoveryCodesStatusAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus?>!
 Supabase.Gotrue.Client.GetSessionFromUrl(System.Uri! uri, bool storeSession = true) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Client.GetUser(string! jwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
+Supabase.Gotrue.Client.GetUserIdentitiesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.UserIdentity!>!>!
 Supabase.Gotrue.Client.LinkIdentity(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ProviderAuthState!>!
 Supabase.Gotrue.Client.LinkIdentityWithIdToken(Supabase.Gotrue.LinkIdentityWithIdTokenOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Client.ListFactors() -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaListFactorsResponse?>!
@@ -224,6 +240,7 @@ Supabase.Gotrue.Client.StartAutoRefresh() -> void
 Supabase.Gotrue.Client.StopAutoRefresh() -> void
 Supabase.Gotrue.Client.TokenRefresh.get -> Supabase.Gotrue.TokenRefresh?
 Supabase.Gotrue.Client.Unenroll(Supabase.Gotrue.Mfa.MfaUnenrollParams! mfaUnenrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaUnenrollResponse?>!
+Supabase.Gotrue.Client.UnenrollRecoveryCodesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Client.UnlinkIdentity(Supabase.Gotrue.UserIdentity! userIdentity) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Client.Update(Supabase.Gotrue.UserAttributes! attributes) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Client.Verify(Supabase.Gotrue.Mfa.MfaVerifyParams! mfaVerifyParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
@@ -249,6 +266,107 @@ Supabase.Gotrue.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
 Supabase.Gotrue.ClientOptions.Retry.set -> void
 Supabase.Gotrue.ClientOptions.Url.get -> string!
 Supabase.Gotrue.ClientOptions.Url.set -> void
+Supabase.Gotrue.Common.CustomProvider
+Supabase.Gotrue.Common.CustomProvider.<Clone>$() -> Supabase.Gotrue.Common.CustomProvider!
+Supabase.Gotrue.Common.CustomProvider.AcceptableClientIds.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.CustomProvider.AcceptableClientIds.init -> void
+Supabase.Gotrue.Common.CustomProvider.AttributeMapping.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object!>!
+Supabase.Gotrue.Common.CustomProvider.AttributeMapping.init -> void
+Supabase.Gotrue.Common.CustomProvider.AuthorizationParameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Supabase.Gotrue.Common.CustomProvider.AuthorizationParameters.init -> void
+Supabase.Gotrue.Common.CustomProvider.AuthorizationUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.AuthorizationUrl.init -> void
+Supabase.Gotrue.Common.CustomProvider.ClientId.get -> string!
+Supabase.Gotrue.Common.CustomProvider.ClientId.init -> void
+Supabase.Gotrue.Common.CustomProvider.CreatedAt.get -> System.DateTime
+Supabase.Gotrue.Common.CustomProvider.CreatedAt.init -> void
+Supabase.Gotrue.Common.CustomProvider.CustomClaimsAllowlist.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.CustomProvider.CustomClaimsAllowlist.init -> void
+Supabase.Gotrue.Common.CustomProvider.CustomProvider() -> void
+Supabase.Gotrue.Common.CustomProvider.DiscoveryDocument.get -> Supabase.Gotrue.Common.OidcDiscoveryDocument?
+Supabase.Gotrue.Common.CustomProvider.DiscoveryDocument.init -> void
+Supabase.Gotrue.Common.CustomProvider.DiscoveryUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.DiscoveryUrl.init -> void
+Supabase.Gotrue.Common.CustomProvider.EmailOptional.get -> bool
+Supabase.Gotrue.Common.CustomProvider.EmailOptional.init -> void
+Supabase.Gotrue.Common.CustomProvider.Enabled.get -> bool
+Supabase.Gotrue.Common.CustomProvider.Enabled.init -> void
+Supabase.Gotrue.Common.CustomProvider.Equals(Supabase.Gotrue.Common.CustomProvider? other) -> bool
+Supabase.Gotrue.Common.CustomProvider.Id.get -> System.Guid
+Supabase.Gotrue.Common.CustomProvider.Id.init -> void
+Supabase.Gotrue.Common.CustomProvider.Identifier.get -> string!
+Supabase.Gotrue.Common.CustomProvider.Identifier.init -> void
+Supabase.Gotrue.Common.CustomProvider.Issuer.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.Issuer.init -> void
+Supabase.Gotrue.Common.CustomProvider.JwksUri.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.JwksUri.init -> void
+Supabase.Gotrue.Common.CustomProvider.Name.get -> string!
+Supabase.Gotrue.Common.CustomProvider.Name.init -> void
+Supabase.Gotrue.Common.CustomProvider.PkceEnabled.get -> bool
+Supabase.Gotrue.Common.CustomProvider.PkceEnabled.init -> void
+Supabase.Gotrue.Common.CustomProvider.Scopes.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.CustomProvider.Scopes.init -> void
+Supabase.Gotrue.Common.CustomProvider.SkipNonceCheck.get -> bool
+Supabase.Gotrue.Common.CustomProvider.SkipNonceCheck.init -> void
+Supabase.Gotrue.Common.CustomProvider.TokenUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.TokenUrl.init -> void
+Supabase.Gotrue.Common.CustomProvider.Type.get -> Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.Common.CustomProvider.Type.init -> void
+Supabase.Gotrue.Common.CustomProvider.UpdatedAt.get -> System.DateTime
+Supabase.Gotrue.Common.CustomProvider.UpdatedAt.init -> void
+Supabase.Gotrue.Common.CustomProvider.UserInfoUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProvider.UserInfoUrl.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions
+Supabase.Gotrue.Common.CustomProviderOptions.<Clone>$() -> Supabase.Gotrue.Common.CustomProviderOptions!
+Supabase.Gotrue.Common.CustomProviderOptions.AcceptableClientIds.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Supabase.Gotrue.Common.CustomProviderOptions.AcceptableClientIds.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.AttributeMapping.get -> System.Collections.Generic.IReadOnlyDictionary<string!, object!>?
+Supabase.Gotrue.Common.CustomProviderOptions.AttributeMapping.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.AuthorizationParameters.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>?
+Supabase.Gotrue.Common.CustomProviderOptions.AuthorizationParameters.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.CustomClaimsAllowlist.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Supabase.Gotrue.Common.CustomProviderOptions.CustomClaimsAllowlist.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.CustomProviderOptions() -> void
+Supabase.Gotrue.Common.CustomProviderOptions.DiscoveryUrl.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProviderOptions.DiscoveryUrl.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.EmailOptional.get -> bool?
+Supabase.Gotrue.Common.CustomProviderOptions.EmailOptional.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.Enabled.get -> bool?
+Supabase.Gotrue.Common.CustomProviderOptions.Enabled.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.Equals(Supabase.Gotrue.Common.CustomProviderOptions? other) -> bool
+Supabase.Gotrue.Common.CustomProviderOptions.JwksUri.get -> System.Uri?
+Supabase.Gotrue.Common.CustomProviderOptions.JwksUri.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.PkceEnabled.get -> bool?
+Supabase.Gotrue.Common.CustomProviderOptions.PkceEnabled.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.Scopes.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Supabase.Gotrue.Common.CustomProviderOptions.Scopes.init -> void
+Supabase.Gotrue.Common.CustomProviderOptions.SkipNonceCheck.get -> bool?
+Supabase.Gotrue.Common.CustomProviderOptions.SkipNonceCheck.init -> void
+Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.Common.CustomProviderType.OAuth2 = 0 -> Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.Common.CustomProviderType.Oidc = 1 -> Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.Common.OidcDiscoveryDocument
+Supabase.Gotrue.Common.OidcDiscoveryDocument.<Clone>$() -> Supabase.Gotrue.Common.OidcDiscoveryDocument!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.AuthorizationEndpoint.get -> System.Uri!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.AuthorizationEndpoint.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.Equals(Supabase.Gotrue.Common.OidcDiscoveryDocument? other) -> bool
+Supabase.Gotrue.Common.OidcDiscoveryDocument.GrantTypesSupported.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.GrantTypesSupported.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.Issuer.get -> System.Uri!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.Issuer.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.JwksUri.get -> System.Uri!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.JwksUri.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.OidcDiscoveryDocument() -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.ResponseTypesSupported.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.ResponseTypesSupported.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.ScopesSupported.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.ScopesSupported.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.SubjectTypesSupported.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.SubjectTypesSupported.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.TokenEndpoint.get -> System.Uri!
+Supabase.Gotrue.Common.OidcDiscoveryDocument.TokenEndpoint.init -> void
+Supabase.Gotrue.Common.OidcDiscoveryDocument.UserInfoEndpoint.get -> System.Uri?
+Supabase.Gotrue.Common.OidcDiscoveryDocument.UserInfoEndpoint.init -> void
 Supabase.Gotrue.Constants
 Supabase.Gotrue.Constants.AuthState
 Supabase.Gotrue.Constants.AuthState.MfaChallengeVerified = 6 -> Supabase.Gotrue.Constants.AuthState
@@ -308,6 +426,18 @@ Supabase.Gotrue.Constants.SignUpType.Phone = 1 -> Supabase.Gotrue.Constants.Sign
 Supabase.Gotrue.Constants.SortOrder
 Supabase.Gotrue.Constants.SortOrder.Ascending = 0 -> Supabase.Gotrue.Constants.SortOrder
 Supabase.Gotrue.Constants.SortOrder.Descending = 1 -> Supabase.Gotrue.Constants.SortOrder
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.<Clone>$() -> Supabase.Gotrue.CreateCustomProvider.NewCustomProvider!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.AuthorizationUrl.get -> System.Uri?
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.ClientId.get -> string!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.ClientSecret.get -> string!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Equals(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? other) -> bool
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Identifier.get -> string!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Issuer.get -> System.Uri?
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Name.get -> string!
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.TokenUrl.get -> System.Uri?
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Type.get -> Supabase.Gotrue.Common.CustomProviderType
+Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.UserInfoUrl.get -> System.Uri?
 Supabase.Gotrue.DebugNotification
 Supabase.Gotrue.DebugNotification.AddDebugListener(System.Action<string!, System.Exception?>! listener) -> void
 Supabase.Gotrue.DebugNotification.DebugNotification() -> void
@@ -374,9 +504,20 @@ Supabase.Gotrue.GenerateLinkOptions.RedirectTo.set -> void
 Supabase.Gotrue.GenerateLinkOptions.Type.get -> string!
 Supabase.Gotrue.GenerateLinkSignupOptions
 Supabase.Gotrue.GenerateLinkSignupOptions.GenerateLinkSignupOptions(string! email, string! password) -> void
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.<Clone>$() -> Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus!
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.Equals(Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus? other) -> bool
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.FactorId.get -> string!
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.FactorId.init -> void
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.RecoveryCodesStatus() -> void
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.Remaining.get -> int
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.Remaining.init -> void
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.Total.get -> int
+Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.Total.init -> void
 Supabase.Gotrue.GotrueDiagnostics
 Supabase.Gotrue.Helpers
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateCustomProviderAsync(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateUser(Supabase.Gotrue.AdminUserAttributes! attributes) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateUser(string! email, string! password, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteCustomProviderAsync(string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
@@ -384,15 +525,21 @@ Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteFactor(Supabase.Gotru
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteUser(string! uid) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteUser(string! uid, bool shouldSoftDelete = false) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GenerateLink(Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.GenerateLinkResponse?>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GetCustomProviderAsync(string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GetUser(string! jwt) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GetUserById(string! userId) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.InviteUserByEmail(string! email, Supabase.Gotrue.InviteUserByEmailOptions? options = null) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.ListCustomProvidersAsync(Supabase.Gotrue.Common.CustomProviderType? type = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.CustomProvider!>!>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.ListFactors(Supabase.Gotrue.Mfa.MfaAdminListFactorsParams! listFactorsParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminListFactorsResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.ListUsers(string? filter = null, string? sortBy = null, Supabase.Gotrue.Constants.SortOrder sortOrder = Supabase.Gotrue.Constants.SortOrder.Descending, int? page = null, int? perPage = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.UserList<TUser!>?>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.SignOutAsync(string! accessToken, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.Update(Supabase.Gotrue.UserAttributes! attributes) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.UpdateCustomProviderAsync(string! identifier, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.UpdateFactorAsync(string! userId, string! factorId, Supabase.Gotrue.UpdateFactor.FactorChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.Factor!>!
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.UpdateUserById(string! userId, Supabase.Gotrue.AdminUserAttributes! userData) -> System.Threading.Tasks.Task<Supabase.Gotrue.User?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Challenge(string! jwt, Supabase.Gotrue.Mfa.MfaChallengeParams! mfaChallengeParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaChallengeResponse?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateCustomProviderAsync(string! jwt, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider! provider, Supabase.Gotrue.Common.CustomProviderOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateUser(string! jwt, Supabase.Gotrue.AdminUserAttributes? attributes = null) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteCustomProviderAsync(string! jwt, string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteFactor(string! jwt, Supabase.Gotrue.Mfa.MfaAdminDeleteFactorParams! deleteFactorParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaAdminDeleteFactorResponse?>!
@@ -401,7 +548,9 @@ Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteUser(string! uid, s
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Enroll(string! jwt, Supabase.Gotrue.Mfa.MfaEnrollParams! mfaEnrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaEnrollResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ExchangeCodeForSession(string! codeVerifier, string! authCode) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GenerateLink(string! jwt, Supabase.Gotrue.GenerateLinkOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetCustomProviderAsync(string! jwt, string! identifier, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetJwksAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.Jwks?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetRecoveryCodesStatusAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUriForProvider(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions? options = null) -> Supabase.Gotrue.ProviderAuthState!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUser(string! jwt) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUserAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TUser?>!
@@ -409,6 +558,7 @@ Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetUserById(string! jwt, 
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.InviteUserByEmail(string! email, string! jwt, Supabase.Gotrue.InviteUserByEmailOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.LinkIdentity(string! token, Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ProviderAuthState!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.LinkIdentityWithIdToken(string! token, Supabase.Gotrue.LinkIdentityWithIdTokenOptions! options) -> System.Threading.Tasks.Task<TSession?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListCustomProvidersAsync(string! jwt, Supabase.Gotrue.Common.CustomProviderType? type = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.CustomProvider!>!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListFactors(string! jwt, Supabase.Gotrue.Mfa.MfaAdminListFactorsParams! listFactorsParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListUsers(string! jwt, string? filter = null, string? sortBy = null, Supabase.Gotrue.Constants.SortOrder sortOrder = Supabase.Gotrue.Constants.SortOrder.Descending, int? page = null, int? perPage = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.UserList<TUser!>?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Reauthenticate(string! userJwt) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -430,10 +580,14 @@ Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithPhone(string! p
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithSSO(System.Guid providerId, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithSSO(string! domain, Supabase.Gotrue.SignInWithSSOOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.SSOResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignOut(string! jwt, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignOutAsync(string! jwt, Supabase.Gotrue.Constants.SignOutScope scope = Supabase.Gotrue.Constants.SignOutScope.Global, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignUpWithEmail(string! email, string! password, Supabase.Gotrue.SignUpOptions? options = null) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignUpWithPhone(string! phone, string! password, Supabase.Gotrue.SignUpOptions? options = null) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Unenroll(string! jwt, Supabase.Gotrue.Mfa.MfaUnenrollParams! mfaVerifyParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaUnenrollResponse?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.UnenrollRecoveryCodesAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.UnlinkIdentity(string! token, Supabase.Gotrue.UserIdentity! userIdentity) -> System.Threading.Tasks.Task<bool>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.UpdateCustomProviderAsync(string! jwt, string! identifier, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.CustomProvider!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.UpdateFactorAsync(string! jwt, string! userId, string! factorId, Supabase.Gotrue.UpdateFactor.FactorChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.Factor!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.UpdateUser(string! jwt, Supabase.Gotrue.UserAttributes! attributes) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.UpdateUserById(string! jwt, string! userId, Supabase.Gotrue.UserAttributes! userData) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Verify(string! jwt, Supabase.Gotrue.Mfa.MfaVerifyParams! mfaVerifyParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaVerifyResponse?>!
@@ -453,8 +607,10 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Enroll(Supabase.Gotrue
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ExchangeCodeForSession(string! codeVerifier, string! authCode) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetAuthenticatorAssuranceLevel() -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaGetAuthenticatorAssuranceLevelResponse?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetClaimsAsync(string? jwt = null, Supabase.Gotrue.Claims.GetClaimsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Claims.GetClaimsResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetRecoveryCodesStatusAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetSessionFromUrl(System.Uri! uri, bool storeSession = true) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetUser(string! jwt) -> System.Threading.Tasks.Task<TUser?>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetUserIdentitiesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.UserIdentity!>!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.LinkIdentity(Supabase.Gotrue.Constants.Provider provider, Supabase.Gotrue.SignInOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ProviderAuthState!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.LinkIdentityWithIdToken(Supabase.Gotrue.LinkIdentityWithIdTokenOptions! options) -> System.Threading.Tasks.Task<TSession?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ListFactors() -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaListFactorsResponse?>!
@@ -496,6 +652,7 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignUp(string! email, 
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.StartAutoRefresh() -> void
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.StopAutoRefresh() -> void
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Unenroll(Supabase.Gotrue.Mfa.MfaUnenrollParams! mfaUnenrollParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Mfa.MfaUnenrollResponse?>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.UnenrollRecoveryCodesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.UnlinkIdentity(Supabase.Gotrue.UserIdentity! userIdentity) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Update(Supabase.Gotrue.UserAttributes! attributes) -> System.Threading.Tasks.Task<TUser?>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Verify(Supabase.Gotrue.Mfa.MfaVerifyParams! mfaVerifyParams) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
@@ -582,6 +739,8 @@ Supabase.Gotrue.Mfa.Factor.FriendlyName.get -> string?
 Supabase.Gotrue.Mfa.Factor.FriendlyName.set -> void
 Supabase.Gotrue.Mfa.Factor.Id.get -> string!
 Supabase.Gotrue.Mfa.Factor.Id.set -> void
+Supabase.Gotrue.Mfa.Factor.Phone.get -> string?
+Supabase.Gotrue.Mfa.Factor.Phone.set -> void
 Supabase.Gotrue.Mfa.Factor.Status.get -> string!
 Supabase.Gotrue.Mfa.Factor.Status.set -> void
 Supabase.Gotrue.Mfa.Factor.UpdatedAt.get -> System.DateTime
@@ -907,6 +1066,34 @@ Supabase.Gotrue.TokenRefresh
 Supabase.Gotrue.TokenRefresh.Debug -> bool
 Supabase.Gotrue.TokenRefresh.ManageAutoRefresh(Supabase.Gotrue.Interfaces.IGotrueClient<Supabase.Gotrue.User!, Supabase.Gotrue.Session!>! sender, Supabase.Gotrue.Constants.AuthState stateChanged) -> void
 Supabase.Gotrue.TokenRefresh.TokenRefresh(Supabase.Gotrue.Client! client) -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.<Clone>$() -> Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges!
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.AuthorizationUrl.get -> System.Uri?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.AuthorizationUrl.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ClientId.get -> string?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ClientId.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ClientSecret.get -> string?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ClientSecret.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.CustomProviderChanges() -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Equals(Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? other) -> bool
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Issuer.get -> System.Uri?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Issuer.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Name.get -> string?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Name.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Options.get -> Supabase.Gotrue.Common.CustomProviderOptions?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Options.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.TokenUrl.get -> System.Uri?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.TokenUrl.init -> void
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.UserInfoUrl.get -> System.Uri?
+Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.UserInfoUrl.init -> void
+Supabase.Gotrue.UpdateFactor.FactorChanges
+Supabase.Gotrue.UpdateFactor.FactorChanges.<Clone>$() -> Supabase.Gotrue.UpdateFactor.FactorChanges!
+Supabase.Gotrue.UpdateFactor.FactorChanges.Equals(Supabase.Gotrue.UpdateFactor.FactorChanges? other) -> bool
+Supabase.Gotrue.UpdateFactor.FactorChanges.FactorChanges() -> void
+Supabase.Gotrue.UpdateFactor.FactorChanges.FriendlyName.get -> string?
+Supabase.Gotrue.UpdateFactor.FactorChanges.FriendlyName.init -> void
+Supabase.Gotrue.UpdateFactor.FactorChanges.Phone.get -> string?
+Supabase.Gotrue.UpdateFactor.FactorChanges.Phone.init -> void
 Supabase.Gotrue.User
 Supabase.Gotrue.User.AppMetadata.get -> System.Collections.Generic.Dictionary<string!, object!>!
 Supabase.Gotrue.User.AppMetadata.set -> void
@@ -1021,6 +1208,27 @@ override Supabase.Gotrue.Claims.JwtClaims.ToString() -> string!
 override Supabase.Gotrue.Claims.JwtHeader.Equals(object? obj) -> bool
 override Supabase.Gotrue.Claims.JwtHeader.GetHashCode() -> int
 override Supabase.Gotrue.Claims.JwtHeader.ToString() -> string!
+override Supabase.Gotrue.Common.CustomProvider.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.CustomProvider.GetHashCode() -> int
+override Supabase.Gotrue.Common.CustomProvider.ToString() -> string!
+override Supabase.Gotrue.Common.CustomProviderOptions.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.CustomProviderOptions.GetHashCode() -> int
+override Supabase.Gotrue.Common.CustomProviderOptions.ToString() -> string!
+override Supabase.Gotrue.Common.OidcDiscoveryDocument.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.OidcDiscoveryDocument.GetHashCode() -> int
+override Supabase.Gotrue.Common.OidcDiscoveryDocument.ToString() -> string!
+override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Equals(object? obj) -> bool
+override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.GetHashCode() -> int
+override Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.ToString() -> string!
+override Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.Equals(object? obj) -> bool
+override Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.GetHashCode() -> int
+override Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.ToString() -> string!
+override Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.Equals(object? obj) -> bool
+override Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.GetHashCode() -> int
+override Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.ToString() -> string!
+override Supabase.Gotrue.UpdateFactor.FactorChanges.Equals(object? obj) -> bool
+override Supabase.Gotrue.UpdateFactor.FactorChanges.GetHashCode() -> int
+override Supabase.Gotrue.UpdateFactor.FactorChanges.ToString() -> string!
 readonly Supabase.Gotrue.StatelessClient.StatelessClientOptions.Headers -> System.Collections.Generic.Dictionary<string!, string!>!
 static Supabase.Gotrue.Claims.GetClaimsOptions.operator !=(Supabase.Gotrue.Claims.GetClaimsOptions? left, Supabase.Gotrue.Claims.GetClaimsOptions? right) -> bool
 static Supabase.Gotrue.Claims.GetClaimsOptions.operator ==(Supabase.Gotrue.Claims.GetClaimsOptions? left, Supabase.Gotrue.Claims.GetClaimsOptions? right) -> bool
@@ -1034,11 +1242,27 @@ static Supabase.Gotrue.Claims.JwtClaims.operator !=(Supabase.Gotrue.Claims.JwtCl
 static Supabase.Gotrue.Claims.JwtClaims.operator ==(Supabase.Gotrue.Claims.JwtClaims? left, Supabase.Gotrue.Claims.JwtClaims? right) -> bool
 static Supabase.Gotrue.Claims.JwtHeader.operator !=(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
 static Supabase.Gotrue.Claims.JwtHeader.operator ==(Supabase.Gotrue.Claims.JwtHeader? left, Supabase.Gotrue.Claims.JwtHeader? right) -> bool
+static Supabase.Gotrue.Common.CustomProvider.operator !=(Supabase.Gotrue.Common.CustomProvider? left, Supabase.Gotrue.Common.CustomProvider? right) -> bool
+static Supabase.Gotrue.Common.CustomProvider.operator ==(Supabase.Gotrue.Common.CustomProvider? left, Supabase.Gotrue.Common.CustomProvider? right) -> bool
+static Supabase.Gotrue.Common.CustomProviderOptions.operator !=(Supabase.Gotrue.Common.CustomProviderOptions? left, Supabase.Gotrue.Common.CustomProviderOptions? right) -> bool
+static Supabase.Gotrue.Common.CustomProviderOptions.operator ==(Supabase.Gotrue.Common.CustomProviderOptions? left, Supabase.Gotrue.Common.CustomProviderOptions? right) -> bool
+static Supabase.Gotrue.Common.OidcDiscoveryDocument.operator !=(Supabase.Gotrue.Common.OidcDiscoveryDocument? left, Supabase.Gotrue.Common.OidcDiscoveryDocument? right) -> bool
+static Supabase.Gotrue.Common.OidcDiscoveryDocument.operator ==(Supabase.Gotrue.Common.OidcDiscoveryDocument? left, Supabase.Gotrue.Common.OidcDiscoveryDocument? right) -> bool
+static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.OAuth2(string! identifier, string! name, string! clientId, string! clientSecret, System.Uri! authorizationUrl, System.Uri! tokenUrl, System.Uri! userInfoUrl) -> Supabase.Gotrue.CreateCustomProvider.NewCustomProvider!
+static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.Oidc(string! identifier, string! name, string! clientId, string! clientSecret, System.Uri! issuer) -> Supabase.Gotrue.CreateCustomProvider.NewCustomProvider!
+static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.operator !=(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? left, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? right) -> bool
+static Supabase.Gotrue.CreateCustomProvider.NewCustomProvider.operator ==(Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? left, Supabase.Gotrue.CreateCustomProvider.NewCustomProvider? right) -> bool
 static Supabase.Gotrue.Exceptions.FailureHint.DetectReason(Supabase.Gotrue.Exceptions.GotrueException! gte) -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 static Supabase.Gotrue.Exceptions.FailureHint.ParseErrorCode(string? content) -> string?
+static Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.operator !=(Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus? left, Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus? right) -> bool
+static Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus.operator ==(Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus? left, Supabase.Gotrue.GetRecoveryCodesStatus.RecoveryCodesStatus? right) -> bool
 static Supabase.Gotrue.Helpers.GenerateNonce() -> string!
 static Supabase.Gotrue.Helpers.GeneratePKCENonceVerifier(string! codeVerifier) -> string!
 static Supabase.Gotrue.Helpers.GenerateSHA256NonceFromRawNonce(string! rawNonce) -> string!
+static Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.operator !=(Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? left, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? right) -> bool
+static Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges.operator ==(Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? left, Supabase.Gotrue.UpdateCustomProvider.CustomProviderChanges? right) -> bool
+static Supabase.Gotrue.UpdateFactor.FactorChanges.operator !=(Supabase.Gotrue.UpdateFactor.FactorChanges? left, Supabase.Gotrue.UpdateFactor.FactorChanges? right) -> bool
+static Supabase.Gotrue.UpdateFactor.FactorChanges.operator ==(Supabase.Gotrue.UpdateFactor.FactorChanges? left, Supabase.Gotrue.UpdateFactor.FactorChanges? right) -> bool
 static readonly Supabase.Gotrue.Constants.CookieOptions -> System.Collections.Generic.Dictionary<string!, object!>!
 virtual Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.AuthEventHandler.Invoke(Supabase.Gotrue.Interfaces.IGotrueClient<TUser!, TSession!>! sender, Supabase.Gotrue.Constants.AuthState stateChanged) -> void
 virtual Supabase.Gotrue.NetworkStatus.NetworkListener.Invoke(bool isNetworkAvailable) -> void
