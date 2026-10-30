@@ -148,6 +148,10 @@ features:
     status: implemented
     symbols:
       - Client.GetRecoveryCodesStatusAsync
+  auth.mfa_recovery_codes.unenroll:
+    status: implemented
+    symbols:
+      - Client.UnenrollRecoveryCodesAsync
 
   auth.admin.create_provider:
     status: implemented
