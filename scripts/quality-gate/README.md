@@ -153,6 +153,21 @@ a looser one can only come from a hand edit.
 
 ```sh
 ./scripts/quality-gate/fixtures-baseline-tightened/run.sh   # its cases
+## Which CI jobs a change needs
+
+`changed-areas.sh` classifies a diff, and each workflow skips the jobs it cannot affect:
+
+| Output   | True when the diff touches                                                | Gates                                                |
+|----------|---------------------------------------------------------------------------|------------------------------------------------------|
+| `code`   | anything but `sdk-compliance.yaml`, `CHANGELOG.md`, `.gate-baseline.json` | the full gate                                        |
+| `csharp` | a `.cs` file                                                              | mutation, annotation validation, format, matrix sync |
+
+The decision comes from the files alone, never from the PR's author, title, branch or
+commit message: those are chosen by whoever opens the PR, so skipping on them would let
+any change skip the gate.
+
+```sh
+./scripts/quality-gate/fixtures-changed-areas/run.sh   # its cases
 ```
 
 ## Layout
@@ -168,4 +183,6 @@ format-suggest.sh       prints the format diff for a changed file (dev helper)
 baseline-tightened.sh   fails when a baseline got looser
 fixtures/               the gate's own test suite
 fixtures-baseline-tightened/  cases for baseline-tightened.sh
+fixtures-changed-areas/ cases for changed-areas.sh
+changed-areas.sh        classifies a diff into the areas CI jobs care about
 ```

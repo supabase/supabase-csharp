@@ -11,7 +11,27 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Skips what the diff cannot affect, decided from its files alone
+  # (scripts/quality-gate/changed-areas.sh). A skipped job reports as passing.
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      code: ${{ steps.areas.outputs.code }}
+      csharp: ${{ steps.areas.outputs.csharp }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: areas
+        run: ./scripts/quality-gate/changed-areas.sh "$BASE" | tee -a "$GITHUB_OUTPUT"
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+
   build-and-test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write        # push the baseline branch for the post-merge PR below
@@ -44,18 +64,31 @@ jobs:
       # the dependency-vulnerability scan (a vulnerable package may have no available
       # fix, which shouldn't wedge every PR) are signals — surfaced but non-blocking.
       #
-      # The flag depends on the event (this workflow only runs on pull_request and
-      # push:master, so the two branches below are exactly those two cases):
-      #   PR   → --bypass-format: a fork contributor can't always fix a format
-      #          violation themselves the way an agent can, and blocking the merge on
-      #          it would just be the friction this exists to remove. format-master.yml
-      #          auto-formats master after merge regardless. The gate stays read-only
-      #          (no --overwrite-baseline), so a PR run never rewrites a baseline.
-      #   push → --overwrite-baseline:  The gate writes the improved baseline to the
-      #          runner's tree; the next step commits it. Format stays blocking here
-      #          (no --bypass-format).
+      # The flag depends on where the change comes from:
+      #   push           → --overwrite-baseline: the gate writes the improved baseline
+      #                    to the runner's tree; the next step commits it. Format
+      #                    stays blocking.
+      #   PR from a fork → --bypass-format: a fork contributor can't always fix a
+      #                    format violation themselves the way an agent can, and
+      #                    format-master.yml auto-formats master after merge regardless.
+      #   PR from a branch of this repository → no flag: format blocks, so the
+      #                    violation is fixed before merge instead of in a format PR
+      #                    after it.
+      # A PR run never passes --overwrite-baseline, so it never rewrites a baseline.
       - name: Quality gate
-        run: ./scripts/quality-gate/gate.sh packages ${{ github.event_name == 'pull_request' && '--bypass-format' || '--overwrite-baseline' }}
+        run: |
+          if [[ "$EVENT" == "push" ]]; then
+            mode="--overwrite-baseline"
+          elif [[ "$HEAD_REPOSITORY" != "$REPOSITORY" ]]; then
+            mode="--bypass-format"
+          else
+            mode=""
+          fi
+          ./scripts/quality-gate/gate.sh packages $mode
+        env:
+          EVENT: ${{ github.event_name }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          REPOSITORY: ${{ github.repository }}
 
       - name: Refresh baseline on master
         if: always() && github.event_name == 'push'
@@ -101,6 +134,8 @@ jobs:
   # catches a mistyped feature key or a feature reported with conflicting statuses.
   capability-matrix:
     name: Validate capability annotations
+    needs: changes
+    if: needs.changes.outputs.csharp == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read

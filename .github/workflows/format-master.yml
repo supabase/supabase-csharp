@@ -1,10 +1,10 @@
 name: Auto-format master
 
-# Runs only on push to master. It exists because build-and-test.yml's
-# PR-time gate runs with --bypass-format (a fork contributor can't always fix a
-# format violation themselves the way an agent can), so master can land a merge
-# with a format violation still in it. This closes that gap: format whatever
-# the merge actually changed, and commit the fix directly.
+# Runs only on push to master. It exists because build-and-test.yml's PR-time
+# gate runs with --bypass-format for PRs from forks (a fork contributor can't
+# always fix a format violation themselves the way an agent can), so master can
+# land a merge with a format violation still in it. This closes that gap: format
+# whatever the merge actually changed, and commit the fix directly.
 on:
   push:
     branches: [master]
@@ -14,10 +14,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Formats only the .cs files this push changed, so a push without one has
+  # nothing to format (scripts/quality-gate/changed-areas.sh).
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      csharp: ${{ steps.areas.outputs.csharp }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: areas
+        run: ./scripts/quality-gate/changed-areas.sh "$BASE" | tee -a "$GITHUB_OUTPUT"
+        env:
+          BASE: ${{ github.event.before }}
+
   format-master:
-    if: >-
-      !startsWith(github.event.head_commit.message, 'chore(format)') &&
-      !startsWith(github.event.head_commit.message, 'chore(quality-gate)')
+    needs: changes
+    if: needs.changes.outputs.csharp == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
