@@ -144,6 +144,11 @@ features:
     symbols:
       - Client.Verify
 
+  auth.mfa_recovery_codes.get_status:
+    status: implemented
+    symbols:
+      - Client.GetRecoveryCodesStatusAsync
+
   auth.admin.create_provider:
     status: implemented
     symbols:
