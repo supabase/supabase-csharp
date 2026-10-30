@@ -34,6 +34,7 @@
     <None Update="TokenRefresh\Fixtures\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Common\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Identities\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="UpdateFactor\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

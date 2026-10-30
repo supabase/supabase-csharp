@@ -19,6 +19,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
+using Supabase.Gotrue.UpdateFactor;
 using static Supabase.Gotrue.Constants;
 
 namespace Supabase.Gotrue;
@@ -641,6 +642,18 @@ public class Api : IGotrueApi<User, Session>
 
     /// <inheritdoc />
     public Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams) => this.MakeRequestAsync<MfaAdminDeleteFactorResponse>(HttpMethod.Delete, $"{this.Url}/admin/users/{PathSegment.Escape(deleteFactorParams.UserId)}/factors/{PathSegment.Escape(deleteFactorParams.Id)}", null, this.CreateAuthedRequestHeaders(jwt));
+
+    /// <inheritdoc />
+    public async Task<Factor> UpdateFactorAsync(string jwt, string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default)
+    {
+        var url = this.AdminFactorUrl(userId, factorId);
+        var body = UpdateFactorBody.For(changes);
+        var updated = await this.MakeRequestAsync<Factor>(HttpMethod.Put, url, body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return updated ?? throw new GotrueException("The auth server returned no factor.");
+    }
+
+    private string AdminFactorUrl(string userId, string factorId) =>
+        $"{this.Url}/admin/users/{CanonicalUuid.EnsureRoutable(userId)}/factors/{CanonicalUuid.EnsureRoutable(factorId)}";
 
     /// <inheritdoc />
     public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>

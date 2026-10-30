@@ -8,6 +8,7 @@ using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
+using Supabase.Gotrue.UpdateFactor;
 
 namespace Supabase.Gotrue.Interfaces;
 
@@ -140,6 +141,41 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// <param name="listFactorParams">A <see cref="MfaAdminListFactorsParams"/> object that contains the user id.</param>
     /// <returns>A <see cref="MfaAdminDeleteFactorResponse"/> containing the deleted factor id.</returns>
     Task<MfaAdminDeleteFactorResponse?> DeleteFactor(MfaAdminDeleteFactorParams deleteFactorParams);
+
+    /// <summary>
+    /// Updates a user's MFA factor, such as its friendly name or the phone number of a phone factor. Only the members set
+    /// on <paramref name="changes" /> are sent; the others keep their current value. Requires a full-access API key, such
+    /// as the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="userId">The id of the user who owns the factor, a UUID such as <c>8d3f1c2a-5b6e-4f70-9a81-b2c3d4e5f607</c>.</param>
+    /// <param name="factorId">The id of the factor, a UUID such as <c>2b306a77-21dc-4110-ba71-537cb56b9e98</c>.</param>
+    /// <param name="changes">
+    /// The changes. An empty or blank value cannot clear a setting: the server reads it as unchanged. The server ignores
+    /// <see cref="FactorChanges.Phone" /> on a factor that is not a phone factor.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The updated factor.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="userId" />, <paramref name="factorId" /> or <paramref name="changes" /> is null. Nothing is sent.</exception>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="userId" /> or <paramref name="factorId" /> is not a UUID in its canonical, hyphenated form. Nothing is sent.
+    /// </exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>user_not_found</c> when
+    /// no user has <paramref name="userId" />, <c>mfa_factor_not_found</c> when the user owns no factor with
+    /// <paramref name="factorId" />, and <c>validation_failed</c> when the phone number is not in E.164 format;
+    /// <see cref="Exceptions.GotrueException.Reason" /> is <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" />
+    /// when the key is not a full-access key. A friendly name another factor of the user already has fails with
+    /// status code 500.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.UpdateFactor;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var factor = await admin.UpdateFactorAsync(userId, factorId, new FactorChanges { FriendlyName = "Work phone" });
+    /// </code>
+    /// </example>
+    Task<Factor> UpdateFactorAsync(string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a custom OAuth/OIDC provider. Requires a full-access API key, such as the service_role key:
