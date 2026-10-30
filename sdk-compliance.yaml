@@ -205,6 +205,10 @@ features:
     status: implemented
     symbols:
       - AdminClient.ListFactors
+  auth.admin.update_mfa_factor:
+    status: implemented
+    symbols:
+      - AdminClient.UpdateFactorAsync
 
   # ── Client Initialization ──────────────────────────────────────────────────
 
