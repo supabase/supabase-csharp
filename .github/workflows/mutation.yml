@@ -10,7 +10,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Stryker only mutates changed .cs files, so a diff without one has nothing to
+  # mutate (scripts/quality-gate/changed-areas.sh).
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      csharp: ${{ steps.areas.outputs.csharp }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: areas
+        run: ./scripts/quality-gate/changed-areas.sh "$BASE" | tee -a "$GITHUB_OUTPUT"
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+
   mutation:
+    needs: changes
+    if: needs.changes.outputs.csharp == 'true'
     runs-on: ubuntu-latest
     # Ceiling, not the norm: Stryker.NET mutates everything if a non-C# file changed
     # (stryker-net#3013), so the timeout bounds that worst case.
