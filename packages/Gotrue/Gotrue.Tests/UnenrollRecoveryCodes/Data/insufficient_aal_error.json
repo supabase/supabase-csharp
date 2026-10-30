@@ -1,0 +1,5 @@
+{
+  "code": 403,
+  "error_code": "insufficient_aal",
+  "msg": "AAL2 required to delete recovery codes"
+}

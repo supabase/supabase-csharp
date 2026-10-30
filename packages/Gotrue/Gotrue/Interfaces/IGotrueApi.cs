@@ -80,6 +80,14 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <returns>The recovery codes status, or null when the user has no recovery codes.</returns>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Removes the user's MFA recovery codes factor together with every remaining code.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task UnenrollRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default);
     Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams);
     Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams);
     Task<Factor> UpdateFactorAsync(string jwt, string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default);

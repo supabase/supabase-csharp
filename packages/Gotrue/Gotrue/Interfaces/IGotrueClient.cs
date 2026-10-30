@@ -679,6 +679,29 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// </example>
     Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>
+    ///     Removes the signed-in user's MFA recovery codes factor, invalidating every remaining code. The session must
+    ///     be at the <c>aal2</c> assurance level. Sessions that reached <c>aal2</c> with a recovery code are lowered to
+    ///     <c>aal1</c> on the server; the current session keeps its tokens until it is refreshed.
+    ///     Recovery codes are experimental on the auth server.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>insufficient_aal</c> when the session is not at <c>aal2</c>,
+    ///     <c>mfa_factor_not_found</c> when the user has no recovery codes,
+    ///     <c>no_authorization</c> for an anonymous user.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     await client.ChallengeAndVerify(new MfaChallengeAndVerifyParams { FactorId = totpFactorId, Code = code });
+    ///     await client.UnenrollRecoveryCodesAsync();
+    ///     </code>
+    /// </example>
+    Task UnenrollRecoveryCodesAsync(CancellationToken cancellationToken = default);
+
     #endregion
 
 }

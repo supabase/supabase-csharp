@@ -72,6 +72,7 @@ internal static class GotrueInstrumentation
         internal const string LinkIdentityWithIdToken = "gotrue.link_identity.id_token";
         internal const string GetUserIdentities = "gotrue.get_user_identities";
         internal const string GetRecoveryCodesStatus = "gotrue.get_recovery_codes_status";
+        internal const string UnenrollRecoveryCodes = "gotrue.unenroll_recovery_codes";
         internal const string SignInWithOtp = "gotrue.sign_in.otp";
         internal const string SignIn = "gotrue.sign_in";
         internal const string SignInAnonymously = "gotrue.sign_in.anonymous";

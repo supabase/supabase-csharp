@@ -658,6 +658,10 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
+    public Task UnenrollRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/factors/recovery-codes", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
     public Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams) => this.MakeRequestAsync(HttpMethod.Get, $"{this.Url}/admin/users/{PathSegment.Escape(listFactorsParams.UserId)}/factors", null, this.CreateAuthedRequestHeaders(jwt));
 
     /// <inheritdoc />
