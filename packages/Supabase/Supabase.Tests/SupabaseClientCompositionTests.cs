@@ -335,6 +335,17 @@ public class SupabaseClientCompositionTests
                 "an active session's access token must take precedence over the api key as the bearer");
     }
 
+    [TestMethod]
+    public void SupabaseClient_ShouldOmitAuthorizationOnRealtimePath_GivenActiveSession()
+    {
+        var client = UrlClient();
+        var auth = Substitute.For<IGotrueClient<User, Session>>();
+        auth.CurrentSession.Returns(new Session { AccessToken = "session-token" });
+        client.Auth = auth;
+        client.Realtime.GetHeaders!().Should().NotContainKey("Authorization",
+            "hosted Realtime rejects a user JWT on the websocket upgrade, the token goes in the channel join");
+    }
+
     private static Supabase.Client NewKeyClient(string key) =>
         new("http://localhost", key, new SupabaseOptions { AutoConnectRealtime = false });
 
@@ -355,8 +366,6 @@ public class SupabaseClientCompositionTests
     [TestMethod]
     public void SupabaseClient_ShouldStillSendKeyAsBearerOnDatabasePath_GivenNewFormatKeyAndNoSession()
     {
-        // Database/Storage/Realtime/auth keep the key on both headers — the gateway accepts it because
-        // the Bearer value exactly equals the apikey value. Only the Functions path is special-cased.
         NewKeyClient("sb_publishable_abc123").Postgrest.GetHeaders!().Should().ContainKey("Authorization")
             .WhoseValue.Should().Be("Bearer sb_publishable_abc123");
     }
