@@ -21,6 +21,7 @@
 		</PackageReference>
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="Verify.MSTest" />
+		<PackageReference Include="WireMock.Net" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Extensions;
 using Supabase.Realtime.Exceptions;
+using Supabase.Realtime.HttpSend;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Socket;
 using Supabase.Realtime.Sockets;
@@ -59,6 +60,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private readonly string endpoint;
     private readonly ClientOptions options;
     private readonly IWebsocketClient connection;
+    private readonly HttpBroadcaster httpBroadcaster;
 
     private CancellationTokenSource? heartbeatTokenSource;
 
@@ -85,7 +87,11 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
         this.connection = (options.WebSocketFactory ?? DefaultWebSocketFactory.Instance)
             .Create(new Uri(this.EndpointUrl), () => this.Headers);
+        this.httpBroadcaster = new HttpBroadcaster(endpoint, options, () => this.Headers);
     }
+
+    Task IRealtimeSocket.HttpSendAsync(RealtimeChannel channel, string eventName, object payload, CancellationToken cancellationToken) =>
+        this.httpBroadcaster.SendAsync(channel, eventName, payload, cancellationToken);
 
     void IDisposable.Dispose()
     {

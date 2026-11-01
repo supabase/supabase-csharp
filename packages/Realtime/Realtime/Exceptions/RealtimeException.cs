@@ -24,6 +24,11 @@ public class RealtimeException : Exception
     public FailureHint.Reason Reason { get; internal set; }
 
     /// <summary>
+    /// The HTTP status code of a rejected <c>HttpSendAsync</c>.
+    /// </summary>
+    public int StatusCode { get; internal set; }
+
+    /// <summary>
     /// Creates exception from a <see cref="DisconnectionInfo"/> instance.
     /// </summary>
     /// <param name="info"></param>

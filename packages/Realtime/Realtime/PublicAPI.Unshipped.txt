@@ -1,1 +1,4 @@
 #nullable enable
+Supabase.Realtime.Exceptions.RealtimeException.StatusCode.get -> int
+Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendAsync(string! eventName, object! payload, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Realtime.RealtimeChannel.HttpSendAsync(string! eventName, object! payload, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
