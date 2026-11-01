@@ -28,6 +28,14 @@ public class PresenceStateTests
         "\"payload\":{\"joins\":{\"user-2\":{\"metas\":[{\"phx_ref\":\"r2\",\"time\":\"2023-09-01T11:00:00Z\"}]}}," +
         "\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]}}}}";
 
+    private const string SecondConnectionJoinFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s3\"," +
+        "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\"}]}},\"leaves\":{}}}";
+
+    private const string FirstConnectionLeaveFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s4\"," +
+        "\"payload\":{\"joins\":{},\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]}}}}";
+
     private static (RealtimeChannel channel, RealtimePresence<PresenceExample> presence) Presence()
     {
         var channel = Wire.Channel("realtime:online-users");
@@ -65,6 +73,19 @@ public class PresenceStateTests
             joins.Should().Be(1);
             leaves.Should().Be(1);
         }
+    }
+
+    [TestMethod]
+    public void HandleSocketMessage_ShouldTrackEachMeta_GivenTwoConnectionsOnOneKey()
+    {
+        var (channel, presence) = Presence();
+        channel.HandleSocketMessage(Wire.Decode(StateFrame));
+        channel.HandleSocketMessage(Wire.Decode(SecondConnectionJoinFrame));
+        presence.CurrentState["user-1"].Should().HaveCount(2, "a second connection joined the same key");
+
+        channel.HandleSocketMessage(Wire.Decode(FirstConnectionLeaveFrame));
+        presence.CurrentState.Should().ContainKey("user-1", "the user is still online on the other connection")
+            .WhoseValue.Should().ContainSingle().Which.PhoenixRef.Should().Be("r2");
     }
 
     [TestMethod]
