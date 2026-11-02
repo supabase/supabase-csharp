@@ -569,6 +569,19 @@ public class Client : IGotrueClient<User, Session>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.passkey.delete_passkey")]
+    public async Task DeletePasskeyAsync(Guid passkeyId, CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.DeletePasskey);
+        if (!this.Online)
+        {
+            throw new GotrueException("Only supported when online", Offline);
+        }
+        var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
+        await this.api.DeletePasskeyAsync(accessToken, passkeyId, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
     [ImplementedCapability("auth.session.sign_out")]
     public async Task SignOut(SignOutScope scope = SignOutScope.Global)
     {

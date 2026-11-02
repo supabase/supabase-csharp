@@ -668,6 +668,10 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
+    public Task DeletePasskeyAsync(string jwt, Guid passkeyId, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/passkeys/{passkeyId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
     public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)
     {
         var generated = await this.MakeRequestAsync<RecoveryCodesResponse>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes", GenerateRecoveryCodesBody.For(options), this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
