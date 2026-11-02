@@ -61,6 +61,10 @@ features:
     status: implemented
     symbols:
       - Client.ListPasskeysAsync
+  auth.passkey.delete_passkey:
+    status: implemented
+    symbols:
+      - Client.DeletePasskeyAsync
 
   auth.session.auto_refresh:
     status: implemented
