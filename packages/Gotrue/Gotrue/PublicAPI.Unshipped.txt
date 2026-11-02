@@ -1,1 +1,31 @@
 #nullable enable
+override Supabase.Gotrue.Common.RecoveryCodes.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.RecoveryCodes.GetHashCode() -> int
+override Supabase.Gotrue.Common.RecoveryCodes.ToString() -> string!
+override Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.Equals(object? obj) -> bool
+override Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.GetHashCode() -> int
+override Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.ToString() -> string!
+static Supabase.Gotrue.Common.RecoveryCodes.operator !=(Supabase.Gotrue.Common.RecoveryCodes? left, Supabase.Gotrue.Common.RecoveryCodes? right) -> bool
+static Supabase.Gotrue.Common.RecoveryCodes.operator ==(Supabase.Gotrue.Common.RecoveryCodes? left, Supabase.Gotrue.Common.RecoveryCodes? right) -> bool
+static Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.operator !=(Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? left, Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? right) -> bool
+static Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.operator ==(Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? left, Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? right) -> bool
+Supabase.Gotrue.Api.GenerateRecoveryCodesAsync(string! jwt, Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Client.GenerateRecoveryCodesAsync(Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Common.RecoveryCodes
+Supabase.Gotrue.Common.RecoveryCodes.<Clone>$() -> Supabase.Gotrue.Common.RecoveryCodes!
+Supabase.Gotrue.Common.RecoveryCodes.Codes.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.RecoveryCodes.Codes.init -> void
+Supabase.Gotrue.Common.RecoveryCodes.Equals(Supabase.Gotrue.Common.RecoveryCodes? other) -> bool
+Supabase.Gotrue.Common.RecoveryCodes.FactorId.get -> string!
+Supabase.Gotrue.Common.RecoveryCodes.FactorId.init -> void
+Supabase.Gotrue.Common.RecoveryCodes.FriendlyName.get -> string!
+Supabase.Gotrue.Common.RecoveryCodes.FriendlyName.init -> void
+Supabase.Gotrue.Common.RecoveryCodes.RecoveryCodes() -> void
+Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions
+Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.<Clone>$() -> Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions!
+Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.Equals(Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? other) -> bool
+Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.FriendlyName.get -> string?
+Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.FriendlyName.init -> void
+Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions.GenerateRecoveryCodesOptions() -> void
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GenerateRecoveryCodesAsync(string! jwt, Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GenerateRecoveryCodesAsync(Supabase.Gotrue.GenerateRecoveryCodes.GenerateRecoveryCodesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!

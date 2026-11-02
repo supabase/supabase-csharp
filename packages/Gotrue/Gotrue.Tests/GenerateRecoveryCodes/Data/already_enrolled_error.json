@@ -1,0 +1,5 @@
+{
+  "code": 422,
+  "error_code": "mfa_verified_factor_exists",
+  "msg": "Recovery codes are already enrolled for this user, use regenerate to rotate them"
+}

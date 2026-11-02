@@ -11,7 +11,9 @@ using System.Web;
 using Supabase.Core.Attributes;
 using Supabase.Core.Diagnostics;
 using Supabase.Gotrue.Claims;
+using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
+using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
@@ -1222,6 +1224,19 @@ public class Client : IGotrueClient<User, Session>
         }
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         return await this.api.GetRecoveryCodesStatusAsync(accessToken, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.mfa_recovery_codes.generate")]
+    public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GenerateRecoveryCodes);
+        if (!this.Online)
+        {
+            throw new GotrueException("Only supported when online", Offline);
+        }
+        var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
+        return await this.api.GenerateRecoveryCodesAsync(accessToken, options, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

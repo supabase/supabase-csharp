@@ -1,0 +1,5 @@
+{
+  "code": 422,
+  "error_code": "mfa_recovery_codes_sole_factor",
+  "msg": "At least one other verified factor is required to generate recovery codes"
+}
