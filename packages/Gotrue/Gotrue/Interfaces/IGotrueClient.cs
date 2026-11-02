@@ -6,7 +6,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
+using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
+using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
@@ -678,6 +680,42 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     </code>
     /// </example>
     Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Generates the signed-in user's single set of MFA recovery codes. The plaintext codes are returned exactly
+    ///     once and cannot be read back: show them to the user and ask them to store them safely. The session must be at
+    ///     the <c>aal2</c> assurance level and the user must already have another verified factor, because recovery codes
+    ///     can never be the only second factor. A user has at most one set of recovery codes.
+    ///     The new <c>recovery_code</c> factor is not in the current session's <see cref="User.Factors" />, which
+    ///     <see cref="ListFactors" /> reads, until the session is refreshed or the user is fetched again.
+    ///     Recovery codes are experimental on the auth server.
+    /// </summary>
+    /// <param name="options">Optional settings, such as the factor's friendly name.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The generated codes, returned only this once.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>insufficient_aal</c> when the session is not at <c>aal2</c>,
+    ///     <c>mfa_recovery_codes_sole_factor</c> when the user has no other verified factor,
+    ///     <c>mfa_verified_factor_exists</c> when the user already has recovery codes,
+    ///     <c>mfa_factor_name_conflict</c> when another factor has the same friendly name,
+    ///     <c>too_many_enrolled_mfa_factors</c> when the user has reached the factor limit,
+    ///     <c>mfa_recovery_codes_enroll_not_enabled</c> when recovery codes are disabled on the server,
+    ///     <c>no_authorization</c> for an anonymous user.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     await client.ChallengeAndVerify(new MfaChallengeAndVerifyParams { FactorId = totpFactorId, Code = code });
+    ///     var recoveryCodes = await client.GenerateRecoveryCodesAsync(new GenerateRecoveryCodesOptions { FriendlyName = "Backup codes" });
+    ///     foreach (var recoveryCode in recoveryCodes.Codes)
+    ///     {
+    ///         // show each code once; they cannot be retrieved again
+    ///     }
+    ///     </code>
+    /// </example>
+    Task<RecoveryCodes> GenerateRecoveryCodesAsync(GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Removes the signed-in user's MFA recovery codes factor, invalidating every remaining code. The session must

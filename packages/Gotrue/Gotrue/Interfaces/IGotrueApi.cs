@@ -6,6 +6,7 @@ using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
@@ -80,6 +81,16 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <returns>The recovery codes status, or null when the user has no recovery codes.</returns>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Generates the user's one-time set of MFA recovery codes.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level.</param>
+    /// <param name="options">Optional settings, such as the factor's friendly name.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The generated codes, returned only this once.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes the user's MFA recovery codes factor together with every remaining code.

@@ -37,6 +37,7 @@
     <None Update="UpdateFactor\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="GetRecoveryCodesStatus\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="UnenrollRecoveryCodes\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="GenerateRecoveryCodes\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

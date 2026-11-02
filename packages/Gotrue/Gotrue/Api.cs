@@ -13,6 +13,7 @@ using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
+using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
@@ -655,6 +656,13 @@ public class Api : IGotrueApi<User, Session>
         {
             return RecoveryCodesStatusResponse.NotEnrolled;
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var generated = await this.MakeRequestAsync<RecoveryCodesResponse>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes", GenerateRecoveryCodesBody.For(options), this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return RecoveryCodesResponse.Read(generated);
     }
 
     /// <inheritdoc />
