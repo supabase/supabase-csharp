@@ -30,6 +30,7 @@ public class ObservabilityContractTests
 {
     private const string AccessToken = "an-access-token";
     private const string RefreshTokenValue = "a-refresh-token";
+    private static readonly Guid DeletedPasskeyId = Guid.Parse("5f0b6c1e-8a43-4d1f-9c7e-2b8f3e6a1d24");
 
     private readonly List<Activity> activities = new();
     private readonly List<RecordedMeasurement> measurements = new();
@@ -139,6 +140,17 @@ public class ObservabilityContractTests
         await this.client.ListPasskeysAsync();
         var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.list_passkeys").Which;
         this.activities.Should().ContainSingle(a => a.OperationName == "GET /passkeys").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeyDeletion()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeyDeletionSuccess();
+        await this.client.DeletePasskeyAsync(DeletedPasskeyId);
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.delete_passkey").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == $"DELETE /passkeys/{DeletedPasskeyId}").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
     }
 
     [TestMethod]
@@ -298,6 +310,11 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ListPasskeys", "Data", "passkeys.json"))));
+
+    private void MockPasskeyDeletionSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath($"/passkeys/{DeletedPasskeyId}").UsingDelete())
+            .RespondWith(Response.Create().WithStatusCode(204));
 
     private void MockRecoveryCodesStatusSuccess() =>
         this.server

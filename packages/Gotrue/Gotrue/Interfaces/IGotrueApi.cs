@@ -93,6 +93,15 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<IReadOnlyList<Passkey>> ListPasskeysAsync(string jwt, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Deletes one of the user's passkeys.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level when the user has MFA enabled.</param>
+    /// <param name="passkeyId">The id of the passkey.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task DeletePasskeyAsync(string jwt, Guid passkeyId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Generates the user's one-time set of MFA recovery codes.
     /// </summary>
     /// <param name="jwt">The user's access token, at the aal2 assurance level.</param>

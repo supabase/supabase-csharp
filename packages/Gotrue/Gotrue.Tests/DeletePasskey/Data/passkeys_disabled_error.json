@@ -1,0 +1,5 @@
+{
+  "code": 404,
+  "error_code": "passkey_disabled",
+  "msg": "Passkeys are disabled"
+}

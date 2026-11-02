@@ -4,9 +4,13 @@ override Supabase.Gotrue.ListPasskeys.Passkey.GetHashCode() -> int
 override Supabase.Gotrue.ListPasskeys.Passkey.ToString() -> string!
 static Supabase.Gotrue.ListPasskeys.Passkey.operator !=(Supabase.Gotrue.ListPasskeys.Passkey? left, Supabase.Gotrue.ListPasskeys.Passkey? right) -> bool
 static Supabase.Gotrue.ListPasskeys.Passkey.operator ==(Supabase.Gotrue.ListPasskeys.Passkey? left, Supabase.Gotrue.ListPasskeys.Passkey? right) -> bool
+Supabase.Gotrue.Api.DeletePasskeyAsync(string! jwt, System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Api.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Client.DeletePasskeyAsync(System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Client.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeletePasskeyAsync(string! jwt, System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.DeletePasskeyAsync(System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
 Supabase.Gotrue.ListPasskeys.Passkey
 Supabase.Gotrue.ListPasskeys.Passkey.<Clone>$() -> Supabase.Gotrue.ListPasskeys.Passkey!

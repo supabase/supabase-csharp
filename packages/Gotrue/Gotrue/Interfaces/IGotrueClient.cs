@@ -523,6 +523,30 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     Task<IReadOnlyList<Passkey>> ListPasskeysAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Deletes one of the signed-in user's passkeys, revoking that credential: it can no longer sign the user in.
+    ///     No admin privileges are needed. When the user has multi-factor authentication enabled, the session must be
+    ///     at the <c>aal2</c> assurance level. The current session is kept.
+    /// </summary>
+    /// <param name="passkeyId">The id of the passkey, as listed by <see cref="ListPasskeysAsync" />.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>insufficient_aal</c> (403) when the user has MFA enabled and the session is not at <c>aal2</c>,
+    ///     <c>validation_failed</c> (404) when the user has no passkey with that id,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var passkeys = await client.ListPasskeysAsync();
+    ///     var lost = passkeys.First(passkey => passkey.FriendlyName == "Old laptop");
+    ///     await client.DeletePasskeyAsync(lost.Id);
+    ///     </code>
+    /// </example>
+    Task DeletePasskeyAsync(Guid passkeyId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Add a listener to get errors that occur outside of a typical Exception flow.
     ///     In particular, this is used to get errors and messages from the background thread
     ///     that automatically manages refreshing the user's token.
