@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
@@ -225,13 +226,27 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
 
             if (state?.Payload == null) return;
 
-            // Remove any result that has "left"
-            foreach (var item in state.Payload.Leaves!)
-                this.CurrentState.Remove(item.Key);
-
-            // Add any results that have come in.
             foreach (var item in state.Payload.Joins!)
-                this.CurrentState[item.Key] = item.Value.Metas!;
+            {
+                var joined = item.Value.Metas!;
+                var joinedRefs = joined.Select(m => m.PhoenixRef).ToHashSet();
+                this.CurrentState[item.Key] = this.CurrentState.GetValueOrDefault(item.Key, [])
+                    .Where(m => !joinedRefs.Contains(m.PhoenixRef))
+                    .Concat(joined)
+                    .ToList();
+            }
+
+            foreach (var item in state.Payload.Leaves!)
+            {
+                var leftRefs = item.Value.Metas!.Select(m => m.PhoenixRef).ToHashSet();
+                var metas = this.CurrentState.GetValueOrDefault(item.Key, [])
+                    .Where(m => !leftRefs.Contains(m.PhoenixRef))
+                    .ToList();
+                if (metas.Count > 0)
+                    this.CurrentState[item.Key] = metas;
+                else
+                    this.CurrentState.Remove(item.Key);
+            }
         }
         else
         {
