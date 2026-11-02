@@ -22,6 +22,7 @@ using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.VerifyRecoveryCode;
 using static Supabase.Gotrue.Constants;
 
 namespace Supabase.Gotrue;
@@ -664,6 +665,10 @@ public class Api : IGotrueApi<User, Session>
         var generated = await this.MakeRequestAsync<RecoveryCodesResponse>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes", GenerateRecoveryCodesBody.For(options), this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return RecoveryCodesResponse.Read(generated);
     }
+
+    /// <inheritdoc />
+    public Task<Session?> VerifyRecoveryCodeAsync(string jwt, string code, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes/verify", new VerifyRecoveryCodeBody(code), this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
     /// <inheritdoc />
     public Task UnenrollRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default) =>

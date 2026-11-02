@@ -1240,6 +1240,35 @@ public class Client : IGotrueClient<User, Session>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.mfa_recovery_codes.verify")]
+    public async Task<Session> VerifyRecoveryCodeAsync(string code, CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.VerifyRecoveryCode);
+        RequireRecoveryCode(code);
+        if (!this.Online)
+        {
+            throw new GotrueException("Only supported when online", Offline);
+        }
+        var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
+        var verified = await this.api.VerifyRecoveryCodeAsync(accessToken, code, cancellationToken).ConfigureAwait(false);
+        var session = RequireVerifiedSession(verified);
+        await this.UpdateSessionAsync(session).ConfigureAwait(false);
+        await this.NotifyAuthStateChangeAsync(MfaChallengeVerified).ConfigureAwait(false);
+        return session;
+    }
+
+    private static void RequireRecoveryCode(string code)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            throw new ArgumentException("A recovery code is required.", nameof(code));
+        }
+    }
+
+    private static Session RequireVerifiedSession(Session? verified) =>
+        string.IsNullOrEmpty(verified?.AccessToken) ? throw new GotrueException("Could not verify MFA.", MfaChallengeUnverified) : verified!;
+
+    /// <inheritdoc />
     [ImplementedCapability("auth.mfa_recovery_codes.unenroll")]
     public async Task UnenrollRecoveryCodesAsync(CancellationToken cancellationToken = default)
     {

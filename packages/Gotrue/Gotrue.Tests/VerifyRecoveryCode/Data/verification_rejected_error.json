@@ -1,0 +1,5 @@
+{
+  "code": 403,
+  "error_code": "mfa_verification_rejected",
+  "msg": "Further MFA verification attempts will be rejected."
+}
