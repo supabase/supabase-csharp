@@ -233,10 +233,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignUp);
         activity?.SetTag(GotrueInstrumentation.Tags.SignUpType, type.ToString());
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var session = type switch
         {
             SignUpType.Email => await this.api.SignUpWithEmail(identifier, password, options),
@@ -258,10 +255,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<bool> SignIn(string email, SignInOptions? options = null)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SendMagicLink);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         await this.api.SendMagicLinkEmail(email, options);
         return true;
     }
@@ -273,10 +267,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInWithIdToken);
         activity?.SetTag(GotrueInstrumentation.Tags.Provider, provider.ToString());
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var result = await this.api.SignInWithIdToken(provider, idToken, accessToken, nonce, captchaToken);
         await this.UpdateSessionAsync(result).ConfigureAwait(false);
         await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
@@ -289,10 +280,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInWithOtp);
         activity?.SetTag(GotrueInstrumentation.Tags.OtpChannel, GotrueInstrumentation.Channels.Email);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         return await this.api.SignInWithOtp(options);
     }
 
@@ -301,10 +289,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInWithOtp);
         activity?.SetTag(GotrueInstrumentation.Tags.OtpChannel, GotrueInstrumentation.Channels.Phone);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         return await this.api.SignInWithOtp(options);
     }
 
@@ -341,10 +326,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignIn);
         activity?.SetTag(GotrueInstrumentation.Tags.SignInType, type.ToString());
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         Session? newSession;
         switch (type)
         {
@@ -384,10 +366,7 @@ public class Client : IGotrueClient<User, Session>
     /// <inheritdoc />
     public async Task<ProviderAuthState> SignIn(Provider provider, SignInOptions? options = null)
     {
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         return this.api.GetUriForProvider(provider, options);
     }
 
@@ -395,20 +374,14 @@ public class Client : IGotrueClient<User, Session>
     [ImplementedCapability("auth.sign_in.sign_in_with_sso")]
     public async Task<SSOResponse?> SignInWithSSO(Guid providerId, SignInWithSSOOptions? options = null)
     {
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         return await this.api.SignInWithSSO(providerId, options).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<SSOResponse?> SignInWithSSO(string domain, SignInWithSSOOptions? options = null)
     {
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         return await this.api.SignInWithSSO(domain, options).ConfigureAwait(false);
     }
 
@@ -417,10 +390,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<Session?> SignInAnonymously(SignInAnonymouslyOptions? options = null)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInAnonymously);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var newSession = await this.api.SignInAnonymously(options);
         await this.UpdateSessionAsync(newSession).ConfigureAwait(false);
         await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
@@ -433,10 +403,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.VerifyOtp);
         activity?.SetTag(GotrueInstrumentation.Tags.OtpChannel, GotrueInstrumentation.Channels.Phone);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var session = await this.api.VerifyMobileOTP(phone, token, type);
         if (session?.AccessToken != null)
         {
@@ -452,10 +419,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.VerifyOtp);
         activity?.SetTag(GotrueInstrumentation.Tags.OtpChannel, GotrueInstrumentation.Channels.Email);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var session = await this.api.VerifyEmailOTP(email, token, type);
         if (session?.AccessToken != null)
         {
@@ -471,10 +435,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<Session?> VerifyTokenHash(string tokenHash, EmailOtpType type = EmailOtpType.Email)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.VerifyTokenHash);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var session = await this.api.VerifyTokenHash(tokenHash, type);
         if (session?.AccessToken != null)
         {
@@ -489,10 +450,7 @@ public class Client : IGotrueClient<User, Session>
     [ImplementedCapability("auth.identities.link_identity")]
     public Task<ProviderAuthState> LinkIdentity(Provider provider, SignInOptions options)
     {
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         if (this.CurrentSession == null || this.CurrentUser == null)
         {
             throw new GotrueException("A valid session is required.", NoSessionFound);
@@ -509,10 +467,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.LinkIdentityWithIdToken);
         activity?.SetTag(GotrueInstrumentation.Tags.Provider, options.Provider.ToString());
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         if (this.CurrentSession == null || this.CurrentUser == null)
         {
             throw new GotrueException("A valid session is required.", NoSessionFound);
@@ -530,10 +485,7 @@ public class Client : IGotrueClient<User, Session>
     [ImplementedCapability("auth.identities.unlink_identity")]
     public Task<bool> UnlinkIdentity(UserIdentity userIdentity)
     {
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         if (this.CurrentSession == null || this.CurrentUser == null)
         {
             throw new GotrueException("A valid session is required.", NoSessionFound);
@@ -546,10 +498,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<IReadOnlyList<UserIdentity>> GetUserIdentitiesAsync(CancellationToken cancellationToken = default)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GetUserIdentities);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         var user = await this.api.GetUserAsync(accessToken, cancellationToken).ConfigureAwait(false);
         return user?.Identities ?? new List<UserIdentity>();
@@ -560,10 +509,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<IReadOnlyList<Passkey>> ListPasskeysAsync(CancellationToken cancellationToken = default)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.ListPasskeys);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         return await this.api.ListPasskeysAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
@@ -573,10 +519,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task DeletePasskeyAsync(Guid passkeyId, CancellationToken cancellationToken = default)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.DeletePasskey);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         await this.api.DeletePasskeyAsync(accessToken, passkeyId, cancellationToken).ConfigureAwait(false);
     }
@@ -613,10 +556,7 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Not Logged in.");
         }
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var result = await this.api.UpdateUser(session.AccessToken!, attributes);
         // The session may have refreshed meanwhile, so the update lands on the current one if it is still this user's.
         var current = this.CurrentSession;
@@ -637,10 +577,7 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Not Logged in.", NoSessionFound);
         }
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var response = await this.api.Reauthenticate(this.CurrentSession.AccessToken!);
         return response.ResponseMessage?.IsSuccessStatusCode ?? false;
     }
@@ -669,10 +606,6 @@ public class Client : IGotrueClient<User, Session>
         if (this.CurrentSession == null || string.IsNullOrEmpty(this.CurrentSession.AccessToken))
         {
             throw new GotrueException("Not Logged in.", NoSessionFound);
-        }
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
         }
         await this.RefreshToken();
         var session = this.CurrentSession;
@@ -875,10 +808,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task RefreshToken(string accessToken, string refreshToken)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RefreshToken);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
         {
             throw new GotrueException("No token provided", NoSessionFound);
@@ -909,10 +839,7 @@ public class Client : IGotrueClient<User, Session>
     /// <inheritdoc />
     public async Task RefreshToken()
     {
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         Task attempt;
         // Refresh tokens are single-use, and startup can race the auto-refresh timer here - so callers share the in-flight attempt.
         // The session is read and the attempt registered under one hold of the gate, so a sign-out cannot interleave.
@@ -1081,10 +1008,7 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Not Logged in.", NoSessionFound);
         }
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         return await this.api.Enroll(this.CurrentSession.AccessToken, mfaEnrollParams);
     }
 
@@ -1096,10 +1020,7 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Not Logged in.", NoSessionFound);
         }
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         return await this.api.Challenge(this.CurrentSession.AccessToken, mfaChallengeParams);
     }
 
@@ -1111,10 +1032,7 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Not Logged in.", NoSessionFound);
         }
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var result = await this.api.Verify(this.CurrentSession.AccessToken, mfaVerifyParams);
         if (result == null || string.IsNullOrEmpty(result.AccessToken))
         {
@@ -1141,10 +1059,7 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Not Logged in.", NoSessionFound);
         }
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var challengeResponse = await this.api.Challenge(this.CurrentSession.AccessToken, new MfaChallengeParams
         {
             FactorId = mfaChallengeAndVerifyParams.FactorId,
@@ -1184,10 +1099,7 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("Not Logged in.", NoSessionFound);
         }
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         return await this.api.Unenroll(this.CurrentSession.AccessToken, mfaUnenrollParams);
     }
 
@@ -1245,10 +1157,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(CancellationToken cancellationToken = default)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GetRecoveryCodesStatus);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         return await this.api.GetRecoveryCodesStatusAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
@@ -1258,10 +1167,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GenerateRecoveryCodes);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         return await this.api.GenerateRecoveryCodesAsync(accessToken, options, cancellationToken).ConfigureAwait(false);
     }
@@ -1272,10 +1178,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.VerifyRecoveryCode);
         RequireRecoveryCode(code);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         var verified = await this.api.VerifyRecoveryCodeAsync(accessToken, code, cancellationToken).ConfigureAwait(false);
         var session = RequireVerifiedSession(verified);
@@ -1300,10 +1203,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task UnenrollRecoveryCodesAsync(CancellationToken cancellationToken = default)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.UnenrollRecoveryCodes);
-        if (!this.Online)
-        {
-            throw new GotrueException("Only supported when online", Offline);
-        }
+        this.ThrowWhenOffline();
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         await this.api.UnenrollRecoveryCodesAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
@@ -1358,6 +1258,14 @@ public class Client : IGotrueClient<User, Session>
             this.jwksCache = new JwksCache(fetched, DateTime.UtcNow);
         }
         return Match(fetched);
+    }
+
+    private void ThrowWhenOffline()
+    {
+        if (!this.Online)
+        {
+            throw new GotrueException("Only supported when online", Offline);
+        }
     }
 
     private AuthState? SetCurrentSession(Session? session)
