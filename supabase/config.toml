@@ -217,6 +217,16 @@ message_service_sid = "test-service-sid"
 # DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
 auth_token = "test-auth-token"
 
+# Passkey sign-ins and management (/auth/v1/passkeys), used by the passkey E2E tests.
+[auth.passkey]
+enabled = true
+
+# WebAuthn relying party for passkeys. The E2E tests' software authenticator signs for this rp_id and origin.
+[auth.webauthn]
+rp_display_name = "Supabase C# SDK tests"
+rp_id = "localhost"
+rp_origins = ["http://localhost:3000"]
+
 # Multi-factor-authentication is available to Supabase Pro plan.
 [auth.mfa]
 # Control how many MFA factors can be enrolled at once per user.

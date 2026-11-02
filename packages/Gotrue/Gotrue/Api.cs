@@ -17,6 +17,7 @@ using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
+using Supabase.Gotrue.ListPasskeys;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -657,6 +658,13 @@ public class Api : IGotrueApi<User, Session>
         {
             return RecoveryCodesStatusResponse.NotEnrolled;
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<Passkey>> ListPasskeysAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var passkeys = await this.MakeRequestAsync<IReadOnlyList<PasskeyResponse>>(HttpMethod.Get, $"{this.Url}/passkeys", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyResponse.Read(passkeys);
     }
 
     /// <inheritdoc />

@@ -10,6 +10,7 @@ using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
+using Supabase.Gotrue.ListPasskeys;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -496,6 +497,30 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     </code>
     /// </example>
     Task<IReadOnlyList<UserIdentity>> GetUserIdentitiesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Lists the passkeys the signed-in user has registered, oldest first, read from the server so the user can
+    ///     review the credentials tied to their account. Returns an empty list when the user has none. Works at any
+    ///     authenticator assurance level.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The signed-in user's passkeys, in registration order.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />
+    ///     (<c>passkey_disabled</c> when passkeys are disabled on the server).
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var passkeys = await client.ListPasskeysAsync();
+    ///     foreach (var passkey in passkeys)
+    ///     {
+    ///         Console.WriteLine($"{passkey.FriendlyName ?? "Passkey"}, last used {passkey.LastUsedAt?.ToString() ?? "never"}");
+    ///     }
+    ///     </code>
+    /// </example>
+    Task<IReadOnlyList<Passkey>> ListPasskeysAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Add a listener to get errors that occur outside of a typical Exception flow.

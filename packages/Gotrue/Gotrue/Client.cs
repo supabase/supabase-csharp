@@ -16,6 +16,7 @@ using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
+using Supabase.Gotrue.ListPasskeys;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -552,6 +553,19 @@ public class Client : IGotrueClient<User, Session>
         var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
         var user = await this.api.GetUserAsync(accessToken, cancellationToken).ConfigureAwait(false);
         return user?.Identities ?? new List<UserIdentity>();
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.passkey.list_passkeys")]
+    public async Task<IReadOnlyList<Passkey>> ListPasskeysAsync(CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.ListPasskeys);
+        if (!this.Online)
+        {
+            throw new GotrueException("Only supported when online", Offline);
+        }
+        var accessToken = this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
+        return await this.api.ListPasskeysAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

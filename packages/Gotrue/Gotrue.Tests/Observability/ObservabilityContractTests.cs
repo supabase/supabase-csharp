@@ -131,6 +131,17 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeysListing()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeysSuccess();
+        await this.client.ListPasskeysAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.list_passkeys").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "GET /passkeys").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
     public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodesStatusReading()
     {
         this.MockTokenSuccess();
@@ -279,6 +290,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Identities", "Data", "user_with_identities.json"))));
+
+    private void MockPasskeysSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/passkeys").UsingGet())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ListPasskeys", "Data", "passkeys.json"))));
 
     private void MockRecoveryCodesStatusSuccess() =>
         this.server

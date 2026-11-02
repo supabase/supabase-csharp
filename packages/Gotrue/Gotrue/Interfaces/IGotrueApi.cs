@@ -8,6 +8,7 @@ using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
+using Supabase.Gotrue.ListPasskeys;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -81,6 +82,15 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <returns>The recovery codes status, or null when the user has no recovery codes.</returns>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the passkeys the user has registered, oldest first.
+    /// </summary>
+    /// <param name="jwt">The user's access token.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The user's passkeys, empty when the user has none.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<Passkey>> ListPasskeysAsync(string jwt, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Generates the user's one-time set of MFA recovery codes.
