@@ -718,6 +718,42 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     Task<RecoveryCodes> GenerateRecoveryCodesAsync(GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Redeems one of the signed-in user's single-use MFA recovery codes and upgrades the session to the
+    ///     <c>aal2</c> assurance level. Use it when the user cannot reach their other factors, such as a lost
+    ///     authenticator app. The code is consumed: it cannot be used again. Letter case, whitespace and <c>-</c>
+    ///     separators are ignored by the server, so pass the code as the user typed it.
+    ///     On success the new session replaces the current one and is persisted, listeners receive
+    ///     <see cref="Constants.AuthState.UserUpdated" /> then <see cref="Constants.AuthState.MfaChallengeVerified" />,
+    ///     and the server signs out the user's other <c>aal1</c> sessions.
+    ///     Recovery codes are experimental on the auth server.
+    /// </summary>
+    /// <param name="code">The recovery code as the user typed it.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The new session, at the <c>aal2</c> assurance level.</returns>
+    /// <exception cref="ArgumentException">When <paramref name="code" /> is null, empty or whitespace.</exception>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     <see cref="FailureHint.Reason.MfaChallengeUnverified" /> when the code is wrong or already used
+    ///     (<c>mfa_verification_failed</c>), the verification hook rejected it (<c>mfa_verification_rejected</c>),
+    ///     or the server answered without a session,
+    ///     <see cref="FailureHint.Reason.UserTooManyRequests" /> when verification is locked after too many failed
+    ///     attempts (<c>mfa_recovery_codes_locked</c>) or rate limited (<c>over_request_rate_limit</c>),
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>mfa_recovery_codes_verify_not_enabled</c> when recovery codes are disabled on the server,
+    ///     <c>no_authorization</c> for an anonymous user.
+    ///     The current session is kept on every failure.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     await client.SignIn(email, password);
+    ///     var session = await client.VerifyRecoveryCodeAsync("K4M9-X7QP-2AB8-HT3Z");
+    ///     // the session is now at aal2
+    ///     </code>
+    /// </example>
+    Task<TSession> VerifyRecoveryCodeAsync(string code, CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Removes the signed-in user's MFA recovery codes factor, invalidating every remaining code. The session must
     ///     be at the <c>aal2</c> assurance level. Sessions that reached <c>aal2</c> with a recovery code are lowered to
     ///     <c>aal1</c> on the server; the current session keeps its tokens until it is refreshed.

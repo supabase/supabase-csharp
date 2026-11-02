@@ -164,6 +164,17 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodeVerification()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockRecoveryCodeVerificationSuccess();
+        await this.client.VerifyRecoveryCodeAsync("K4M9-X7QP-2AB8-HT3Z");
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.verify_recovery_code").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /factors/recovery-codes/verify").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
     public async Task HttpSpan_ShouldBeMarkedError_GivenFailedRequest()
     {
         this.MockTokenFailure();
@@ -292,6 +303,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UnenrollRecoveryCodes", "Data", "unenrolled.json"))));
+
+    private void MockRecoveryCodeVerificationSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/factors/recovery-codes/verify").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "VerifyRecoveryCode", "Data", "verified_session.json"))));
 
     private void MockTokenFailure() =>
         this.server

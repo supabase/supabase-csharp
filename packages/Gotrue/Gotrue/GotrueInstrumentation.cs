@@ -74,6 +74,7 @@ internal static class GotrueInstrumentation
         internal const string GetRecoveryCodesStatus = "gotrue.get_recovery_codes_status";
         internal const string GenerateRecoveryCodes = "gotrue.generate_recovery_codes";
         internal const string UnenrollRecoveryCodes = "gotrue.unenroll_recovery_codes";
+        internal const string VerifyRecoveryCode = "gotrue.verify_recovery_code";
         internal const string SignInWithOtp = "gotrue.sign_in.otp";
         internal const string SignIn = "gotrue.sign_in";
         internal const string SignInAnonymously = "gotrue.sign_in.anonymous";
