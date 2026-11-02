@@ -57,6 +57,11 @@ features:
       - Client.VerifyOTP
       - Client.VerifyTokenHash
 
+  auth.passkey.list_passkeys:
+    status: implemented
+    symbols:
+      - Client.ListPasskeysAsync
+
   auth.session.auto_refresh:
     status: implemented
     symbols:
