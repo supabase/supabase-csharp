@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
@@ -447,6 +448,16 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
             this.subscriptions.Remove(channel.Topic);
         }
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.client.remove_all_channels")]
+    public void RemoveAll()
+    {
+        foreach (var channel in this.subscriptions.Values.ToArray())
+            channel.Unsubscribe();
+
+        this.Disconnect();
     }
 
     /// <summary>

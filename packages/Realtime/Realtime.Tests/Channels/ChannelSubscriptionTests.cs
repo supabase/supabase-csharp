@@ -89,6 +89,18 @@ public class ChannelSubscriptionTests
     }
 
     [TestMethod]
+    public async Task RemoveAll_ShouldCloseEveryChannel()
+    {
+        var todos = this.client.Channel("realtime", "public", "todos");
+        var room = this.client.Channel("room");
+        await todos.Subscribe();
+        await room.Subscribe();
+        this.client.RemoveAll();
+        Assert.IsTrue(todos.IsClosed);
+        Assert.IsTrue(room.IsClosed);
+    }
+
+    [TestMethod]
     public async Task SetAuth_ShouldPushAccessTokenToJoinedChannelsOnly()
     {
         var first = this.client.Channel("realtime", "public", "todos");
