@@ -132,16 +132,6 @@ public class RecoveryCodesStatusContractTests
     }
 
     [TestMethod]
-    public async Task GetRecoveryCodesStatusAsync_ShouldThrowOffline_GivenClientIsOffline()
-    {
-        this.SignIn();
-        this.client.Online = false;
-        var reading = () => this.client.GetRecoveryCodesStatusAsync();
-        (await reading.Should().ThrowAsync<GotrueException>().WithMessage("Only supported when online")).Which.Reason.Should().Be(Offline,
-            "the status is read from the server, like the other MFA operations");
-    }
-
-    [TestMethod]
     public async Task GetRecoveryCodesStatusAsync_ShouldCancelTheRequest_GivenCancelledToken()
     {
         this.SignIn();

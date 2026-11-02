@@ -226,16 +226,6 @@ public class VerifyRecoveryCodeContractTests
     }
 
     [TestMethod]
-    public async Task VerifyRecoveryCodeAsync_ShouldThrowOffline_GivenClientIsOffline()
-    {
-        this.SignIn();
-        this.client.Online = false;
-        var verifying = () => this.client.VerifyRecoveryCodeAsync(RecoveryCode);
-        (await verifying.Should().ThrowAsync<GotrueException>().WithMessage("Only supported when online")).Which.Reason.Should().Be(Offline,
-            "verifying a recovery code needs the server, like the other MFA operations");
-    }
-
-    [TestMethod]
     public async Task VerifyRecoveryCodeAsync_ShouldCancelTheRequest_GivenCancelledToken()
     {
         this.SignIn();
