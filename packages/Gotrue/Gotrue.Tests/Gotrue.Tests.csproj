@@ -39,6 +39,7 @@
     <None Update="UnenrollRecoveryCodes\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="GenerateRecoveryCodes\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="VerifyRecoveryCode\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="ListPasskeys\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

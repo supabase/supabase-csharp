@@ -1,1 +1,22 @@
 #nullable enable
+override Supabase.Gotrue.ListPasskeys.Passkey.Equals(object? obj) -> bool
+override Supabase.Gotrue.ListPasskeys.Passkey.GetHashCode() -> int
+override Supabase.Gotrue.ListPasskeys.Passkey.ToString() -> string!
+static Supabase.Gotrue.ListPasskeys.Passkey.operator !=(Supabase.Gotrue.ListPasskeys.Passkey? left, Supabase.Gotrue.ListPasskeys.Passkey? right) -> bool
+static Supabase.Gotrue.ListPasskeys.Passkey.operator ==(Supabase.Gotrue.ListPasskeys.Passkey? left, Supabase.Gotrue.ListPasskeys.Passkey? right) -> bool
+Supabase.Gotrue.Api.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Client.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.ListPasskeys.Passkey
+Supabase.Gotrue.ListPasskeys.Passkey.<Clone>$() -> Supabase.Gotrue.ListPasskeys.Passkey!
+Supabase.Gotrue.ListPasskeys.Passkey.CreatedAt.get -> System.DateTime
+Supabase.Gotrue.ListPasskeys.Passkey.CreatedAt.init -> void
+Supabase.Gotrue.ListPasskeys.Passkey.Equals(Supabase.Gotrue.ListPasskeys.Passkey? other) -> bool
+Supabase.Gotrue.ListPasskeys.Passkey.FriendlyName.get -> string?
+Supabase.Gotrue.ListPasskeys.Passkey.FriendlyName.init -> void
+Supabase.Gotrue.ListPasskeys.Passkey.Id.get -> System.Guid
+Supabase.Gotrue.ListPasskeys.Passkey.Id.init -> void
+Supabase.Gotrue.ListPasskeys.Passkey.LastUsedAt.get -> System.DateTime?
+Supabase.Gotrue.ListPasskeys.Passkey.LastUsedAt.init -> void
+Supabase.Gotrue.ListPasskeys.Passkey.Passkey() -> void
