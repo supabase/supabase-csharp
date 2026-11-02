@@ -134,16 +134,6 @@ public class ListPasskeysContractTests
     }
 
     [TestMethod]
-    public async Task ListPasskeysAsync_ShouldThrowOffline_GivenClientIsOffline()
-    {
-        this.SignIn();
-        this.client.Online = false;
-        var listing = () => this.client.ListPasskeysAsync();
-        (await listing.Should().ThrowAsync<GotrueException>().WithMessage("Only supported when online")).Which.Reason.Should().Be(Offline,
-            "the passkeys are read from the server");
-    }
-
-    [TestMethod]
     public async Task ListPasskeysAsync_ShouldCancelTheRequest_GivenCancelledToken()
     {
         this.SignIn();

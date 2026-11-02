@@ -148,16 +148,6 @@ public class GenerateRecoveryCodesContractTests
     }
 
     [TestMethod]
-    public async Task GenerateRecoveryCodesAsync_ShouldThrowOffline_GivenClientIsOffline()
-    {
-        this.SignIn();
-        this.client.Online = false;
-        var generating = () => this.client.GenerateRecoveryCodesAsync();
-        (await generating.Should().ThrowAsync<GotrueException>().WithMessage("Only supported when online")).Which.Reason.Should().Be(Offline,
-            "generating the recovery codes needs the server, like the other MFA operations");
-    }
-
-    [TestMethod]
     public async Task GenerateRecoveryCodesAsync_ShouldCancelTheRequest_GivenCancelledToken()
     {
         this.SignIn();

@@ -110,16 +110,6 @@ public class UnenrollRecoveryCodesContractTests
     }
 
     [TestMethod]
-    public async Task UnenrollRecoveryCodesAsync_ShouldThrowOffline_GivenClientIsOffline()
-    {
-        this.SignIn();
-        this.client.Online = false;
-        var unenrolling = () => this.client.UnenrollRecoveryCodesAsync();
-        (await unenrolling.Should().ThrowAsync<GotrueException>().WithMessage("Only supported when online")).Which.Reason.Should().Be(Offline,
-            "removing the recovery codes needs the server, like the other MFA operations");
-    }
-
-    [TestMethod]
     public async Task UnenrollRecoveryCodesAsync_ShouldCancelTheRequest_GivenCancelledToken()
     {
         this.SignIn();

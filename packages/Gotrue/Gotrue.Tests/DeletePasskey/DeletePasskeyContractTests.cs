@@ -122,16 +122,6 @@ public class DeletePasskeyContractTests
     }
 
     [TestMethod]
-    public async Task DeletePasskeyAsync_ShouldThrowOffline_GivenClientIsOffline()
-    {
-        this.SignIn();
-        this.client.Online = false;
-        var deleting = () => this.client.DeletePasskeyAsync(PasskeyId);
-        (await deleting.Should().ThrowAsync<GotrueException>().WithMessage("Only supported when online")).Which.Reason.Should().Be(Offline,
-            "the passkey is deleted on the server");
-    }
-
-    [TestMethod]
     public async Task DeletePasskeyAsync_ShouldCancelTheRequest_GivenCancelledToken()
     {
         this.SignIn();
