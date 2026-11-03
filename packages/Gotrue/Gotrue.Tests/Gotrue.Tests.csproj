@@ -46,6 +46,7 @@
     <None Update="RenamePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="SignInWithPasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="AdminListPasskeys\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="AdminDeletePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
