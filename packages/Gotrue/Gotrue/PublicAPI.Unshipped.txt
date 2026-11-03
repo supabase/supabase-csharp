@@ -1,30 +1,34 @@
 #nullable enable
-override Supabase.Gotrue.ListPasskeys.Passkey.Equals(object? obj) -> bool
-override Supabase.Gotrue.ListPasskeys.Passkey.GetHashCode() -> int
-override Supabase.Gotrue.ListPasskeys.Passkey.ToString() -> string!
-static Supabase.Gotrue.ListPasskeys.Passkey.operator !=(Supabase.Gotrue.ListPasskeys.Passkey? left, Supabase.Gotrue.ListPasskeys.Passkey? right) -> bool
-static Supabase.Gotrue.ListPasskeys.Passkey.operator ==(Supabase.Gotrue.ListPasskeys.Passkey? left, Supabase.Gotrue.ListPasskeys.Passkey? right) -> bool
+override Supabase.Gotrue.Common.Passkey.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.Passkey.GetHashCode() -> int
+override Supabase.Gotrue.Common.Passkey.ToString() -> string!
+static Supabase.Gotrue.Common.Passkey.operator !=(Supabase.Gotrue.Common.Passkey? left, Supabase.Gotrue.Common.Passkey? right) -> bool
+static Supabase.Gotrue.Common.Passkey.operator ==(Supabase.Gotrue.Common.Passkey? left, Supabase.Gotrue.Common.Passkey? right) -> bool
 Supabase.Gotrue.Api.DeletePasskeyAsync(string! jwt, System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Gotrue.Api.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Api.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.Passkey!>!>!
 Supabase.Gotrue.Api.RegenerateRecoveryCodesAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Api.RenamePasskeyAsync(string! jwt, System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Client.DeletePasskeyAsync(System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Gotrue.Client.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Client.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.Passkey!>!>!
 Supabase.Gotrue.Client.RegenerateRecoveryCodesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Client.RenamePasskeyAsync(System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
+Supabase.Gotrue.Common.Passkey
+Supabase.Gotrue.Common.Passkey.<Clone>$() -> Supabase.Gotrue.Common.Passkey!
+Supabase.Gotrue.Common.Passkey.CreatedAt.get -> System.DateTimeOffset
+Supabase.Gotrue.Common.Passkey.CreatedAt.init -> void
+Supabase.Gotrue.Common.Passkey.Equals(Supabase.Gotrue.Common.Passkey? other) -> bool
+Supabase.Gotrue.Common.Passkey.FriendlyName.get -> string?
+Supabase.Gotrue.Common.Passkey.FriendlyName.init -> void
+Supabase.Gotrue.Common.Passkey.Id.get -> System.Guid
+Supabase.Gotrue.Common.Passkey.Id.init -> void
+Supabase.Gotrue.Common.Passkey.LastUsedAt.get -> System.DateTimeOffset?
+Supabase.Gotrue.Common.Passkey.LastUsedAt.init -> void
+Supabase.Gotrue.Common.Passkey.Passkey() -> void
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeletePasskeyAsync(string! jwt, System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.Passkey!>!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RegenerateRecoveryCodesAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RenamePasskeyAsync(string! jwt, System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.DeletePasskeyAsync(System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.ListPasskeys.Passkey!>!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.Passkey!>!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RegenerateRecoveryCodesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
-Supabase.Gotrue.ListPasskeys.Passkey
-Supabase.Gotrue.ListPasskeys.Passkey.<Clone>$() -> Supabase.Gotrue.ListPasskeys.Passkey!
-Supabase.Gotrue.ListPasskeys.Passkey.CreatedAt.get -> System.DateTime
-Supabase.Gotrue.ListPasskeys.Passkey.CreatedAt.init -> void
-Supabase.Gotrue.ListPasskeys.Passkey.Equals(Supabase.Gotrue.ListPasskeys.Passkey? other) -> bool
-Supabase.Gotrue.ListPasskeys.Passkey.FriendlyName.get -> string?
-Supabase.Gotrue.ListPasskeys.Passkey.FriendlyName.init -> void
-Supabase.Gotrue.ListPasskeys.Passkey.Id.get -> System.Guid
-Supabase.Gotrue.ListPasskeys.Passkey.Id.init -> void
-Supabase.Gotrue.ListPasskeys.Passkey.LastUsedAt.get -> System.DateTime?
-Supabase.Gotrue.ListPasskeys.Passkey.LastUsedAt.init -> void
-Supabase.Gotrue.ListPasskeys.Passkey.Passkey() -> void
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RenamePasskeyAsync(System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!

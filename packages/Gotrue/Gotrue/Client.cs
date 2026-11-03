@@ -16,7 +16,6 @@ using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
-using Supabase.Gotrue.ListPasskeys;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -522,6 +521,16 @@ public class Client : IGotrueClient<User, Session>
         this.ThrowWhenOffline();
         var accessToken = this.RetrieveAccessTokenOrThrow();
         await this.api.DeletePasskeyAsync(accessToken, passkeyId, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.passkey.update_passkey")]
+    public async Task<Passkey> RenamePasskeyAsync(Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RenamePasskey);
+        this.ThrowWhenOffline();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
+        return await this.api.RenamePasskeyAsync(accessToken, passkeyId, friendlyName, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

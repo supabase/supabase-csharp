@@ -1,0 +1,5 @@
+{
+  "code": 400,
+  "error_code": "validation_failed",
+  "msg": "friendly_name must be 120 characters or less"
+}
