@@ -207,6 +207,16 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<IReadOnlyList<Passkey>> AdminListPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Deletes one of a user's passkeys.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="userId">The id of the user who owns the passkey.</param>
+    /// <param name="passkeyId">The id of the passkey.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task AdminDeletePasskeyAsync(string jwt, Guid userId, Guid passkeyId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Deletes a custom OAuth/OIDC provider.
     /// </summary>
     /// <param name="jwt">A full-access API key, such as the service_role key.</param>

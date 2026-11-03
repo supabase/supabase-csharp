@@ -756,7 +756,13 @@ public class Api : IGotrueApi<User, Session>
         return PasskeyResponse.Read(passkeys);
     }
 
+    /// <inheritdoc />
+    public Task AdminDeletePasskeyAsync(string jwt, Guid userId, Guid passkeyId, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, this.AdminUserPasskeyUrl(userId, passkeyId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
     private string AdminUserPasskeysUrl(Guid userId) => $"{this.Url}/admin/users/{userId}/passkeys";
+
+    private string AdminUserPasskeyUrl(Guid userId, Guid passkeyId) => $"{this.AdminUserPasskeysUrl(userId)}/{passkeyId}";
 
     /// <inheritdoc />
     public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>
