@@ -507,53 +507,28 @@ public class Client : IGotrueClient<User, Session>
 
     /// <inheritdoc />
     [ImplementedCapability("auth.passkey.list_passkeys")]
-    public async Task<IReadOnlyList<Passkey>> ListPasskeysAsync(CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.ListPasskeys);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        return await this.api.ListPasskeysAsync(accessToken, cancellationToken).ConfigureAwait(false);
-    }
+    public Task<IReadOnlyList<Passkey>> ListPasskeysAsync(CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.ListPasskeys, accessToken => this.api.ListPasskeysAsync(accessToken, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.passkey.delete_passkey")]
-    public async Task DeletePasskeyAsync(Guid passkeyId, CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.DeletePasskey);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        await this.api.DeletePasskeyAsync(accessToken, passkeyId, cancellationToken).ConfigureAwait(false);
-    }
+    public Task DeletePasskeyAsync(Guid passkeyId, CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.DeletePasskey, accessToken => this.api.DeletePasskeyAsync(accessToken, passkeyId, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.passkey.update_passkey")]
-    public async Task<Passkey> RenamePasskeyAsync(Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RenamePasskey);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        return await this.api.RenamePasskeyAsync(accessToken, passkeyId, friendlyName, cancellationToken).ConfigureAwait(false);
-    }
+    public Task<Passkey> RenamePasskeyAsync(Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.RenamePasskey, accessToken => this.api.RenamePasskeyAsync(accessToken, passkeyId, friendlyName, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.passkey.register_passkey")]
-    public async Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.StartPasskeyRegistration);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        return await this.api.StartPasskeyRegistrationAsync(accessToken, cancellationToken).ConfigureAwait(false);
-    }
+    public Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.StartPasskeyRegistration, accessToken => this.api.StartPasskeyRegistrationAsync(accessToken, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.passkey.register_passkey")]
-    public async Task<Passkey> RegisterPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RegisterPasskey);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        return await this.api.RegisterPasskeyAsync(accessToken, challengeId, credential, cancellationToken).ConfigureAwait(false);
-    }
+    public Task<Passkey> RegisterPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.RegisterPasskey, accessToken => this.api.RegisterPasskeyAsync(accessToken, challengeId, credential, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.passkey.sign_in_with_passkey")]
@@ -1210,33 +1185,18 @@ public class Client : IGotrueClient<User, Session>
 
     /// <inheritdoc />
     [ImplementedCapability("auth.mfa_recovery_codes.get_status")]
-    public async Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GetRecoveryCodesStatus);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        return await this.api.GetRecoveryCodesStatusAsync(accessToken, cancellationToken).ConfigureAwait(false);
-    }
+    public Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.GetRecoveryCodesStatus, accessToken => this.api.GetRecoveryCodesStatusAsync(accessToken, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.mfa_recovery_codes.generate")]
-    public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GenerateRecoveryCodes);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        return await this.api.GenerateRecoveryCodesAsync(accessToken, options, cancellationToken).ConfigureAwait(false);
-    }
+    public Task<RecoveryCodes> GenerateRecoveryCodesAsync(GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.GenerateRecoveryCodes, accessToken => this.api.GenerateRecoveryCodesAsync(accessToken, options, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.mfa_recovery_codes.regenerate")]
-    public async Task<RecoveryCodes> RegenerateRecoveryCodesAsync(CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RegenerateRecoveryCodes);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        return await this.api.RegenerateRecoveryCodesAsync(accessToken, cancellationToken).ConfigureAwait(false);
-    }
+    public Task<RecoveryCodes> RegenerateRecoveryCodesAsync(CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.RegenerateRecoveryCodes, accessToken => this.api.RegenerateRecoveryCodesAsync(accessToken, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.mfa_recovery_codes.verify")]
@@ -1266,13 +1226,8 @@ public class Client : IGotrueClient<User, Session>
 
     /// <inheritdoc />
     [ImplementedCapability("auth.mfa_recovery_codes.unenroll")]
-    public async Task UnenrollRecoveryCodesAsync(CancellationToken cancellationToken = default)
-    {
-        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.UnenrollRecoveryCodes);
-        this.ThrowWhenOffline();
-        var accessToken = this.RetrieveAccessTokenOrThrow();
-        await this.api.UnenrollRecoveryCodesAsync(accessToken, cancellationToken).ConfigureAwait(false);
-    }
+    public Task UnenrollRecoveryCodesAsync(CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(GotrueInstrumentation.Spans.UnenrollRecoveryCodes, accessToken => this.api.UnenrollRecoveryCodesAsync(accessToken, cancellationToken));
 
     /// <inheritdoc />
     [ImplementedCapability("auth.session.get_claims")]
@@ -1324,6 +1279,20 @@ public class Client : IGotrueClient<User, Session>
             this.jwksCache = new JwksCache(fetched, DateTime.UtcNow);
         }
         return Match(fetched);
+    }
+
+    private async Task<T> AsSignedInUserAsync<T>(string span, Func<string, Task<T>> call)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(span);
+        this.ThrowWhenOffline();
+        return await call(this.RetrieveAccessTokenOrThrow()).ConfigureAwait(false);
+    }
+
+    private async Task AsSignedInUserAsync(string span, Func<string, Task> call)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(span);
+        this.ThrowWhenOffline();
+        await call(this.RetrieveAccessTokenOrThrow()).ConfigureAwait(false);
     }
 
     private void ThrowWhenOffline()
