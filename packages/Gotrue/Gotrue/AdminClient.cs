@@ -152,6 +152,11 @@ public class AdminClient : IGotrueAdminClient<User>
         this.api.UpdateFactorAsync(this.serviceKey, userId, factorId, changes, cancellationToken);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.passkey_admin.list_passkeys")]
+    public Task<IReadOnlyList<Passkey>> ListPasskeysAsync(Guid userId, CancellationToken cancellationToken = default) =>
+        this.api.ListUserPasskeysAsync(this.serviceKey, userId, cancellationToken);
+
+    /// <inheritdoc />
     [ImplementedCapability("auth.admin.delete_provider")]
     public Task DeleteCustomProviderAsync(string identifier, CancellationToken cancellationToken = default) =>
         this.api.DeleteCustomProviderAsync(this.serviceKey, identifier, cancellationToken);
