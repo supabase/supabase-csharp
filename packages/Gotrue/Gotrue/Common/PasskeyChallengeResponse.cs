@@ -3,9 +3,9 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Supabase.Gotrue.Exceptions;
 
-namespace Supabase.Gotrue.RegisterPasskey;
+namespace Supabase.Gotrue.Common;
 
-internal sealed record PasskeyRegistrationChallengeResponse
+internal sealed record PasskeyChallengeResponse
 {
     [JsonPropertyName("challenge_id")]
     public Guid ChallengeId { get; init; }
@@ -16,10 +16,10 @@ internal sealed record PasskeyRegistrationChallengeResponse
     [JsonPropertyName("expires_at")]
     public long ExpiresAt { get; init; }
 
-    internal static PasskeyRegistrationChallenge Read(PasskeyRegistrationChallengeResponse? response) =>
-        response?.ToChallenge() ?? throw new GotrueException("The auth server returned no passkey registration challenge.");
+    internal static PasskeyChallenge Read(PasskeyChallengeResponse? response) =>
+        response?.ToChallenge() ?? throw new GotrueException("The auth server returned no passkey challenge.");
 
-    private PasskeyRegistrationChallenge ToChallenge() =>
+    private PasskeyChallenge ToChallenge() =>
         new()
         {
             Id = this.ChallengeId,

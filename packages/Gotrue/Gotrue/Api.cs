@@ -683,10 +683,10 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
-    public async Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default)
+    public async Task<PasskeyChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default)
     {
-        var challenge = await this.MakeRequestAsync<PasskeyRegistrationChallengeResponse>(HttpMethod.Post, $"{this.Url}/passkeys/registration/options", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
-        return PasskeyRegistrationChallengeResponse.Read(challenge);
+        var challenge = await this.MakeRequestAsync<PasskeyChallengeResponse>(HttpMethod.Post, $"{this.Url}/passkeys/registration/options", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyChallengeResponse.Read(challenge);
     }
 
     /// <inheritdoc />
@@ -698,11 +698,11 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
-    public async Task<PasskeySignInChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<PasskeyChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default)
     {
         var body = StartPasskeySignInBody.For(options);
-        var challenge = await this.MakeRequestAsync<PasskeySignInChallengeResponse>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/options", body, this.Headers, cancellationToken).ConfigureAwait(false);
-        return PasskeySignInChallengeResponse.Read(challenge);
+        var challenge = await this.MakeRequestAsync<PasskeyChallengeResponse>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/options", body, this.Headers, cancellationToken).ConfigureAwait(false);
+        return PasskeyChallengeResponse.Read(challenge);
     }
 
     /// <inheritdoc />

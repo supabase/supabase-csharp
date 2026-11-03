@@ -17,7 +17,6 @@ using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
-using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
@@ -537,7 +536,7 @@ public class Client : IGotrueClient<User, Session>
 
     /// <inheritdoc />
     [ImplementedCapability("auth.passkey.register_passkey")]
-    public async Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default)
+    public async Task<PasskeyChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.StartPasskeyRegistration);
         this.ThrowWhenOffline();
@@ -557,7 +556,7 @@ public class Client : IGotrueClient<User, Session>
 
     /// <inheritdoc />
     [ImplementedCapability("auth.passkey.sign_in_with_passkey")]
-    public async Task<PasskeySignInChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<PasskeyChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.StartPasskeySignIn);
         this.ThrowWhenOffline();
