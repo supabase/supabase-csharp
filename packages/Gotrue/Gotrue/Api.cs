@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core;
@@ -21,6 +22,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.RenamePasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.SignInWithPasskey;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
 using Supabase.Gotrue.VerifyRecoveryCode;
@@ -678,6 +680,18 @@ public class Api : IGotrueApi<User, Session>
         var renamed = await this.MakeRequestAsync<PasskeyResponse>(HttpMethod.Patch, $"{this.Url}/passkeys/{passkeyId}", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return PasskeyResponse.Read(renamed);
     }
+
+    /// <inheritdoc />
+    public async Task<PasskeySignInChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var body = StartPasskeySignInBody.For(options);
+        var challenge = await this.MakeRequestAsync<PasskeySignInChallengeResponse>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/options", body, this.Headers, cancellationToken).ConfigureAwait(false);
+        return PasskeySignInChallengeResponse.Read(challenge);
+    }
+
+    /// <inheritdoc />
+    public Task<Session?> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/verify", SignInWithPasskeyBody.For(challengeId, credential), this.Headers, cancellationToken);
 
     /// <inheritdoc />
     public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)

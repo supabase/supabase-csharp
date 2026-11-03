@@ -19,6 +19,7 @@ using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.SignInWithPasskey;
 using static Supabase.Gotrue.Constants;
 using static Supabase.Gotrue.Constants.AuthState;
 using static Supabase.Gotrue.Exceptions.FailureHint.Reason;
@@ -532,6 +533,31 @@ public class Client : IGotrueClient<User, Session>
         var accessToken = this.RetrieveAccessTokenOrThrow();
         return await this.api.RenamePasskeyAsync(accessToken, passkeyId, friendlyName, cancellationToken).ConfigureAwait(false);
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.passkey.sign_in_with_passkey")]
+    public async Task<PasskeySignInChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.StartPasskeySignIn);
+        this.ThrowWhenOffline();
+        return await this.api.StartPasskeySignInAsync(options, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.passkey.sign_in_with_passkey")]
+    public async Task<Session> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInWithPasskey);
+        this.ThrowWhenOffline();
+        var signedIn = await this.api.SignInWithPasskeyAsync(challengeId, credential, cancellationToken).ConfigureAwait(false);
+        var session = RetrievePasskeySessionOrThrow(signedIn);
+        await this.UpdateSessionAsync(session).ConfigureAwait(false);
+        await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
+        return session;
+    }
+
+    private static Session RetrievePasskeySessionOrThrow(Session? signedIn) =>
+        string.IsNullOrEmpty(signedIn?.AccessToken) ? throw new GotrueException("The auth server returned no session for the passkey sign-in.", Unknown) : signedIn!;
 
     /// <inheritdoc />
     [ImplementedCapability("auth.session.sign_out")]

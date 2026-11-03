@@ -1,0 +1,10 @@
+{
+  "challenge_id": "9a6c2f4e-3b1d-4e8a-a7c5-0f2d6b9e1c38",
+  "options": {
+    "challenge": "q1Xb7dQm3N0vLrS8yTzK2wF5pH9jC4aE6uG0oB1iV7M",
+    "timeout": 300000,
+    "rpId": "localhost",
+    "userVerification": "preferred"
+  },
+  "expires_at": 1793717400
+}

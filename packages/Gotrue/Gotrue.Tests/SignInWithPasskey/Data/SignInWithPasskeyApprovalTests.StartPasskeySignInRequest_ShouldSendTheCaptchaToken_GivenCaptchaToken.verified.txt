@@ -1,0 +1,1 @@
+﻿{"gotrue_meta_security":{"captcha_token":"a-captcha-token"}}
