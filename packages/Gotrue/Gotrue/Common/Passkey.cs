@@ -3,7 +3,7 @@ using System;
 namespace Supabase.Gotrue.Common;
 
 /// <summary>
-/// A passkey (WebAuthn credential) registered by the signed-in user. Only its metadata is returned: the credential's
+/// A passkey (WebAuthn credential) registered by a user. Only its metadata is returned: the credential's
 /// key material never leaves the auth server.
 /// </summary>
 public sealed record Passkey

@@ -135,6 +135,11 @@ public static class FailureHint
         /// No custom OAuth/OIDC provider has the requested identifier.
         /// </summary>
         CustomProviderNotFound,
+
+        /// <summary>
+        /// No user has the requested id.
+        /// </summary>
+        UserNotFound,
     }
 
     /// <summary>
@@ -162,6 +167,7 @@ public static class FailureHint
         ["not_admin"] = AdminTokenRequired,
         ["sso_provider_not_found"] = SsoProviderNotFound,
         ["custom_provider_not_found"] = CustomProviderNotFound,
+        ["user_not_found"] = UserNotFound,
         ["mfa_verification_failed"] = MfaChallengeUnverified,
         ["mfa_verification_rejected"] = MfaChallengeUnverified,
         ["mfa_challenge_expired"] = MfaChallengeUnverified,

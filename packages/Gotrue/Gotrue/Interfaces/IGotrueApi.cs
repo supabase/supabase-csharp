@@ -197,6 +197,16 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<Factor> UpdateFactorAsync(string jwt, string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Lists the passkeys a user has registered, oldest first.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="userId">The id of the user.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The user's passkeys, empty when the user has none.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<Passkey>> AdminListPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Deletes a custom OAuth/OIDC provider.
     /// </summary>
     /// <param name="jwt">A full-access API key, such as the service_role key.</param>

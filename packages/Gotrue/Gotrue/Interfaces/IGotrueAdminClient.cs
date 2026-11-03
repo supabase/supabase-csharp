@@ -178,6 +178,29 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     Task<Factor> UpdateFactorAsync(string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Lists the passkeys a user has registered, oldest first. Only their metadata is returned: a passkey's key
+    /// material never leaves the auth server. Requires a full-access API key, such as the service_role key: call it
+    /// from a server, never from a client app.
+    /// </summary>
+    /// <param name="userId">The id of the user.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The user's passkeys in registration order, empty when the user has none.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.UserNotFound" /> when no user has <paramref name="userId" />, and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var passkeys = await admin.ListPasskeysAsync(userId);
+    /// foreach (var passkey in passkeys)
+    ///     Console.WriteLine($"{passkey.FriendlyName ?? "Passkey"}, last used {passkey.LastUsedAt?.ToString() ?? "never"}");
+    /// </code>
+    /// </example>
+    Task<IReadOnlyList<Passkey>> ListPasskeysAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Deletes a custom OAuth/OIDC provider. Requires a full-access API key, such as the service_role key:
     /// call it from a server, never from a client app.
     /// </summary>
