@@ -152,8 +152,11 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>The session of the passkey's owner.</returns>
     /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
-    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
-    Task<TSession?> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request, or answered without a session carrying an access token
+    /// (<see cref="Exceptions.FailureHint.Reason.Unknown" />).
+    /// </exception>
+    Task<TSession> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Generates the user's one-time set of MFA recovery codes.

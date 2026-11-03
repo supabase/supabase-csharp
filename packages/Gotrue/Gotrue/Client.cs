@@ -569,15 +569,11 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInWithPasskey);
         this.ThrowWhenOffline();
-        var signedIn = await this.api.SignInWithPasskeyAsync(challengeId, credential, cancellationToken).ConfigureAwait(false);
-        var session = RetrievePasskeySessionOrThrow(signedIn);
+        var session = await this.api.SignInWithPasskeyAsync(challengeId, credential, cancellationToken).ConfigureAwait(false);
         await this.UpdateSessionAsync(session).ConfigureAwait(false);
         await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
         return session;
     }
-
-    private static Session RetrievePasskeySessionOrThrow(Session? signedIn) =>
-        string.IsNullOrEmpty(signedIn?.AccessToken) ? throw new GotrueException("The auth server returned no session for the passkey sign-in.", Unknown) : signedIn!;
 
     /// <inheritdoc />
     [ImplementedCapability("auth.session.sign_out")]
