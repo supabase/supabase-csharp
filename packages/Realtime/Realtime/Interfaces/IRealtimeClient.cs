@@ -138,6 +138,11 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     void Remove(TChannel channel);
 
     /// <summary>
+    /// Unsubscribes from every channel and disconnects from the <see cref="Socket"/>.
+    /// </summary>
+    void RemoveAll();
+
+    /// <summary>
     /// Sets the authentication JWT to be passed into all realtime channels. Used for WALRUS permissions.
     /// </summary>
     /// <param name="jwt"></param>

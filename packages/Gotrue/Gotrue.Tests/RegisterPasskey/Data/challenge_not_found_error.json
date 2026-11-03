@@ -1,0 +1,5 @@
+{
+  "code": 400,
+  "error_code": "webauthn_challenge_not_found",
+  "msg": "Challenge not found or already used"
+}

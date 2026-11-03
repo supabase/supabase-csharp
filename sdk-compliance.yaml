@@ -57,6 +57,29 @@ features:
       - Client.VerifyOTP
       - Client.VerifyTokenHash
 
+  auth.passkey.register_passkey:
+    status: implemented
+    symbols:
+      - Client.RegisterPasskeyAsync
+      - Client.StartPasskeyRegistrationAsync
+  auth.passkey.sign_in_with_passkey:
+    status: implemented
+    symbols:
+      - Client.SignInWithPasskeyAsync
+      - Client.StartPasskeySignInAsync
+  auth.passkey.list_passkeys:
+    status: implemented
+    symbols:
+      - Client.ListPasskeysAsync
+  auth.passkey.update_passkey:
+    status: implemented
+    symbols:
+      - Client.RenamePasskeyAsync
+  auth.passkey.delete_passkey:
+    status: implemented
+    symbols:
+      - Client.DeletePasskeyAsync
+
   auth.session.auto_refresh:
     status: implemented
     symbols:
@@ -144,14 +167,26 @@ features:
     symbols:
       - Client.Verify
 
+  auth.mfa_recovery_codes.generate:
+    status: implemented
+    symbols:
+      - Client.GenerateRecoveryCodesAsync
   auth.mfa_recovery_codes.get_status:
     status: implemented
     symbols:
       - Client.GetRecoveryCodesStatusAsync
+  auth.mfa_recovery_codes.regenerate:
+    status: implemented
+    symbols:
+      - Client.RegenerateRecoveryCodesAsync
   auth.mfa_recovery_codes.unenroll:
     status: implemented
     symbols:
       - Client.UnenrollRecoveryCodesAsync
+  auth.mfa_recovery_codes.verify:
+    status: implemented
+    symbols:
+      - Client.VerifyRecoveryCodeAsync
 
   auth.admin.create_provider:
     status: implemented
@@ -205,6 +240,15 @@ features:
     status: implemented
     symbols:
       - AdminClient.UpdateUserById
+
+  auth.passkey_admin.delete_passkey:
+    status: implemented
+    symbols:
+      - AdminClient.DeletePasskeyAsync
+  auth.passkey_admin.list_passkeys:
+    status: implemented
+    symbols:
+      - AdminClient.ListPasskeysAsync
 
   auth.admin.delete_mfa_factor:
     status: implemented
@@ -504,6 +548,10 @@ features:
     note: "Active channels exposed as a Subscriptions dictionary; no getChannels() method."
     symbols:
       - Client.Subscriptions
+  realtime.client.remove_all_channels:
+    status: implemented
+    symbols:
+      - Client.RemoveAll
   realtime.client.remove_channel:
     status: implemented
     symbols:

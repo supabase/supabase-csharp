@@ -1,0 +1,5 @@
+{
+  "code": 404,
+  "error_code": "validation_failed",
+  "msg": "Passkey not found"
+}

@@ -1,0 +1,14 @@
+{
+  "challenge_id": "4d8e1b7a-6c2f-4a9e-b3d5-7f0c1e2a9b64",
+  "options": {
+    "rp": { "name": "Supabase C# SDK tests", "id": "localhost" },
+    "user": { "name": "example@email.com", "displayName": "example@email.com", "id": "MTExMTExMTEtMTExMS0xMTExLTExMTEtMTExMTExMTExMTEx" },
+    "challenge": "Zr8tY2pVq0xW4nL7cK1sB9dH3fJ6mA5eT0uG2oR8iE4",
+    "pubKeyCredParams": [ { "type": "public-key", "alg": -7 } ],
+    "timeout": 300000,
+    "excludeCredentials": [],
+    "authenticatorSelection": { "residentKey": "required", "requireResidentKey": true, "userVerification": "preferred" },
+    "attestation": "none"
+  },
+  "expires_at": 1793717400
+}

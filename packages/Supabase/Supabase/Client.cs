@@ -215,7 +215,12 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             WebSocketFactory = this.options.WebSocketFactory
         };
         this.realtime = new Realtime.Client(realtimeUrl, realtimeOptions);
-        this.realtime.GetHeaders = () => this.GetAuthHeaders();
+        this.realtime.GetHeaders = () =>
+        {
+            var headers = this.GetAuthHeaders();
+            headers.Remove("Authorization");
+            return headers;
+        };
         this.functions = new Functions.Client(functionsUrl, options: new Functions.ClientOptions
         {
             HttpClient = this.options.HttpClient,

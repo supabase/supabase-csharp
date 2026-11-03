@@ -1,0 +1,5 @@
+{
+  "code": 403,
+  "error_code": "no_authorization",
+  "msg": "Anonymous user not allowed to perform these actions"
+}

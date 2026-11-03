@@ -2,15 +2,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
+using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
+using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.SignInWithPasskey;
 using static Supabase.Gotrue.Constants;
 
 #endregion
@@ -496,6 +500,201 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     Task<IReadOnlyList<UserIdentity>> GetUserIdentitiesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Lists the passkeys the signed-in user has registered, oldest first, read from the server so the user can
+    ///     review the credentials tied to their account. Returns an empty list when the user has none. Works at any
+    ///     authenticator assurance level.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The signed-in user's passkeys, in registration order.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />
+    ///     (<c>passkey_disabled</c> when passkeys are disabled on the server).
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var passkeys = await client.ListPasskeysAsync();
+    ///     foreach (var passkey in passkeys)
+    ///     {
+    ///         Console.WriteLine($"{passkey.FriendlyName ?? "Passkey"}, last used {passkey.LastUsedAt?.ToString() ?? "never"}");
+    ///     }
+    ///     </code>
+    /// </example>
+    Task<IReadOnlyList<Passkey>> ListPasskeysAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Deletes one of the signed-in user's passkeys, revoking that credential: it can no longer sign the user in.
+    ///     No admin privileges are needed. When the user has multi-factor authentication enabled, the session must be
+    ///     at the <c>aal2</c> assurance level. The current session is kept.
+    /// </summary>
+    /// <param name="passkeyId">The id of the passkey, as listed by <see cref="ListPasskeysAsync" />.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>insufficient_aal</c> (403) when the user has MFA enabled and the session is not at <c>aal2</c>,
+    ///     <c>validation_failed</c> (404) when the user has no passkey with that id,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var passkeys = await client.ListPasskeysAsync();
+    ///     var lost = passkeys.First(passkey => passkey.FriendlyName == "Old laptop");
+    ///     await client.DeletePasskeyAsync(lost.Id);
+    ///     </code>
+    /// </example>
+    Task DeletePasskeyAsync(Guid passkeyId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Renames one of the signed-in user's passkeys, replacing the name the server derived from its authenticator
+    ///     so the user can tell their passkeys apart. Works at any authenticator assurance level. The current session
+    ///     is kept.
+    /// </summary>
+    /// <param name="passkeyId">The id of the passkey, as listed by <see cref="ListPasskeysAsync" />.</param>
+    /// <param name="friendlyName">The new name, at most 120 characters.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The passkey with its new name.</returns>
+    /// <exception cref="ArgumentException"><paramref name="friendlyName" /> is null or empty. Nothing is sent.</exception>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>validation_failed</c> (400) when the name is longer than 120 characters,
+    ///     <c>validation_failed</c> (404) when the user has no passkey with that id,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var passkeys = await client.ListPasskeysAsync();
+    ///     var renamed = await client.RenamePasskeyAsync(passkeys[0].Id, "Work laptop");
+    ///     </code>
+    /// </example>
+    Task<Passkey> RenamePasskeyAsync(Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Starts registering a new passkey for the signed-in user: asks the server for a WebAuthn challenge. Run the
+    ///     platform's WebAuthn ceremony with <see cref="PasskeyChallenge.Options" /> (the SDK cannot, as .NET
+    ///     has no cross-platform credential API), then complete the registration with <see cref="RegisterPasskeyAsync" />
+    ///     before <see cref="PasskeyChallenge.ExpiresAt" />. Anonymous and SSO users cannot register passkeys,
+    ///     and a user with multi-factor authentication enabled needs a session at the <c>aal2</c> assurance level.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The challenge and the WebAuthn creation options to hand to the platform.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>no_authorization</c> for an anonymous user,
+    ///     <c>validation_failed</c> for an SSO user,
+    ///     <c>insufficient_aal</c> when the user has MFA enabled and the session is not at <c>aal2</c>,
+    ///     <c>too_many_passkeys</c> when the user already has the maximum number of passkeys,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var challenge = await client.StartPasskeyRegistrationAsync();
+    ///     var credential = await js.InvokeAsync&lt;JsonElement&gt;("passkeys.create", challenge.Options);
+    ///     var passkey = await client.RegisterPasskeyAsync(challenge.Id, credential);
+    ///     </code>
+    /// </example>
+    Task<PasskeyChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Completes a passkey registration started with <see cref="StartPasskeyRegistrationAsync" />: the server checks
+    ///     the credential the platform's WebAuthn ceremony created and adds it to the signed-in user's passkeys. The
+    ///     current session is kept.
+    /// </summary>
+    /// <param name="challengeId">The <see cref="PasskeyChallenge.Id" /> the credential answers.</param>
+    /// <param name="credential">
+    ///     The new credential, as the W3C <c>RegistrationResponseJSON</c> object (what <c>PublicKeyCredential.toJSON()</c>
+    ///     and Android's Credential Manager produce), passed to the server verbatim.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>
+    ///     The registered passkey, named by the server after the authenticator that created it and never used yet. Rename
+    ///     it with <see cref="RenamePasskeyAsync" />.
+    /// </returns>
+    /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>webauthn_challenge_not_found</c> when the challenge is unknown or already used (a failed attempt uses it
+    ///     too: start again), <c>webauthn_challenge_expired</c> when it expired,
+    ///     <c>webauthn_verification_failed</c> when the credential does not check out,
+    ///     <c>webauthn_credential_exists</c> when the credential is already registered,
+    ///     <c>too_many_passkeys</c>, <c>insufficient_aal</c>, <c>no_authorization</c>, <c>validation_failed</c> and
+    ///     <c>passkey_disabled</c> as for <see cref="StartPasskeyRegistrationAsync" />.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var challenge = await client.StartPasskeyRegistrationAsync();
+    ///     var credential = await js.InvokeAsync&lt;JsonElement&gt;("passkeys.create", challenge.Options);
+    ///     var passkey = await client.RegisterPasskeyAsync(challenge.Id, credential);
+    ///     </code>
+    /// </example>
+    Task<Passkey> RegisterPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Starts a passkey sign-in: asks the server for a WebAuthn challenge that any of the user's passkeys can answer.
+    ///     No session is needed. Run the platform's WebAuthn ceremony with <see cref="PasskeyChallenge.Options" />
+    ///     (the SDK cannot, as .NET has no cross-platform credential API), then complete the sign-in with
+    ///     <see cref="SignInWithPasskeyAsync" /> before <see cref="PasskeyChallenge.ExpiresAt" />.
+    /// </summary>
+    /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The challenge and the WebAuthn request options to hand to the platform.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.UserTooManyRequests" /> when the passkey sign-in rate limit is reached,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />
+    ///     (<c>captcha_failed</c> when the CAPTCHA token is missing or invalid,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server).
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var challenge = await client.StartPasskeySignInAsync();
+    ///     var assertion = await js.InvokeAsync&lt;JsonElement&gt;("passkeys.get", challenge.Options);
+    ///     var session = await client.SignInWithPasskeyAsync(challenge.Id, assertion);
+    ///     </code>
+    /// </example>
+    Task<PasskeyChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Completes a passkey sign-in started with <see cref="StartPasskeySignInAsync" />: the server checks the
+    ///     assertion the platform's WebAuthn ceremony produced and signs in the passkey's owner. The new session replaces
+    ///     the current one, is persisted, and is announced like any other sign-in.
+    /// </summary>
+    /// <param name="challengeId">The <see cref="PasskeyChallenge.Id" /> the assertion answers.</param>
+    /// <param name="credential">
+    ///     The assertion, as the W3C <c>AuthenticationResponseJSON</c> object (what <c>PublicKeyCredential.toJSON()</c>
+    ///     and Android's Credential Manager produce), passed to the server verbatim.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The signed-in session.</returns>
+    /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.UserEmailNotConfirmed" /> when the user has not confirmed their email,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>webauthn_challenge_not_found</c> when the challenge is unknown or already used (a failed attempt uses it
+    ///     too: start again), <c>webauthn_challenge_expired</c> when it expired,
+    ///     <c>webauthn_verification_failed</c> when the assertion does not check out,
+    ///     <c>phone_not_confirmed</c>, <c>user_banned</c>,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var challenge = await client.StartPasskeySignInAsync();
+    ///     var assertion = await js.InvokeAsync&lt;JsonElement&gt;("passkeys.get", challenge.Options);
+    ///     var session = await client.SignInWithPasskeyAsync(challenge.Id, assertion);
+    ///     </code>
+    /// </example>
+    Task<TSession> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Add a listener to get errors that occur outside of a typical Exception flow.
     ///     In particular, this is used to get errors and messages from the background thread
     ///     that automatically manages refreshing the user's token.
@@ -678,6 +877,109 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     </code>
     /// </example>
     Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Generates the signed-in user's single set of MFA recovery codes. The plaintext codes are returned exactly
+    ///     once and cannot be read back: show them to the user and ask them to store them safely. The session must be at
+    ///     the <c>aal2</c> assurance level and the user must already have another verified factor, because recovery codes
+    ///     can never be the only second factor. A user has at most one set of recovery codes.
+    ///     The new <c>recovery_code</c> factor is not in the current session's <see cref="User.Factors" />, which
+    ///     <see cref="ListFactors" /> reads, until the session is refreshed or the user is fetched again.
+    ///     Recovery codes are experimental on the auth server.
+    /// </summary>
+    /// <param name="options">Optional settings, such as the factor's friendly name.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The generated codes, returned only this once.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>insufficient_aal</c> when the session is not at <c>aal2</c>,
+    ///     <c>mfa_recovery_codes_sole_factor</c> when the user has no other verified factor,
+    ///     <c>mfa_verified_factor_exists</c> when the user already has recovery codes,
+    ///     <c>mfa_factor_name_conflict</c> when another factor has the same friendly name,
+    ///     <c>too_many_enrolled_mfa_factors</c> when the user has reached the factor limit,
+    ///     <c>mfa_recovery_codes_enroll_not_enabled</c> when recovery codes are disabled on the server,
+    ///     <c>no_authorization</c> for an anonymous user.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     await client.ChallengeAndVerify(new MfaChallengeAndVerifyParams { FactorId = totpFactorId, Code = code });
+    ///     var recoveryCodes = await client.GenerateRecoveryCodesAsync(new GenerateRecoveryCodesOptions { FriendlyName = "Backup codes" });
+    ///     foreach (var recoveryCode in recoveryCodes.Codes)
+    ///     {
+    ///         // show each code once; they cannot be retrieved again
+    ///     }
+    ///     </code>
+    /// </example>
+    Task<RecoveryCodes> GenerateRecoveryCodesAsync(GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Replaces the signed-in user's MFA recovery codes with a new set. Every previous code stops working at once,
+    ///     and any lockout from failed verification attempts is cleared. The plaintext codes are returned exactly once and
+    ///     cannot be read back: show them to the user and ask them to store them safely. The session must be at the
+    ///     <c>aal2</c> assurance level and the user must already have recovery codes; use
+    ///     <see cref="GenerateRecoveryCodesAsync" /> to create the first set.
+    ///     Recovery codes are experimental on the auth server.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The new codes, returned only this once.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>insufficient_aal</c> when the session is not at <c>aal2</c>,
+    ///     <c>mfa_factor_not_found</c> when the user has no recovery codes,
+    ///     <c>mfa_recovery_codes_enroll_not_enabled</c> when recovery codes are disabled on the server,
+    ///     <c>no_authorization</c> for an anonymous user.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     await client.ChallengeAndVerify(new MfaChallengeAndVerifyParams { FactorId = totpFactorId, Code = code });
+    ///     var recoveryCodes = await client.RegenerateRecoveryCodesAsync();
+    ///     foreach (var recoveryCode in recoveryCodes.Codes)
+    ///     {
+    ///         // show each code once; the previous codes no longer work
+    ///     }
+    ///     </code>
+    /// </example>
+    Task<RecoveryCodes> RegenerateRecoveryCodesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Redeems one of the signed-in user's single-use MFA recovery codes and upgrades the session to the
+    ///     <c>aal2</c> assurance level. Use it when the user cannot reach their other factors, such as a lost
+    ///     authenticator app. The code is consumed: it cannot be used again. Letter case, whitespace and <c>-</c>
+    ///     separators are ignored by the server, so pass the code as the user typed it.
+    ///     On success the new session replaces the current one and is persisted, listeners receive
+    ///     <see cref="Constants.AuthState.UserUpdated" /> then <see cref="Constants.AuthState.MfaChallengeVerified" />,
+    ///     and the server signs out the user's other <c>aal1</c> sessions.
+    ///     Recovery codes are experimental on the auth server.
+    /// </summary>
+    /// <param name="code">The recovery code as the user typed it.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The new session, at the <c>aal2</c> assurance level.</returns>
+    /// <exception cref="ArgumentException">When <paramref name="code" /> is null, empty or whitespace.</exception>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     <see cref="FailureHint.Reason.MfaChallengeUnverified" /> when the code is wrong or already used
+    ///     (<c>mfa_verification_failed</c>), the verification hook rejected it (<c>mfa_verification_rejected</c>),
+    ///     or the server answered without a session,
+    ///     <see cref="FailureHint.Reason.UserTooManyRequests" /> when verification is locked after too many failed
+    ///     attempts (<c>mfa_recovery_codes_locked</c>) or rate limited (<c>over_request_rate_limit</c>),
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>mfa_recovery_codes_verify_not_enabled</c> when recovery codes are disabled on the server,
+    ///     <c>no_authorization</c> for an anonymous user.
+    ///     The current session is kept on every failure.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     await client.SignIn(email, password);
+    ///     var session = await client.VerifyRecoveryCodeAsync("K4M9-X7QP-2AB8-HT3Z");
+    ///     // the session is now at aal2
+    ///     </code>
+    /// </example>
+    Task<TSession> VerifyRecoveryCodeAsync(string code, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Removes the signed-in user's MFA recovery codes factor, invalidating every remaining code. The session must

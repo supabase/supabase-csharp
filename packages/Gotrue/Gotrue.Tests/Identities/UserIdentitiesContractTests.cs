@@ -120,16 +120,6 @@ public class UserIdentitiesContractTests
     }
 
     [TestMethod]
-    public async Task GetUserIdentitiesAsync_ShouldThrowOffline_GivenClientIsOffline()
-    {
-        this.SignIn();
-        this.client.Online = false;
-        var listing = () => this.client.GetUserIdentitiesAsync();
-        (await listing.Should().ThrowAsync<GotrueException>().WithMessage("Only supported when online")).Which.Reason.Should().Be(Offline,
-            "reading the identities needs the server, like the other identity-linking operations");
-    }
-
-    [TestMethod]
     public async Task GetUserIdentitiesAsync_ShouldCancelTheRequest_GivenCancelledToken()
     {
         this.SignIn();

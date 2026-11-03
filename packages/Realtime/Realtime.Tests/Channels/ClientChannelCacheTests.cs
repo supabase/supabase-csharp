@@ -7,8 +7,9 @@ using Supabase.Realtime;
 namespace Realtime.Tests.Channels;
 
 /// <summary>
-///     The client hands out a fresh channel after the cached one is unsubscribed, and keeps its socket when
-///     connected again. Runs over a fake socket that reports itself connected, so no server is needed.
+///     The client hands out a fresh channel after the cached one is unsubscribed, keeps its socket when
+///     connected again, and drops every channel and the socket on RemoveAll. Runs over a fake socket that
+///     reports itself connected, so no server is needed.
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
@@ -70,5 +71,21 @@ public class ClientChannelCacheTests
         _ = channel.Subscribe(100);
         await Task.Yield();
         this.client.Channel("room").Should().BeSameAs(channel);
+    }
+
+    [TestMethod]
+    public void RemoveAll_ShouldRemoveEveryChannel()
+    {
+        this.client.Channel("room");
+        this.client.Channel("lobby");
+        this.client.RemoveAll();
+        this.client.Subscriptions.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public void RemoveAll_ShouldDisconnect()
+    {
+        this.client.RemoveAll();
+        this.client.Socket.Should().BeNull();
     }
 }

@@ -1,0 +1,13 @@
+{
+  "access_token": "an-aal2-access-token",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "expires_at": 1767225600,
+  "refresh_token": "an-aal2-refresh-token",
+  "user": {
+    "id": "11111111-1111-1111-1111-111111111111",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "example@email.com"
+  }
+}

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -30,6 +31,7 @@ public class ObservabilityContractTests
 {
     private const string AccessToken = "an-access-token";
     private const string RefreshTokenValue = "a-refresh-token";
+    private static readonly Guid PasskeyId = Guid.Parse("5f0b6c1e-8a43-4d1f-9c7e-2b8f3e6a1d24");
 
     private readonly List<Activity> activities = new();
     private readonly List<RecordedMeasurement> measurements = new();
@@ -131,6 +133,79 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeysListing()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeysSuccess();
+        await this.client.ListPasskeysAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.list_passkeys").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "GET /passkeys").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeyDeletion()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeyDeletionSuccess();
+        await this.client.DeletePasskeyAsync(PasskeyId);
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.delete_passkey").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == $"DELETE /passkeys/{PasskeyId}").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeyRename()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeyRenameSuccess();
+        await this.client.RenamePasskeyAsync(PasskeyId, "Work laptop");
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.rename_passkey").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == $"PATCH /passkeys/{PasskeyId}").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeySignInStart()
+    {
+        this.MockPasskeySignInSuccess("options", "sign_in_challenge.json");
+        await this.client.StartPasskeySignInAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.start_passkey_sign_in").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/authentication/options").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeySignIn()
+    {
+        this.MockPasskeySignInSuccess("verify", "signed_in_session.json");
+        await this.client.SignInWithPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement);
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.sign_in.passkey").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/authentication/verify").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeyRegistrationStart()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeyRegistrationSuccess("options", "registration_challenge.json");
+        await this.client.StartPasskeyRegistrationAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.start_passkey_registration").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/registration/options").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeyRegistration()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeyRegistrationSuccess("verify", "registered_passkey.json");
+        await this.client.RegisterPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement);
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.register_passkey").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/registration/verify").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
     public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodesStatusReading()
     {
         this.MockTokenSuccess();
@@ -142,6 +217,17 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodesGeneration()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockRecoveryCodesGenerationSuccess();
+        await this.client.GenerateRecoveryCodesAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.generate_recovery_codes").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /factors/recovery-codes").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
     public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodesUnenrollment()
     {
         this.MockTokenSuccess();
@@ -150,6 +236,28 @@ public class ObservabilityContractTests
         await this.client.UnenrollRecoveryCodesAsync();
         var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.unenroll_recovery_codes").Which;
         this.activities.Should().ContainSingle(a => a.OperationName == "DELETE /factors/recovery-codes").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodesRegeneration()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockRecoveryCodesRegenerationSuccess();
+        await this.client.RegenerateRecoveryCodesAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.regenerate_recovery_codes").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /factors/recovery-codes/regenerate").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodeVerification()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockRecoveryCodeVerificationSuccess();
+        await this.client.VerifyRecoveryCodeAsync("K4M9-X7QP-2AB8-HT3Z");
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.verify_recovery_code").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /factors/recovery-codes/verify").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
     }
 
     [TestMethod]
@@ -258,6 +366,43 @@ public class ObservabilityContractTests
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Identities", "Data", "user_with_identities.json"))));
 
+    private void MockPasskeysSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/passkeys").UsingGet())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ListPasskeys", "Data", "passkeys.json"))));
+
+    private void MockPasskeyDeletionSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath($"/passkeys/{PasskeyId}").UsingDelete())
+            .RespondWith(Response.Create().WithStatusCode(204));
+
+    private void MockPasskeyRenameSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath($"/passkeys/{PasskeyId}").UsingPatch())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RenamePasskey", "Data", "renamed_passkey.json"))));
+
+    private void MockPasskeySignInSuccess(string step, string fixture) =>
+        this.server
+            .Given(Request.Create().WithPath($"/passkeys/authentication/{step}").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SignInWithPasskey", "Data", fixture))));
+
+    private void MockPasskeyRegistrationSuccess(string step, string fixture) =>
+        this.server
+            .Given(Request.Create().WithPath($"/passkeys/registration/{step}").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RegisterPasskey", "Data", fixture))));
+
     private void MockRecoveryCodesStatusSuccess() =>
         this.server
             .Given(Request.Create().WithPath("/factors/recovery-codes").UsingGet())
@@ -266,6 +411,22 @@ public class ObservabilityContractTests
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GetRecoveryCodesStatus", "Data", "recovery_codes_status.json"))));
 
+    private void MockRecoveryCodesGenerationSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/factors/recovery-codes").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GenerateRecoveryCodes", "Data", "recovery_codes.json"))));
+
+    private void MockRecoveryCodesRegenerationSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/factors/recovery-codes/regenerate").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RegenerateRecoveryCodes", "Data", "regenerated_codes.json"))));
+
     private void MockRecoveryCodesUnenrollmentSuccess() =>
         this.server
             .Given(Request.Create().WithPath("/factors/recovery-codes").UsingDelete())
@@ -273,6 +434,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UnenrollRecoveryCodes", "Data", "unenrolled.json"))));
+
+    private void MockRecoveryCodeVerificationSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/factors/recovery-codes/verify").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "VerifyRecoveryCode", "Data", "verified_session.json"))));
 
     private void MockTokenFailure() =>
         this.server

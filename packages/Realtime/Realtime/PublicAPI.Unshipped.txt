@@ -1,4 +1,6 @@
 #nullable enable
+Supabase.Realtime.Client.RemoveAll() -> void
 Supabase.Realtime.Exceptions.RealtimeException.StatusCode.get -> int
 Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendAsync(string! eventName, object! payload, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveAll() -> void
 Supabase.Realtime.RealtimeChannel.HttpSendAsync(string! eventName, object! payload, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!

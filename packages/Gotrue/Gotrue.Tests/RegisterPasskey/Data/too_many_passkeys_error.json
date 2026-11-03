@@ -1,0 +1,5 @@
+{
+  "code": 422,
+  "error_code": "too_many_passkeys",
+  "msg": "Maximum number of passkeys reached"
+}

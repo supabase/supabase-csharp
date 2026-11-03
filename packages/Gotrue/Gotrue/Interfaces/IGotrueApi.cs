@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.SignInWithPasskey;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
 using static Supabase.Gotrue.Constants;
@@ -82,6 +85,109 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<RecoveryCodesStatus?> GetRecoveryCodesStatusAsync(string jwt, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Lists the passkeys the user has registered, oldest first.
+    /// </summary>
+    /// <param name="jwt">The user's access token.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The user's passkeys, empty when the user has none.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<Passkey>> ListPasskeysAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes one of the user's passkeys.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level when the user has MFA enabled.</param>
+    /// <param name="passkeyId">The id of the passkey.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task DeletePasskeyAsync(string jwt, Guid passkeyId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Renames one of the user's passkeys.
+    /// </summary>
+    /// <param name="jwt">The user's access token.</param>
+    /// <param name="passkeyId">The id of the passkey.</param>
+    /// <param name="friendlyName">The new name, at most 120 characters.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The passkey with its new name.</returns>
+    /// <exception cref="ArgumentException"><paramref name="friendlyName" /> is null or empty. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<Passkey> RenamePasskeyAsync(string jwt, Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Asks the server for a WebAuthn challenge to register a new passkey for the user.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level when the user has MFA enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The challenge and the WebAuthn creation options to hand to the platform.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<PasskeyChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers the credential a WebAuthn ceremony created as one of the user's passkeys.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level when the user has MFA enabled.</param>
+    /// <param name="challengeId">The id of the challenge the credential answers.</param>
+    /// <param name="credential">The W3C <c>RegistrationResponseJSON</c> credential, passed to the server verbatim.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered passkey.</returns>
+    /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<Passkey> RegisterPasskeyAsync(string jwt, Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Asks the server for a passkey sign-in challenge that any of the user's passkeys can answer. No session is needed.
+    /// </summary>
+    /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The challenge and the WebAuthn request options to hand to the platform.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<PasskeyChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Exchanges a passkey assertion for a session. Nothing is stored: the caller keeps the session.
+    /// </summary>
+    /// <param name="challengeId">The id of the challenge the assertion answers.</param>
+    /// <param name="credential">The W3C <c>AuthenticationResponseJSON</c> assertion, passed to the server verbatim.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The session of the passkey's owner.</returns>
+    /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request, or answered without a session carrying an access token
+    /// (<see cref="Exceptions.FailureHint.Reason.Unknown" />).
+    /// </exception>
+    Task<TSession> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Generates the user's one-time set of MFA recovery codes.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level.</param>
+    /// <param name="options">Optional settings, such as the factor's friendly name.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The generated codes, returned only this once.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Replaces the user's MFA recovery codes with a new set, invalidating every previous code.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The new codes, returned only this once.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<RecoveryCodes> RegenerateRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Redeems one of the user's single-use MFA recovery codes for a session at the aal2 assurance level.
+    /// </summary>
+    /// <param name="jwt">The user's access token.</param>
+    /// <param name="code">The recovery code as the user typed it.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The new aal2 session.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<TSession?> VerifyRecoveryCodeAsync(string jwt, string code, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Removes the user's MFA recovery codes factor together with every remaining code.
     /// </summary>
     /// <param name="jwt">The user's access token, at the aal2 assurance level.</param>
@@ -91,6 +197,26 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams);
     Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams);
     Task<Factor> UpdateFactorAsync(string jwt, string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the passkeys a user has registered, oldest first.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="userId">The id of the user.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The user's passkeys, empty when the user has none.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<Passkey>> AdminListPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes one of a user's passkeys.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="userId">The id of the user who owns the passkey.</param>
+    /// <param name="passkeyId">The id of the passkey.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task AdminDeletePasskeyAsync(string jwt, Guid userId, Guid passkeyId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a custom OAuth/OIDC provider.

@@ -1,5 +1,19 @@
 # Changelog
 
+## [8.8.0](https://github.com/supabase/supabase-csharp/compare/v8.7.0...v8.8.0) (2026-11-02)
+
+
+### Features
+
+* **auth:** generate the signed-in user's MFA recovery codes ([#626](https://github.com/supabase/supabase-csharp/issues/626)) ([0772b24](https://github.com/supabase/supabase-csharp/commit/0772b24d9c4cfd2931b94fbf0e0385cccce9a945))
+* **auth:** verify an MFA recovery code to reach aal2 ([#627](https://github.com/supabase/supabase-csharp/issues/627)) ([d01c630](https://github.com/supabase/supabase-csharp/commit/d01c6308fbdac56fff423ea14967e18f5aad5ef6))
+
+
+### Bug Fixes
+
+* **realtime:** keep presence when one of several connections leaves ([#620](https://github.com/supabase/supabase-csharp/issues/620)) ([5002b2e](https://github.com/supabase/supabase-csharp/commit/5002b2e53257fe9908d980eca0cb7d17278c6133))
+* **supabase:** don't propagate the Authorization header on the Realtime client ([#622](https://github.com/supabase/supabase-csharp/issues/622)) ([f9bf4a3](https://github.com/supabase/supabase-csharp/commit/f9bf4a321fca0d64f0daf5c24a8c1f35ef9f5710))
+
 ## [8.7.0](https://github.com/supabase/supabase-csharp/compare/v8.6.0...v8.7.0) (2026-10-30)
 
 

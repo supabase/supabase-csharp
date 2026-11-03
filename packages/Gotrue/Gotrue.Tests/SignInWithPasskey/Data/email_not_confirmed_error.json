@@ -1,0 +1,5 @@
+{
+  "code": 403,
+  "error_code": "email_not_confirmed",
+  "msg": "Email not confirmed"
+}

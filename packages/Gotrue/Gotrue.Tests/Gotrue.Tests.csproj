@@ -37,6 +37,16 @@
     <None Update="UpdateFactor\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="GetRecoveryCodesStatus\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="UnenrollRecoveryCodes\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="GenerateRecoveryCodes\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="RegenerateRecoveryCodes\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="VerifyRecoveryCode\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="ListPasskeys\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="DeletePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="RegisterPasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="RenamePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="SignInWithPasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="AdminListPasskeys\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="AdminDeletePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core;
@@ -13,14 +14,19 @@ using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
+using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.RegisterPasskey;
+using Supabase.Gotrue.RenamePasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.SignInWithPasskey;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.VerifyRecoveryCode;
 using static Supabase.Gotrue.Constants;
 
 namespace Supabase.Gotrue;
@@ -658,6 +664,80 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<Passkey>> ListPasskeysAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var passkeys = await this.MakeRequestAsync<IReadOnlyList<PasskeyResponse>>(HttpMethod.Get, this.PasskeyCollectionUrl(), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyResponse.Read(passkeys);
+    }
+
+    /// <inheritdoc />
+    public Task DeletePasskeyAsync(string jwt, Guid passkeyId, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, this.PasskeyUrl(passkeyId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<Passkey> RenamePasskeyAsync(string jwt, Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default)
+    {
+        var body = RenamePasskeyBody.For(friendlyName);
+        var renamed = await this.MakeRequestAsync<PasskeyResponse>(HttpMethod.Patch, this.PasskeyUrl(passkeyId), body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyResponse.Read(renamed);
+    }
+
+    private string PasskeyCollectionUrl() => $"{this.Url}/passkeys";
+
+    private string PasskeyUrl(Guid passkeyId) => $"{this.PasskeyCollectionUrl()}/{passkeyId}";
+
+    /// <inheritdoc />
+    public async Task<PasskeyChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var challenge = await this.MakeRequestAsync<PasskeyChallengeResponse>(HttpMethod.Post, $"{this.Url}/passkeys/registration/options", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyChallengeResponse.Read(challenge);
+    }
+
+    /// <inheritdoc />
+    public async Task<Passkey> RegisterPasskeyAsync(string jwt, Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
+    {
+        var body = RegisterPasskeyBody.For(challengeId, credential);
+        var registered = await this.MakeRequestAsync<PasskeyResponse>(HttpMethod.Post, $"{this.Url}/passkeys/registration/verify", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyResponse.Read(registered);
+    }
+
+    /// <inheritdoc />
+    public async Task<PasskeyChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var body = StartPasskeySignInBody.For(options);
+        var challenge = await this.MakeRequestAsync<PasskeyChallengeResponse>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/options", body, this.Headers, cancellationToken).ConfigureAwait(false);
+        return PasskeyChallengeResponse.Read(challenge);
+    }
+
+    /// <inheritdoc />
+    public async Task<Session> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
+    {
+        var signedIn = await this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/verify", SignInWithPasskeyBody.For(challengeId, credential), this.Headers, cancellationToken).ConfigureAwait(false);
+        return RetrievePasskeySessionOrThrow(signedIn);
+    }
+
+    private static Session RetrievePasskeySessionOrThrow(Session? signedIn) =>
+        string.IsNullOrEmpty(signedIn?.AccessToken) ? throw new GotrueException("The auth server returned no session for the passkey sign-in.", FailureHint.Reason.Unknown) : signedIn!;
+
+    /// <inheritdoc />
+    public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var generated = await this.MakeRequestAsync<RecoveryCodesResponse>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes", GenerateRecoveryCodesBody.For(options), this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return RecoveryCodesResponse.Read(generated);
+    }
+
+    /// <inheritdoc />
+    public async Task<RecoveryCodes> RegenerateRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var regenerated = await this.MakeRequestAsync<RecoveryCodesResponse>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes/regenerate", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return RecoveryCodesResponse.Read(regenerated);
+    }
+
+    /// <inheritdoc />
+    public Task<Session?> VerifyRecoveryCodeAsync(string jwt, string code, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes/verify", new VerifyRecoveryCodeBody(code), this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
     public Task UnenrollRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default) =>
         this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/factors/recovery-codes", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
@@ -678,6 +758,21 @@ public class Api : IGotrueApi<User, Session>
 
     private string AdminFactorUrl(string userId, string factorId) =>
         $"{this.Url}/admin/users/{CanonicalUuid.EnsureRoutable(userId)}/factors/{CanonicalUuid.EnsureRoutable(factorId)}";
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<Passkey>> AdminListPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var passkeys = await this.MakeRequestAsync<IReadOnlyList<PasskeyResponse>>(HttpMethod.Get, this.AdminUserPasskeyCollectionUrl(userId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyResponse.Read(passkeys);
+    }
+
+    /// <inheritdoc />
+    public Task AdminDeletePasskeyAsync(string jwt, Guid userId, Guid passkeyId, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, this.AdminUserPasskeyUrl(userId, passkeyId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    private string AdminUserPasskeyCollectionUrl(Guid userId) => $"{this.Url}/admin/users/{userId}/passkeys";
+
+    private string AdminUserPasskeyUrl(Guid userId, Guid passkeyId) => $"{this.AdminUserPasskeyCollectionUrl(userId)}/{passkeyId}";
 
     /// <inheritdoc />
     public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>

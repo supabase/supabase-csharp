@@ -1,0 +1,1 @@
+﻿{"challenge_id":"9a6c2f4e-3b1d-4e8a-a7c5-0f2d6b9e1c38","credential":{"id":"3q2-7w","rawId":"3q2-7w","type":"public-key","response":{"clientDataJSON":"eyJ0eXBlIjoid2ViYXV0aG4uZ2V0In0","authenticatorData":"SZYN5YgO","signature":"MEUCIQ","userHandle":"MTExMTExMTE"},"clientExtensionResults":{}}}

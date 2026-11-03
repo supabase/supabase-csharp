@@ -1,0 +1,5 @@
+{
+  "code": 422,
+  "error_code": "mfa_recovery_codes_verify_not_enabled",
+  "msg": "MFA verification is disabled for recovery codes"
+}
