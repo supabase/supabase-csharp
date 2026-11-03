@@ -57,6 +57,11 @@ features:
       - Client.VerifyOTP
       - Client.VerifyTokenHash
 
+  auth.passkey.sign_in_with_passkey:
+    status: implemented
+    symbols:
+      - Client.SignInWithPasskeyAsync
+      - Client.StartPasskeySignInAsync
   auth.passkey.list_passkeys:
     status: implemented
     symbols:
