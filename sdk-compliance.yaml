@@ -241,6 +241,11 @@ features:
     symbols:
       - AdminClient.UpdateUserById
 
+  auth.passkey_admin.list_passkeys:
+    status: implemented
+    symbols:
+      - AdminClient.ListPasskeysAsync
+
   auth.admin.delete_mfa_factor:
     status: implemented
     symbols:
