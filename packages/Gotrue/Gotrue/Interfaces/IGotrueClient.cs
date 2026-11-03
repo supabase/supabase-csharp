@@ -12,7 +12,6 @@ using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
-using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
@@ -576,9 +575,9 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
 
     /// <summary>
     ///     Starts registering a new passkey for the signed-in user: asks the server for a WebAuthn challenge. Run the
-    ///     platform's WebAuthn ceremony with <see cref="PasskeyRegistrationChallenge.Options" /> (the SDK cannot, as .NET
+    ///     platform's WebAuthn ceremony with <see cref="PasskeyChallenge.Options" /> (the SDK cannot, as .NET
     ///     has no cross-platform credential API), then complete the registration with <see cref="RegisterPasskeyAsync" />
-    ///     before <see cref="PasskeyRegistrationChallenge.ExpiresAt" />. Anonymous and SSO users cannot register passkeys,
+    ///     before <see cref="PasskeyChallenge.ExpiresAt" />. Anonymous and SSO users cannot register passkeys,
     ///     and a user with multi-factor authentication enabled needs a session at the <c>aal2</c> assurance level.
     /// </summary>
     /// <param name="cancellationToken">Cancels the request.</param>
@@ -600,14 +599,14 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     var passkey = await client.RegisterPasskeyAsync(challenge.Id, credential);
     ///     </code>
     /// </example>
-    Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default);
+    Task<PasskeyChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Completes a passkey registration started with <see cref="StartPasskeyRegistrationAsync" />: the server checks
     ///     the credential the platform's WebAuthn ceremony created and adds it to the signed-in user's passkeys. The
     ///     current session is kept.
     /// </summary>
-    /// <param name="challengeId">The <see cref="PasskeyRegistrationChallenge.Id" /> the credential answers.</param>
+    /// <param name="challengeId">The <see cref="PasskeyChallenge.Id" /> the credential answers.</param>
     /// <param name="credential">
     ///     The new credential, as the W3C <c>RegistrationResponseJSON</c> object (what <c>PublicKeyCredential.toJSON()</c>
     ///     and Android's Credential Manager produce), passed to the server verbatim.
@@ -640,9 +639,9 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
 
     /// <summary>
     ///     Starts a passkey sign-in: asks the server for a WebAuthn challenge that any of the user's passkeys can answer.
-    ///     No session is needed. Run the platform's WebAuthn ceremony with <see cref="PasskeySignInChallenge.Options" />
+    ///     No session is needed. Run the platform's WebAuthn ceremony with <see cref="PasskeyChallenge.Options" />
     ///     (the SDK cannot, as .NET has no cross-platform credential API), then complete the sign-in with
-    ///     <see cref="SignInWithPasskeyAsync" /> before <see cref="PasskeySignInChallenge.ExpiresAt" />.
+    ///     <see cref="SignInWithPasskeyAsync" /> before <see cref="PasskeyChallenge.ExpiresAt" />.
     /// </summary>
     /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
     /// <param name="cancellationToken">Cancels the request.</param>
@@ -661,14 +660,14 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     var session = await client.SignInWithPasskeyAsync(challenge.Id, assertion);
     ///     </code>
     /// </example>
-    Task<PasskeySignInChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default);
+    Task<PasskeyChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Completes a passkey sign-in started with <see cref="StartPasskeySignInAsync" />: the server checks the
     ///     assertion the platform's WebAuthn ceremony produced and signs in the passkey's owner. The new session replaces
     ///     the current one, is persisted, and is announced like any other sign-in.
     /// </summary>
-    /// <param name="challengeId">The <see cref="PasskeySignInChallenge.Id" /> the assertion answers.</param>
+    /// <param name="challengeId">The <see cref="PasskeyChallenge.Id" /> the assertion answers.</param>
     /// <param name="credential">
     ///     The assertion, as the W3C <c>AuthenticationResponseJSON</c> object (what <c>PublicKeyCredential.toJSON()</c>
     ///     and Android's Credential Manager produce), passed to the server verbatim.
