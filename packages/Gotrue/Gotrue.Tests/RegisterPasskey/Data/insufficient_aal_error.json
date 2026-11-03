@@ -1,0 +1,5 @@
+{
+  "code": 403,
+  "error_code": "insufficient_aal",
+  "msg": "AAL2 session is required to manage passkeys when MFA is enabled"
+}

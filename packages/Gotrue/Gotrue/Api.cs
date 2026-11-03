@@ -19,6 +19,7 @@ using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.RenamePasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -679,6 +680,21 @@ public class Api : IGotrueApi<User, Session>
         var body = RenamePasskeyBody.For(friendlyName);
         var renamed = await this.MakeRequestAsync<PasskeyResponse>(HttpMethod.Patch, $"{this.Url}/passkeys/{passkeyId}", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return PasskeyResponse.Read(renamed);
+    }
+
+    /// <inheritdoc />
+    public async Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var challenge = await this.MakeRequestAsync<PasskeyRegistrationChallengeResponse>(HttpMethod.Post, $"{this.Url}/passkeys/registration/options", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyRegistrationChallengeResponse.Read(challenge);
+    }
+
+    /// <inheritdoc />
+    public async Task<Passkey> RegisterPasskeyAsync(string jwt, Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
+    {
+        var body = RegisterPasskeyBody.For(challengeId, credential);
+        var registered = await this.MakeRequestAsync<PasskeyResponse>(HttpMethod.Post, $"{this.Url}/passkeys/registration/verify", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyResponse.Read(registered);
     }
 
     /// <inheritdoc />

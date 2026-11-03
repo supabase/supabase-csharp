@@ -10,6 +10,7 @@ using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
@@ -113,6 +114,27 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <exception cref="ArgumentException"><paramref name="friendlyName" /> is null or empty. Nothing is sent.</exception>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<Passkey> RenamePasskeyAsync(string jwt, Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Asks the server for a WebAuthn challenge to register a new passkey for the user.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level when the user has MFA enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The challenge and the WebAuthn creation options to hand to the platform.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers the credential a WebAuthn ceremony created as one of the user's passkeys.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level when the user has MFA enabled.</param>
+    /// <param name="challengeId">The id of the challenge the credential answers.</param>
+    /// <param name="credential">The W3C <c>RegistrationResponseJSON</c> credential, passed to the server verbatim.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered passkey.</returns>
+    /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<Passkey> RegisterPasskeyAsync(string jwt, Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Asks the server for a passkey sign-in challenge that any of the user's passkeys can answer. No session is needed.

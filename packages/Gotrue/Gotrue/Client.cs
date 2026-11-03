@@ -17,6 +17,7 @@ using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
@@ -532,6 +533,26 @@ public class Client : IGotrueClient<User, Session>
         this.ThrowWhenOffline();
         var accessToken = this.RetrieveAccessTokenOrThrow();
         return await this.api.RenamePasskeyAsync(accessToken, passkeyId, friendlyName, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.passkey.register_passkey")]
+    public async Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.StartPasskeyRegistration);
+        this.ThrowWhenOffline();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
+        return await this.api.StartPasskeyRegistrationAsync(accessToken, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.passkey.register_passkey")]
+    public async Task<Passkey> RegisterPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RegisterPasskey);
+        this.ThrowWhenOffline();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
+        return await this.api.RegisterPasskeyAsync(accessToken, challengeId, credential, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

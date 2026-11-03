@@ -22,7 +22,8 @@ namespace Gotrue.Tests.Support;
 ///     ceremony through the auth server's own API with a plain <see cref="HttpClient" />: it asks
 ///     <c>POST /passkeys/registration/options</c> for a challenge, answers it with a fresh P-256 key under the
 ///     <c>none</c> attestation format (the format the server's own tests use), and submits the answer to
-///     <c>POST /passkeys/registration/verify</c>. Assertions answer a discoverable sign-in challenge the way
+///     <c>POST /passkeys/registration/verify</c>. It can also answer creation options the SDK fetched, leaving the
+///     submission to the code under test. Assertions answer a discoverable sign-in challenge the way
 ///     supabase/auth's <c>virtualAuthenticator.getAssertion</c> does. The relying party below matches
 ///     <c>[auth.webauthn]</c> in <c>supabase/config.toml</c>.
 /// </summary>
@@ -58,6 +59,13 @@ internal static class SoftwareAuthenticator
         var credential = CreateCredential(challenge.Options.Challenge, credentialId, key);
         var passkey = await PostAsync<RegisteredPasskey>("/passkeys/registration/verify", accessToken, new { challenge_id = challenge.ChallengeId, credential });
         return new SoftwarePasskey(passkey.Id, credentialId, key.ExportParameters(true), Base64UrlDecode(challenge.Options.User.Id));
+    }
+
+    internal static JsonElement CreateCredential(JsonElement creationOptions)
+    {
+        using var key = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var credential = CreateCredential(creationOptions.GetProperty("challenge").GetString()!, RandomNumberGenerator.GetBytes(CredentialIdLength), key);
+        return JsonSerializer.SerializeToElement(credential);
     }
 
     internal static SoftwarePasskey CreateUnregisteredPasskey()
