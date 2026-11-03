@@ -51,8 +51,12 @@ public class SignInWithPasskeyApprovalTests : RequestApprovalFixture
     [TestMethod]
     public async Task SignInWithPasskeyRequest_ShouldSendTheChallengeIdAndTheAssertionVerbatim()
     {
-        var assertion = JsonDocument.Parse(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SignInWithPasskey", "Data", "assertion.json"))).RootElement;
+        this.RespondTo("/passkeys/authentication/verify", Fixture("signed_in_session.json"));
+        var assertion = JsonDocument.Parse(Fixture("assertion.json")).RootElement;
         await this.Api.SignInWithPasskeyAsync(ChallengeId, assertion);
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
+
+    private static string Fixture(string name) =>
+        File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SignInWithPasskey", "Data", name));
 }

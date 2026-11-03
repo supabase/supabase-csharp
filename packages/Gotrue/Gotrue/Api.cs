@@ -706,8 +706,14 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
-    public Task<Session?> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default) =>
-        this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/verify", SignInWithPasskeyBody.For(challengeId, credential), this.Headers, cancellationToken);
+    public async Task<Session> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
+    {
+        var signedIn = await this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/verify", SignInWithPasskeyBody.For(challengeId, credential), this.Headers, cancellationToken).ConfigureAwait(false);
+        return RetrievePasskeySessionOrThrow(signedIn);
+    }
+
+    private static Session RetrievePasskeySessionOrThrow(Session? signedIn) =>
+        string.IsNullOrEmpty(signedIn?.AccessToken) ? throw new GotrueException("The auth server returned no session for the passkey sign-in.", FailureHint.Reason.Unknown) : signedIn!;
 
     /// <inheritdoc />
     public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)
