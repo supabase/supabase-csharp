@@ -54,6 +54,7 @@ public class OfflineClientContractTests
             Operation("GetUserIdentities", client => client.GetUserIdentitiesAsync()),
             Operation("ListPasskeys", client => client.ListPasskeysAsync()),
             Operation("DeletePasskey", client => client.DeletePasskeyAsync(Guid.NewGuid())),
+            Operation("RenamePasskey", client => client.RenamePasskeyAsync(Guid.NewGuid(), "a-passkey-name")),
             Operation("Update", client => client.Update(new UserAttributes { Email = Email })),
             Operation("Reauthenticate", client => client.Reauthenticate()),
             Operation("RefreshSession", client => client.RefreshSession()),

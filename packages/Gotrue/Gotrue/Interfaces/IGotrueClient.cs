@@ -10,7 +10,6 @@ using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
-using Supabase.Gotrue.ListPasskeys;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -545,6 +544,32 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     </code>
     /// </example>
     Task DeletePasskeyAsync(Guid passkeyId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Renames one of the signed-in user's passkeys, replacing the name the server derived from its authenticator
+    ///     so the user can tell their passkeys apart. Works at any authenticator assurance level. The current session
+    ///     is kept.
+    /// </summary>
+    /// <param name="passkeyId">The id of the passkey, as listed by <see cref="ListPasskeysAsync" />.</param>
+    /// <param name="friendlyName">The new name, at most 120 characters.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The passkey with its new name.</returns>
+    /// <exception cref="ArgumentException"><paramref name="friendlyName" /> is null or empty. Nothing is sent.</exception>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>validation_failed</c> (400) when the name is longer than 120 characters,
+    ///     <c>validation_failed</c> (404) when the user has no passkey with that id,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var passkeys = await client.ListPasskeysAsync();
+    ///     var renamed = await client.RenamePasskeyAsync(passkeys[0].Id, "Work laptop");
+    ///     </code>
+    /// </example>
+    Task<Passkey> RenamePasskeyAsync(Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Add a listener to get errors that occur outside of a typical Exception flow.

@@ -17,8 +17,8 @@ using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
-using Supabase.Gotrue.ListPasskeys;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.RenamePasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
@@ -670,6 +670,14 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public Task DeletePasskeyAsync(string jwt, Guid passkeyId, CancellationToken cancellationToken = default) =>
         this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/passkeys/{passkeyId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<Passkey> RenamePasskeyAsync(string jwt, Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default)
+    {
+        var body = RenamePasskeyBody.For(friendlyName);
+        var renamed = await this.MakeRequestAsync<PasskeyResponse>(HttpMethod.Patch, $"{this.Url}/passkeys/{passkeyId}", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return PasskeyResponse.Read(renamed);
+    }
 
     /// <inheritdoc />
     public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)

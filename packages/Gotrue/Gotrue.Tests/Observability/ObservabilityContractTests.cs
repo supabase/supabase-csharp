@@ -30,7 +30,7 @@ public class ObservabilityContractTests
 {
     private const string AccessToken = "an-access-token";
     private const string RefreshTokenValue = "a-refresh-token";
-    private static readonly Guid DeletedPasskeyId = Guid.Parse("5f0b6c1e-8a43-4d1f-9c7e-2b8f3e6a1d24");
+    private static readonly Guid PasskeyId = Guid.Parse("5f0b6c1e-8a43-4d1f-9c7e-2b8f3e6a1d24");
 
     private readonly List<Activity> activities = new();
     private readonly List<RecordedMeasurement> measurements = new();
@@ -148,9 +148,20 @@ public class ObservabilityContractTests
         this.MockTokenSuccess();
         await this.Refresh();
         this.MockPasskeyDeletionSuccess();
-        await this.client.DeletePasskeyAsync(DeletedPasskeyId);
+        await this.client.DeletePasskeyAsync(PasskeyId);
         var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.delete_passkey").Which;
-        this.activities.Should().ContainSingle(a => a.OperationName == $"DELETE /passkeys/{DeletedPasskeyId}").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+        this.activities.Should().ContainSingle(a => a.OperationName == $"DELETE /passkeys/{PasskeyId}").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeyRename()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeyRenameSuccess();
+        await this.client.RenamePasskeyAsync(PasskeyId, "Work laptop");
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.rename_passkey").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == $"PATCH /passkeys/{PasskeyId}").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
     }
 
     [TestMethod]
@@ -324,8 +335,16 @@ public class ObservabilityContractTests
 
     private void MockPasskeyDeletionSuccess() =>
         this.server
-            .Given(Request.Create().WithPath($"/passkeys/{DeletedPasskeyId}").UsingDelete())
+            .Given(Request.Create().WithPath($"/passkeys/{PasskeyId}").UsingDelete())
             .RespondWith(Response.Create().WithStatusCode(204));
+
+    private void MockPasskeyRenameSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath($"/passkeys/{PasskeyId}").UsingPatch())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RenamePasskey", "Data", "renamed_passkey.json"))));
 
     private void MockRecoveryCodesStatusSuccess() =>
         this.server

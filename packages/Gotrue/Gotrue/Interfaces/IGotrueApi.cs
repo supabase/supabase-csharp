@@ -8,7 +8,6 @@ using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
-using Supabase.Gotrue.ListPasskeys;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -100,6 +99,18 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task DeletePasskeyAsync(string jwt, Guid passkeyId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Renames one of the user's passkeys.
+    /// </summary>
+    /// <param name="jwt">The user's access token.</param>
+    /// <param name="passkeyId">The id of the passkey.</param>
+    /// <param name="friendlyName">The new name, at most 120 characters.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The passkey with its new name.</returns>
+    /// <exception cref="ArgumentException"><paramref name="friendlyName" /> is null or empty. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<Passkey> RenamePasskeyAsync(string jwt, Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Generates the user's one-time set of MFA recovery codes.

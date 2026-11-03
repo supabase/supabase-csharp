@@ -1,6 +1,6 @@
 using System;
 
-namespace Supabase.Gotrue.ListPasskeys;
+namespace Supabase.Gotrue.Common;
 
 /// <summary>
 /// A passkey (WebAuthn credential) registered by the signed-in user. Only its metadata is returned: the credential's
@@ -12,14 +12,14 @@ public sealed record Passkey
     public Guid Id { get; init; }
 
     /// <summary>
-    /// The human-readable name of the passkey, which the server derives from the authenticator that created it
-    /// (for example <c>iCloud Keychain</c>), or null when it has none.
+    /// The human-readable name of the passkey, or null when it has none. The server derives it from the authenticator
+    /// that created the passkey (for example <c>iCloud Keychain</c>) until the user renames it.
     /// </summary>
     public string? FriendlyName { get; init; }
 
     /// <summary>When the passkey was registered.</summary>
-    public DateTime CreatedAt { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
 
     /// <summary>When the passkey last signed the user in, or null when it never has.</summary>
-    public DateTime? LastUsedAt { get; init; }
+    public DateTimeOffset? LastUsedAt { get; init; }
 }

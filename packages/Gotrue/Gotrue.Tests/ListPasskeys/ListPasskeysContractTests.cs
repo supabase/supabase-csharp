@@ -9,9 +9,9 @@ using FluentAssertions;
 using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Gotrue;
+using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
-using Supabase.Gotrue.ListPasskeys;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using static Supabase.Gotrue.Exceptions.FailureHint.Reason;
@@ -68,13 +68,13 @@ public class ListPasskeysContractTests
             {
                 Id = Guid.Parse("5f0b6c1e-8a43-4d1f-9c7e-2b8f3e6a1d24"),
                 FriendlyName = "iCloud Keychain",
-                CreatedAt = new DateTime(2026, 3, 2, 9, 15, 30, DateTimeKind.Utc).AddTicks(1234560),
-                LastUsedAt = new DateTime(2026, 10, 28, 17, 42, 5, DateTimeKind.Utc),
+                CreatedAt = new DateTimeOffset(2026, 3, 2, 9, 15, 30, TimeSpan.Zero).AddTicks(1234560),
+                LastUsedAt = new DateTimeOffset(2026, 10, 28, 17, 42, 5, TimeSpan.Zero),
             },
             new Passkey
             {
                 Id = Guid.Parse("c3a9e2d7-41b6-4f08-8e5a-9d1c7b2f6e30"),
-                CreatedAt = new DateTime(2026, 4, 11, 8, 0, 0, DateTimeKind.Utc),
+                CreatedAt = new DateTimeOffset(2026, 4, 11, 8, 0, 0, TimeSpan.Zero),
             },
         }, options => options.WithStrictOrdering(),
             "each item is a PasskeyListItem (id, friendly_name, created_at, last_used_at), listed in the server's created_at order (supabase/auth PasskeyList)");

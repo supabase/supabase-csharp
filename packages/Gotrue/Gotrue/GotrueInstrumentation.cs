@@ -73,6 +73,7 @@ internal static class GotrueInstrumentation
         internal const string GetUserIdentities = "gotrue.get_user_identities";
         internal const string ListPasskeys = "gotrue.list_passkeys";
         internal const string DeletePasskey = "gotrue.delete_passkey";
+        internal const string RenamePasskey = "gotrue.rename_passkey";
         internal const string GetRecoveryCodesStatus = "gotrue.get_recovery_codes_status";
         internal const string GenerateRecoveryCodes = "gotrue.generate_recovery_codes";
         internal const string RegenerateRecoveryCodes = "gotrue.regenerate_recovery_codes";

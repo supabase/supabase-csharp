@@ -37,7 +37,7 @@ public class ListPasskeysTests : AuthClientFixture
         var session = await this.SignUpNewUser();
         var registered = await SoftwareAuthenticator.RegisterPasskeyAsync(session.AccessToken!);
         var passkeys = await this.Client.ListPasskeysAsync();
-        passkeys.Should().ContainSingle().Which.Should().BeEquivalentTo(new { Id = registered, FriendlyName = "Passkey", LastUsedAt = (DateTime?) null },
+        passkeys.Should().ContainSingle().Which.Should().BeEquivalentTo(new { Id = registered, FriendlyName = "Passkey", LastUsedAt = (DateTimeOffset?) null },
             "the server names a passkey from an unknown authenticator model \"Passkey\" and sets last_used_at only on sign-in (supabase/auth PasskeyFriendlyName)");
     }
 
