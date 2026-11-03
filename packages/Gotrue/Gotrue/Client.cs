@@ -499,7 +499,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GetUserIdentities);
         this.ThrowWhenOffline();
-        var accessToken = this.RequireAccessToken();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
         var user = await this.api.GetUserAsync(accessToken, cancellationToken).ConfigureAwait(false);
         return user?.Identities ?? new List<UserIdentity>();
     }
@@ -510,7 +510,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.ListPasskeys);
         this.ThrowWhenOffline();
-        var accessToken = this.RequireAccessToken();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
         return await this.api.ListPasskeysAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
 
@@ -520,7 +520,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.DeletePasskey);
         this.ThrowWhenOffline();
-        var accessToken = this.RequireAccessToken();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
         await this.api.DeletePasskeyAsync(accessToken, passkeyId, cancellationToken).ConfigureAwait(false);
     }
 
@@ -1158,7 +1158,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GetRecoveryCodesStatus);
         this.ThrowWhenOffline();
-        var accessToken = this.RequireAccessToken();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
         return await this.api.GetRecoveryCodesStatusAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
 
@@ -1168,7 +1168,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.GenerateRecoveryCodes);
         this.ThrowWhenOffline();
-        var accessToken = this.RequireAccessToken();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
         return await this.api.GenerateRecoveryCodesAsync(accessToken, options, cancellationToken).ConfigureAwait(false);
     }
 
@@ -1178,7 +1178,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.RegenerateRecoveryCodes);
         this.ThrowWhenOffline();
-        var accessToken = this.RequireAccessToken();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
         return await this.api.RegenerateRecoveryCodesAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
 
@@ -1189,7 +1189,7 @@ public class Client : IGotrueClient<User, Session>
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.VerifyRecoveryCode);
         RequireRecoveryCode(code);
         this.ThrowWhenOffline();
-        var accessToken = this.RequireAccessToken();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
         var verified = await this.api.VerifyRecoveryCodeAsync(accessToken, code, cancellationToken).ConfigureAwait(false);
         var session = RequireVerifiedSession(verified);
         await this.UpdateSessionAsync(session).ConfigureAwait(false);
@@ -1214,7 +1214,7 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.UnenrollRecoveryCodes);
         this.ThrowWhenOffline();
-        var accessToken = this.RequireAccessToken();
+        var accessToken = this.RetrieveAccessTokenOrThrow();
         await this.api.UnenrollRecoveryCodesAsync(accessToken, cancellationToken).ConfigureAwait(false);
     }
 
@@ -1278,7 +1278,7 @@ public class Client : IGotrueClient<User, Session>
         }
     }
 
-    private string RequireAccessToken() =>
+    private string RetrieveAccessTokenOrThrow() =>
         this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
 
     private AuthState? SetCurrentSession(Session? session)
