@@ -679,6 +679,13 @@ public class Api : IGotrueApi<User, Session>
     }
 
     /// <inheritdoc />
+    public async Task<RecoveryCodes> RegenerateRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var regenerated = await this.MakeRequestAsync<RecoveryCodesResponse>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes/regenerate", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return RecoveryCodesResponse.Read(regenerated);
+    }
+
+    /// <inheritdoc />
     public Task<Session?> VerifyRecoveryCodeAsync(string jwt, string code, CancellationToken cancellationToken = default) =>
         this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/factors/recovery-codes/verify", new VerifyRecoveryCodeBody(code), this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 

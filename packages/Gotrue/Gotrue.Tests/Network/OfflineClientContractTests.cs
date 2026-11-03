@@ -66,6 +66,7 @@ public class OfflineClientContractTests
             Operation("Unenroll", client => client.Unenroll(new MfaUnenrollParams())),
             Operation("GetRecoveryCodesStatus", client => client.GetRecoveryCodesStatusAsync()),
             Operation("GenerateRecoveryCodes", client => client.GenerateRecoveryCodesAsync()),
+            Operation("RegenerateRecoveryCodes", client => client.RegenerateRecoveryCodesAsync()),
             Operation("VerifyRecoveryCode", client => client.VerifyRecoveryCodeAsync("a-recovery-code")),
             Operation("UnenrollRecoveryCodes", client => client.UnenrollRecoveryCodesAsync()),
         };

@@ -112,6 +112,15 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Replaces the user's MFA recovery codes with a new set, invalidating every previous code.
+    /// </summary>
+    /// <param name="jwt">The user's access token, at the aal2 assurance level.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The new codes, returned only this once.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<RecoveryCodes> RegenerateRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Redeems one of the user's single-use MFA recovery codes for a session at the aal2 assurance level.
     /// </summary>
     /// <param name="jwt">The user's access token.</param>

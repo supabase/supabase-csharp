@@ -1,0 +1,5 @@
+{
+  "code": 422,
+  "error_code": "mfa_recovery_codes_enroll_not_enabled",
+  "msg": "MFA recovery codes enrollment is disabled"
+}

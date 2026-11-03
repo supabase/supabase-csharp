@@ -767,6 +767,37 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     Task<RecoveryCodes> GenerateRecoveryCodesAsync(GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Replaces the signed-in user's MFA recovery codes with a new set. Every previous code stops working at once,
+    ///     and any lockout from failed verification attempts is cleared. The plaintext codes are returned exactly once and
+    ///     cannot be read back: show them to the user and ask them to store them safely. The session must be at the
+    ///     <c>aal2</c> assurance level and the user must already have recovery codes; use
+    ///     <see cref="GenerateRecoveryCodesAsync" /> to create the first set.
+    ///     Recovery codes are experimental on the auth server.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The new codes, returned only this once.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>insufficient_aal</c> when the session is not at <c>aal2</c>,
+    ///     <c>mfa_factor_not_found</c> when the user has no recovery codes,
+    ///     <c>mfa_recovery_codes_enroll_not_enabled</c> when recovery codes are disabled on the server,
+    ///     <c>no_authorization</c> for an anonymous user.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     await client.ChallengeAndVerify(new MfaChallengeAndVerifyParams { FactorId = totpFactorId, Code = code });
+    ///     var recoveryCodes = await client.RegenerateRecoveryCodesAsync();
+    ///     foreach (var recoveryCode in recoveryCodes.Codes)
+    ///     {
+    ///         // show each code once; the previous codes no longer work
+    ///     }
+    ///     </code>
+    /// </example>
+    Task<RecoveryCodes> RegenerateRecoveryCodesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Redeems one of the signed-in user's single-use MFA recovery codes and upgrades the session to the
     ///     <c>aal2</c> assurance level. Use it when the user cannot reach their other factors, such as a lost
     ///     authenticator app. The code is consumed: it cannot be used again. Letter case, whitespace and <c>-</c>

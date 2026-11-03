@@ -187,6 +187,17 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodesRegeneration()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockRecoveryCodesRegenerationSuccess();
+        await this.client.RegenerateRecoveryCodesAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.regenerate_recovery_codes").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /factors/recovery-codes/regenerate").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
     public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodeVerification()
     {
         this.MockTokenSuccess();
@@ -331,6 +342,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "GenerateRecoveryCodes", "Data", "recovery_codes.json"))));
+
+    private void MockRecoveryCodesRegenerationSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/factors/recovery-codes/regenerate").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RegenerateRecoveryCodes", "Data", "regenerated_codes.json"))));
 
     private void MockRecoveryCodesUnenrollmentSuccess() =>
         this.server
