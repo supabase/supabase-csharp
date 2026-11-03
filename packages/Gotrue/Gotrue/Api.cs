@@ -666,21 +666,25 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public async Task<IReadOnlyList<Passkey>> ListPasskeysAsync(string jwt, CancellationToken cancellationToken = default)
     {
-        var passkeys = await this.MakeRequestAsync<IReadOnlyList<PasskeyResponse>>(HttpMethod.Get, $"{this.Url}/passkeys", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        var passkeys = await this.MakeRequestAsync<IReadOnlyList<PasskeyResponse>>(HttpMethod.Get, this.PasskeyCollectionUrl(), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return PasskeyResponse.Read(passkeys);
     }
 
     /// <inheritdoc />
     public Task DeletePasskeyAsync(string jwt, Guid passkeyId, CancellationToken cancellationToken = default) =>
-        this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/passkeys/{passkeyId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+        this.MakeRequestAsync(HttpMethod.Delete, this.PasskeyUrl(passkeyId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
     /// <inheritdoc />
     public async Task<Passkey> RenamePasskeyAsync(string jwt, Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default)
     {
         var body = RenamePasskeyBody.For(friendlyName);
-        var renamed = await this.MakeRequestAsync<PasskeyResponse>(HttpMethod.Patch, $"{this.Url}/passkeys/{passkeyId}", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        var renamed = await this.MakeRequestAsync<PasskeyResponse>(HttpMethod.Patch, this.PasskeyUrl(passkeyId), body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return PasskeyResponse.Read(renamed);
     }
+
+    private string PasskeyCollectionUrl() => $"{this.Url}/passkeys";
+
+    private string PasskeyUrl(Guid passkeyId) => $"{this.PasskeyCollectionUrl()}/{passkeyId}";
 
     /// <inheritdoc />
     public async Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default)
@@ -752,7 +756,7 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public async Task<IReadOnlyList<Passkey>> AdminListPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default)
     {
-        var passkeys = await this.MakeRequestAsync<IReadOnlyList<PasskeyResponse>>(HttpMethod.Get, this.AdminUserPasskeysUrl(userId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        var passkeys = await this.MakeRequestAsync<IReadOnlyList<PasskeyResponse>>(HttpMethod.Get, this.AdminUserPasskeyCollectionUrl(userId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return PasskeyResponse.Read(passkeys);
     }
 
@@ -760,9 +764,9 @@ public class Api : IGotrueApi<User, Session>
     public Task AdminDeletePasskeyAsync(string jwt, Guid userId, Guid passkeyId, CancellationToken cancellationToken = default) =>
         this.MakeRequestAsync(HttpMethod.Delete, this.AdminUserPasskeyUrl(userId, passkeyId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
-    private string AdminUserPasskeysUrl(Guid userId) => $"{this.Url}/admin/users/{userId}/passkeys";
+    private string AdminUserPasskeyCollectionUrl(Guid userId) => $"{this.Url}/admin/users/{userId}/passkeys";
 
-    private string AdminUserPasskeyUrl(Guid userId, Guid passkeyId) => $"{this.AdminUserPasskeysUrl(userId)}/{passkeyId}";
+    private string AdminUserPasskeyUrl(Guid userId, Guid passkeyId) => $"{this.AdminUserPasskeyCollectionUrl(userId)}/{passkeyId}";
 
     /// <inheritdoc />
     public Task DeleteCustomProviderAsync(string jwt, string identifier, CancellationToken cancellationToken = default) =>
