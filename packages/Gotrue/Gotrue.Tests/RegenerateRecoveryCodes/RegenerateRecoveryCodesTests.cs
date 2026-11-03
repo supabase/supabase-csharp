@@ -2,10 +2,9 @@
 
 using System.Threading.Tasks;
 using FluentAssertions;
-using Gotrue.Tests.Mfa;
+using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Gotrue.Exceptions;
-using Supabase.Gotrue.Mfa;
 
 #endregion
 
@@ -14,20 +13,21 @@ namespace Gotrue.Tests.RegenerateRecoveryCodes;
 /// <summary>
 ///     End-to-end regeneration of the signed-in user's MFA recovery codes against the live stack. The local stack
 ///     cannot enroll recovery codes (the CLI does not expose the auth server's recovery codes enroll setting, which
-///     defaults to off), so these cover the rejections the stack can reach; a successful regeneration is pinned by
+///     defaults to off) and checks that setting before the session's aal or the user's codes, so these cover the
+///     rejections the stack can reach; a successful regeneration and the aal and not-enrolled rejections are pinned by
 ///     <see cref="RegenerateRecoveryCodesContractTests" />.
 /// </summary>
 [TestClass]
 [TestCategory("E2E")]
-public class RegenerateRecoveryCodesTests : MfaFixture
+public class RegenerateRecoveryCodesTests : AuthClientFixture
 {
     [TestMethod]
-    public async Task RegenerateRecoveryCodesAsync_ShouldThrowInsufficientAal_GivenAal1Session()
+    public async Task RegenerateRecoveryCodesAsync_ShouldThrowEnrollNotEnabled_GivenServerWithRecoveryCodesDisabled()
     {
         await this.SignUpNewUser();
         var regenerating = () => this.Client.RegenerateRecoveryCodesAsync();
-        (await regenerating.Should().ThrowAsync<GotrueException>()).Which.ErrorCode.Should().Be("insufficient_aal",
-            "POST /factors/recovery-codes/regenerate requires an aal2 session (auth OpenAPI, 403 insufficient_aal)");
+        (await regenerating.Should().ThrowAsync<GotrueException>()).Which.ErrorCode.Should().Be("mfa_recovery_codes_enroll_not_enabled",
+            "the auth server leaves GOTRUE_MFA_RECOVERY_CODES_ENROLL_ENABLED off by default and refuses regeneration before checking the session's aal (auth OpenAPI, POST /factors/recovery-codes/regenerate 422)");
     }
 
     [TestMethod]
@@ -37,16 +37,5 @@ public class RegenerateRecoveryCodesTests : MfaFixture
         var regenerating = () => this.Client.RegenerateRecoveryCodesAsync();
         (await regenerating.Should().ThrowAsync<GotrueException>()).Which.ErrorCode.Should().Be("no_authorization",
             "anonymous users cannot use recovery codes (auth OpenAPI, POST /factors/recovery-codes/regenerate 403)");
-    }
-
-    [TestMethod]
-    public async Task RegenerateRecoveryCodesAsync_ShouldThrowFactorNotFound_GivenAal2SessionWithoutRecoveryCodes()
-    {
-        await this.SignUpNewUser();
-        var enrollment = await this.EnrollTotp();
-        await this.Client.ChallengeAndVerify(new MfaChallengeAndVerifyParams { FactorId = enrollment.Id, Code = TotpCode(enrollment) });
-        var regenerating = () => this.Client.RegenerateRecoveryCodesAsync();
-        (await regenerating.Should().ThrowAsync<GotrueException>()).Which.ErrorCode.Should().Be("mfa_factor_not_found",
-            "an aal2 user who never enrolled recovery codes has no set to replace (auth OpenAPI, 404 mfa_factor_not_found)");
     }
 }
