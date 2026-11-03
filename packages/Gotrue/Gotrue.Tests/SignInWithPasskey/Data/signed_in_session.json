@@ -1,0 +1,13 @@
+{
+  "access_token": "a-passkey-access-token",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "expires_at": 1793720700,
+  "refresh_token": "a-passkey-refresh-token",
+  "user": {
+    "id": "11111111-1111-1111-1111-111111111111",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "example@email.com"
+  }
+}

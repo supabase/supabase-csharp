@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -162,6 +163,24 @@ public class ObservabilityContractTests
         await this.client.RenamePasskeyAsync(PasskeyId, "Work laptop");
         var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.rename_passkey").Which;
         this.activities.Should().ContainSingle(a => a.OperationName == $"PATCH /passkeys/{PasskeyId}").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeySignInStart()
+    {
+        this.MockPasskeySignInSuccess("options", "sign_in_challenge.json");
+        await this.client.StartPasskeySignInAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.start_passkey_sign_in").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/authentication/options").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeySignIn()
+    {
+        this.MockPasskeySignInSuccess("verify", "signed_in_session.json");
+        await this.client.SignInWithPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement);
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.sign_in.passkey").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/authentication/verify").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
     }
 
     [TestMethod]
@@ -345,6 +364,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RenamePasskey", "Data", "renamed_passkey.json"))));
+
+    private void MockPasskeySignInSuccess(string step, string fixture) =>
+        this.server
+            .Given(Request.Create().WithPath($"/passkeys/authentication/{step}").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SignInWithPasskey", "Data", fixture))));
 
     private void MockRecoveryCodesStatusSuccess() =>
         this.server

@@ -1,0 +1,5 @@
+{
+  "code": 400,
+  "error_code": "webauthn_verification_failed",
+  "msg": "Credential verification failed"
+}

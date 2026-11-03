@@ -69,6 +69,8 @@ internal static class GotrueInstrumentation
         internal const string SignUp = "gotrue.sign_up";
         internal const string SendMagicLink = "gotrue.send_magic_link";
         internal const string SignInWithIdToken = "gotrue.sign_in.id_token";
+        internal const string StartPasskeySignIn = "gotrue.start_passkey_sign_in";
+        internal const string SignInWithPasskey = "gotrue.sign_in.passkey";
         internal const string LinkIdentityWithIdToken = "gotrue.link_identity.id_token";
         internal const string GetUserIdentities = "gotrue.get_user_identities";
         internal const string ListPasskeys = "gotrue.list_passkeys";

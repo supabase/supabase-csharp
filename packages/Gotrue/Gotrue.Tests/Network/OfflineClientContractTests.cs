@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Gotrue.Tests.Support;
@@ -55,6 +56,8 @@ public class OfflineClientContractTests
             Operation("ListPasskeys", client => client.ListPasskeysAsync()),
             Operation("DeletePasskey", client => client.DeletePasskeyAsync(Guid.NewGuid())),
             Operation("RenamePasskey", client => client.RenamePasskeyAsync(Guid.NewGuid(), "a-passkey-name")),
+            Operation("StartPasskeySignIn", client => client.StartPasskeySignInAsync()),
+            Operation("SignInWithPasskey", client => client.SignInWithPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement)),
             Operation("Update", client => client.Update(new UserAttributes { Email = Email })),
             Operation("Reauthenticate", client => client.Reauthenticate()),
             Operation("RefreshSession", client => client.RefreshSession()),

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
@@ -13,6 +14,7 @@ using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.SignInWithPasskey;
 using static Supabase.Gotrue.Constants;
 
 #endregion
@@ -570,6 +572,63 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     </code>
     /// </example>
     Task<Passkey> RenamePasskeyAsync(Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Starts a passkey sign-in: asks the server for a WebAuthn challenge that any of the user's passkeys can answer.
+    ///     No session is needed. Run the platform's WebAuthn ceremony with <see cref="PasskeySignInChallenge.Options" />
+    ///     (the SDK cannot, as .NET has no cross-platform credential API), then complete the sign-in with
+    ///     <see cref="SignInWithPasskeyAsync" /> before <see cref="PasskeySignInChallenge.ExpiresAt" />.
+    /// </summary>
+    /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The challenge and the WebAuthn request options to hand to the platform.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.UserTooManyRequests" /> when the passkey sign-in rate limit is reached,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />
+    ///     (<c>captcha_failed</c> when the CAPTCHA token is missing or invalid,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server).
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var challenge = await client.StartPasskeySignInAsync();
+    ///     var assertion = await js.InvokeAsync&lt;JsonElement&gt;("passkeys.get", challenge.Options);
+    ///     var session = await client.SignInWithPasskeyAsync(challenge.Id, assertion);
+    ///     </code>
+    /// </example>
+    Task<PasskeySignInChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Completes a passkey sign-in started with <see cref="StartPasskeySignInAsync" />: the server checks the
+    ///     assertion the platform's WebAuthn ceremony produced and signs in the passkey's owner. The new session replaces
+    ///     the current one, is persisted, and is announced like any other sign-in.
+    /// </summary>
+    /// <param name="challengeId">The <see cref="PasskeySignInChallenge.Id" /> the assertion answers.</param>
+    /// <param name="credential">
+    ///     The assertion, as the W3C <c>AuthenticationResponseJSON</c> object (what <c>PublicKeyCredential.toJSON()</c>
+    ///     and Android's Credential Manager produce), passed to the server verbatim.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The signed-in session.</returns>
+    /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.UserEmailNotConfirmed" /> when the user has not confirmed their email,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>webauthn_challenge_not_found</c> when the challenge is unknown or already used (a failed attempt uses it
+    ///     too: start again), <c>webauthn_challenge_expired</c> when it expired,
+    ///     <c>webauthn_verification_failed</c> when the assertion does not check out,
+    ///     <c>phone_not_confirmed</c>, <c>user_banned</c>,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var challenge = await client.StartPasskeySignInAsync();
+    ///     var assertion = await js.InvokeAsync&lt;JsonElement&gt;("passkeys.get", challenge.Options);
+    ///     var session = await client.SignInWithPasskeyAsync(challenge.Id, assertion);
+    ///     </code>
+    /// </example>
+    Task<TSession> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Add a listener to get errors that occur outside of a typical Exception flow.

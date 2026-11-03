@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
@@ -11,6 +12,7 @@ using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
+using Supabase.Gotrue.SignInWithPasskey;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
 using static Supabase.Gotrue.Constants;
@@ -111,6 +113,26 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <exception cref="ArgumentException"><paramref name="friendlyName" /> is null or empty. Nothing is sent.</exception>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<Passkey> RenamePasskeyAsync(string jwt, Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Asks the server for a passkey sign-in challenge that any of the user's passkeys can answer. No session is needed.
+    /// </summary>
+    /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The challenge and the WebAuthn request options to hand to the platform.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<PasskeySignInChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Exchanges a passkey assertion for a session. Nothing is stored: the caller keeps the session.
+    /// </summary>
+    /// <param name="challengeId">The id of the challenge the assertion answers.</param>
+    /// <param name="credential">The W3C <c>AuthenticationResponseJSON</c> assertion, passed to the server verbatim.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The session of the passkey's owner.</returns>
+    /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<TSession?> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Generates the user's one-time set of MFA recovery codes.
