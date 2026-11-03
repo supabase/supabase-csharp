@@ -161,6 +161,10 @@ features:
     status: implemented
     symbols:
       - Client.GetRecoveryCodesStatusAsync
+  auth.mfa_recovery_codes.regenerate:
+    status: implemented
+    symbols:
+      - Client.RegenerateRecoveryCodesAsync
   auth.mfa_recovery_codes.unenroll:
     status: implemented
     symbols:
@@ -521,6 +525,10 @@ features:
     note: "Active channels exposed as a Subscriptions dictionary; no getChannels() method."
     symbols:
       - Client.Subscriptions
+  realtime.client.remove_all_channels:
+    status: implemented
+    symbols:
+      - Client.RemoveAll
   realtime.client.remove_channel:
     status: implemented
     symbols:
