@@ -10,7 +10,6 @@ using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
-using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
@@ -122,7 +121,7 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>The challenge and the WebAuthn creation options to hand to the platform.</returns>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
-    Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default);
+    Task<PasskeyChallenge> StartPasskeyRegistrationAsync(string jwt, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Registers the credential a WebAuthn ceremony created as one of the user's passkeys.
@@ -143,7 +142,7 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>The challenge and the WebAuthn request options to hand to the platform.</returns>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
-    Task<PasskeySignInChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default);
+    Task<PasskeyChallenge> StartPasskeySignInAsync(SignInWithPasskeyOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Exchanges a passkey assertion for a session. Nothing is stored: the caller keeps the session.

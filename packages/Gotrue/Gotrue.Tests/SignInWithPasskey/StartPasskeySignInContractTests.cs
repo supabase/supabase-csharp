@@ -74,7 +74,7 @@ public class StartPasskeySignInContractTests
     {
         this.MockChallengeResponse(200, "null");
         var starting = () => this.client.StartPasskeySignInAsync();
-        await starting.Should().ThrowAsync<GotrueException>().WithMessage("The auth server returned no passkey sign-in challenge.",
+        await starting.Should().ThrowAsync<GotrueException>().WithMessage("The auth server returned no passkey challenge.",
             "a successful answer always carries the challenge, so its absence is a server failure");
     }
 
