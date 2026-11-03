@@ -1,0 +1,5 @@
+{
+  "code": 422,
+  "error_code": "validation_failed",
+  "msg": "SSO users cannot register passkeys"
+}

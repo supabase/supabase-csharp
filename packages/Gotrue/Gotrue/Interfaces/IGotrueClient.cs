@@ -12,6 +12,7 @@ using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
@@ -572,6 +573,70 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     </code>
     /// </example>
     Task<Passkey> RenamePasskeyAsync(Guid passkeyId, string friendlyName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Starts registering a new passkey for the signed-in user: asks the server for a WebAuthn challenge. Run the
+    ///     platform's WebAuthn ceremony with <see cref="PasskeyRegistrationChallenge.Options" /> (the SDK cannot, as .NET
+    ///     has no cross-platform credential API), then complete the registration with <see cref="RegisterPasskeyAsync" />
+    ///     before <see cref="PasskeyRegistrationChallenge.ExpiresAt" />. Anonymous and SSO users cannot register passkeys,
+    ///     and a user with multi-factor authentication enabled needs a session at the <c>aal2</c> assurance level.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The challenge and the WebAuthn creation options to hand to the platform.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>no_authorization</c> for an anonymous user,
+    ///     <c>validation_failed</c> for an SSO user,
+    ///     <c>insufficient_aal</c> when the user has MFA enabled and the session is not at <c>aal2</c>,
+    ///     <c>too_many_passkeys</c> when the user already has the maximum number of passkeys,
+    ///     <c>passkey_disabled</c> when passkeys are disabled on the server.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var challenge = await client.StartPasskeyRegistrationAsync();
+    ///     var credential = await js.InvokeAsync&lt;JsonElement&gt;("passkeys.create", challenge.Options);
+    ///     var passkey = await client.RegisterPasskeyAsync(challenge.Id, credential);
+    ///     </code>
+    /// </example>
+    Task<PasskeyRegistrationChallenge> StartPasskeyRegistrationAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Completes a passkey registration started with <see cref="StartPasskeyRegistrationAsync" />: the server checks
+    ///     the credential the platform's WebAuthn ceremony created and adds it to the signed-in user's passkeys. The
+    ///     current session is kept.
+    /// </summary>
+    /// <param name="challengeId">The <see cref="PasskeyRegistrationChallenge.Id" /> the credential answers.</param>
+    /// <param name="credential">
+    ///     The new credential, as the W3C <c>RegistrationResponseJSON</c> object (what <c>PublicKeyCredential.toJSON()</c>
+    ///     and Android's Credential Manager produce), passed to the server verbatim.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>
+    ///     The registered passkey, named by the server after the authenticator that created it and never used yet. Rename
+    ///     it with <see cref="RenamePasskeyAsync" />.
+    /// </returns>
+    /// <exception cref="ArgumentException"><paramref name="credential" /> is not a JSON object. Nothing is sent.</exception>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.NoSessionFound" /> when no user is signed in,
+    ///     or the server's rejection of the request, with its <see cref="GotrueException.ErrorCode" />:
+    ///     <c>webauthn_challenge_not_found</c> when the challenge is unknown or already used (a failed attempt uses it
+    ///     too: start again), <c>webauthn_challenge_expired</c> when it expired,
+    ///     <c>webauthn_verification_failed</c> when the credential does not check out,
+    ///     <c>webauthn_credential_exists</c> when the credential is already registered,
+    ///     <c>too_many_passkeys</c>, <c>insufficient_aal</c>, <c>no_authorization</c>, <c>validation_failed</c> and
+    ///     <c>passkey_disabled</c> as for <see cref="StartPasskeyRegistrationAsync" />.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var challenge = await client.StartPasskeyRegistrationAsync();
+    ///     var credential = await js.InvokeAsync&lt;JsonElement&gt;("passkeys.create", challenge.Options);
+    ///     var passkey = await client.RegisterPasskeyAsync(challenge.Id, credential);
+    ///     </code>
+    /// </example>
+    Task<Passkey> RegisterPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Starts a passkey sign-in: asks the server for a WebAuthn challenge that any of the user's passkeys can answer.

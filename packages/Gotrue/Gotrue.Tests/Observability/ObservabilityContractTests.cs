@@ -184,6 +184,28 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeyRegistrationStart()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeyRegistrationSuccess("options", "registration_challenge.json");
+        await this.client.StartPasskeyRegistrationAsync();
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.start_passkey_registration").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/registration/options").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenPasskeyRegistration()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.MockPasskeyRegistrationSuccess("verify", "registered_passkey.json");
+        await this.client.RegisterPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement);
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.register_passkey").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/registration/verify").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
     public async Task DomainSpan_ShouldParentTheHttpSpan_GivenRecoveryCodesStatusReading()
     {
         this.MockTokenSuccess();
@@ -372,6 +394,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SignInWithPasskey", "Data", fixture))));
+
+    private void MockPasskeyRegistrationSuccess(string step, string fixture) =>
+        this.server
+            .Given(Request.Create().WithPath($"/passkeys/registration/{step}").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "RegisterPasskey", "Data", fixture))));
 
     private void MockRecoveryCodesStatusSuccess() =>
         this.server

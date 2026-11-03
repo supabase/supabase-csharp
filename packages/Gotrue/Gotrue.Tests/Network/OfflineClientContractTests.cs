@@ -56,6 +56,8 @@ public class OfflineClientContractTests
             Operation("ListPasskeys", client => client.ListPasskeysAsync()),
             Operation("DeletePasskey", client => client.DeletePasskeyAsync(Guid.NewGuid())),
             Operation("RenamePasskey", client => client.RenamePasskeyAsync(Guid.NewGuid(), "a-passkey-name")),
+            Operation("StartPasskeyRegistration", client => client.StartPasskeyRegistrationAsync()),
+            Operation("RegisterPasskey", client => client.RegisterPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement)),
             Operation("StartPasskeySignIn", client => client.StartPasskeySignInAsync()),
             Operation("SignInWithPasskey", client => client.SignInWithPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement)),
             Operation("Update", client => client.Update(new UserAttributes { Email = Email })),

@@ -2,6 +2,9 @@
 override Supabase.Gotrue.Common.Passkey.Equals(object? obj) -> bool
 override Supabase.Gotrue.Common.Passkey.GetHashCode() -> int
 override Supabase.Gotrue.Common.Passkey.ToString() -> string!
+override Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.Equals(object? obj) -> bool
+override Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.GetHashCode() -> int
+override Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.ToString() -> string!
 static Supabase.Gotrue.Common.Passkey.operator !=(Supabase.Gotrue.Common.Passkey? left, Supabase.Gotrue.Common.Passkey? right) -> bool
 static Supabase.Gotrue.Common.Passkey.operator ==(Supabase.Gotrue.Common.Passkey? left, Supabase.Gotrue.Common.Passkey? right) -> bool
 override Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge.Equals(object? obj) -> bool
@@ -10,6 +13,8 @@ override Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge.ToString() -> 
 override Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions.Equals(object? obj) -> bool
 override Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions.GetHashCode() -> int
 override Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions.ToString() -> string!
+static Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.operator !=(Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge? left, Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge? right) -> bool
+static Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.operator ==(Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge? left, Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge? right) -> bool
 static Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge.operator !=(Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge? left, Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge? right) -> bool
 static Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge.operator ==(Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge? left, Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge? right) -> bool
 static Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions.operator !=(Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions? left, Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions? right) -> bool
@@ -17,13 +22,17 @@ static Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions.operator ==(Su
 Supabase.Gotrue.Api.DeletePasskeyAsync(string! jwt, System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Api.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.Passkey!>!>!
 Supabase.Gotrue.Api.RegenerateRecoveryCodesAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Api.RegisterPasskeyAsync(string! jwt, System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Api.RenamePasskeyAsync(string! jwt, System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Api.SignInWithPasskeyAsync(System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
+Supabase.Gotrue.Api.StartPasskeyRegistrationAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge!>!
 Supabase.Gotrue.Api.StartPasskeySignInAsync(Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge!>!
 Supabase.Gotrue.Client.DeletePasskeyAsync(System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Client.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.Passkey!>!>!
 Supabase.Gotrue.Client.RegenerateRecoveryCodesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Client.RegisterPasskeyAsync(System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Client.RenamePasskeyAsync(System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
+Supabase.Gotrue.Client.StartPasskeyRegistrationAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge!>!
 Supabase.Gotrue.Common.Passkey
 Supabase.Gotrue.Common.Passkey.<Clone>$() -> Supabase.Gotrue.Common.Passkey!
 Supabase.Gotrue.Common.Passkey.CreatedAt.get -> System.DateTimeOffset
@@ -41,15 +50,29 @@ Supabase.Gotrue.Client.StartPasskeySignInAsync(Supabase.Gotrue.SignInWithPasskey
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeletePasskeyAsync(string! jwt, System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListPasskeysAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.Passkey!>!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RegenerateRecoveryCodesAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RegisterPasskeyAsync(string! jwt, System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RenamePasskeyAsync(string! jwt, System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithPasskeyAsync(System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession?>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.StartPasskeyRegistrationAsync(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.StartPasskeySignInAsync(Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.DeletePasskeyAsync(System.Guid passkeyId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ListPasskeysAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.Passkey!>!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RegenerateRecoveryCodesAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.RecoveryCodes!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RegisterPasskeyAsync(System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RenamePasskeyAsync(System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithPasskeyAsync(System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.StartPasskeyRegistrationAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.StartPasskeySignInAsync(Supabase.Gotrue.SignInWithPasskey.SignInWithPasskeyOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge!>!
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.<Clone>$() -> Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge!
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.Equals(Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge? other) -> bool
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.ExpiresAt.get -> System.DateTimeOffset
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.ExpiresAt.init -> void
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.Id.get -> System.Guid
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.Id.init -> void
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.Options.get -> System.Text.Json.JsonElement
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.Options.init -> void
+Supabase.Gotrue.RegisterPasskey.PasskeyRegistrationChallenge.PasskeyRegistrationChallenge() -> void
 Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge
 Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge.<Clone>$() -> Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge!
 Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge.Equals(Supabase.Gotrue.SignInWithPasskey.PasskeySignInChallenge? other) -> bool
