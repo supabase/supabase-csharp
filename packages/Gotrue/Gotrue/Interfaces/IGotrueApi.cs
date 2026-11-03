@@ -204,7 +204,7 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>The user's passkeys, empty when the user has none.</returns>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
-    Task<IReadOnlyList<Passkey>> ListUserPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Passkey>> AdminListPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a custom OAuth/OIDC provider.

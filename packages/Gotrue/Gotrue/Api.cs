@@ -750,7 +750,7 @@ public class Api : IGotrueApi<User, Session>
         $"{this.Url}/admin/users/{CanonicalUuid.EnsureRoutable(userId)}/factors/{CanonicalUuid.EnsureRoutable(factorId)}";
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Passkey>> ListUserPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Passkey>> AdminListPasskeysAsync(string jwt, Guid userId, CancellationToken cancellationToken = default)
     {
         var passkeys = await this.MakeRequestAsync<IReadOnlyList<PasskeyResponse>>(HttpMethod.Get, this.AdminUserPasskeysUrl(userId), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return PasskeyResponse.Read(passkeys);
