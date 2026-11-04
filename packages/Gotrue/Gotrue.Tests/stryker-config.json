@@ -9,6 +9,6 @@
       "json",
       "progress"
     ],
-    "test-case-filter": "TestCategory!=E2E"
+    "test-case-filter": "TestCategory!=E2E&TestCategory!=Stress"
   }
 }

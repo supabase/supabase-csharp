@@ -36,6 +36,10 @@ public class PresenceStateTests
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s4\"," +
         "\"payload\":{\"joins\":{},\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]}}}}";
 
+    private const string StateFrameAfterReconnect =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_state\",\"ref\":\"s5\"," +
+        "\"payload\":{\"user-2\":{\"metas\":[{\"phx_ref\":\"r2\"}]}}}";
+
     private static (RealtimeChannel channel, RealtimePresence<PresenceExample> presence) Presence()
     {
         var channel = Wire.Channel("realtime:online-users");
@@ -86,6 +90,15 @@ public class PresenceStateTests
         channel.HandleSocketMessage(Wire.Decode(FirstConnectionLeaveFrame));
         presence.CurrentState.Should().ContainKey("user-1", "the user is still online on the other connection")
             .WhoseValue.Should().ContainSingle().Which.PhoenixRef.Should().Be("r2");
+    }
+
+    [TestMethod]
+    public void HandleSocketMessage_ShouldReplaceState_GivenASecondPresenceState()
+    {
+        var (channel, presence) = Presence();
+        channel.HandleSocketMessage(Wire.Decode(StateFrame));
+        channel.HandleSocketMessage(Wire.Decode(StateFrameAfterReconnect));
+        presence.CurrentState.Keys.Should().Equal(["user-2"], "user-1 left during the drop, so no leave diff will ever remove them");
     }
 
     [TestMethod]
