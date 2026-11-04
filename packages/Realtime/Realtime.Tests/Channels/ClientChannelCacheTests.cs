@@ -3,25 +3,27 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
+using Supabase.Realtime.Exceptions;
+using static Supabase.Realtime.Constants;
 
 namespace Realtime.Tests.Channels;
 
 /// <summary>
 ///     The client hands out a fresh channel after the cached one is unsubscribed, keeps its socket when
-///     connected again, and drops every channel and the socket on RemoveAll. Runs over a fake socket that
+///     connected again, and drops every channel and the socket on Disconnect or RemoveAll. Runs over a fake socket that
 ///     reports itself connected, so no server is needed.
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
 public class ClientChannelCacheTests
 {
+    private readonly FakeWebsocketClient socket = new() { OpenOnStart = true };
     private Client client = null!;
 
     [TestInitialize]
     public async Task Connect()
     {
-        var socket = new FakeWebsocketClient { OpenOnStart = true };
-        this.client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(socket) });
+        this.client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(this.socket) });
         await this.client.ConnectAsync();
     }
 
@@ -87,5 +89,40 @@ public class ClientChannelCacheTests
     {
         this.client.RemoveAll();
         this.client.Socket.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task Channel_ShouldUseTheNewSocket_GivenAChannelResubscribesWhileDisconnecting()
+    {
+        var channel = this.client.Channel("room");
+        channel.AddStateChangedHandler((_, state) =>
+        {
+            if (state == ChannelState.Closed)
+                channel.Subscribe(100);
+        });
+        this.client.Disconnect();
+        await this.client.ConnectAsync();
+        this.client.Channel("room").Socket.Should().BeSameAs(this.client.Socket);
+    }
+
+    [TestMethod]
+    public void Disconnect_ShouldUnsubscribe_GivenAJoinedChannel()
+    {
+        var channel = this.client.Channel("room");
+        _ = channel.Subscribe();
+        this.socket.Reply(channel.Topic, channel.JoinPush!.Ref);
+        channel.IsSubscribed.Should().BeTrue();
+        this.client.Disconnect();
+        channel.IsSubscribed.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void Disconnect_ShouldFailSubscribe_GivenAChannelStillJoining()
+    {
+        var subscribing = this.client.Channel("room").Subscribe();
+        this.client.Disconnect();
+        var exception = subscribing.Exception!.InnerException.Should().BeOfType<RealtimeException>().Subject;
+        exception.Reason.Should().Be(FailureHint.Reason.ChannelJoinFailure);
+        exception.Message.Should().Be("Channel closed before it joined");
     }
 }

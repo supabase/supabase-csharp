@@ -516,7 +516,8 @@ public class RealtimeChannel : IRealtimeChannel
                 case ChannelState.Errored:
                     sender.RemoveStateChangedHandler(channelCallback!);
                     this.JoinPush.OnTimeout -= joinPushTimeoutCallback;
-                    tsc.TrySetException(this.exception);
+                    tsc.TrySetException(this.exception ?? new RealtimeException("Channel closed before it joined")
+                    { Reason = FailureHint.Reason.ChannelJoinFailure });
                     break;
             }
         };
