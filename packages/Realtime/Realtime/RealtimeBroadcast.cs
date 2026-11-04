@@ -29,7 +29,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
 
     private SocketResponse? lastSocketResponse;
 
-    private readonly List<IRealtimeBroadcast.BroadcastEventHandler> broadcastEventHandlers = new();
+    private readonly HandlerCollection<IRealtimeBroadcast.BroadcastEventHandler> broadcastEventHandlers = new();
 
     /// <summary>
     /// The last received broadcast.
@@ -65,8 +65,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
     /// <param name="broadcastEventHandler"></param>
     public void AddBroadcastEventHandler(IRealtimeBroadcast.BroadcastEventHandler broadcastEventHandler)
     {
-        if (!this.broadcastEventHandlers.Contains(broadcastEventHandler))
-            this.broadcastEventHandlers.Add(broadcastEventHandler);
+        this.broadcastEventHandlers.Add(broadcastEventHandler);
     }
 
     /// <summary>
@@ -75,8 +74,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
     /// <param name="broadcastEventHandler"></param>
     public void RemoveBroadcastEventHandler(IRealtimeBroadcast.BroadcastEventHandler broadcastEventHandler)
     {
-        if (this.broadcastEventHandlers.Contains(broadcastEventHandler))
-            this.broadcastEventHandlers.Remove(broadcastEventHandler);
+        this.broadcastEventHandlers.Remove(broadcastEventHandler);
     }
 
     /// <summary>
@@ -87,7 +85,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
 
     private void NotifyBroadcastEventHandlers()
     {
-        foreach (var handler in this.broadcastEventHandlers.ToArray())
+        foreach (var handler in this.broadcastEventHandlers.Snapshot())
             handler.Invoke(this, this.Current());
     }
 

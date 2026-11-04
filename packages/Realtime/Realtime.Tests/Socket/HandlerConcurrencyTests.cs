@@ -1,35 +1,38 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Realtime.Tests.Support;
 using Supabase.Realtime;
 using Supabase.Realtime.Interfaces;
-using Supabase.Realtime.Socket;
 
 namespace Realtime.Tests.Socket;
 
 /// <summary>
 ///     Handlers may be added, removed and cleared while a message is being dispatched
 ///     (push replies and timeouts do this internally), without corrupting the handler list.
+///     Probabilistic and slow, so it runs apart from the unit tests.
 /// </summary>
 [TestClass]
-[TestCategory("Unit")]
+[TestCategory("Stress")]
 public class HandlerConcurrencyTests
 {
     private const int Iterations = 100_000;
+    private const string Frame = """{"topic":"room","event":"broadcast","ref":"1","payload":{}}""";
 
     [TestMethod]
     public async Task MessageHandlers_ShouldSurviveConcurrentChanges_GivenDispatch()
     {
-        using var socket = new RealtimeSocket("ws://127.0.0.1/realtime/v1", new ClientOptions());
-        var dispatch = typeof(RealtimeSocket).GetMethod("NotifyMessageReceived",
-            BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var fake = new FakeWebsocketClient { OpenOnStart = true };
+        var options = new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(fake) };
+        _ = new Client("ws://localhost/socket", options); // installs the default message encoder and decoder on the options
+        using var socket = new RealtimeSocket("ws://localhost/socket", options);
+        await socket.Connect();
         var handlers = Enumerable.Range(0, 64)
             .Select(i => new IRealtimeSocket.MessageEventHandler((_, _) => GC.KeepAlive(i)))
             .ToArray();
-        var message = new object[] { new SocketResponse() };
         using var start = new ManualResetEventSlim();
 
         Task Worker(Action action) => Task.Factory.StartNew(() =>
@@ -50,10 +53,13 @@ public class HandlerConcurrencyTests
                     socket.AddMessageReceivedHandler(handlers[0]);
                 }
             }),
-            Worker(() => { for (var i = 0; i < Iterations; i++) dispatch.Invoke(socket, message); }),
+            Worker(() => { for (var i = 0; i < Iterations; i++) fake.Receive(Frame); }),
         };
 
         start.Set();
-        await Task.WhenAll(workers);
+        Func<Task> act = () => Task.WhenAll(workers);
+
+        await act.Should().NotThrowAsync("handlers change while push replies and timeouts dispatch");
+        socket.Disconnect();
     }
 }
