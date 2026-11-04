@@ -65,7 +65,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <summary>
     /// Handlers for notifications of message events.
     /// </summary>
-    private readonly List<IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler> _messageEventHandlers = new();
+    private readonly HandlerCollection<IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler> _messageEventHandlers = new();
 
     /// <summary>
     /// Initializes a single request that will be `Pushed` to the Socket server.
@@ -166,9 +166,6 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="handler"></param>
     public void AddMessageReceivedHandler(IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler handler)
     {
-        if (this._messageEventHandlers.Contains(handler))
-            return;
-
         this._messageEventHandlers.Add(handler);
     }
 
@@ -178,9 +175,6 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="handler"></param>
     public void RemoveMessageReceivedHandler(IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler handler)
     {
-        if (!this._messageEventHandlers.Contains(handler))
-            return;
-
         this._messageEventHandlers.Remove(handler);
     }
 
@@ -190,7 +184,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="messageResponse"></param>
     private void NotifyMessageReceived(SocketResponse messageResponse)
     {
-        foreach (var handler in this._messageEventHandlers.ToArray())
+        foreach (var handler in this._messageEventHandlers.Snapshot())
             handler.Invoke(this, messageResponse);
     }
 

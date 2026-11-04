@@ -92,6 +92,10 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     /// <summary>Delivers a frame as if the server had sent it.</summary>
     public void Receive(string json) => this.messageReceived.OnNext(ResponseMessage.TextMessage(json));
 
+    /// <summary>Reports a connection failure as if the transport had dropped with an error.</summary>
+    public void Fail(Exception exception) =>
+        this.disconnectionHappened.OnNext(DisconnectionInfo.Create(DisconnectionType.Error, null, exception));
+
     public void Dispose() { }
 
     // Unused by RealtimeSocket, not exercised by these tests.
