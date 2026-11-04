@@ -516,7 +516,9 @@ public class RealtimeChannel : IRealtimeChannel
                 case ChannelState.Errored:
                     sender.RemoveStateChangedHandler(channelCallback!);
                     this.JoinPush.OnTimeout -= joinPushTimeoutCallback;
-                    tsc.TrySetException(this.exception);
+                    tsc.TrySetException(state == ChannelState.Errored
+                        ? this.exception
+                        : new RealtimeException("Channel closed before it joined") { Reason = FailureHint.Reason.ChannelJoinFailure });
                     break;
             }
         };
@@ -747,6 +749,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="message"></param>
     private void HandleJoinResponse(IRealtimePush<RealtimeChannel, SocketResponse> sender, SocketResponse message)
     {
+        if (!this.IsJoining) return;
         if (message._event != ChannelEventReply) return;
 
         var obj = JsonSerializer.Deserialize<SocketResponse<PhoenixResponse>>(message.Json!,
