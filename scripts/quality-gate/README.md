@@ -108,6 +108,9 @@ The split in responsibility:
   and under warnings-as-errors those mutants are discarded as compile errors instead of
   tested. Stryker's granularity is the **file** — a file with any change gets *all* its
   mutants, not just the ones on changed lines.
+- Each package's `stryker-config.json` filters out `TestCategory=E2E` (needs the local
+  stack) and `TestCategory=Stress` (slow, probabilistic concurrency tests that would rerun
+  for every mutant without killing any). Both still run in the regular test stage.
 - `gate.sh --mutation` then **narrows** that to survivors whose line falls inside a
   changed hunk, and FAILs on any new one. A pre-existing survivor on an untouched line of
   a file you edited is that file's existing debt, not your change's regression, so it does
