@@ -1,0 +1,1 @@
+{"topic":"realtime:example","event":"broadcast","ref":"srv-1","payload":{"event":"user","userId":"abc-123"}}

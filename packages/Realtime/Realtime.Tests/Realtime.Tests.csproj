@@ -32,5 +32,6 @@
 		<None Include="Fixtures\**\*.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="**\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 </Project>

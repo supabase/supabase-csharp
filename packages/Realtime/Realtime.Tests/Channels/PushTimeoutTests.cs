@@ -17,15 +17,19 @@ namespace Realtime.Tests.Channels;
 public class PushTimeoutTests
 {
     private readonly FakeWebsocketClient socket = new() { OpenOnStart = true };
+    private Client client = null!;
     private RealtimeChannel channel = null!;
 
     [TestInitialize]
     public async Task Connect()
     {
-        var client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(this.socket) });
-        await client.ConnectAsync();
-        this.channel = client.Channel("room");
+        this.client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(this.socket) });
+        await this.client.ConnectAsync();
+        this.channel = this.client.Channel("room");
     }
+
+    [TestCleanup]
+    public void Disconnect() => this.client.Disconnect();
 
     [TestMethod]
     public async Task Push_ShouldTimeOutOnce_GivenNoReply()
@@ -41,7 +45,7 @@ public class PushTimeoutTests
     public async Task Push_ShouldIgnoreALateReply_GivenItTimedOut()
     {
         var push = await this.TimedOutPush();
-        this.Reply(push.Ref);
+        this.socket.Reply(this.channel.Topic, push.Ref);
         push.Response.Should().BeNull("a timed out push must stop listening to the socket");
     }
 
@@ -50,7 +54,7 @@ public class PushTimeoutTests
     {
         var push = await this.TimedOutPush();
         push.Resend(5000);
-        this.Reply(push.Ref);
+        this.socket.Reply(this.channel.Topic, push.Ref);
         push.Response.Should().NotBeNull();
     }
 
@@ -63,7 +67,4 @@ public class PushTimeoutTests
         await timedOut.Task.WaitAsync(TimeSpan.FromSeconds(5));
         return push;
     }
-
-    private void Reply(string? reference) =>
-        this.socket.Receive("""{"topic":"realtime:room","event":"phx_reply","ref":"REF","payload":{"status":"ok","response":{}}}""".Replace("REF", reference));
 }

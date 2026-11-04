@@ -76,9 +76,14 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     {
         this.FirstSend.TrySetResult();
         if (this.AnswerHeartbeats && JsonNode.Parse(message) is { } frame && (string?) frame["event"] == "heartbeat")
-            this.Receive("""{"topic":"phoenix","event":"phx_reply","ref":"REF","payload":{"status":"ok","response":{}}}""".Replace("REF", (string?) frame["ref"]));
+            this.Reply("phoenix", (string?) frame["ref"]);
         return true;
     }
+
+    /// <summary>Delivers the server's ok reply to the frame sent with <paramref name="reference" />.</summary>
+    public void Reply(string topic, string? reference) =>
+        this.Receive("""{"topic":"TOPIC","event":"phx_reply","ref":"REF","payload":{"status":"ok","response":{}}}"""
+            .Replace("TOPIC", topic).Replace("REF", reference));
 
     public Task Reconnect()
     {

@@ -20,15 +20,13 @@ namespace Realtime.Tests.Socket;
 public class HandlerConcurrencyTests
 {
     private const int Iterations = 100_000;
-    private const string Frame = """{"topic":"room","event":"broadcast","ref":"1","payload":{}}""";
+    private static readonly string Frame = DataFile.Read("Socket", "BroadcastFrame.json");
 
     [TestMethod]
     public async Task MessageHandlers_ShouldSurviveConcurrentChanges_GivenDispatch()
     {
-        var fake = new FakeWebsocketClient { OpenOnStart = true };
-        var options = new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(fake) };
-        _ = new Client("ws://localhost/socket", options); // installs the default message encoder and decoder on the options
-        using var socket = new RealtimeSocket("ws://localhost/socket", options);
+        var server = new FakeWebsocketClient { OpenOnStart = true };
+        using var socket = new RealtimeSocket("ws://localhost/socket", Wire.OptionsOver(server));
         await socket.Connect();
         var handlers = Enumerable.Range(0, 64)
             .Select(i => new IRealtimeSocket.MessageEventHandler((_, _) => GC.KeepAlive(i)))
@@ -53,13 +51,12 @@ public class HandlerConcurrencyTests
                     socket.AddMessageReceivedHandler(handlers[0]);
                 }
             }),
-            Worker(() => { for (var i = 0; i < Iterations; i++) fake.Receive(Frame); }),
+            Worker(() => { for (var i = 0; i < Iterations; i++) server.Receive(Frame); }),
         };
 
         start.Set();
         Func<Task> act = () => Task.WhenAll(workers);
 
         await act.Should().NotThrowAsync("handlers change while push replies and timeouts dispatch");
-        socket.Disconnect();
     }
 }

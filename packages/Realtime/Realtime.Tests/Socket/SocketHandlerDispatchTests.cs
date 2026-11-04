@@ -5,9 +5,8 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
-using static Supabase.Realtime.Constants;
 using Supabase.Realtime.Interfaces;
-using Supabase.Realtime.Socket;
+using static Supabase.Realtime.Constants;
 
 namespace Realtime.Tests.Socket;
 
@@ -19,145 +18,148 @@ namespace Realtime.Tests.Socket;
 [TestCategory("Unit")]
 public class SocketHandlerDispatchTests
 {
-    private const string Frame = """{"topic":"room","event":"broadcast","ref":"1","payload":{}}""";
+    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
+    private static readonly string Frame = DataFile.Read("Socket", "BroadcastFrame.json");
 
-    private static (RealtimeSocket Socket, FakeWebsocketClient Fake) Create(bool openOnStart = true, bool answerHeartbeats = false)
-    {
-        var fake = new FakeWebsocketClient { OpenOnStart = openOnStart, AnswerHeartbeats = answerHeartbeats };
-        var options = new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(fake), HeartbeatInterval = TimeSpan.FromMilliseconds(20) };
-        _ = new Client("ws://localhost/socket", options); // installs the default message encoder and decoder on the options
-        return (new RealtimeSocket("ws://localhost/socket", options), fake);
-    }
+    private RealtimeSocket socket = null!;
+    private int calls;
+
+    [TestCleanup]
+    public void Disconnect() => this.socket.Disconnect();
 
     [TestMethod]
     public async Task StateHandler_ShouldBeCalledWithOpen_GivenAConnection()
     {
-        var (socket, _) = Create();
         var states = new List<SocketState>();
-        socket.AddStateChangedHandler((_, state) => states.Add(state));
+        this.SocketOver(new FakeWebsocketClient { OpenOnStart = true }).AddStateChangedHandler((_, state) => states.Add(state));
 
-        await socket.Connect();
+        await this.socket.Connect();
 
         states.Should().Contain(SocketState.Open, "a state handler hears that the socket opened");
-        socket.Disconnect();
     }
 
     [TestMethod]
     public async Task StateHandler_ShouldNotBeCalled_GivenItWasCleared()
     {
-        var (socket, _) = Create();
-        var calls = 0;
-        socket.AddStateChangedHandler((_, _) => calls++);
-        socket.ClearStateChangedHandlers();
+        this.SocketOver(new FakeWebsocketClient { OpenOnStart = true }).AddStateChangedHandler((_, _) => this.calls++);
+        this.socket.ClearStateChangedHandlers();
 
-        await socket.Connect();
+        await this.socket.Connect();
 
-        calls.Should().Be(0, "a cleared handler is not notified");
-        socket.Disconnect();
+        this.calls.Should().Be(0, "a cleared handler is not notified");
+    }
+
+    [TestMethod]
+    public async Task StateHandler_ShouldBeCalledWithError_GivenAFailureBeforeTheFirstConnection()
+    {
+        var server = new FakeWebsocketClient();
+        var states = new List<SocketState>();
+        this.SocketOver(server).AddStateChangedHandler((_, state) => states.Add(state));
+        await this.socket.Connect();
+
+        server.Fail(new InvalidOperationException("boom"));
+
+        states.Should().Contain(SocketState.Error, "a transport failure puts the socket in the error state");
     }
 
     [TestMethod]
     public async Task MessageHandler_ShouldReceiveTheFrame_GivenAServerMessage()
     {
-        var (socket, fake) = Create();
-        SocketResponse? received = null;
-        socket.AddMessageReceivedHandler((_, message) => received = message);
-        await socket.Connect();
+        var server = new FakeWebsocketClient { OpenOnStart = true };
+        string? topic = null;
+        this.SocketOver(server).AddMessageReceivedHandler((_, message) => topic = message.Topic);
+        await this.socket.Connect();
 
-        fake.Receive(Frame);
+        server.Receive(Frame);
 
-        received.Should().NotBeNull("a message handler gets the decoded frame");
-        received!.Topic.Should().Be("room");
-        socket.Disconnect();
+        topic.Should().Be("room", "a message handler gets the decoded frame");
     }
 
     [TestMethod]
     public async Task MessageHandler_ShouldNotBeCalled_GivenItWasRemoved()
     {
-        var (socket, fake) = Create();
-        var calls = 0;
-        IRealtimeSocket.MessageEventHandler handler = (_, _) => calls++;
-        socket.AddMessageReceivedHandler(handler);
-        socket.RemoveMessageReceivedHandler(handler);
-        await socket.Connect();
+        var server = new FakeWebsocketClient { OpenOnStart = true };
+        IRealtimeSocket.MessageEventHandler handler = (_, _) => this.calls++;
+        this.SocketOver(server).AddMessageReceivedHandler(handler);
+        this.socket.RemoveMessageReceivedHandler(handler);
+        await this.socket.Connect();
 
-        fake.Receive(Frame);
+        server.Receive(Frame);
 
-        calls.Should().Be(0, "a removed handler is not notified");
-        socket.Disconnect();
+        this.calls.Should().Be(0, "a removed handler is not notified");
     }
 
     [TestMethod]
     public async Task HeartbeatHandler_ShouldBeCalled_GivenAHeartbeatReply()
     {
-        var (socket, _) = Create(answerHeartbeats: true);
         var heard = new TaskCompletionSource();
-        socket.AddHeartbeatHandler((_, _) => heard.TrySetResult());
+        this.SocketOver(new FakeWebsocketClient { OpenOnStart = true, AnswerHeartbeats = true })
+            .AddHeartbeatHandler((_, _) => heard.TrySetResult());
 
-        await socket.Connect();
+        await this.socket.Connect();
 
-        await heard.Task.Awaiting(t => t).Should().CompleteWithinAsync(TimeSpan.FromSeconds(5),
+        await heard.Awaiting(source => source.Task).Should().CompleteWithinAsync(Patience,
             "a heartbeat handler hears the server's reply");
-        socket.Disconnect();
     }
 
     [TestMethod]
     public async Task HeartbeatHandler_ShouldNotBeCalled_GivenItWasCleared()
     {
-        var (socket, fake) = Create(answerHeartbeats: true);
-        var calls = 0;
-        socket.AddHeartbeatHandler((_, _) => calls++);
-        socket.ClearHeartbeatHandlers();
+        var witnessed = new TaskCompletionSource();
+        this.SocketOver(new FakeWebsocketClient { OpenOnStart = true, AnswerHeartbeats = true })
+            .AddHeartbeatHandler((_, _) => this.calls++);
+        this.socket.ClearHeartbeatHandlers();
+        this.socket.AddHeartbeatHandler((_, _) => witnessed.TrySetResult());
 
-        await socket.Connect();
-        await fake.FirstSend.Task.Awaiting(t => t).Should().CompleteWithinAsync(TimeSpan.FromSeconds(5));
+        await this.socket.Connect();
+        await witnessed.Task.WaitAsync(Patience);
 
-        calls.Should().Be(0, "a cleared handler is not notified");
-        socket.Disconnect();
+        this.calls.Should().Be(0, "a cleared handler is not notified of the reply its successor heard");
     }
 
     [TestMethod]
     public async Task ErrorHandler_ShouldBeCalled_GivenAFailureBeforeTheFirstConnection()
     {
-        var (socket, fake) = Create(openOnStart: false);
+        var server = new FakeWebsocketClient();
         var errors = new List<Exception>();
-        var states = new List<SocketState>();
-        socket.AddErrorHandler((_, exception) => errors.Add(exception));
-        socket.AddStateChangedHandler((_, state) => states.Add(state));
-        await socket.Connect();
+        this.SocketOver(server).AddErrorHandler((_, exception) => errors.Add(exception));
+        await this.socket.Connect();
 
-        fake.Fail(new InvalidOperationException("boom"));
+        server.Fail(new InvalidOperationException("boom"));
 
         errors.Should().ContainSingle("the error handler hears the failure");
-        states.Should().Contain(SocketState.Error);
     }
 
     [TestMethod]
     public async Task ErrorHandler_ShouldNotBeCalled_GivenItWasRemoved()
     {
-        var (socket, fake) = Create(openOnStart: false);
-        var calls = 0;
-        IRealtimeSocket.ErrorEventHandler handler = (_, _) => calls++;
-        socket.AddErrorHandler(handler);
-        socket.RemoveErrorHandler(handler);
-        await socket.Connect();
+        var server = new FakeWebsocketClient();
+        IRealtimeSocket.ErrorEventHandler handler = (_, _) => this.calls++;
+        this.SocketOver(server).AddErrorHandler(handler);
+        this.socket.RemoveErrorHandler(handler);
+        await this.socket.Connect();
 
-        fake.Fail(new InvalidOperationException("boom"));
+        server.Fail(new InvalidOperationException("boom"));
 
-        calls.Should().Be(0, "a removed handler is not notified");
+        this.calls.Should().Be(0, "a removed handler is not notified");
     }
 
     [TestMethod]
     public async Task ErrorHandler_ShouldNotBeCalled_GivenItWasCleared()
     {
-        var (socket, fake) = Create(openOnStart: false);
-        var calls = 0;
-        socket.AddErrorHandler((_, _) => calls++);
-        socket.ClearErrorHandlers();
-        await socket.Connect();
+        var server = new FakeWebsocketClient();
+        this.SocketOver(server).AddErrorHandler((_, _) => this.calls++);
+        this.socket.ClearErrorHandlers();
+        await this.socket.Connect();
 
-        fake.Fail(new InvalidOperationException("boom"));
+        server.Fail(new InvalidOperationException("boom"));
 
-        calls.Should().Be(0, "a cleared handler is not notified");
+        this.calls.Should().Be(0, "a cleared handler is not notified");
+    }
+
+    private RealtimeSocket SocketOver(FakeWebsocketClient server)
+    {
+        this.socket = new RealtimeSocket("ws://localhost/socket", Wire.OptionsOver(server));
+        return this.socket;
     }
 }
