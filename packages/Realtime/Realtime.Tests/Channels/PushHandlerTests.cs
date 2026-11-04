@@ -18,40 +18,44 @@ namespace Realtime.Tests.Channels;
 public class PushHandlerTests
 {
     private readonly FakeWebsocketClient socket = new() { OpenOnStart = true };
+    private Client client = null!;
     private RealtimeChannel channel = null!;
+    private int calls;
 
     [TestInitialize]
     public async Task Connect()
     {
-        var client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(this.socket) });
-        await client.ConnectAsync();
-        this.channel = client.Channel("room");
+        this.client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(this.socket) });
+        await this.client.ConnectAsync();
+        this.channel = this.client.Channel("room");
     }
+
+    [TestCleanup]
+    public void Disconnect() => this.client.Disconnect();
 
     [TestMethod]
     public void Push_ShouldCallTheHandlerOnce_GivenAReply()
     {
-        var calls = 0;
         var push = new Push(this.channel.Socket, this.channel, ChannelAccessToken);
-        push.AddMessageReceivedHandler((_, _) => calls++);
+        push.AddMessageReceivedHandler((_, _) => this.calls++);
         push.Send();
-        this.Reply(push.Ref);
-        calls.Should().Be(1, "the handler is told about the reply to the push");
+
+        this.socket.Reply(this.channel.Topic, push.Ref);
+
+        this.calls.Should().Be(1, "the handler is told about the reply to the push");
     }
 
     [TestMethod]
     public void Push_ShouldNotCallTheHandler_GivenItWasRemoved()
     {
-        var calls = 0;
         var push = new Push(this.channel.Socket, this.channel, ChannelAccessToken);
-        IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler handler = (_, _) => calls++;
+        IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler handler = (_, _) => this.calls++;
         push.AddMessageReceivedHandler(handler);
         push.RemoveMessageReceivedHandler(handler);
         push.Send();
-        this.Reply(push.Ref);
-        calls.Should().Be(0, "a removed handler must not be told about the reply");
-    }
 
-    private void Reply(string? reference) =>
-        this.socket.Receive("""{"topic":"realtime:room","event":"phx_reply","ref":"REF","payload":{"status":"ok","response":{}}}""".Replace("REF", reference));
+        this.socket.Reply(this.channel.Topic, push.Ref);
+
+        this.calls.Should().Be(0, "a removed handler must not be told about the reply");
+    }
 }

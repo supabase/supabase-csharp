@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Models;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
-using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
 
 namespace Realtime.Tests.Channels;
@@ -18,99 +17,134 @@ namespace Realtime.Tests.Channels;
 [TestCategory("Unit")]
 public class ChannelHandlerTests
 {
-    private const string BroadcastFrame =
-        "{\"topic\":\"realtime:example\",\"event\":\"broadcast\",\"ref\":\"srv-1\",\"payload\":{\"event\":\"user\",\"userId\":\"abc-123\"}}";
+    private const int JoinTimeoutMs = 50;
+    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
+    private static readonly string BroadcastFrame = DataFile.Read("Channels", "BroadcastFrame.json");
+    private static readonly string PresenceStateFrame = DataFile.Read("Channels", "PresenceStateFrame.json");
 
-    private const string PresenceStateFrame =
-        "{\"topic\":\"realtime:example\",\"event\":\"presence_state\",\"ref\":\"s1\"," +
-        "\"payload\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\",\"time\":\"2023-09-01T10:00:00Z\"}]}}}";
+    private readonly RealtimeChannel channel = Wire.Channel();
+    private int calls;
+
+    [TestCleanup]
+    public void Leave() => this.channel.Unsubscribe();
 
     [TestMethod]
-    public void StateChangedHandler_ShouldStopCalling_GivenRemoval()
+    public void StateChangedHandler_ShouldBeCalled_GivenAStateChange()
     {
-        var channel = Wire.Channel();
-        var calls = 0;
-        IRealtimeChannel.StateChangedHandler handler = (_, _) => calls++;
-        channel.AddStateChangedHandler(handler);
-        channel.Unsubscribe();
-        var afterAdd = calls;
+        this.channel.AddStateChangedHandler((_, _) => this.calls++);
 
-        channel.RemoveStateChangedHandler(handler);
-        channel.Unsubscribe();
+        this.channel.Unsubscribe();
 
-        afterAdd.Should().BeGreaterThan(0);
-        calls.Should().Be(afterAdd);
+        this.calls.Should().BePositive("a registered handler hears the channel leave");
     }
 
     [TestMethod]
-    public void MessageReceivedHandler_ShouldStopCalling_GivenRemoval()
+    public void StateChangedHandler_ShouldNotBeCalled_GivenItWasRemoved()
     {
-        var channel = Wire.Channel();
-        var calls = 0;
-        IRealtimeChannel.MessageReceivedHandler handler = (_, _) => calls++;
-        channel.AddMessageReceivedHandler(handler);
-        channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
-        calls.Should().Be(1);
+        IRealtimeChannel.StateChangedHandler handler = (_, _) => this.calls++;
+        this.channel.AddStateChangedHandler(handler);
+        this.channel.RemoveStateChangedHandler(handler);
 
-        channel.RemoveMessageReceivedHandler(handler);
-        channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
-        calls.Should().Be(1);
+        this.channel.Unsubscribe();
+
+        this.calls.Should().Be(0, "a removed handler is not notified");
     }
 
     [TestMethod]
-    public async Task ErrorHandler_ShouldStopCalling_GivenRemoval()
+    public void MessageReceivedHandler_ShouldBeCalled_GivenAFrame()
     {
-        var channel = Wire.Channel();
-        var calls = 0;
-        IRealtimeChannel.ErrorEventHandler handler = (_, _) => calls++;
-        channel.AddErrorHandler(handler);
-        await FailJoin(channel);
-        var afterAdd = calls;
+        this.channel.AddMessageReceivedHandler((_, _) => this.calls++);
 
-        channel.RemoveErrorHandler(handler);
-        await FailJoin(channel);
+        this.channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
 
-        afterAdd.Should().BeGreaterThan(0);
-        calls.Should().Be(afterAdd);
+        this.calls.Should().Be(1, "a registered handler gets each inbound frame once");
     }
 
     [TestMethod]
-    public void BroadcastHandler_ShouldStopCalling_GivenRemoval()
+    public void MessageReceivedHandler_ShouldNotBeCalled_GivenItWasRemoved()
     {
-        var channel = Wire.Channel();
-        var broadcast = channel.Register<BroadcastExample>();
-        var calls = 0;
-        IRealtimeBroadcast.BroadcastEventHandler handler = (_, _) => calls++;
+        IRealtimeChannel.MessageReceivedHandler handler = (_, _) => this.calls++;
+        this.channel.AddMessageReceivedHandler(handler);
+        this.channel.RemoveMessageReceivedHandler(handler);
+
+        this.channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
+
+        this.calls.Should().Be(0, "a removed handler is not notified");
+    }
+
+    [TestMethod]
+    public async Task ErrorHandler_ShouldBeCalled_GivenAJoinTimeout()
+    {
+        var heard = new TaskCompletionSource();
+        this.channel.AddErrorHandler((_, _) => heard.TrySetResult());
+
+        this.StartAJoinThatTimesOut();
+
+        await heard.Awaiting(source => source.Task).Should().CompleteWithinAsync(Patience,
+            "a registered handler hears that the join timed out");
+    }
+
+    [TestMethod]
+    public async Task ErrorHandler_ShouldNotBeCalled_GivenItWasRemoved()
+    {
+        var witnessed = new TaskCompletionSource();
+        IRealtimeChannel.ErrorEventHandler handler = (_, _) => this.calls++;
+        this.channel.AddErrorHandler(handler);
+        this.channel.RemoveErrorHandler(handler);
+        this.channel.AddErrorHandler((_, _) => witnessed.TrySetResult());
+
+        this.StartAJoinThatTimesOut();
+        await witnessed.Task.WaitAsync(Patience);
+
+        this.calls.Should().Be(0, "a removed handler is not notified of the error its successor heard");
+    }
+
+    [TestMethod]
+    public void BroadcastHandler_ShouldBeCalled_GivenABroadcast()
+    {
+        this.channel.Register<BroadcastExample>().AddBroadcastEventHandler((_, _) => this.calls++);
+
+        this.channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
+
+        this.calls.Should().Be(1, "a registered handler gets each broadcast once");
+    }
+
+    [TestMethod]
+    public void BroadcastHandler_ShouldNotBeCalled_GivenItWasRemoved()
+    {
+        var broadcast = this.channel.Register<BroadcastExample>();
+        IRealtimeBroadcast.BroadcastEventHandler handler = (_, _) => this.calls++;
         broadcast.AddBroadcastEventHandler(handler);
-        channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
-        calls.Should().Be(1);
-
         broadcast.RemoveBroadcastEventHandler(handler);
-        channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
-        calls.Should().Be(1);
+
+        this.channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
+
+        this.calls.Should().Be(0, "a removed handler is not notified");
     }
 
     [TestMethod]
-    public void PresenceHandler_ShouldStopCalling_GivenRemoval()
+    public void PresenceHandler_ShouldBeCalled_GivenAPresenceState()
     {
-        var channel = Wire.Channel();
-        var presence = channel.Register<PresenceExample>("user-1");
-        var calls = 0;
-        IRealtimePresence.PresenceEventHandler handler = (_, _) => calls++;
+        this.channel.Register<PresenceExample>("user-1")
+            .AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => this.calls++);
+
+        this.channel.HandleSocketMessage(Wire.Decode(PresenceStateFrame));
+
+        this.calls.Should().Be(1, "a registered handler hears each presence sync once");
+    }
+
+    [TestMethod]
+    public void PresenceHandler_ShouldNotBeCalled_GivenItWasRemoved()
+    {
+        var presence = this.channel.Register<PresenceExample>("user-1");
+        IRealtimePresence.PresenceEventHandler handler = (_, _) => this.calls++;
         presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, handler);
-        channel.HandleSocketMessage(Wire.Decode(PresenceStateFrame));
-        calls.Should().Be(1);
-
         presence.RemovePresenceEventHandlers(IRealtimePresence.EventType.Sync, handler);
-        channel.HandleSocketMessage(Wire.Decode(PresenceStateFrame));
-        calls.Should().Be(1);
+
+        this.channel.HandleSocketMessage(Wire.Decode(PresenceStateFrame));
+
+        this.calls.Should().Be(0, "a removed handler is not notified");
     }
 
-    private static async Task FailJoin(RealtimeChannel channel)
-    {
-        var act = () => channel.Subscribe(100).WaitAsync(TimeSpan.FromSeconds(5));
-        await act.Should().ThrowAsync<RealtimeException>();
-        // Error handlers run right after the state change that fails Subscribe; let them finish.
-        await Task.Delay(200);
-    }
+    private void StartAJoinThatTimesOut() => _ = this.channel.Subscribe(JoinTimeoutMs);
 }
