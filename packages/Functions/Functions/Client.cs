@@ -66,7 +66,7 @@ public partial class Client : IFunctionsClient
     }
 
     /// <inheritdoc />
-    [ImplementedCapability("functions.invocation.set_auth_token")]
+    [ImplementedCapability("functions.invocation.auth_token")]
     public void SetAuth(string token) => this.token = token;
 
     /// <summary>

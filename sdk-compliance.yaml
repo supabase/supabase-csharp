@@ -501,7 +501,7 @@ features:
     symbols:
       - Client.InvokeStream
 
-  functions.invocation.set_auth_token:
+  functions.invocation.auth_token:
     status: implemented
     symbols:
       - Client.SetAuth
