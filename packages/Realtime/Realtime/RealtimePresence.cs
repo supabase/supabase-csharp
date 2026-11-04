@@ -254,6 +254,7 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
 
             if (state?.Payload == null) return;
 
+            this.CurrentState.Clear();
             foreach (var item in state.Payload)
                 this.CurrentState[item.Key] = item.Value.Metas!;
         }
