@@ -312,7 +312,16 @@ public class RealtimeChannel : IRealtimeChannel
             this.rejoinTimer.Stop();
 
         foreach (var handler in this.stateChangedHandlers.Snapshot())
-            handler.Invoke(this, state);
+        {
+            try
+            {
+                handler.Invoke(this, state);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Instance.Log(this, ex.Message, ex);
+            }
+        }
     }
 
     /// <summary>
@@ -516,8 +525,9 @@ public class RealtimeChannel : IRealtimeChannel
                 case ChannelState.Errored:
                     sender.RemoveStateChangedHandler(channelCallback!);
                     this.JoinPush.OnTimeout -= joinPushTimeoutCallback;
-                    tsc.TrySetException(this.exception ?? new RealtimeException("Channel closed before it joined")
-                    { Reason = FailureHint.Reason.ChannelJoinFailure });
+                    tsc.TrySetException(state == ChannelState.Errored
+                        ? this.exception
+                        : new RealtimeException("Channel closed before it joined") { Reason = FailureHint.Reason.ChannelJoinFailure });
                     break;
             }
         };

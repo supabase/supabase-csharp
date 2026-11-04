@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -114,6 +116,25 @@ public class ClientChannelCacheTests
         channel.IsSubscribed.Should().BeTrue();
         this.client.Disconnect();
         channel.IsSubscribed.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public void Disconnect_ShouldCloseEveryChannel_GivenAStateHandlerThrows()
+    {
+        var failure = new InvalidOperationException("boom");
+        var logged = new List<Exception?>();
+        var states = new List<ChannelState>();
+        this.client.AddDebugHandler((_, _, error) => logged.Add(error));
+        foreach (var topic in new[] { "first", "second" })
+        {
+            var channel = this.client.Channel(topic);
+            channel.AddStateChangedHandler((_, _) => throw failure);
+            channel.AddStateChangedHandler((_, state) => states.Add(state));
+        }
+        this.client.Disconnect();
+        this.client.ClearDebugHandlers();
+        states.Should().Equal([ChannelState.Leaving, ChannelState.Closed, ChannelState.Leaving, ChannelState.Closed], "a throwing handler must not stop the next handler or the next channel");
+        logged.Should().Contain(failure, "the handler's exception is logged, not lost");
     }
 
     [TestMethod]
