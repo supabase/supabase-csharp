@@ -62,6 +62,7 @@ Supabase.Realtime.Client.GetHeaders.get -> System.Func<System.Collections.Generi
 Supabase.Realtime.Client.GetHeaders.set -> void
 Supabase.Realtime.Client.Options.get -> Supabase.Realtime.ClientOptions!
 Supabase.Realtime.Client.Remove(Supabase.Realtime.RealtimeChannel! channel) -> void
+Supabase.Realtime.Client.RemoveAll() -> void
 Supabase.Realtime.Client.RemoveDebugHandler(Supabase.Realtime.Interfaces.IRealtimeDebugger.DebugEventHandler! handler) -> void
 Supabase.Realtime.Client.RemoveStateChangedHandler(Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>.SocketStateEventHandler! handler) -> void
 Supabase.Realtime.Client.SerializerSettings.get -> System.Text.Json.JsonSerializerOptions!
@@ -203,6 +204,7 @@ Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ConnectAsync() -
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Disconnect(System.Net.WebSockets.WebSocketCloseStatus code = System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, string! reason = "Programmatic Disconnect") -> Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>!
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Options.get -> Supabase.Realtime.ClientOptions!
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Remove(TChannel channel) -> void
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveAll() -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveDebugHandler(Supabase.Realtime.Interfaces.IRealtimeDebugger.DebugEventHandler! handler) -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveStateChangedHandler(Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.SocketStateEventHandler! handler) -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.SerializerSettings.get -> System.Text.Json.JsonSerializerOptions!
