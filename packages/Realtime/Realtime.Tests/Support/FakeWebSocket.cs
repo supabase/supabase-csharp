@@ -86,6 +86,9 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
         return Task.CompletedTask;
     }
 
+    /// <summary>Reports that a lost connection is back, as the real client does once it has reconnected.</summary>
+    public void RecoverFromLostConnection() => this.reconnectionHappened.OnNext(ReconnectionInfo.Create(ReconnectionType.Lost));
+
     /// <summary>Delivers a frame as if the server had sent it.</summary>
     public void Receive(string json) => this.messageReceived.OnNext(ResponseMessage.TextMessage(json));
 
