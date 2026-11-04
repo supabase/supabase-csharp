@@ -1,5 +1,27 @@
 # Changelog
 
+## [8.9.0](https://github.com/supabase/supabase-csharp/compare/v8.8.0...v8.9.0) (2026-11-04)
+
+
+### Features
+
+* **auth:** delete a user's passkey as an admin ([#653](https://github.com/supabase/supabase-csharp/issues/653)) ([55f5b46](https://github.com/supabase/supabase-csharp/commit/55f5b46e2860be91e16b96b5e2a7ff59e147715e))
+* **auth:** delete one of the signed-in user's passkeys ([#637](https://github.com/supabase/supabase-csharp/issues/637)) ([a279fa8](https://github.com/supabase/supabase-csharp/commit/a279fa83c08b37b8c99813cc3ce67d6811eca45b))
+* **auth:** list a user's passkeys as an admin ([#651](https://github.com/supabase/supabase-csharp/issues/651)) ([c9f335f](https://github.com/supabase/supabase-csharp/commit/c9f335fa24745d76f40a02b3ee5e8fe74067a3a2))
+* **auth:** list the signed-in user's passkeys ([#634](https://github.com/supabase/supabase-csharp/issues/634)) ([5dc5845](https://github.com/supabase/supabase-csharp/commit/5dc584548710efd8121ecb8f6362f1882ef4da5a))
+* **auth:** regenerate a user's MFA recovery codes ([#643](https://github.com/supabase/supabase-csharp/issues/643)) ([ebeb52f](https://github.com/supabase/supabase-csharp/commit/ebeb52ff0b56f991facd8245d30a7ca179d28380))
+* **auth:** register a passkey for the signed-in user ([#649](https://github.com/supabase/supabase-csharp/issues/649)) ([a3dd4e6](https://github.com/supabase/supabase-csharp/commit/a3dd4e6ccd84de472f3b48957a8182ecedc43e4b))
+* **auth:** rename one of the signed-in user's passkeys ([#645](https://github.com/supabase/supabase-csharp/issues/645)) ([de1b9df](https://github.com/supabase/supabase-csharp/commit/de1b9dfda6e2fbbb3295cdaeecc87ded2f512f98))
+* **auth:** sign in with a passkey ([#646](https://github.com/supabase/supabase-csharp/issues/646)) ([db8636d](https://github.com/supabase/supabase-csharp/commit/db8636d714720063f14fa0e146f73e71dd98d80a))
+* **realtime:** remove all channels in one call ([#633](https://github.com/supabase/supabase-csharp/issues/633)) ([8bf642e](https://github.com/supabase/supabase-csharp/commit/8bf642e351c2aee5ff062d8147efa62d3fbf2e76))
+
+
+### Bug Fixes
+
+* **realtime:** drop presences that left during a reconnect ([#661](https://github.com/supabase/supabase-csharp/issues/661)) ([1c7917f](https://github.com/supabase/supabase-csharp/commit/1c7917fe601ac23b85a4c9f38d356ff3ec1d3ce5))
+* **realtime:** guard socket handler lists against concurrent changes ([#662](https://github.com/supabase/supabase-csharp/issues/662)) ([1e3891b](https://github.com/supabase/supabase-csharp/commit/1e3891b93a2dc7a1b5dd8bd42e642d80335b80c8))
+* **realtime:** tell state handlers when the socket reconnects ([#660](https://github.com/supabase/supabase-csharp/issues/660)) ([b3dbbb2](https://github.com/supabase/supabase-csharp/commit/b3dbbb2012d39eff45212f3db5ea257a73931fd6))
+
 ## [8.8.0](https://github.com/supabase/supabase-csharp/compare/v8.7.0...v8.8.0) (2026-11-02)
 
 

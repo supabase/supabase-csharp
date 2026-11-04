@@ -1,8 +1,10 @@
+using System;
 using System.Text.Json;
 using Supabase.Realtime;
 using Supabase.Realtime.Channel;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Socket;
+using Websocket.Client;
 
 namespace Realtime.Tests.Support;
 
@@ -32,6 +34,18 @@ internal static class Wire
         ChannelOptions.Public(new ClientOptions(), () => accessToken, Settings());
 
     public static IRealtimeSocket Socket() => new RealtimeSocket(Endpoint, new ClientOptions());
+
+    /// <summary>
+    ///     Options for a <see cref="RealtimeSocket" /> talking to <paramref name="server" />, with the client's
+    ///     default JSON codec, so the socket can be connected and driven without a <see cref="Client" />.
+    /// </summary>
+    public static ClientOptions OptionsOver(IWebsocketClient server) => new()
+    {
+        WebSocketFactory = new FakeWebSocketFactory(server),
+        HeartbeatInterval = TimeSpan.FromMilliseconds(20),
+        Encode = (payload, send) => send(JsonSerializer.Serialize(payload, payload.GetType(), Settings())),
+        Decode = (json, receive) => receive(Decode(json)),
+    };
 
     public static RealtimeChannel Channel(string topic = "realtime:example", ChannelOptions? options = null) =>
         new(Socket(), topic, options ?? PublicOptions());

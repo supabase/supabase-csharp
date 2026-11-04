@@ -76,9 +76,14 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     {
         this.FirstSend.TrySetResult();
         if (this.AnswerHeartbeats && JsonNode.Parse(message) is { } frame && (string?) frame["event"] == "heartbeat")
-            this.Receive("""{"topic":"phoenix","event":"phx_reply","ref":"REF","payload":{"status":"ok","response":{}}}""".Replace("REF", (string?) frame["ref"]));
+            this.Reply("phoenix", (string?) frame["ref"]);
         return true;
     }
+
+    /// <summary>Delivers the server's ok reply to the frame sent with <paramref name="reference" />.</summary>
+    public void Reply(string topic, string? reference) =>
+        this.Receive("""{"topic":"TOPIC","event":"phx_reply","ref":"REF","payload":{"status":"ok","response":{}}}"""
+            .Replace("TOPIC", topic).Replace("REF", reference));
 
     public Task Reconnect()
     {
@@ -86,8 +91,15 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
         return Task.CompletedTask;
     }
 
+    /// <summary>Reports that a lost connection is back, as the real client does once it has reconnected.</summary>
+    public void RecoverFromLostConnection() => this.reconnectionHappened.OnNext(ReconnectionInfo.Create(ReconnectionType.Lost));
+
     /// <summary>Delivers a frame as if the server had sent it.</summary>
     public void Receive(string json) => this.messageReceived.OnNext(ResponseMessage.TextMessage(json));
+
+    /// <summary>Reports a connection failure as if the transport had dropped with an error.</summary>
+    public void Fail(Exception exception) =>
+        this.disconnectionHappened.OnNext(DisconnectionInfo.Create(DisconnectionType.Error, null, exception));
 
     public void Dispose() { }
 

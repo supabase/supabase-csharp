@@ -142,6 +142,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
             this.Socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
             this.Socket.AddHeartbeatHandler(this.HandleSocketHeartbeat);
+            this.Socket.AddStateChangedHandler(this.HandleSocketStateChanged);
 
             this.NotifySocketStateChange(SocketState.Open);
             tsc.TrySetResult(this);
@@ -192,6 +193,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
             this.Socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
             this.Socket.AddHeartbeatHandler(this.HandleSocketHeartbeat);
+            this.Socket.AddStateChangedHandler(this.HandleSocketStateChanged);
 
             sender.RemoveStateChangedHandler(socketStateHandler!);
             sender.RemoveErrorHandler(errorEventHandler!);
@@ -492,27 +494,6 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             subscription.HandleSocketMessage(message);
     }
 
-    private void HandleSocketStateChanged(IRealtimeSocket sender, SocketState state)
-    {
-        switch (state)
-        {
-            case SocketState.Open:
-                // Ref: https://github.com/supabase/realtime-js/pull/116/files
-                if (!string.IsNullOrEmpty(this.AccessToken))
-                    this.SetAuth(this.AccessToken!);
-
-                this.NotifySocketStateChange(SocketState.Open);
-                break;
-            case SocketState.Reconnect:
-                // Ref: https://github.com/supabase/realtime-js/pull/116/files
-                if (!string.IsNullOrEmpty(this.AccessToken))
-                    this.SetAuth(this.AccessToken!);
-
-                this.NotifySocketStateChange(SocketState.Reconnect);
-                break;
-            default:
-                this.NotifySocketStateChange(state);
-                break;
-        }
-    }
+    private void HandleSocketStateChanged(IRealtimeSocket sender, SocketState state) =>
+        this.NotifySocketStateChange(state);
 }

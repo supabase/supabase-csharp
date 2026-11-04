@@ -154,9 +154,9 @@ public class RealtimeChannel : IRealtimeChannel
     private IRealtimeBroadcast? broadcast;
     private RealtimeException? exception;
 
-    private readonly List<StateChangedHandler> stateChangedHandlers = new();
-    private readonly List<MessageReceivedHandler> messageReceivedHandlers = new();
-    private readonly List<ErrorEventHandler> errorEventHandlers = new();
+    private readonly HandlerCollection<StateChangedHandler> stateChangedHandlers = new();
+    private readonly HandlerCollection<MessageReceivedHandler> messageReceivedHandlers = new();
+    private readonly HandlerCollection<ErrorEventHandler> errorEventHandlers = new();
 
     private bool CanPush => this.IsJoined && this.Socket.IsConnected;
     private bool hasJoinedOnce;
@@ -279,8 +279,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="stateChangedHandler"></param>
     public void AddStateChangedHandler(StateChangedHandler stateChangedHandler)
     {
-        if (!this.stateChangedHandlers.Contains(stateChangedHandler))
-            this.stateChangedHandlers.Add(stateChangedHandler);
+        this.stateChangedHandlers.Add(stateChangedHandler);
     }
 
     /// <summary>
@@ -289,8 +288,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="stateChangedHandler"></param>
     public void RemoveStateChangedHandler(StateChangedHandler stateChangedHandler)
     {
-        if (this.stateChangedHandlers.Contains(stateChangedHandler))
-            this.stateChangedHandlers.Remove(stateChangedHandler);
+        this.stateChangedHandlers.Remove(stateChangedHandler);
     }
 
     /// <summary>
@@ -314,7 +312,7 @@ public class RealtimeChannel : IRealtimeChannel
         else
             this.rejoinTimer.Stop();
 
-        foreach (var handler in this.stateChangedHandlers.ToArray())
+        foreach (var handler in this.stateChangedHandlers.Snapshot())
             handler.Invoke(this, state);
     }
 
@@ -324,8 +322,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="messageReceivedHandler"></param>
     public void AddMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler)
     {
-        if (!this.messageReceivedHandlers.Contains(messageReceivedHandler))
-            this.messageReceivedHandlers.Add(messageReceivedHandler);
+        this.messageReceivedHandlers.Add(messageReceivedHandler);
     }
 
     /// <summary>
@@ -334,8 +331,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="messageReceivedHandler"></param>
     public void RemoveMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler)
     {
-        if (this.messageReceivedHandlers.Contains(messageReceivedHandler))
-            this.messageReceivedHandlers.Remove(messageReceivedHandler);
+        this.messageReceivedHandlers.Remove(messageReceivedHandler);
     }
 
     /// <summary>
@@ -350,7 +346,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="message"></param>
     private void NotifyMessageReceived(SocketResponse message)
     {
-        foreach (var handler in this.messageReceivedHandlers.ToArray())
+        foreach (var handler in this.messageReceivedHandlers.Snapshot())
             handler.Invoke(this, message);
     }
 
@@ -402,8 +398,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="handler"></param>
     public void AddErrorHandler(ErrorEventHandler handler)
     {
-        if (!this.errorEventHandlers.Contains(handler))
-            this.errorEventHandlers.Add(handler);
+        this.errorEventHandlers.Add(handler);
     }
 
     /// <summary>
@@ -413,8 +408,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <exception cref="NotImplementedException"></exception>
     public void RemoveErrorHandler(ErrorEventHandler handler)
     {
-        if (this.errorEventHandlers.Contains(handler))
-            this.errorEventHandlers.Remove(handler);
+        this.errorEventHandlers.Remove(handler);
     }
 
     /// <summary>
@@ -429,7 +423,7 @@ public class RealtimeChannel : IRealtimeChannel
 
         this.NotifyStateChanged(ChannelState.Errored);
 
-        foreach (var handler in this.errorEventHandlers)
+        foreach (var handler in this.errorEventHandlers.Snapshot())
             handler.Invoke(this, exception);
     }
 

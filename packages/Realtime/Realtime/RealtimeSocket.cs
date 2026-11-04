@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
@@ -52,10 +51,10 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// </summary>
     internal Dictionary<string, string> Headers => this.GetHeaders != null ? this.GetHeaders().MergeLeft(this.options.Headers) : this.options.Headers;
 
-    private readonly List<IRealtimeSocket.StateEventHandler> socketEventHandlers = new();
-    private readonly List<IRealtimeSocket.MessageEventHandler> messageEventHandlers = new();
-    private readonly List<IRealtimeSocket.HeartbeatEventHandler> heartbeatEventHandlers = new();
-    private readonly List<IRealtimeSocket.ErrorEventHandler> errorEventHandlers = new();
+    private readonly HandlerCollection<IRealtimeSocket.StateEventHandler> socketEventHandlers = new();
+    private readonly HandlerCollection<IRealtimeSocket.MessageEventHandler> messageEventHandlers = new();
+    private readonly HandlerCollection<IRealtimeSocket.HeartbeatEventHandler> heartbeatEventHandlers = new();
+    private readonly HandlerCollection<IRealtimeSocket.ErrorEventHandler> errorEventHandlers = new();
 
     private readonly string endpoint;
     private readonly ClientOptions options;
@@ -133,21 +132,13 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// Adds a listener to be notified when the socket state changes.
     /// </summary>
     /// <param name="handler"></param>
-    public void AddStateChangedHandler(IRealtimeSocket.StateEventHandler handler)
-    {
-        if (!this.socketEventHandlers.Contains(handler))
-            this.socketEventHandlers.Add(handler);
-    }
+    public void AddStateChangedHandler(IRealtimeSocket.StateEventHandler handler) => this.socketEventHandlers.Add(handler);
 
     /// <summary>
     /// Removes a specified listener from socket state changes.
     /// </summary>
     /// <param name="handler"></param>
-    public void RemoveStateChangedHandler(IRealtimeSocket.StateEventHandler handler)
-    {
-        if (this.socketEventHandlers.Contains(handler))
-            this.socketEventHandlers.Remove(handler);
-    }
+    public void RemoveStateChangedHandler(IRealtimeSocket.StateEventHandler handler) => this.socketEventHandlers.Remove(handler);
 
     /// <summary>
     /// Notifies all listeners that the socket state has changed.
@@ -155,11 +146,13 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// <param name="newState"></param>
     private void NotifySocketStateChange(SocketState newState)
     {
-        if (!this.socketEventHandlers.Any()) return;
+        var snapshot = this.socketEventHandlers.Snapshot();
+
+        if (snapshot.Length == 0) return;
 
         Debugger.Instance.Log(this, $"Socket State Change: {newState}");
 
-        foreach (var handler in this.socketEventHandlers.ToArray())
+        foreach (var handler in snapshot)
             handler.Invoke(this, newState);
     }
 
@@ -173,25 +166,13 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// Adds a listener to be notified when a message is received.
     /// </summary>
     /// <param name="handler"></param>
-    public void AddMessageReceivedHandler(IRealtimeSocket.MessageEventHandler handler)
-    {
-        if (this.messageEventHandlers.Contains(handler))
-            return;
-
-        this.messageEventHandlers.Add(handler);
-    }
+    public void AddMessageReceivedHandler(IRealtimeSocket.MessageEventHandler handler) => this.messageEventHandlers.Add(handler);
 
     /// <summary>
     /// Removes a specified listener from messages received.
     /// </summary>
     /// <param name="handler"></param>
-    public void RemoveMessageReceivedHandler(IRealtimeSocket.MessageEventHandler handler)
-    {
-        if (!this.messageEventHandlers.Contains(handler))
-            return;
-
-        this.messageEventHandlers.Remove(handler);
-    }
+    public void RemoveMessageReceivedHandler(IRealtimeSocket.MessageEventHandler handler) => this.messageEventHandlers.Remove(handler);
 
     /// <summary>
     /// Notifies all listeners that the socket has received a message
@@ -199,7 +180,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// <param name="heartbeat"></param>
     private void NotifyMessageReceived(SocketResponse heartbeat)
     {
-        foreach (var handler in this.messageEventHandlers.ToArray())
+        foreach (var handler in this.messageEventHandlers.Snapshot())
             handler.Invoke(this, heartbeat);
     }
 
@@ -213,21 +194,13 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// Adds a listener to be notified when a message is received.
     /// </summary>
     /// <param name="handler"></param>
-    public void AddHeartbeatHandler(IRealtimeSocket.HeartbeatEventHandler handler)
-    {
-        if (!this.heartbeatEventHandlers.Contains(handler))
-            this.heartbeatEventHandlers.Add(handler);
-    }
+    public void AddHeartbeatHandler(IRealtimeSocket.HeartbeatEventHandler handler) => this.heartbeatEventHandlers.Add(handler);
 
     /// <summary>
     /// Removes a specified listener from messages received.
     /// </summary>
     /// <param name="handler"></param>
-    public void RemoveHeartbeatHandler(IRealtimeSocket.HeartbeatEventHandler handler)
-    {
-        if (this.heartbeatEventHandlers.Contains(handler))
-            this.heartbeatEventHandlers.Remove(handler);
-    }
+    public void RemoveHeartbeatHandler(IRealtimeSocket.HeartbeatEventHandler handler) => this.heartbeatEventHandlers.Remove(handler);
 
     /// <summary>
     /// Notifies all listeners that the socket has received a heartbeat
@@ -235,7 +208,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// <param name="heartbeat"></param>
     private void NotifyHeartbeatReceived(SocketResponse heartbeat)
     {
-        foreach (var handler in this.heartbeatEventHandlers.ToArray())
+        foreach (var handler in this.heartbeatEventHandlers.Snapshot())
             handler.Invoke(this, heartbeat);
     }
 
@@ -249,22 +222,14 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// Adds an error event handler.
     /// </summary>
     /// <param name="handler"></param>
-    public void AddErrorHandler(IRealtimeSocket.ErrorEventHandler handler)
-    {
-        if (!this.errorEventHandlers.Contains(handler))
-            this.errorEventHandlers.Add(handler);
-    }
+    public void AddErrorHandler(IRealtimeSocket.ErrorEventHandler handler) => this.errorEventHandlers.Add(handler);
 
     /// <summary>
     /// Removes an error event handler
     /// </summary>
     /// <param name="handler"></param>
     /// <exception cref="NotImplementedException"></exception>
-    public void RemoveErrorHandler(IRealtimeSocket.ErrorEventHandler handler)
-    {
-        if (this.errorEventHandlers.Contains(handler))
-            this.errorEventHandlers.Remove(handler);
-    }
+    public void RemoveErrorHandler(IRealtimeSocket.ErrorEventHandler handler) => this.errorEventHandlers.Remove(handler);
 
     /// <summary>
     /// Clears Error Event Handlers
@@ -276,7 +241,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     {
         this.NotifySocketStateChange(SocketState.Error);
 
-        foreach (var handler in this.errorEventHandlers.ToArray())
+        foreach (var handler in this.errorEventHandlers.Snapshot())
             handler.Invoke(this, exception);
     }
 

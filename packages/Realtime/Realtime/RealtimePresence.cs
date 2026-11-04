@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -44,7 +45,7 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     private readonly RealtimeChannel channel;
     private readonly JsonSerializerOptions serializerSettings;
 
-    private readonly Dictionary<IRealtimePresence.EventType, List<IRealtimePresence.PresenceEventHandler>>
+    private readonly ConcurrentDictionary<IRealtimePresence.EventType, HandlerCollection<IRealtimePresence.PresenceEventHandler>>
         presenceEventListeners = new();
 
     /// <summary>
@@ -69,11 +70,8 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     public void AddPresenceEventHandler(IRealtimePresence.EventType eventType,
         IRealtimePresence.PresenceEventHandler handler)
     {
-        if (!this.presenceEventListeners.ContainsKey(eventType))
-            this.presenceEventListeners[eventType] = new List<IRealtimePresence.PresenceEventHandler>();
-
-        if (!this.presenceEventListeners[eventType].Contains(handler))
-            this.presenceEventListeners[eventType].Add(handler);
+        this.presenceEventListeners.GetOrAdd(eventType, _ => new HandlerCollection<IRealtimePresence.PresenceEventHandler>())
+            .Add(handler);
     }
 
     /// <summary>
@@ -84,9 +82,8 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     public void RemovePresenceEventHandlers(IRealtimePresence.EventType eventType,
         IRealtimePresence.PresenceEventHandler handler)
     {
-        if (this.presenceEventListeners.ContainsKey(eventType) &&
-            this.presenceEventListeners[eventType].Contains(handler))
-            this.presenceEventListeners[eventType].Remove(handler);
+        if (this.presenceEventListeners.TryGetValue(eventType, out var list))
+            list.Remove(handler);
     }
 
     /// <summary>
@@ -107,9 +104,9 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     /// <param name="eventType"></param>
     private void NotifyPresenceEventHandlers(IRealtimePresence.EventType eventType)
     {
-        if (!this.presenceEventListeners.ContainsKey(eventType)) return;
+        if (!this.presenceEventListeners.TryGetValue(eventType, out var list)) return;
 
-        foreach (var handler in this.presenceEventListeners[eventType].ToArray())
+        foreach (var handler in list.Snapshot())
             handler.Invoke(this, eventType);
     }
 
@@ -257,6 +254,7 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
 
             if (state?.Payload == null) return;
 
+            this.CurrentState.Clear();
             foreach (var item in state.Payload)
                 this.CurrentState[item.Key] = item.Value.Metas!;
         }
