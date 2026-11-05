@@ -308,6 +308,9 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             this.Socket = null;
         }
 
+        foreach (var channel in this.subscriptions.Values.ToArray())
+            channel.Unsubscribe();
+
         return this;
     }
 
@@ -423,7 +426,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             if (this.subscriptions.Count == 0 && this.Options.DisconnectOnEmptyChannelsAfter is { } delay)
                 _ = this.DisconnectWhenStillEmptyAsync(delay);
         }
-        else if (state == ChannelState.Joining)
+        else if (state == ChannelState.Joining && channel.Socket == this.Socket)
             this.subscriptions.TryAdd(channel.Topic, channel);
     }
 
@@ -454,13 +457,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
     /// <inheritdoc />
     [ImplementedCapability("realtime.client.remove_all_channels")]
-    public void RemoveAll()
-    {
-        foreach (var channel in this.subscriptions.Values.ToArray())
-            channel.Unsubscribe();
-
-        this.Disconnect();
-    }
+    public void RemoveAll() => this.Disconnect();
 
     /// <summary>
     /// The default socket message encoder, used to serialize <see cref="JoinPush"/> messages to the socket
