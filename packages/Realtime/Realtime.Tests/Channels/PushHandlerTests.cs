@@ -58,4 +58,13 @@ public class PushHandlerTests
 
         this.calls.Should().Be(0, "a removed handler must not be told about the reply");
     }
+
+    [TestMethod]
+    public void JoinPush_ShouldLeaveTheChannelClosed_GivenAReplyAfterUnsubscribe()
+    {
+        _ = this.channel.Subscribe();
+        this.channel.Unsubscribe();
+        this.socket.Reply(this.channel.Topic, this.channel.JoinPush!.Ref);
+        this.channel.IsClosed.Should().BeTrue("the server still answers a join sent before the leave");
+    }
 }

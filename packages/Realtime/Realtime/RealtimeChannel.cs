@@ -758,6 +758,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="message"></param>
     private void HandleJoinResponse(IRealtimePush<RealtimeChannel, SocketResponse> sender, SocketResponse message)
     {
+        if (!this.IsJoining) return;
         if (message._event != ChannelEventReply) return;
 
         var obj = JsonSerializer.Deserialize<SocketResponse<PhoenixResponse>>(message.Json!,

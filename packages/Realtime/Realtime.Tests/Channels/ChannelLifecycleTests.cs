@@ -48,6 +48,18 @@ public class ChannelLifecycleTests
     }
 
     [TestMethod]
+    public async Task Unsubscribe_ShouldFailSubscribe_GivenAChannelStillJoining()
+    {
+        var channel = Wire.Channel();
+        var subscribing = channel.Subscribe();
+        channel.Unsubscribe();
+        var act = () => subscribing.WaitAsync(TimeSpan.FromSeconds(5));
+        await act.Should().ThrowAsync<RealtimeException>()
+            .WithMessage("Channel closed before it joined")
+            .Where(e => e.Reason == FailureHint.Reason.ChannelJoinFailure, "leaving during the join must fail Subscribe instead of hanging");
+    }
+
+    [TestMethod]
     public void LeavePush_ShouldCarryTheJoinRef_GivenASentJoin()
     {
         var channel = Wire.Channel();
