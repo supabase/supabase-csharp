@@ -5,6 +5,7 @@ using System.Net.WebSockets;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Realtime;
 using Supabase.Realtime.Sockets;
@@ -72,11 +73,19 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     /// <summary>Completes when the socket forces a reconnect.</summary>
     public TaskCompletionSource Reconnected { get; } = new();
 
+    /// <summary>Heartbeats sent so far, counted once any reply to them has been delivered.</summary>
+    public int HeartbeatsSent => this.heartbeatsSent;
+
+    private int heartbeatsSent;
+
     public bool Send(string message)
     {
         this.FirstSend.TrySetResult();
-        if (this.AnswerHeartbeats && JsonNode.Parse(message) is { } frame && (string?) frame["event"] == "heartbeat")
+        if (JsonNode.Parse(message) is not { } frame || (string?) frame["event"] != "heartbeat")
+            return true;
+        if (this.AnswerHeartbeats)
             this.Reply("phoenix", (string?) frame["ref"]);
+        Interlocked.Increment(ref this.heartbeatsSent);
         return true;
     }
 

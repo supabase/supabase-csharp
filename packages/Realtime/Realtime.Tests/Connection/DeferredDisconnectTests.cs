@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
@@ -47,12 +48,34 @@ public class DeferredDisconnectTests
         client.Socket.Should().NotBeNull("the delay counts from the last channel that closed");
     }
 
-    private static async Task<Client> Connect(TimeSpan disconnectAfter)
+    [TestMethod]
+    public async Task Unsubscribe_ShouldDisconnectAfterTheDelay_GivenACustomTimeProvider()
+    {
+        var clock = new FakeTimeProvider();
+        var delay = TimeSpan.FromMinutes(5);
+        var client = await Connect(delay, clock);
+        client.Channel("room").Unsubscribe();
+        clock.Advance(delay - TimeSpan.FromTicks(1));
+        await Task.Delay(100);
+        client.Socket.Should().NotBeNull("the delay has not yet elapsed on the supplied clock");
+        clock.Advance(TimeSpan.FromTicks(1));
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        while (client.Socket != null && DateTime.UtcNow < deadline)
+            await Task.Delay(10);
+        client.Socket.Should().BeNull("the deferred disconnect waits on the supplied clock");
+    }
+
+    [TestMethod]
+    public void ClientOptions_ShouldDefaultToSystemTimeProvider() =>
+        new ClientOptions().TimeProvider.Should().BeSameAs(TimeProvider.System, "unset, every Realtime timer keeps running on the real clock");
+
+    private static async Task<Client> Connect(TimeSpan disconnectAfter, TimeProvider? clock = null)
     {
         var options = new ClientOptions
         {
             WebSocketFactory = new FakeWebSocketFactory(new FakeWebsocketClient { OpenOnStart = true }),
             DisconnectOnEmptyChannelsAfter = disconnectAfter,
+            TimeProvider = clock ?? TimeProvider.System,
         };
         var client = new Client("ws://localhost/socket", options);
         await client.ConnectAsync();

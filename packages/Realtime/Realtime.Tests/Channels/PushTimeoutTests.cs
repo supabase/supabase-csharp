@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
@@ -56,6 +57,23 @@ public class PushTimeoutTests
         push.Resend(5000);
         this.socket.Reply(this.channel.Topic, push.Ref);
         push.Response.Should().NotBeNull();
+    }
+
+    [TestMethod]
+    public void Push_ShouldTimeOutOnce_GivenTheTimeoutElapsesOnACustomTimeProvider()
+    {
+        var clock = new FakeTimeProvider();
+        var clockedChannel = Wire.Channel(options: ChannelOptions.Public(new ClientOptions { TimeProvider = clock }, () => null, Wire.Settings()));
+        var timeouts = 0;
+        var push = new Push(clockedChannel.Socket, clockedChannel, ChannelAccessToken, timeoutMs: 10_000);
+        push.OnTimeout += (_, _) => timeouts++;
+        push.Send();
+        clock.Advance(TimeSpan.FromMilliseconds(9_999));
+        timeouts.Should().Be(0, "the push still has a millisecond left on the supplied clock");
+        clock.Advance(TimeSpan.FromMilliseconds(1));
+        timeouts.Should().Be(1, "the timeout runs on the supplied clock");
+        clock.Advance(TimeSpan.FromMinutes(1));
+        timeouts.Should().Be(1, "the push timeout is one-shot");
     }
 
     private async Task<Push> TimedOutPush()

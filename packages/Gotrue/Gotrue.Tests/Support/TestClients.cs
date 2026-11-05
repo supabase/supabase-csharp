@@ -44,7 +44,8 @@ internal static class TestClients
     internal static IGotrueAdminClient<User> AdminAgainstCliStack(string serviceKey) =>
         new AdminClient(serviceKey, CliOptions());
 
-    internal static IGotrueClient<User, Session> Against(MockGotrueServer server, bool autoRefreshToken = false, HttpClient? httpClient = null) =>
+    internal static IGotrueClient<User, Session> Against(MockGotrueServer server, bool autoRefreshToken = false, HttpClient? httpClient = null,
+        TimeProvider? timeProvider = null) =>
         new Client(new ClientOptions
         {
             Url = server.Url,
@@ -52,6 +53,7 @@ internal static class TestClients
             HttpClient = httpClient,
             AllowUnconfirmedUserSessions = false,
             Headers = new Dictionary<string, string> { { "apikey", MockGotrueServer.ApiKey } },
+            TimeProvider = timeProvider ?? TimeProvider.System,
         });
 
     internal static StatelessClientOptions StatelessAgainstCliStack()

@@ -434,7 +434,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     {
         var socket = this.Socket;
         var generation = Interlocked.Increment(ref this.disconnectGeneration);
-        await Task.Delay(delay).ConfigureAwait(false);
+        await this.Options.TimeProvider.Delay(delay).ConfigureAwait(false);
         if (generation == this.disconnectGeneration && this.Socket == socket && this.subscriptions.Count == 0)
             this.Disconnect();
     }

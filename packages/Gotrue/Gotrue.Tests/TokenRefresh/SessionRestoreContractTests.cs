@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Gotrue.Tests.Support;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Supabase.Gotrue;
@@ -201,6 +202,25 @@ public class SessionRestoreContractTests
         await Task.Delay(1500);
         handler.Attempts.Should().Be(0, "a shut down client must not refresh");
     }
+
+    [TestMethod]
+    public async Task TokenRefresh_ShouldFireAtTheComputedDueTime_GivenACustomTimeProvider()
+    {
+        var clock = new FakeTimeProvider();
+        var handler = new UnreachableHandler();
+        var refreshDue = TimeSpan.FromSeconds(2880);
+        this.persistence.SaveSession(new Session { AccessToken = "an-access-token", RefreshToken = "a-refresh-token", ExpiresIn = 3600, CreatedAt = clock.GetUtcNow().UtcDateTime });
+        this.Restore(TestClients.Against(this.server, autoRefreshToken: true, new HttpClient(handler), clock));
+        clock.Advance(refreshDue - TimeSpan.FromSeconds(1));
+        handler.Attempts.Should().Be(0, "a one-hour session is not refreshed before four fifths of its lifetime on the supplied clock");
+        clock.Advance(TimeSpan.FromSeconds(1));
+        await handler.Started;
+        handler.Attempts.Should().Be(1, "the refresh timer is scheduled on the supplied clock, due at 4/5 of expires_in");
+    }
+
+    [TestMethod]
+    public void ClientOptions_ShouldDefaultToSystemTimeProvider() =>
+        new ClientOptions().TimeProvider.Should().BeSameAs(TimeProvider.System, "unset, the refresh timer keeps running on the real clock");
 
     [TestMethod]
     public async Task StartAutoRefresh_ShouldRefreshAtOnce_GivenAnExpiredSessionAndTheOptionOff()

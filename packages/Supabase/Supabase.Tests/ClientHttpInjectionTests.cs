@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Core.Http;
 using Supabase.Realtime.Sockets;
@@ -58,6 +59,51 @@ public class ClientHttpInjectionTests
             client.Postgrest.Options.Retry.Should().BeSameAs(postgrestRetry);
             ((Supabase.Functions.Client) client.Functions).Options.Retry.Should().BeSameAs(functionsRetry);
         }
+    }
+
+    [TestMethod]
+    public void Client_ShouldMirrorTimeProviderToEveryChildClient()
+    {
+        var clock = new FakeTimeProvider();
+        var options = new SupabaseOptions { TimeProvider = clock, GotrueRetry = new RetryOptions { MaxRetries = 3 } };
+        var client = new Client("http://localhost:54321", "test-key", options);
+        using (new AssertionScope())
+        {
+            client.Auth.Options.TimeProvider.Should().BeSameAs(clock, "the auth refresh timer must run on the supplied clock");
+            client.Auth.Options.Retry.TimeProvider.Should().BeSameAs(clock, "auth retry backoff must wait on the supplied clock");
+            client.Auth.Options.Retry.MaxRetries.Should().Be(3, "applying the clock must keep the rest of the configured policy");
+            client.Postgrest.Options.Retry.TimeProvider.Should().BeSameAs(clock, "postgrest retry backoff must wait on the supplied clock");
+            ((Supabase.Functions.Client) client.Functions).Options.Retry.TimeProvider.Should().BeSameAs(clock,
+                "functions retry backoff must wait on the supplied clock");
+            ((Supabase.Storage.Client) client.Storage).Options.Retry.TimeProvider.Should().BeSameAs(clock,
+                "storage retry backoff must wait on the supplied clock");
+            client.Realtime.Options.TimeProvider.Should().BeSameAs(clock, "every realtime timer must run on the supplied clock");
+            options.GotrueRetry.TimeProvider.Should().BeSameAs(TimeProvider.System, "the caller's retry policy is copied, not mutated");
+        }
+    }
+
+    [TestMethod]
+    public void Client_ShouldLeaveChildClientsOnTheSystemClock_GivenNoTimeProvider()
+    {
+        var client = new Client("http://localhost:54321", "test-key", new SupabaseOptions());
+        using (new AssertionScope())
+        {
+            client.Auth.Options.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            client.Auth.Options.Retry.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            client.Postgrest.Options.Retry.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            ((Supabase.Functions.Client) client.Functions).Options.Retry.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            ((Supabase.Storage.Client) client.Storage).Options.Retry.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            client.Realtime.Options.TimeProvider.Should().BeSameAs(TimeProvider.System);
+        }
+    }
+
+    [TestMethod]
+    public void AdminAuth_ShouldMirrorTimeProvider_GivenATimeProvider()
+    {
+        var clock = new FakeTimeProvider();
+        var admin = new Client("http://localhost:54321", "test-key", new SupabaseOptions { TimeProvider = clock }).AdminAuth("service-key");
+        ((Supabase.Gotrue.AdminClient) admin).Options.Retry.TimeProvider.Should().BeSameAs(clock,
+            "admin auth retry backoff must wait on the supplied clock");
     }
 
     [TestMethod]

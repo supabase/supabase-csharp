@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Core.Http;
 using Supabase.Functions;
@@ -291,6 +292,23 @@ public class ClientContractTests
             .RespondWith(Response.Create().WithStatusCode(200).WithDelay(TimeSpan.FromMilliseconds(200)));
         var act = () => this.client.Invoke(FunctionName, options: new InvokeFunctionOptions { HttpTimeout = TimeSpan.FromMilliseconds(20) });
         (await act.Should().ThrowAsync<TaskCanceledException>()).Which.InnerException.Should().BeOfType<TimeoutException>();
+    }
+
+    [TestMethod]
+    public async Task Invoke_ShouldTimeOutOnTheRetryClock_GivenACustomTimeProvider()
+    {
+        this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingAnyMethod())
+            .RespondWith(Response.Create().WithStatusCode(200).WithDelay(TimeSpan.FromSeconds(3)));
+        var clock = new FakeTimeProvider();
+        this.client = new Client($"{this.server.Url}/functions/v1", options: new ClientOptions { Retry = new RetryOptions { TimeProvider = clock } });
+
+        var invoke = this.client.Invoke(FunctionName, options: new InvokeFunctionOptions { HttpTimeout = TimeSpan.FromSeconds(1) });
+        await Task.Delay(100);
+        invoke.IsCompleted.Should().BeFalse("the timeout waits on the supplied clock, not the wall clock");
+        clock.Advance(TimeSpan.FromSeconds(1));
+
+        var act = () => invoke;
+        (await act.Should().ThrowAsync<TaskCanceledException>().WaitAsync(Deadline)).Which.InnerException.Should().BeOfType<TimeoutException>();
     }
 
     [TestMethod]

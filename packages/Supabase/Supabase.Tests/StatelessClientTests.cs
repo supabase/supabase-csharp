@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Core.Http;
 using static Supabase.Gotrue.Constants;
@@ -84,6 +85,25 @@ public class StatelessClientTests
     public void GetRestOptions_ShouldForwardPostgrestTimeout_GivenATimeout() =>
         GetRestOptions("my-key", new Supabase.SupabaseOptions { PostgrestTimeout = TimeSpan.FromSeconds(5) })
             .Timeout.Should().Be(TimeSpan.FromSeconds(5), "the timeout must reach the Postgrest client");
+
+    [TestMethod]
+    public void StatelessClient_ShouldMirrorTimeProviderToEveryChildClient_GivenATimeProvider()
+    {
+        var clock = new FakeTimeProvider();
+        var options = FormatOptions();
+        options.TimeProvider = clock;
+        using (new AssertionScope())
+        {
+            var authOptions = GetAuthOptions(SupabaseUrl, "my-key", options);
+            authOptions.TimeProvider.Should().BeSameAs(clock, "the auth refresh timer must run on the supplied clock");
+            authOptions.Retry.TimeProvider.Should().BeSameAs(clock, "auth retry backoff must wait on the supplied clock");
+            GetRestOptions("my-key", options).Retry.TimeProvider.Should().BeSameAs(clock, "postgrest retry backoff must wait on the supplied clock");
+            ((Supabase.Functions.Client) StatelessClient.Functions(SupabaseUrl, "my-key", options)).Options.Retry.TimeProvider
+                .Should().BeSameAs(clock, "functions retry backoff must wait on the supplied clock");
+            ((Supabase.Storage.Client) StatelessClient.Storage(SupabaseUrl, "my-key", options)).Options.Retry.TimeProvider
+                .Should().BeSameAs(clock, "storage retry backoff must wait on the supplied clock");
+        }
+    }
 
     [TestMethod]
     public void Functions_ShouldCarryDeveloperHeadersToClient_GivenCustomHeader()

@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
@@ -14,6 +15,8 @@ namespace Realtime.Tests.Socket;
 [TestCategory("Unit")]
 public class HeartbeatTests
 {
+    private static readonly TimeSpan Interval = TimeSpan.FromSeconds(20);
+
     private Client client = null!;
 
     [TestCleanup]
@@ -35,11 +38,54 @@ public class HeartbeatTests
             "a healthy connection must not be reconnected");
     }
 
-    private async Task<FakeWebsocketClient> Connect(bool answerHeartbeats)
+    [TestMethod]
+    public async Task Heartbeat_ShouldSendOnEachInterval_GivenACustomTimeProvider()
+    {
+        var clock = new FakeTimeProvider();
+        var socket = await this.Connect(answerHeartbeats: true, clock);
+        await HeartbeatsSent(socket, 1, "the first heartbeat goes out as soon as the socket opens");
+        clock.Advance(Interval - TimeSpan.FromTicks(1));
+        await Task.Delay(100);
+        socket.HeartbeatsSent.Should().Be(1, "the next heartbeat waits a full interval on the supplied clock");
+        clock.Advance(TimeSpan.FromTicks(1));
+        await HeartbeatsSent(socket, 2, "a heartbeat is due every interval on the supplied clock");
+        clock.Advance(Interval);
+        await HeartbeatsSent(socket, 3, "the heartbeat keeps repeating");
+        socket.Reconnected.Task.IsCompleted.Should().BeFalse("every heartbeat was answered");
+    }
+
+    [TestMethod]
+    public async Task Heartbeat_ShouldReconnect_GivenNoReplyWithinAnIntervalOnACustomTimeProvider()
+    {
+        var clock = new FakeTimeProvider();
+        var socket = await this.Connect(answerHeartbeats: false, clock);
+        await HeartbeatsSent(socket, 1, "the first heartbeat goes out as soon as the socket opens");
+        socket.Reconnected.Task.IsCompleted.Should().BeFalse("the unanswered heartbeat is still within its interval");
+        clock.Advance(Interval);
+        await socket.Awaiting(s => s.Reconnected.Task).Should().CompleteWithinAsync(TimeSpan.FromSeconds(5),
+            "a heartbeat still unanswered when the next is due on the supplied clock means a dead connection");
+    }
+
+    private async Task<FakeWebsocketClient> Connect(bool answerHeartbeats, TimeProvider? clock = null)
     {
         var socket = new FakeWebsocketClient { OpenOnStart = true, AnswerHeartbeats = answerHeartbeats };
-        this.client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(socket), HeartbeatInterval = TimeSpan.FromMilliseconds(50) });
+        var options = new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(socket), HeartbeatInterval = TimeSpan.FromMilliseconds(50) };
+        if (clock != null)
+        {
+            options.HeartbeatInterval = Interval;
+            options.TimeProvider = clock;
+        }
+        this.client = new Client("ws://localhost/socket", options);
         await this.client.ConnectAsync();
         return socket;
+    }
+
+    /// <summary>Heartbeat frames go out on a background task, so wait (bounded) for the count to land.</summary>
+    private static async Task HeartbeatsSent(FakeWebsocketClient socket, int expected, string because)
+    {
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        while (socket.HeartbeatsSent < expected && DateTime.UtcNow < deadline)
+            await Task.Delay(10);
+        socket.HeartbeatsSent.Should().Be(expected, because);
     }
 }

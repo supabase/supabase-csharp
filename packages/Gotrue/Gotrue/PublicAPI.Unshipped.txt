@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.Gotrue.ClientOptions.TimeProvider.get -> System.TimeProvider!
+Supabase.Gotrue.ClientOptions.TimeProvider.set -> void
