@@ -276,19 +276,13 @@ public class RealtimeChannel : IRealtimeChannel
     /// Registers a state changed listener relative to this channel. Called when channel state changes.
     /// </summary>
     /// <param name="stateChangedHandler"></param>
-    public void AddStateChangedHandler(StateChangedHandler stateChangedHandler)
-    {
-        this.stateChangedHandlers.Add(stateChangedHandler);
-    }
+    public void AddStateChangedHandler(StateChangedHandler stateChangedHandler) => this.stateChangedHandlers.Add(stateChangedHandler);
 
     /// <summary>
     /// Removes a channel state changed listener
     /// </summary>
     /// <param name="stateChangedHandler"></param>
-    public void RemoveStateChangedHandler(StateChangedHandler stateChangedHandler)
-    {
-        this.stateChangedHandlers.Remove(stateChangedHandler);
-    }
+    public void RemoveStateChangedHandler(StateChangedHandler stateChangedHandler) => this.stateChangedHandlers.Remove(stateChangedHandler);
 
     /// <summary>
     /// Clears all channel state changed listeners
@@ -328,19 +322,13 @@ public class RealtimeChannel : IRealtimeChannel
     /// Registers a message received listener, called when a socket message is received for this channel.
     /// </summary>
     /// <param name="messageReceivedHandler"></param>
-    public void AddMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler)
-    {
-        this.messageReceivedHandlers.Add(messageReceivedHandler);
-    }
+    public void AddMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler) => this.messageReceivedHandlers.Add(messageReceivedHandler);
 
     /// <summary>
     /// Removes a message received listener.
     /// </summary>
     /// <param name="messageReceivedHandler"></param>
-    public void RemoveMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler)
-    {
-        this.messageReceivedHandlers.Remove(messageReceivedHandler);
-    }
+    public void RemoveMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler) => this.messageReceivedHandlers.Remove(messageReceivedHandler);
 
     /// <summary>
     /// Clears message received listeners.
@@ -404,20 +392,14 @@ public class RealtimeChannel : IRealtimeChannel
     /// Adds an error event handler.
     /// </summary>
     /// <param name="handler"></param>
-    public void AddErrorHandler(ErrorEventHandler handler)
-    {
-        this.errorEventHandlers.Add(handler);
-    }
+    public void AddErrorHandler(ErrorEventHandler handler) => this.errorEventHandlers.Add(handler);
 
     /// <summary>
     /// Removes an error event handler
     /// </summary>
     /// <param name="handler"></param>
     /// <exception cref="NotImplementedException"></exception>
-    public void RemoveErrorHandler(ErrorEventHandler handler)
-    {
-        this.errorEventHandlers.Remove(handler);
-    }
+    public void RemoveErrorHandler(ErrorEventHandler handler) => this.errorEventHandlers.Remove(handler);
 
     /// <summary>
     /// Clears Error Event Handlers
