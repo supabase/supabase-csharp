@@ -146,5 +146,44 @@ public class ChannelHandlerTests
         this.calls.Should().Be(0, "a removed handler is not notified");
     }
 
+    [TestMethod]
+    public void MessageReceivedHandler_ShouldNotStopTheBroadcast_GivenItThrows()
+    {
+        this.channel.AddMessageReceivedHandler((_, _) => throw new InvalidOperationException("boom"));
+        this.channel.Register<BroadcastExample>().AddBroadcastEventHandler((_, _) => this.calls++);
+        this.channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
+        this.calls.Should().Be(1, "a throwing message handler must not stop the rest of the dispatch");
+    }
+
+    [TestMethod]
+    public async Task ErrorHandler_ShouldNotStopTheNextHandler_GivenItThrows()
+    {
+        var heard = new TaskCompletionSource();
+        this.channel.AddErrorHandler((_, _) => throw new InvalidOperationException("boom"));
+        this.channel.AddErrorHandler((_, _) => heard.TrySetResult());
+        this.StartAJoinThatTimesOut();
+        await heard.Awaiting(source => source.Task).Should().CompleteWithinAsync(Patience, "a throwing handler must not stop the next one");
+    }
+
+    [TestMethod]
+    public void BroadcastHandler_ShouldNotStopTheNextHandler_GivenItThrows()
+    {
+        var broadcast = this.channel.Register<BroadcastExample>();
+        broadcast.AddBroadcastEventHandler((_, _) => throw new InvalidOperationException("boom"));
+        broadcast.AddBroadcastEventHandler((_, _) => this.calls++);
+        this.channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
+        this.calls.Should().Be(1, "a throwing handler must not stop the next one");
+    }
+
+    [TestMethod]
+    public void PresenceHandler_ShouldNotStopTheNextHandler_GivenItThrows()
+    {
+        var presence = this.channel.Register<PresenceExample>("user-1");
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => throw new InvalidOperationException("boom"));
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => this.calls++);
+        this.channel.HandleSocketMessage(Wire.Decode(PresenceStateFrame));
+        this.calls.Should().Be(1, "a throwing handler must not stop the next one");
+    }
+
     private void StartAJoinThatTimesOut() => _ = this.channel.Subscribe(JoinTimeoutMs);
 }

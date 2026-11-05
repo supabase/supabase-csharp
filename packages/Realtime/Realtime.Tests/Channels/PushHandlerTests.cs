@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -57,6 +58,17 @@ public class PushHandlerTests
         this.socket.Reply(this.channel.Topic, push.Ref);
 
         this.calls.Should().Be(0, "a removed handler must not be told about the reply");
+    }
+
+    [TestMethod]
+    public void Push_ShouldNotStopTheNextHandler_GivenOneThrows()
+    {
+        var push = new Push(this.channel.Socket, this.channel, ChannelAccessToken);
+        push.AddMessageReceivedHandler((_, _) => throw new InvalidOperationException("boom"));
+        push.AddMessageReceivedHandler((_, _) => this.calls++);
+        push.Send();
+        this.socket.Reply(this.channel.Topic, push.Ref);
+        this.calls.Should().Be(1, "a throwing handler must not stop the next one");
     }
 
     [TestMethod]

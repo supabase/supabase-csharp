@@ -256,16 +256,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     private void NotifySocketStateChange(SocketState stateChanged)
     {
         foreach (var handler in this.socketEventHandlers.ToArray())
-        {
-            try
-            {
-                handler.Invoke(this, stateChanged);
-            }
-            catch (Exception ex)
-            {
-                Debugger.Instance.Log(this, ex.Message, ex);
-            }
-        }
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, stateChanged));
     }
 
     /// <summary>

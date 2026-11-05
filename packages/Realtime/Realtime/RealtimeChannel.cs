@@ -306,16 +306,7 @@ public class RealtimeChannel : IRealtimeChannel
             this.rejoinTimer.Stop();
 
         foreach (var handler in this.stateChangedHandlers.Snapshot())
-        {
-            try
-            {
-                handler.Invoke(this, state);
-            }
-            catch (Exception ex)
-            {
-                Debugger.Instance.Log(this, ex.Message, ex);
-            }
-        }
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, state));
     }
 
     /// <summary>
@@ -343,7 +334,7 @@ public class RealtimeChannel : IRealtimeChannel
     private void NotifyMessageReceived(SocketResponse message)
     {
         foreach (var handler in this.messageReceivedHandlers.Snapshot())
-            handler.Invoke(this, message);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, message));
     }
 
     /// <inheritdoc />
@@ -414,7 +405,7 @@ public class RealtimeChannel : IRealtimeChannel
         this.NotifyStateChanged(ChannelState.Errored);
 
         foreach (var handler in this.errorEventHandlers.Snapshot())
-            handler.Invoke(this, exception);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, exception));
     }
 
     /// <summary>
@@ -920,7 +911,7 @@ public class RealtimeChannel : IRealtimeChannel
             if (binding.ListenType != eventType && binding.ListenType != ListenType.All) return;
             if (binding.Options == null || response.Payload == null || binding.Handler == null) return;
 
-            if (response.Payload.Ids.Contains(binding.Id)) binding.Handler.Invoke(this, response);
+            if (response.Payload.Ids.Contains(binding.Id)) Debugger.Instance.Guard(this, () => binding.Handler.Invoke(this, response));
         });
     }
 

@@ -58,4 +58,19 @@ internal class Debugger : IRealtimeDebugger
         foreach (var l in _debugListeners.Snapshot())
             l.Invoke(sender, message, exception);
     }
+
+    /// <summary>
+    /// Runs an event handler. Anything it throws is logged here, because a throw reaching the socket's receive loop ends receiving for good.
+    /// </summary>
+    public void Guard(object sender, Action handler)
+    {
+        try
+        {
+            handler();
+        }
+        catch (Exception ex)
+        {
+            this.Log(sender, ex.Message, ex);
+        }
+    }
 }
