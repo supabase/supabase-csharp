@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -43,5 +44,44 @@ public class ClientReconnectionTests
 #pragma warning restore CS0618
         this.socket.RecoverFromLostConnection();
         this.states.Should().Equal([SocketState.Open, SocketState.Reconnect, SocketState.Open], "a reconnect must reach the client's state handlers (issue #105)");
+    }
+
+    [TestMethod]
+    public async Task ConnectAsync_ShouldReportCloseOncePerDrop()
+    {
+        await this.client.ConnectAsync();
+        this.socket.Fail(new InvalidOperationException("boom"));
+        this.socket.Fail(new InvalidOperationException("boom"));
+        this.socket.RecoverFromLostConnection();
+        this.socket.Fail(new InvalidOperationException("boom"));
+        this.states.Should().Equal([SocketState.Open, SocketState.Close, SocketState.Reconnect, SocketState.Open, SocketState.Close], "failed reconnect attempts are part of the same drop");
+    }
+
+    [TestMethod]
+    public async Task ConnectAsync_ShouldNotReconnect_GivenAStateHandlerDisconnectsOnClose()
+    {
+        this.client.AddStateChangedHandler((_, state) =>
+        {
+            if (state == SocketState.Close)
+                this.client.Disconnect();
+        });
+        await this.client.ConnectAsync();
+        this.socket.Fail(new InvalidOperationException("boom"));
+        this.socket.IsReconnectionEnabled.Should().BeFalse("the handler already disconnected, so nothing owns this socket");
+    }
+
+    [TestMethod]
+    public async Task ConnectAsync_ShouldReachTheNextStateHandler_GivenOneThrows()
+    {
+        var failure = new InvalidOperationException("boom");
+        var logged = new List<Exception?>();
+        var heard = new List<SocketState>();
+        this.client.AddDebugHandler((_, _, error) => logged.Add(error));
+        this.client.AddStateChangedHandler((_, _) => throw failure);
+        this.client.AddStateChangedHandler((_, state) => heard.Add(state));
+        await this.client.ConnectAsync();
+        this.client.ClearDebugHandlers();
+        heard.Should().Equal([SocketState.Open], "a throwing handler must not stop the next one or the connect");
+        logged.Should().Contain(failure, "the handler's exception is logged, not lost");
     }
 }
