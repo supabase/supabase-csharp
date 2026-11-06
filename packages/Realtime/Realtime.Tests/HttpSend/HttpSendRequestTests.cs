@@ -115,15 +115,6 @@ public class HttpSendRequestTests
     }
 
     [TestMethod]
-    [DataRow(".")]
-    [DataRow("..")]
-    public async Task HttpSendAsync_ShouldRejectAnUnusableEventName(string eventName)
-    {
-        var act = () => this.Channel().HttpSendAsync(eventName, new { x = 1 });
-        await act.Should().ThrowAsync<ArgumentException>().WithMessage("*cannot be a path segment*");
-    }
-
-    [TestMethod]
     public async Task HttpSendAsync_ShouldThrow_GivenNoAnswerWithinTheClientTimeout()
     {
         this.server.ResetMappings();

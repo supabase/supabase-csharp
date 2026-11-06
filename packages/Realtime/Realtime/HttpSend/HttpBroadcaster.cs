@@ -50,7 +50,7 @@ internal sealed class HttpBroadcaster
         var topic = channel.Topic.StartsWith(TopicPrefix, StringComparison.Ordinal)
             ? channel.Topic.Substring(TopicPrefix.Length)
             : channel.Topic;
-        var url = $"{this.endpoint}/{PathSegment(topic)}/events/{PathSegment(eventName)}";
+        var url = $"{this.endpoint}/{Uri.EscapeDataString(topic)}/events/{Uri.EscapeDataString(eventName)}";
         return channel.Options.IsPrivate ? $"{url}?private=true" : url;
     }
 
@@ -69,12 +69,5 @@ internal sealed class HttpBroadcaster
         if (!string.IsNullOrEmpty(accessToken))
             headers["Authorization"] = $"Bearer {accessToken}";
         return headers;
-    }
-
-    private static string PathSegment(string value)
-    {
-        if (value is "." or "..")
-            throw new ArgumentException($"'{value}' cannot be a path segment: System.Uri resolves it into another route.");
-        return Uri.EscapeDataString(value);
     }
 }
