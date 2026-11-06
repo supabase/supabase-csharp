@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
 
 namespace Supabase.Realtime;
@@ -27,25 +25,19 @@ internal class Debugger : IRealtimeDebugger
     /// Adds a debug listener
     /// </summary>
     /// <param name="handler"></param>
-    public void AddDebugHandler(IRealtimeDebugger.DebugEventHandler handler)
-    {
-        _debugListeners.Add(handler);
-    }
+    public void AddDebugHandler(IRealtimeDebugger.DebugEventHandler handler) => this._debugListeners.Add(handler);
 
     /// <summary>
     /// Removes a debug handler.
     /// </summary>
     /// <param name="handler"></param>
-    public void RemoveDebugHandler(IRealtimeDebugger.DebugEventHandler handler)
-    {
-        _debugListeners.Remove(handler);
-    }
+    public void RemoveDebugHandler(IRealtimeDebugger.DebugEventHandler handler) => this._debugListeners.Remove(handler);
 
     /// <summary>
     /// Clears debug handlers.
     /// </summary>
     public void ClearDebugHandlers() =>
-        _debugListeners.Clear();
+        this._debugListeners.Clear();
 
     /// <summary>
     /// Notifies debug listeners.
@@ -55,7 +47,7 @@ internal class Debugger : IRealtimeDebugger
     /// <param name="exception"></param>
     public void Log(object sender, string message, Exception? exception = null)
     {
-        foreach (var l in _debugListeners.Snapshot())
+        foreach (var l in this._debugListeners.Snapshot())
             l.Invoke(sender, message, exception);
     }
 
