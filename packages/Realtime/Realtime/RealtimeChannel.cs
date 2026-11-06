@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Timers;
 using Supabase.Core.Attributes;
 using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Channel;
@@ -18,7 +18,6 @@ using Supabase.Realtime.Socket.Responses;
 using static Supabase.Realtime.Constants;
 using static Supabase.Realtime.Interfaces.IRealtimeChannel;
 using static Supabase.Realtime.PostgresChanges.PostgresChangesOptions;
-using Timer = System.Timers.Timer;
 
 // ReSharper disable InvalidXmlDocComment
 
@@ -159,7 +158,10 @@ public class RealtimeChannel : IRealtimeChannel
 
     private bool CanPush => this.IsJoined && this.Socket.IsConnected;
     private bool hasJoinedOnce;
-    private readonly Timer rejoinTimer;
+    private readonly ITimer rejoinTimer;
+    private readonly TimeSpan rejoinInterval;
+    private readonly object rejoinTimerGate = new();
+    private bool isRejoinTimerRunning;
     private bool isRejoining;
 
     private List<Binding> bindings = [];
@@ -176,9 +178,9 @@ public class RealtimeChannel : IRealtimeChannel
         this.Socket = socket;
         this.Socket.AddStateChangedHandler(this.HandleSocketStateChanged);
 
-        this.rejoinTimer = new Timer(options.ClientOptions.Timeout.TotalMilliseconds);
-        this.rejoinTimer.Elapsed += this.HandleRejoinTimerElapsed;
-        this.rejoinTimer.AutoReset = true;
+        this.rejoinInterval = options.ClientOptions.Timeout;
+        this.rejoinTimer = options.ClientOptions.TimeProvider.CreateTimer(this.HandleRejoinTimerElapsed, null,
+            Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>
@@ -301,9 +303,9 @@ public class RealtimeChannel : IRealtimeChannel
 
         this.isRejoining = shouldRejoin;
         if (shouldRejoin)
-            this.rejoinTimer.Start();
+            this.StartRejoinTimer();
         else
-            this.rejoinTimer.Stop();
+            this.StopRejoinTimer();
 
         foreach (var handler in this.stateChangedHandlers.Snapshot())
         {
@@ -699,9 +701,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <summary>
     /// If the channel errors internally (phoenix error, not transport) attempt rejoining.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void HandleRejoinTimerElapsed(object sender, ElapsedEventArgs e)
+    private void HandleRejoinTimerElapsed(object? _)
     {
         if (this.isRejoining) return;
         this.isRejoining = true;
@@ -715,6 +715,29 @@ public class RealtimeChannel : IRealtimeChannel
         this.JoinPush = this.GenerateJoinPush();
 
         this.Rejoin();
+    }
+
+    /// <summary>
+    /// Starts the repeating rejoin timer. Starting a running timer leaves its schedule untouched, so a
+    /// state change mid-interval does not postpone the next tick.
+    /// </summary>
+    private void StartRejoinTimer()
+    {
+        lock (this.rejoinTimerGate)
+        {
+            if (this.isRejoinTimerRunning) return;
+            this.isRejoinTimerRunning = true;
+            this.rejoinTimer.Change(this.rejoinInterval, this.rejoinInterval);
+        }
+    }
+
+    private void StopRejoinTimer()
+    {
+        lock (this.rejoinTimerGate)
+        {
+            this.isRejoinTimerRunning = false;
+            this.rejoinTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        }
     }
 
     /// <summary>
@@ -754,7 +777,7 @@ public class RealtimeChannel : IRealtimeChannel
             // A response was received from the channel
             case PhoenixStatusOk:
                 // Disable Rejoin Timeout
-                this.rejoinTimer.Stop();
+                this.StopRejoinTimer();
                 this.isRejoining = false;
 
                 var authPush = this.GenerateAuthPush();
@@ -766,7 +789,7 @@ public class RealtimeChannel : IRealtimeChannel
                     this.NotifyStateChanged(ChannelState.Joined);
                 break;
             case PhoenixStatusError:
-                this.rejoinTimer.Stop();
+                this.StopRejoinTimer();
                 this.isRejoining = false;
 
                 this.NotifyErrorOccurred(new RealtimeException(message.Json)

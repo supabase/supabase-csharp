@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Timers;
+using System.Threading;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Socket;
 
@@ -56,11 +56,11 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// </summary>
     public string? Ref { get; private set; }
 
-    private string? _msgRefEvent;
-    private int _timeoutMs;
-    private readonly Timer _timer;
+    private string? msgRefEvent;
+    private int timeoutMs;
+    private readonly ITimer timer;
 
-    private readonly IRealtimeSocket _socket;
+    private readonly IRealtimeSocket socket;
 
     /// <summary>
     /// Handlers for notifications of message events.
@@ -79,10 +79,10 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     public Push(IRealtimeSocket socket, RealtimeChannel channel, string eventName, string? type = null,
         object? payload = null, int timeoutMs = Constants.DefaultTimeout)
     {
-        this._socket = socket;
-        this._timeoutMs = timeoutMs;
-        this._timer = new Timer(this._timeoutMs) { AutoReset = false };
-        this._timer.Elapsed += this.HandleTimeoutElapsed;
+        this.socket = socket;
+        this.timeoutMs = timeoutMs;
+        this.timer = channel.Options.ClientOptions.TimeProvider.CreateTimer(this.HandleTimeoutElapsed, null,
+            Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 
         this.Channel = channel;
         this.Type = type;
@@ -98,9 +98,9 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="timeoutMs"></param>
     public void Resend(int timeoutMs = Constants.DefaultTimeout)
     {
-        this._timer.Interval = timeoutMs;
+        this.timeoutMs = timeoutMs;
         this.Ref = null;
-        this._msgRefEvent = null;
+        this.msgRefEvent = null;
 
         this.IsSent = false;
         this.Send();
@@ -124,19 +124,19 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
             JoinRef = this.Channel.JoinPush?.Ref,
         };
 
-        this._socket.Push(this.Message);
+        this.socket.Push(this.Message);
     }
 
     /// <summary>
-    /// Keeps an internal timer for raising an event if this message is not responded to.
+    /// Keeps an internal one-shot timer, on <see cref="ClientOptions.TimeProvider"/>, for raising an event if
+    /// this message is not responded to. Restarting it resets the countdown.
     /// </summary>
     internal void StartTimeout()
     {
-        this._timer.Stop();
-        this._timer.Start();
-        this._socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
-        this.Ref = this._socket.MakeMsgRef();
-        this._msgRefEvent = this._socket.ReplyEventName(this.Ref);
+        this.socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
+        this.Ref = this.socket.MakeMsgRef();
+        this.msgRefEvent = this.socket.ReplyEventName(this.Ref);
+        this.timer.Change(TimeSpan.FromMilliseconds(this.timeoutMs), Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>
@@ -194,11 +194,11 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     public void ClearMessageReceivedHandler() =>
         this._messageEventHandlers.Clear();
 
-    private void HandleTimeoutElapsed(object sender, ElapsedEventArgs e)
+    private void HandleTimeoutElapsed(object? _)
     {
-        this._socket.RemoveMessageReceivedHandler(this.HandleSocketMessageReceived);
+        this.socket.RemoveMessageReceivedHandler(this.HandleSocketMessageReceived);
         OnTimeout?.Invoke(this, null);
     }
 
-    private void CancelTimeout() => this._timer.Stop();
+    private void CancelTimeout() => this.timer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 }

@@ -32,6 +32,7 @@ public class SupabaseOptionsTests
             options.HttpClient.Should().BeNull();
             options.Proxy.Should().BeNull();
             options.WebSocketFactory.Should().BeNull();
+            options.TimeProvider.Should().BeNull("unset, every child client keeps its own default clock");
         }
     }
 }

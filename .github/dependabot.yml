@@ -24,6 +24,8 @@ updates:
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: "Microsoft.Extensions.DependencyInjection"
         update-types: ["version-update:semver-major", "version-update:semver-minor"]
+      - dependency-name: "Microsoft.Bcl.TimeProvider"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: "System.IdentityModel.Tokens.Jwt"
         update-types: ["version-update:semver-major"]
     groups:

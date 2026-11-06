@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using Supabase.Core.Attributes;
+using Supabase.Core.Http;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Realtime.Sockets;
@@ -30,8 +31,8 @@ public class SupabaseOptions
     public bool AutoConnectRealtime { get; set; }
 
     /// <summary>
-    /// Functions passed to Gotrue that handle sessions. 
-    /// 
+    /// Functions passed to Gotrue that handle sessions.
+    ///
     /// **By default these do nothing for persistence.**
     /// </summary>
     [ImplementedCapability("client.session_management.custom_storage")]
@@ -89,6 +90,26 @@ public class SupabaseOptions
     public IWebSocketFactory? WebSocketFactory { get; set; }
 
     /// <summary>
+    /// The clock every child client's timers, delays and retry backoff run on: the Auth refresh timer, the
+    /// Realtime heartbeat, push, rejoin and deferred-disconnect timers, and the backoff of
+    /// <see cref="PostgrestRetry"/>, <see cref="GotrueRetry"/>, <see cref="FunctionsRetry"/> and
+    /// <see cref="StorageClientOptions"/>' <c>Retry</c>. Supply one to drive them all from a host's own
+    /// timers (or a fake clock in tests). Left null, every child keeps its own default,
+    /// <see cref="System.TimeProvider.System"/>.
+    /// </summary>
+    /// <remarks>
+    /// The retry policies are copied with the clock applied, so the <see cref="RetryOptions"/> instances set
+    /// here are left as they are. Storage's options object is the caller's own and is passed through, so
+    /// its <c>Retry</c> is updated in place.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var client = new Supabase.Client(url, key, new SupabaseOptions { TimeProvider = myMainThreadClock });
+    /// </code>
+    /// </example>
+    public TimeProvider? TimeProvider { get; set; }
+
+    /// <summary>
     /// The Supabase Auth Url Format
     /// </summary>
     public string AuthUrlFormat { get; set; } = "{0}/auth/v1";
@@ -112,4 +133,24 @@ public class SupabaseOptions
     /// The Supabase Functions Url Format
     /// </summary>
     public string FunctionsUrlFormat { get; set; } = "{0}/functions/v1";
+
+    /// <summary>
+    /// The clock handed to the Auth and Realtime clients: <see cref="TimeProvider"/>, or their default.
+    /// </summary>
+    internal TimeProvider ChildTimeProvider => this.TimeProvider ?? System.TimeProvider.System;
+
+    /// <summary>
+    /// Returns <paramref name="retry"/> waiting on <see cref="TimeProvider"/>, or unchanged when none is set.
+    /// </summary>
+    internal RetryOptions WithTimeProvider(RetryOptions retry) =>
+        this.TimeProvider is { } clock ? retry with { TimeProvider = clock } : retry;
+
+    /// <summary>
+    /// Returns <see cref="StorageClientOptions"/>, its <c>Retry</c> waiting on <see cref="TimeProvider"/> when one is set.
+    /// </summary>
+    internal Storage.ClientOptions StorageClientOptionsWithTimeProvider()
+    {
+        this.StorageClientOptions.Retry = this.WithTimeProvider(this.StorageClientOptions.Retry);
+        return this.StorageClientOptions;
+    }
 }

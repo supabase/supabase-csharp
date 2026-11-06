@@ -20,4 +20,11 @@ public sealed record RetryOptions
 
     /// <summary>HTTP status codes treated as transient and worth retrying.</summary>
     public IReadOnlyCollection<int> RetryableStatusCodes { get; init; } = new HashSet<int> { 408, 429, 500, 502, 503, 504 };
+
+    /// <summary>
+    /// The clock the backoff delay between attempts waits on, and that per-request timeouts (Postgrest
+    /// <c>Timeout</c>, Functions <c>HttpTimeout</c>) are measured on. Defaults to <see cref="System.TimeProvider.System"/>;
+    /// supply another provider to drive them from a host's own timers (or a fake clock in tests).
+    /// </summary>
+    public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
 }

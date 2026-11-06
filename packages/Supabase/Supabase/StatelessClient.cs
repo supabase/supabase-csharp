@@ -35,7 +35,8 @@ public static class StatelessClient
             Headers = headers,
             HttpClient = options.HttpClient,
             Proxy = options.Proxy,
-            Retry = options.GotrueRetry
+            Retry = options.WithTimeProvider(options.GotrueRetry),
+            TimeProvider = options.ChildTimeProvider
         };
     }
 
@@ -55,7 +56,7 @@ public static class StatelessClient
         {
             Schema = options.Schema,
             Headers = headers,
-            Retry = options.PostgrestRetry,
+            Retry = options.WithTimeProvider(options.PostgrestRetry),
             Timeout = options.PostgrestTimeout,
             HttpClient = options.HttpClient,
             Proxy = options.Proxy
@@ -75,7 +76,7 @@ public static class StatelessClient
 
         var headers = GetAuthHeaders(supabaseKey, options).MergeLeft(options.Headers);
 
-        return new Storage.Client(string.Format(options.StorageUrlFormat, supabaseUrl), options.StorageClientOptions, headers);
+        return new Storage.Client(string.Format(options.StorageUrlFormat, supabaseUrl), options.StorageClientOptionsWithTimeProvider(), headers);
     }
 
     /// <summary>
@@ -108,7 +109,7 @@ public static class StatelessClient
         {
             HttpClient = options.HttpClient,
             Proxy = options.Proxy,
-            Retry = options.FunctionsRetry
+            Retry = options.WithTimeProvider(options.FunctionsRetry)
         });
         client.GetHeaders = () => headers;
 
@@ -133,7 +134,8 @@ public static class StatelessClient
         var realtimeOptions = new Realtime.ClientOptions
         {
             Parameters = { ApiKey = supabaseKey },
-            WebSocketFactory = options.WebSocketFactory
+            WebSocketFactory = options.WebSocketFactory,
+            TimeProvider = options.ChildTimeProvider
         };
 
         var postgrestClient = new Postgrest.Client(restUrl, restOptions);
