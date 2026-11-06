@@ -343,7 +343,7 @@ public class RealtimeChannel : IRealtimeChannel
     private void NotifyMessageReceived(SocketResponse message)
     {
         foreach (var handler in this.messageReceivedHandlers.Snapshot())
-            handler.Invoke(this, message);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, message));
     }
 
     /// <inheritdoc />

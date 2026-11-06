@@ -177,7 +177,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private void NotifyMessageReceived(SocketResponse heartbeat)
     {
         foreach (var handler in this.messageEventHandlers.Snapshot())
-            handler.Invoke(this, heartbeat);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, heartbeat));
     }
 
     /// <summary>
@@ -205,7 +205,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private void NotifyHeartbeatReceived(SocketResponse heartbeat)
     {
         foreach (var handler in this.heartbeatEventHandlers.Snapshot())
-            handler.Invoke(this, heartbeat);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, heartbeat));
     }
 
     /// <summary>
