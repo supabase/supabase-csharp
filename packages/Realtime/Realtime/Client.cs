@@ -140,6 +140,13 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
             sender.RemoveStateChangedHandler(socketStateHandler!);
 
+            if (sender != this.Socket)
+            {
+                sender.Disconnect();
+                tsc.TrySetException(new RealtimeException("Disconnected before the socket opened.") { Reason = FailureHint.Reason.SocketError });
+                return;
+            }
+
             this.Socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
             this.Socket.AddHeartbeatHandler(this.HandleSocketHeartbeat);
             this.Socket.AddStateChangedHandler(this.HandleSocketStateChanged);
