@@ -1,6 +1,7 @@
 ﻿using Supabase.Realtime.Socket;
 using System;
 using System.Net.WebSockets;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Realtime.Exceptions;
@@ -143,4 +144,9 @@ public interface IRealtimeSocket: IGettableHeaders
     /// <param name="msgRef"></param>
     /// <returns></returns>
     internal string ReplyEventName(string msgRef);
+
+    /// <summary>
+    /// Broadcasts through the Realtime REST API.
+    /// </summary>
+    internal Task HttpSendAsync(RealtimeChannel channel, string eventName, object payload, CancellationToken cancellationToken);
 }
