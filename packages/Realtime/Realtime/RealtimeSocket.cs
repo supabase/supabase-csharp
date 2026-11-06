@@ -67,6 +67,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
     private readonly List<Task> buffer = new();
     private bool isReconnecting;
+    private bool isOpen;
     private int reconnectionAttempts = 0;
 
     /// <summary>
@@ -117,6 +118,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     public void Disconnect(WebSocketCloseStatus code = WebSocketCloseStatus.NormalClosure, string reason = "")
     {
         this.heartbeatTokenSource?.Cancel();
+        this.connection.IsReconnectionEnabled = false;
         this.connection.Stop(code, reason);
     }
 
@@ -336,6 +338,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         // Send any pending `Push` messages that were queued while socket was disconnected.
         this.FlushBuffer();
 
+        this.isOpen = true;
         this.NotifySocketStateChange(SocketState.Open);
     }
 
@@ -371,6 +374,12 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private void HandleSocketDisconnectionHappened(DisconnectionInfo disconnectionInfo)
     {
         Debugger.Instance.Log(this, $"Socket Disconnection: {disconnectionInfo.Type}", disconnectionInfo.Exception);
+
+        if (this.isOpen)
+        {
+            this.isOpen = false;
+            this.NotifySocketStateChange(SocketState.Close);
+        }
 
         if (disconnectionInfo.Exception != null)
             this.HandleSocketError(disconnectionInfo);
