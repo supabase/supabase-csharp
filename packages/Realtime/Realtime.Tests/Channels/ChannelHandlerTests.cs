@@ -146,5 +146,14 @@ public class ChannelHandlerTests
         this.calls.Should().Be(0, "a removed handler is not notified");
     }
 
+    [TestMethod]
+    public void MessageReceivedHandler_ShouldNotStopTheBroadcast_GivenItThrows()
+    {
+        this.channel.AddMessageReceivedHandler((_, _) => throw new InvalidOperationException("boom"));
+        this.channel.Register<BroadcastExample>().AddBroadcastEventHandler((_, _) => this.calls++);
+        this.channel.HandleSocketMessage(Wire.Decode(BroadcastFrame));
+        this.calls.Should().Be(1, "a throwing message handler must not stop the rest of the dispatch");
+    }
+
     private void StartAJoinThatTimesOut() => _ = this.channel.Subscribe(JoinTimeoutMs);
 }

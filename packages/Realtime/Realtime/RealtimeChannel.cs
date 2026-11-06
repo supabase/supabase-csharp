@@ -277,19 +277,13 @@ public class RealtimeChannel : IRealtimeChannel
     /// Registers a state changed listener relative to this channel. Called when channel state changes.
     /// </summary>
     /// <param name="stateChangedHandler"></param>
-    public void AddStateChangedHandler(StateChangedHandler stateChangedHandler)
-    {
-        this.stateChangedHandlers.Add(stateChangedHandler);
-    }
+    public void AddStateChangedHandler(StateChangedHandler stateChangedHandler) => this.stateChangedHandlers.Add(stateChangedHandler);
 
     /// <summary>
     /// Removes a channel state changed listener
     /// </summary>
     /// <param name="stateChangedHandler"></param>
-    public void RemoveStateChangedHandler(StateChangedHandler stateChangedHandler)
-    {
-        this.stateChangedHandlers.Remove(stateChangedHandler);
-    }
+    public void RemoveStateChangedHandler(StateChangedHandler stateChangedHandler) => this.stateChangedHandlers.Remove(stateChangedHandler);
 
     /// <summary>
     /// Clears all channel state changed listeners
@@ -313,26 +307,29 @@ public class RealtimeChannel : IRealtimeChannel
             this.rejoinTimer.Stop();
 
         foreach (var handler in this.stateChangedHandlers.Snapshot())
-            handler.Invoke(this, state);
+        {
+            try
+            {
+                handler.Invoke(this, state);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Instance.Log(this, ex.Message, ex);
+            }
+        }
     }
 
     /// <summary>
     /// Registers a message received listener, called when a socket message is received for this channel.
     /// </summary>
     /// <param name="messageReceivedHandler"></param>
-    public void AddMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler)
-    {
-        this.messageReceivedHandlers.Add(messageReceivedHandler);
-    }
+    public void AddMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler) => this.messageReceivedHandlers.Add(messageReceivedHandler);
 
     /// <summary>
     /// Removes a message received listener.
     /// </summary>
     /// <param name="messageReceivedHandler"></param>
-    public void RemoveMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler)
-    {
-        this.messageReceivedHandlers.Remove(messageReceivedHandler);
-    }
+    public void RemoveMessageReceivedHandler(MessageReceivedHandler messageReceivedHandler) => this.messageReceivedHandlers.Remove(messageReceivedHandler);
 
     /// <summary>
     /// Clears message received listeners.
@@ -347,7 +344,7 @@ public class RealtimeChannel : IRealtimeChannel
     private void NotifyMessageReceived(SocketResponse message)
     {
         foreach (var handler in this.messageReceivedHandlers.Snapshot())
-            handler.Invoke(this, message);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, message));
     }
 
     /// <inheritdoc />
@@ -396,20 +393,14 @@ public class RealtimeChannel : IRealtimeChannel
     /// Adds an error event handler.
     /// </summary>
     /// <param name="handler"></param>
-    public void AddErrorHandler(ErrorEventHandler handler)
-    {
-        this.errorEventHandlers.Add(handler);
-    }
+    public void AddErrorHandler(ErrorEventHandler handler) => this.errorEventHandlers.Add(handler);
 
     /// <summary>
     /// Removes an error event handler
     /// </summary>
     /// <param name="handler"></param>
     /// <exception cref="NotImplementedException"></exception>
-    public void RemoveErrorHandler(ErrorEventHandler handler)
-    {
-        this.errorEventHandlers.Remove(handler);
-    }
+    public void RemoveErrorHandler(ErrorEventHandler handler) => this.errorEventHandlers.Remove(handler);
 
     /// <summary>
     /// Clears Error Event Handlers
@@ -517,7 +508,9 @@ public class RealtimeChannel : IRealtimeChannel
                 case ChannelState.Errored:
                     sender.RemoveStateChangedHandler(channelCallback!);
                     this.JoinPush.OnTimeout -= joinPushTimeoutCallback;
-                    tsc.TrySetException(this.exception);
+                    tsc.TrySetException(state == ChannelState.Errored
+                        ? this.exception
+                        : new RealtimeException("Channel closed before it joined") { Reason = FailureHint.Reason.ChannelJoinFailure });
                     break;
             }
         };
@@ -753,6 +746,7 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="message"></param>
     private void HandleJoinResponse(IRealtimePush<RealtimeChannel, SocketResponse> sender, SocketResponse message)
     {
+        if (!this.IsJoining) return;
         if (message._event != ChannelEventReply) return;
 
         var obj = JsonSerializer.Deserialize<SocketResponse<PhoenixResponse>>(message.Json!,
