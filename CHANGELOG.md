@@ -1,5 +1,15 @@
 # Changelog
 
+## [8.9.1](https://github.com/supabase/supabase-csharp/compare/v8.9.0...v8.9.1) (2026-11-06)
+
+
+### Bug Fixes
+
+* **realtime:** close channels on disconnect ([#670](https://github.com/supabase/supabase-csharp/issues/670)) ([1adfe3a](https://github.com/supabase/supabase-csharp/commit/1adfe3af02156ce02cd777cddfe23f9dba9d3558))
+* **realtime:** fail Subscribe when the channel closes during the join ([#671](https://github.com/supabase/supabase-csharp/issues/671)) ([9209e0b](https://github.com/supabase/supabase-csharp/commit/9209e0b81b04c541a8166f449bcae5c4d3980ab3))
+* **realtime:** keep receiving when a message handler throws ([#677](https://github.com/supabase/supabase-csharp/issues/677)) ([72af5ca](https://github.com/supabase/supabase-csharp/commit/72af5cafcecd390045262a138f677dd8757cfa75))
+* **realtime:** report Close when the connection drops ([#674](https://github.com/supabase/supabase-csharp/issues/674)) ([2910494](https://github.com/supabase/supabase-csharp/commit/2910494bff3ea440cf622acfaa57252ee608207e))
+
 ## [8.9.0](https://github.com/supabase/supabase-csharp/compare/v8.8.0...v8.9.0) (2026-11-04)
 
 
