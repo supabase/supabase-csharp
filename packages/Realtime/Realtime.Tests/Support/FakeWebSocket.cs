@@ -31,6 +31,7 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
 {
     public int StartOrFailCallCount { get; private set; }
     public bool IsRunning { get; set; }
+    public bool IsReconnectionEnabled { get; set; } = true;
 
     public IObservable<ResponseMessage> MessageReceived => this.messageReceived;
     public IObservable<ReconnectionInfo> ReconnectionHappened => this.reconnectionHappened;
@@ -116,7 +117,6 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     public Uri Url { get; set; } = new("ws://localhost/unused");
     public TimeSpan ConnectTimeout { get; set; }
     public TimeSpan? LostReconnectTimeout { get; set; }
-    public bool IsReconnectionEnabled { get; set; }
     public string? Name { get; set; }
     public bool IsStarted => this.IsRunning;
     public bool TextSenderRunning => throw new NotImplementedException();
