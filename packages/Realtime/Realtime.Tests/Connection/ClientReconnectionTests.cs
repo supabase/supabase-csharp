@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
+using Supabase.Realtime.Exceptions;
 using static Supabase.Realtime.Constants;
 
 namespace Realtime.Tests.Connection;
@@ -68,6 +69,20 @@ public class ClientReconnectionTests
         await this.client.ConnectAsync();
         this.socket.Fail(new InvalidOperationException("boom"));
         this.socket.IsReconnectionEnabled.Should().BeFalse("the handler already disconnected, so nothing owns this socket");
+    }
+
+    [TestMethod]
+    public async Task ConnectAsync_ShouldFail_GivenADisconnectBeforeTheSocketOpened()
+    {
+        var socket = new FakeWebsocketClient();
+        var client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(socket) });
+        var connect = client.ConnectAsync();
+        client.Disconnect();
+        socket.IsRunning = true;
+        socket.RecoverFromLostConnection();
+        var act = () => connect.WaitAsync(TimeSpan.FromSeconds(5));
+        (await act.Should().ThrowAsync<RealtimeException>().WithMessage("Disconnected before the socket opened.")).Which.Reason.Should().Be(FailureHint.Reason.SocketError);
+        socket.IsRunning.Should().BeFalse("nothing owns this socket, so it must not stay open");
     }
 
     [TestMethod]
