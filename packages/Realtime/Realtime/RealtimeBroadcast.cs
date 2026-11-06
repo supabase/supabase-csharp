@@ -86,7 +86,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
     private void NotifyBroadcastEventHandlers()
     {
         foreach (var handler in this.broadcastEventHandlers.Snapshot())
-            Debugger.Instance.Guard(this, () => handler.Invoke(this, this.Current()));
+            handler.Invoke(this, this.Current());
     }
 
     /// <summary>

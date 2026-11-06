@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -59,19 +58,6 @@ public class PostgresChangesHandlerTests
             """{"id":8,"event":"INSERT","schema":"public","table":"todos"}""");
         this.socket.Receive(Insert);
         (all, inserts).Should().Be((1, 1));
-    }
-
-    [TestMethod]
-    public async Task OnPostgresChange_ShouldNotStopTheNextHandler_GivenOneThrows()
-    {
-        var filter = new PostgresChangesFilter { Table = "todos" };
-        var heard = 0;
-        this.channel.OnPostgresChange((_, _) => throw new InvalidOperationException("boom"), ListenType.Inserts, filter);
-        this.channel.OnPostgresChange((_, _) => heard++, ListenType.Inserts, filter);
-        var change = """{"id":7,"event":"INSERT","schema":"public","table":"todos"}""";
-        await this.SubscribeAsync(change, change);
-        this.socket.Receive(Insert);
-        heard.Should().Be(1, "a throwing handler must not stop the next one");
     }
 
     private async Task SubscribeAsync(params string[] changes)

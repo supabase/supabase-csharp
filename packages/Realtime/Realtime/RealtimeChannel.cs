@@ -306,7 +306,16 @@ public class RealtimeChannel : IRealtimeChannel
             this.rejoinTimer.Stop();
 
         foreach (var handler in this.stateChangedHandlers.Snapshot())
-            Debugger.Instance.Guard(this, () => handler.Invoke(this, state));
+        {
+            try
+            {
+                handler.Invoke(this, state);
+            }
+            catch (Exception ex)
+            {
+                Debugger.Instance.Log(this, ex.Message, ex);
+            }
+        }
     }
 
     /// <summary>
@@ -405,7 +414,7 @@ public class RealtimeChannel : IRealtimeChannel
         this.NotifyStateChanged(ChannelState.Errored);
 
         foreach (var handler in this.errorEventHandlers.Snapshot())
-            Debugger.Instance.Guard(this, () => handler.Invoke(this, exception));
+            handler.Invoke(this, exception);
     }
 
     /// <summary>
@@ -911,7 +920,7 @@ public class RealtimeChannel : IRealtimeChannel
             if (binding.ListenType != eventType && binding.ListenType != ListenType.All) return;
             if (binding.Options == null || response.Payload == null || binding.Handler == null) return;
 
-            if (response.Payload.Ids.Contains(binding.Id)) Debugger.Instance.Guard(this, () => binding.Handler.Invoke(this, response));
+            if (response.Payload.Ids.Contains(binding.Id)) binding.Handler.Invoke(this, response);
         });
     }
 

@@ -185,7 +185,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     private void NotifyMessageReceived(SocketResponse messageResponse)
     {
         foreach (var handler in this._messageEventHandlers.Snapshot())
-            Debugger.Instance.Guard(this, () => handler.Invoke(this, messageResponse));
+            handler.Invoke(this, messageResponse);
     }
 
     /// <summary>

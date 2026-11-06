@@ -107,7 +107,7 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
         if (!this.presenceEventListeners.TryGetValue(eventType, out var list)) return;
 
         foreach (var handler in list.Snapshot())
-            Debugger.Instance.Guard(this, () => handler.Invoke(this, eventType));
+            handler.Invoke(this, eventType);
     }
 
     /// <summary>
