@@ -40,6 +40,13 @@ public class PresenceStateTests
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_state\",\"ref\":\"s5\"," +
         "\"payload\":{\"user-2\":{\"metas\":[{\"phx_ref\":\"r2\"}]}}}";
 
+    // Track while already joined: the server joins the new meta (phx_ref_prev = the old ref)
+    // and leaves the previous phx_ref in the same diff. The key stays present.
+    private const string TrackWhileJoinedFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s6\"," +
+        "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\",\"phx_ref_prev\":\"r1\",\"time\":\"2023-09-01T11:00:00Z\"}]}}," +
+        "\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\",\"time\":\"2023-09-01T10:00:00Z\"}]}}}}";
+
     private static (RealtimeChannel channel, RealtimePresence<PresenceExample> presence) Presence()
     {
         var channel = Wire.Channel("realtime:online-users");
@@ -76,6 +83,29 @@ public class PresenceStateTests
             presence.CurrentState.Should().NotContainKey("user-1");
             joins.Should().Be(1);
             leaves.Should().Be(1);
+        }
+    }
+
+    [TestMethod]
+    public void HandleSocketMessage_ShouldSyncOnly_GivenTrackOfAnAlreadyPresentUser()
+    {
+        var (channel, presence) = Presence();
+        channel.HandleSocketMessage(Wire.Decode(StateFrame));
+        int syncs = 0, joins = 0, leaves = 0;
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => syncs++);
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Join, (_, _) => joins++);
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Leave, (_, _) => leaves++);
+
+        channel.HandleSocketMessage(Wire.Decode(TrackWhileJoinedFrame));
+
+        using (new AssertionScope())
+        {
+            presence.CurrentState.Should().ContainKey("user-1");
+            presence.CurrentState["user-1"].Should().ContainSingle()
+                .Which.PhoenixRef.Should().Be("r2", "the new meta replaces the previous phx_ref");
+            syncs.Should().Be(1);
+            joins.Should().Be(0, "the user was already present; the join is the replacement meta");
+            leaves.Should().Be(0, "the leave is the previous phx_ref and the user is still present");
         }
     }
 
