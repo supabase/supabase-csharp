@@ -793,6 +793,14 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <returns></returns>
     Task<BaseResponse> Resend(ResendParameters resendParameters);
 
+    /// <summary>
+    /// Resends a confirmation code to a user's email or phone, with the PKCE code challenge on the PKCE flow.
+    /// </summary>
+    /// <param name="resendParameters"></param>
+    /// <param name="flowType"></param>
+    /// <returns></returns>
+    Task<ResendState> Resend(ResendParameters resendParameters, OAuthFlowType flowType);
+
     #region MFA
 
     /// <summary>

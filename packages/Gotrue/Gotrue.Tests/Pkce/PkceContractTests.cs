@@ -10,6 +10,7 @@ using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
+using Supabase.Gotrue.Resend;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using static Supabase.Gotrue.Constants;
@@ -27,6 +28,8 @@ namespace Gotrue.Tests.Pkce;
 [TestCategory("Contract")]
 public class PkceContractTests
 {
+    private static readonly ResendParameters SignUpByEmail = new(ResendType.SignUp, "test@example.com", null, null);
+
     private IGotrueClient<User, Session> client = null!;
     private MockGotrueServer server = null!;
 
@@ -66,6 +69,44 @@ public class PkceContractTests
         request.ReadJsonBodyField("code_challenge_method").Should().Be("s256");
         request.ReadJsonBodyField("code_challenge").Should().Be(S256(state.PKCEVerifier!),
             "the server must receive BASE64URL(SHA256(verifier)) per RFC 7636 §4.2");
+    }
+
+    [TestMethod]
+    public async Task Resend_ShouldSendSha256OfVerifierAsCodeChallenge_GivenPkceFlow()
+    {
+        this.StubJsonOk("/resend");
+        var state = await this.client.Resend(SignUpByEmail, OAuthFlowType.PKCE);
+        var request = this.server.VerifySingleReceivedRequest().WithMethod(HttpMethod.Post).WithPath("/resend");
+        request.ReadJsonBodyField("code_challenge_method").Should().Be("s256");
+        request.ReadJsonBodyField("code_challenge").Should().Be(S256(state.PKCEVerifier!),
+            "the server must receive BASE64URL(SHA256(verifier)) per RFC 7636 section 4.2");
+    }
+
+    [TestMethod]
+    public async Task Resend_ShouldNotSendCodeChallenge_GivenImplicitFlow()
+    {
+        this.StubJsonOk("/resend");
+        var state = await this.client.Resend(SignUpByEmail, OAuthFlowType.Implicit);
+        this.server.VerifySingleReceivedRequest().WithoutJsonBodyField("code_challenge");
+        state.PKCEVerifier.Should().BeNull();
+    }
+
+    [TestMethod]
+    public async Task Resend_ShouldNotSendCodeChallenge_GivenPhoneChangeOnPkceFlow()
+    {
+        this.StubJsonOk("/resend");
+        var parameters = new ResendParameters(ResendType.PhoneChange, null, "+15555550100", null);
+        var state = await this.client.Resend(parameters, OAuthFlowType.PKCE);
+        this.server.VerifySingleReceivedRequest().WithoutJsonBodyField("code_challenge");
+        state.PKCEVerifier.Should().BeNull();
+    }
+
+    [TestMethod]
+    public void Resend_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
+    {
+        this.StubJsonOk("/resend");
+        BlockingCaller.Completes(() => this.client.Resend(SignUpByEmail, OAuthFlowType.PKCE)).Should().BeTrue(
+            "a library must not resume on the caller's context: a UI thread blocking on the task would deadlock");
     }
 
     [TestMethod]

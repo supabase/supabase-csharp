@@ -66,7 +66,7 @@ public class ResendParameters
         return this.IsEmail() ? Helpers.WithRedirectTo(newUrl, this.Options?.EmailRedirectTo) : newUrl;
     }
 
-    private bool IsEmail() => this.Type is ResendType.EmailChange or ResendType.SignUp;
+    internal bool IsEmail() => this.Type is ResendType.EmailChange or ResendType.SignUp;
 
     private Dictionary<string, object> AddEmailAndTokenField(Dictionary<string, object> parameter)
     {
