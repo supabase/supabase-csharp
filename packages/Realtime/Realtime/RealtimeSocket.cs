@@ -393,7 +393,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// <param name="args"></param>
     private void HandleSocketMessage(ResponseMessage args)
     {
-        this.options.Decode!(args.Text, decoded =>
+        Debugger.Instance.Guard(this, () => this.options.Decode!(args.Text, decoded =>
         {
             Debugger.Instance.Log(this, $"Socket Message Received:\n\t{args.Text}");
 
@@ -407,7 +407,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
             decoded.Json = args.Text;
             this.NotifyMessageReceived(decoded);
-        });
+        }));
     }
 
     /// <summary>
