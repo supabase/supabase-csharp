@@ -19,6 +19,7 @@ namespace Realtime.Tests.Connection;
 public class HeartbeatHandlerTests
 {
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
+
     private readonly List<(HeartbeatStatus Status, TimeSpan? Latency)> heard = [];
     private Client client = null!;
 

@@ -85,6 +85,9 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     private readonly List<IRealtimeClient<RealtimeSocket, RealtimeChannel>.SocketStateEventHandler>
         socketEventHandlers = new();
 
+    /// <summary>
+    /// Handlers for notifications of heartbeats.
+    /// </summary>
     private readonly HandlerCollection<IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler>
         heartbeatEventHandlers = new();
 
@@ -250,25 +253,6 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     public void ClearStateChangedHandlers() =>
         this.socketEventHandlers.Clear();
 
-    /// <inheritdoc />
-    [ImplementedCapability("realtime.client.listen_heartbeats")]
-    public void AddHeartbeatHandler(IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler handler) =>
-        this.heartbeatEventHandlers.Add(handler);
-
-    /// <inheritdoc />
-    public void RemoveHeartbeatHandler(IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler handler) =>
-        this.heartbeatEventHandlers.Remove(handler);
-
-    /// <inheritdoc />
-    public void ClearHeartbeatHandlers() =>
-        this.heartbeatEventHandlers.Clear();
-
-    private void NotifyHeartbeat(HeartbeatStatus status, TimeSpan? latency)
-    {
-        foreach (var handler in this.heartbeatEventHandlers.Snapshot())
-            Debugger.Instance.Guard(this, () => handler.Invoke(this, status, latency));
-    }
-
     /// <summary>
     /// Notifies all listeners that the current user auth state has changed.
     ///
@@ -288,6 +272,25 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
                 Debugger.Instance.Log(this, ex.Message, ex);
             }
         }
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.client.listen_heartbeats")]
+    public void AddHeartbeatHandler(IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler handler) =>
+        this.heartbeatEventHandlers.Add(handler);
+
+    /// <inheritdoc />
+    public void RemoveHeartbeatHandler(IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler handler) =>
+        this.heartbeatEventHandlers.Remove(handler);
+
+    /// <inheritdoc />
+    public void ClearHeartbeatHandlers() =>
+        this.heartbeatEventHandlers.Clear();
+
+    private void NotifyHeartbeat(HeartbeatStatus status, TimeSpan? latency)
+    {
+        foreach (var handler in this.heartbeatEventHandlers.Snapshot())
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, status, latency));
     }
 
     /// <summary>

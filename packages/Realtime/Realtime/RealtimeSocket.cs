@@ -51,6 +51,11 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// </summary>
     internal Dictionary<string, string> Headers => this.GetHeaders != null ? this.GetHeaders().MergeLeft(this.options.Headers) : this.options.Headers;
 
+    /// <summary>
+    /// Reports each heartbeat to the owning client.
+    /// </summary>
+    internal Action<HeartbeatStatus, TimeSpan?>? OnHeartbeat;
+
     private readonly HandlerCollection<IRealtimeSocket.StateEventHandler> socketEventHandlers = new();
     private readonly HandlerCollection<IRealtimeSocket.MessageEventHandler> messageEventHandlers = new();
     private readonly HandlerCollection<IRealtimeSocket.HeartbeatEventHandler> heartbeatEventHandlers = new();
@@ -66,8 +71,6 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private bool hasPendingHeartbeat;
     private string? pendingHeartbeatRef;
     private readonly Stopwatch heartbeatStopwatch = new();
-
-    internal Action<HeartbeatStatus, TimeSpan?>? OnHeartbeat;
 
     private readonly List<Task> buffer = new();
     private bool isReconnecting;
