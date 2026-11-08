@@ -47,6 +47,17 @@ public class WebSocketFactoryInjectionTests
     }
 
     [TestMethod]
+    public async Task Connect_ShouldOpenAgain_GivenAnEarlierDisconnect()
+    {
+        var fakeClient = new FakeWebsocketClient { OpenOnStart = true };
+        var socket = new RealtimeSocket("ws://localhost:4000/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(fakeClient) });
+        await socket.Connect();
+        socket.Disconnect();
+        await socket.Connect();
+        fakeClient.IsRunning.Should().BeTrue("a Disconnect before this Connect must not close the new connection");
+    }
+
+    [TestMethod]
     public void IsConnected_ShouldReflectTheInjectedClientsIsRunning()
     {
         var fakeClient = new FakeWebsocketClient { IsRunning = true };

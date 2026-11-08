@@ -68,6 +68,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private readonly List<Task> buffer = new();
     private bool isReconnecting;
     private bool isOpen;
+    private bool disconnectRequested;
     private int reconnectionAttempts = 0;
 
     /// <summary>
@@ -100,6 +101,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     {
         if (this.connection.IsRunning) return;
 
+        this.disconnectRequested = false;
+
         this.connection.ReconnectTimeout = this.options.ReconnectAfterInterval(this.reconnectionAttempts);
         this.connection.ErrorReconnectTimeout = TimeSpan.FromSeconds(30);
 
@@ -108,6 +111,9 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.connection.MessageReceived.Subscribe(this.HandleSocketMessage);
 
         await this.connection.StartOrFail();
+
+        if (this.disconnectRequested)
+            throw new RealtimeException("Disconnected before the socket opened.") { Reason = FailureHint.Reason.SocketError };
     }
 
     /// <summary>
@@ -117,6 +123,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// <param name="reason"></param>
     public void Disconnect(WebSocketCloseStatus code = WebSocketCloseStatus.NormalClosure, string reason = "")
     {
+        this.disconnectRequested = true;
         this.heartbeatTokenSource?.Cancel();
         this.connection.IsReconnectionEnabled = false;
         this.connection.Stop(code, reason);
@@ -360,6 +367,12 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private void HandleSocketReconnectionHappened(ReconnectionInfo reconnectionInfo)
     {
         Debugger.Instance.Log(this, $"Socket Reconnection: {reconnectionInfo.Type}");
+
+        if (this.disconnectRequested)
+        {
+            this.Disconnect();
+            return;
+        }
 
         if (reconnectionInfo.Type != ReconnectionType.Initial)
             this.isReconnecting = true;

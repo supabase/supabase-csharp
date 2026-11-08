@@ -46,16 +46,19 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     /// <summary>When set, <c>StartOrFail</c> reports the client as connected.</summary>
     public bool OpenOnStart { get; init; }
 
-    public Task StartOrFail()
+    /// <summary>When set, <c>StartOrFail</c> waits for it to complete, then reports the client as connected, like a handshake in flight.</summary>
+    public TaskCompletionSource? Handshake { get; init; }
+
+    public async Task StartOrFail()
     {
         this.StartOrFailCallCount++;
-        if (this.OpenOnStart)
+        if (this.Handshake != null)
+            await this.Handshake.Task;
+        if (this.OpenOnStart || this.Handshake != null)
         {
             this.IsRunning = true;
             this.reconnectionHappened.OnNext(ReconnectionInfo.Create(ReconnectionType.Initial));
         }
-
-        return Task.CompletedTask;
     }
 
     public Task<bool> Stop(WebSocketCloseStatus status, string reason)
