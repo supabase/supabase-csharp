@@ -85,6 +85,9 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     private readonly List<IRealtimeClient<RealtimeSocket, RealtimeChannel>.SocketStateEventHandler>
         socketEventHandlers = new();
 
+    private readonly HandlerCollection<IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler>
+        heartbeatEventHandlers = new();
+
     /// <summary>
     /// Contains all Realtime RealtimeChannel Subscriptions - state managed internally.
     ///
@@ -130,7 +133,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             return this;
         }
 
-        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options);
+        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options) { OnHeartbeat = this.NotifyHeartbeat };
         this.Socket.GetHeaders = this.GetHeaders;
 
         IRealtimeSocket.StateEventHandler? socketStateHandler = null;
@@ -183,7 +186,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             return this;
         }
 
-        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options);
+        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options) { OnHeartbeat = this.NotifyHeartbeat };
         IRealtimeSocket.StateEventHandler? socketStateHandler = null;
         IRealtimeSocket.ErrorEventHandler? errorEventHandler = null;
 
@@ -246,6 +249,25 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// </summary>
     public void ClearStateChangedHandlers() =>
         this.socketEventHandlers.Clear();
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.client.listen_heartbeats")]
+    public void AddHeartbeatHandler(IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler handler) =>
+        this.heartbeatEventHandlers.Add(handler);
+
+    /// <inheritdoc />
+    public void RemoveHeartbeatHandler(IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler handler) =>
+        this.heartbeatEventHandlers.Remove(handler);
+
+    /// <inheritdoc />
+    public void ClearHeartbeatHandlers() =>
+        this.heartbeatEventHandlers.Clear();
+
+    private void NotifyHeartbeat(HeartbeatStatus status, TimeSpan? latency)
+    {
+        foreach (var handler in this.heartbeatEventHandlers.Snapshot())
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, status, latency));
+    }
 
     /// <summary>
     /// Notifies all listeners that the current user auth state has changed.

@@ -1,1 +1,14 @@
 #nullable enable
+Supabase.Realtime.Client.AddHeartbeatHandler(Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>.HeartbeatEventHandler! handler) -> void
+Supabase.Realtime.Client.ClearHeartbeatHandlers() -> void
+Supabase.Realtime.Client.RemoveHeartbeatHandler(Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>.HeartbeatEventHandler! handler) -> void
+Supabase.Realtime.Constants.HeartbeatStatus
+Supabase.Realtime.Constants.HeartbeatStatus.Error = 2 -> Supabase.Realtime.Constants.HeartbeatStatus
+Supabase.Realtime.Constants.HeartbeatStatus.Ok = 1 -> Supabase.Realtime.Constants.HeartbeatStatus
+Supabase.Realtime.Constants.HeartbeatStatus.Sent = 0 -> Supabase.Realtime.Constants.HeartbeatStatus
+Supabase.Realtime.Constants.HeartbeatStatus.Timeout = 3 -> Supabase.Realtime.Constants.HeartbeatStatus
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.AddHeartbeatHandler(Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.HeartbeatEventHandler! handler) -> void
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ClearHeartbeatHandlers() -> void
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.HeartbeatEventHandler
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveHeartbeatHandler(Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.HeartbeatEventHandler! handler) -> void
+virtual Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.HeartbeatEventHandler.Invoke(Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>! sender, Supabase.Realtime.Constants.HeartbeatStatus status, System.TimeSpan? latency) -> void

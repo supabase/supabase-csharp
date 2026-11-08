@@ -35,6 +35,32 @@ public static class Constants
     }
 
     /// <summary>
+    /// The heartbeat status, used in <see cref="RealtimeSocket"/>
+    /// </summary>
+    public enum HeartbeatStatus
+    {
+        /// <summary>
+        /// Heartbeat sent
+        /// </summary>
+        Sent,
+
+        /// <summary>
+        /// Heartbeat answered
+        /// </summary>
+        Ok,
+
+        /// <summary>
+        /// Heartbeat rejected
+        /// </summary>
+        Error,
+
+        /// <summary>
+        /// Heartbeat timed out, socket reconnects
+        /// </summary>
+        Timeout
+    }
+
+    /// <summary>
     /// Mapping of channel states, used with <see cref="RealtimeChannel"/>
     /// </summary>
     public enum ChannelState
