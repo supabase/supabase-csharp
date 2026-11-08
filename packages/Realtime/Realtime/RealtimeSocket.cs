@@ -149,7 +149,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         Debugger.Instance.Log(this, $"Socket State Change: {newState}");
 
         foreach (var handler in snapshot)
-            handler.Invoke(this, newState);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, newState));
     }
 
     /// <summary>
@@ -238,7 +238,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.NotifySocketStateChange(SocketState.Error);
 
         foreach (var handler in this.errorEventHandlers.Snapshot())
-            handler.Invoke(this, exception);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, exception));
     }
 
     #endregion

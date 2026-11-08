@@ -184,6 +184,26 @@ public class SocketHandlerDispatchTests
         await heard.Awaiting(source => source.Task).Should().CompleteWithinAsync(Patience, "a throwing handler must not stop the next one");
     }
 
+    [TestMethod]
+    public async Task StateHandler_ShouldNotStopTheNextHandler_GivenItThrows()
+    {
+        this.SocketOver(new FakeWebsocketClient { OpenOnStart = true }).AddStateChangedHandler((_, _) => throw new InvalidOperationException("boom"));
+        this.socket.AddStateChangedHandler((_, _) => this.calls++);
+        await this.socket.Connect();
+        this.calls.Should().Be(1, "a throwing handler must not stop the next one");
+    }
+
+    [TestMethod]
+    public async Task ErrorHandler_ShouldNotStopTheNextHandler_GivenItThrows()
+    {
+        var server = new FakeWebsocketClient();
+        this.SocketOver(server).AddErrorHandler((_, _) => throw new InvalidOperationException("boom"));
+        this.socket.AddErrorHandler((_, _) => this.calls++);
+        await this.socket.Connect();
+        server.Fail(new InvalidOperationException("lost"));
+        this.calls.Should().Be(1, "a throwing handler must not stop the next one");
+    }
+
     private RealtimeSocket SocketOver(FakeWebsocketClient server)
     {
         this.socket = new RealtimeSocket("ws://localhost/socket", Wire.OptionsOver(server));
