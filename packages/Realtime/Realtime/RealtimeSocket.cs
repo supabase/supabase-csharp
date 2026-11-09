@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
@@ -50,6 +51,11 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// </summary>
     internal Dictionary<string, string> Headers => this.GetHeaders != null ? this.GetHeaders().MergeLeft(this.options.Headers) : this.options.Headers;
 
+    /// <summary>
+    /// Reports each heartbeat to the owning client.
+    /// </summary>
+    internal Action<HeartbeatStatus, TimeSpan?>? OnHeartbeat;
+
     private readonly HandlerCollection<IRealtimeSocket.StateEventHandler> socketEventHandlers = new();
     private readonly HandlerCollection<IRealtimeSocket.MessageEventHandler> messageEventHandlers = new();
     private readonly HandlerCollection<IRealtimeSocket.HeartbeatEventHandler> heartbeatEventHandlers = new();
@@ -64,6 +70,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private bool hasSuccessfullyConnectedOnce;
     private bool hasPendingHeartbeat;
     private string? pendingHeartbeatRef;
+    private readonly Stopwatch heartbeatStopwatch = new();
 
     private readonly List<Task> buffer = new();
     private bool isReconnecting;
@@ -306,12 +313,15 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         {
             this.hasPendingHeartbeat = false;
             Debugger.Instance.Log(this, "Socket Heartbeat Timeout: Attempting to re-establish a connection.");
+            this.OnHeartbeat?.Invoke(HeartbeatStatus.Timeout, null);
             _ = this.connection.Reconnect();
             return;
         }
 
         this.hasPendingHeartbeat = true;
         this.pendingHeartbeatRef = this.MakeMsgRef();
+        this.heartbeatStopwatch.Restart();
+        this.OnHeartbeat?.Invoke(HeartbeatStatus.Sent, null);
 
         this.Push(new SocketRequest
         {
@@ -414,6 +424,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
             if (decoded!.Ref == this.pendingHeartbeatRef)
             {
                 this.hasPendingHeartbeat = false;
+                var status = decoded.Payload?.Status == PhoenixStatusOk ? HeartbeatStatus.Ok : HeartbeatStatus.Error;
+                this.OnHeartbeat?.Invoke(status, this.heartbeatStopwatch.Elapsed);
                 this.NotifyHeartbeatReceived(decoded);
                 return;
             }
