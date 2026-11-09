@@ -40,7 +40,7 @@ internal sealed class HttpBroadcaster
             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         using var timeoutCts = new CancellationTokenSource(this.options.Timeout);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-        using var response = await Client.SendAsync(request, linkedCts.Token);
+        using var response = await Client.SendAsync(request, linkedCts.Token).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
             throw new RealtimeException(await response.Content.ReadAsStringAsync()) { StatusCode = (int) response.StatusCode };
     }

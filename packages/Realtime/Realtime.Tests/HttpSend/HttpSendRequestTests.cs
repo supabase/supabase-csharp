@@ -124,6 +124,10 @@ public class HttpSendRequestTests
         await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
+    [TestMethod]
+    public void HttpSendAsync_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations() =>
+        BlockingCaller.Completes(() => this.Channel().HttpSendAsync("cursor", new { x = 1 })).Should().BeTrue();
+
     private RealtimeChannel Channel(string topic = "realtime:room", ChannelOptions? options = null) =>
         new(new RealtimeSocket($"{this.server.Url!.Replace("http", "ws")}/realtime/v1", this.clientOptions), topic,
             options ?? Wire.PublicOptions());
