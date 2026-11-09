@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
+using Supabase.Realtime.Exceptions;
 using static Supabase.Realtime.Constants;
 
 namespace Realtime.Tests.Connection;
@@ -83,5 +84,31 @@ public class ClientReconnectionTests
         this.client.ClearDebugHandlers();
         heard.Should().Equal([SocketState.Open], "a throwing handler must not stop the next one or the connect");
         logged.Should().Contain(failure, "the handler's exception is logged, not lost");
+    }
+
+    [TestMethod]
+    public async Task ConnectAsync_ShouldFail_GivenADisconnectBeforeTheSocketOpened()
+    {
+        var socket = new FakeWebsocketClient { Handshake = new() };
+        var client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(socket) });
+        var connect = client.ConnectAsync();
+        client.Disconnect();
+        socket.Handshake.SetResult();
+        var act = () => connect.WaitAsync(TimeSpan.FromSeconds(5));
+        (await act.Should().ThrowAsync<RealtimeException>().WithMessage("Disconnected before the socket opened.")).Which.Reason.Should().Be(FailureHint.Reason.SocketError);
+        socket.IsRunning.Should().BeFalse("nothing owns this socket, so it must not stay open");
+    }
+
+    [TestMethod]
+    public async Task Disconnect_ShouldCloseTheSocket_GivenAReconnectFinishesAfterIt()
+    {
+        await this.client.ConnectAsync();
+        var heard = new List<SocketState>();
+        this.client.Socket!.AddStateChangedHandler((_, state) => heard.Add(state));
+        this.client.Disconnect();
+        this.socket.IsRunning = true;
+        this.socket.RecoverFromLostConnection();
+        this.socket.IsRunning.Should().BeFalse("nothing owns this socket, so it must not stay open");
+        heard.Should().BeEmpty("a socket closed on arrival never opened");
     }
 }
