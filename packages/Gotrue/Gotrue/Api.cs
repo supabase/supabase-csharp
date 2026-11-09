@@ -1084,4 +1084,24 @@ public class Api : IGotrueApi<User, Session>
             this.Headers
         );
     }
+
+    /// <inheritdoc />
+    public async Task<ResendState> Resend(ResendParameters resendParameters, OAuthFlowType flowType)
+    {
+        var body = resendParameters.ToDictionary();
+        var url = resendParameters.ApplyRedirectTo(this.Url);
+        string? verifier = null;
+
+        if (flowType == OAuthFlowType.PKCE && resendParameters.IsEmail())
+        {
+            verifier = Helpers.GenerateNonce();
+            var challenge = Helpers.GeneratePKCENonceVerifier(verifier);
+            body.Add("code_challenge", challenge);
+            body.Add("code_challenge_method", "s256");
+        }
+
+        await this.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers).ConfigureAwait(false);
+
+        return new ResendState { PKCEVerifier = verifier };
+    }
 }

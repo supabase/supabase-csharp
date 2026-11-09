@@ -548,6 +548,10 @@ features:
     note: "Active channels exposed as a Subscriptions dictionary; no getChannels() method."
     symbols:
       - Client.Subscriptions
+  realtime.client.listen_heartbeats:
+    status: implemented
+    symbols:
+      - Client.AddHeartbeatHandler
   realtime.client.remove_all_channels:
     status: implemented
     symbols:

@@ -1014,6 +1014,10 @@ public class Client : IGotrueClient<User, Session>
     public Task<BaseResponse> Resend(ResendParameters resendParameters) => this.api.Resend(resendParameters);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.sign_in.resend_confirmation")]
+    public Task<ResendState> Resend(ResendParameters resendParameters, OAuthFlowType flowType) => this.api.Resend(resendParameters, flowType);
+
+    /// <inheritdoc />
     [ImplementedCapability("auth.session.auto_refresh")]
     public void StartAutoRefresh()
     {

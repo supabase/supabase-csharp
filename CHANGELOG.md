@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.10.0](https://github.com/supabase/supabase-csharp/compare/v8.9.0...v8.10.0) (2026-11-09)
+
+
+### Features
+
+* **realtime:** add heartbeat handlers ([#684](https://github.com/supabase/supabase-csharp/issues/684)) ([4acb7ae](https://github.com/supabase/supabase-csharp/commit/4acb7ae596c2d69444c39555fec9e507c1c209ea))
+
+
+### Bug Fixes
+
+* **realtime:** close channels on disconnect ([#670](https://github.com/supabase/supabase-csharp/issues/670)) ([1adfe3a](https://github.com/supabase/supabase-csharp/commit/1adfe3af02156ce02cd777cddfe23f9dba9d3558))
+* **realtime:** close the socket when Disconnect runs before a connect finishes ([#681](https://github.com/supabase/supabase-csharp/issues/681)) ([9fa61fb](https://github.com/supabase/supabase-csharp/commit/9fa61fb04222d3dd05a702c8b381bde3462a156c))
+* **realtime:** fail Subscribe when the channel closes during the join ([#671](https://github.com/supabase/supabase-csharp/issues/671)) ([9209e0b](https://github.com/supabase/supabase-csharp/commit/9209e0b81b04c541a8166f449bcae5c4d3980ab3))
+* **realtime:** keep receiving when a message handler throws ([#677](https://github.com/supabase/supabase-csharp/issues/677)) ([72af5ca](https://github.com/supabase/supabase-csharp/commit/72af5cafcecd390045262a138f677dd8757cfa75))
+* **realtime:** keep the socket going when a state or error handler throws ([#682](https://github.com/supabase/supabase-csharp/issues/682)) ([d2eb06b](https://github.com/supabase/supabase-csharp/commit/d2eb06bc40072f72dcf919a871c7198fa24e9502))
+* **realtime:** report Close when the connection drops ([#674](https://github.com/supabase/supabase-csharp/issues/674)) ([2910494](https://github.com/supabase/supabase-csharp/commit/2910494bff3ea440cf622acfaa57252ee608207e))
+
 ## [8.9.0](https://github.com/supabase/supabase-csharp/compare/v8.8.0...v8.9.0) (2026-11-04)
 
 
