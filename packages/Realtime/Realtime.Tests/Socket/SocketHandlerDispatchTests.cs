@@ -185,6 +185,17 @@ public class SocketHandlerDispatchTests
     }
 
     [TestMethod]
+    public async Task MessageHandler_ShouldReceiveTheNextFrame_GivenOneThatIsNotJson()
+    {
+        var server = new FakeWebsocketClient { OpenOnStart = true };
+        this.SocketOver(server).AddMessageReceivedHandler((_, _) => this.calls++);
+        await this.socket.Connect();
+        server.Receive("not json");
+        server.Receive(Frame);
+        this.calls.Should().Be(1, "a frame the socket cannot decode must not stop the next one");
+    }
+
+    [TestMethod]
     public async Task StateHandler_ShouldNotStopTheNextHandler_GivenItThrows()
     {
         this.SocketOver(new FakeWebsocketClient { OpenOnStart = true }).AddStateChangedHandler((_, _) => throw new InvalidOperationException("boom"));
