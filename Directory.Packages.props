@@ -41,7 +41,7 @@
     <PackageVersion Include="NSubstitute" Version="[6.0.0]" />
     <PackageVersion Include="Verify.MSTest" Version="[32.0.1]" />
     <PackageVersion Include="coverlet.collector" Version="10.1.0" />
-    <PackageVersion Include="WireMock.Net" Version="2.21.0" />
+    <PackageVersion Include="WireMock.Net" Version="2.30.0" />
     <PackageVersion Include="Npgsql" Version="[8.0.6]" />
     <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.23.0" />
   </ItemGroup>
