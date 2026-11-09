@@ -36,6 +36,11 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     IRealtimeSocket? Socket { get; }
 
     /// <summary>
+    /// The current state of the connection
+    /// </summary>
+    ConnectionState ConnectionState { get; }
+
+    /// <summary>
     /// A collection of channels ordered by topic name
     /// </summary>
     ReadOnlyDictionary<string, TChannel> Subscriptions { get; }

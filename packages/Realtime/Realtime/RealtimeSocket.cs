@@ -25,6 +25,11 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     public bool IsConnected => this.connection.IsRunning;
 
     /// <summary>
+    /// Returns whether or not the socket has opened and not closed since.
+    /// </summary>
+    internal bool IsOpen => this.isOpen;
+
+    /// <summary>
     /// The Socket Endpoint
     /// </summary>
     private string EndpointUrl
