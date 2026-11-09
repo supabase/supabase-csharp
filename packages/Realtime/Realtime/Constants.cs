@@ -1,4 +1,4 @@
-﻿using Supabase.Core.Attributes;
+using Supabase.Core.Attributes;
 using Supabase.Realtime.Socket;
 
 namespace Supabase.Realtime;
