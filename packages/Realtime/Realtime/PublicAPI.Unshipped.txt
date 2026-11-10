@@ -1,1 +1,11 @@
 #nullable enable
+Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>
+Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>.CurrentPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
+Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>.Key.get -> string!
+Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>.NewPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
+Supabase.Realtime.Presence.PresenceLeave<TPresenceModel>
+Supabase.Realtime.Presence.PresenceLeave<TPresenceModel>.CurrentPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
+Supabase.Realtime.Presence.PresenceLeave<TPresenceModel>.Key.get -> string!
+Supabase.Realtime.Presence.PresenceLeave<TPresenceModel>.LeftPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
+Supabase.Realtime.RealtimePresence<TPresenceModel>.AddJoinHandler(System.Action<Supabase.Realtime.Presence.PresenceJoin<TPresenceModel!>!>! handler) -> void
+Supabase.Realtime.RealtimePresence<TPresenceModel>.AddLeaveHandler(System.Action<Supabase.Realtime.Presence.PresenceLeave<TPresenceModel!>!>! handler) -> void
