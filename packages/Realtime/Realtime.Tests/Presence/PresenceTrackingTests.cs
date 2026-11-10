@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Models;
 using Supabase.Postgrest.Interfaces;
@@ -23,13 +24,13 @@ public class PresenceTrackingTests
     [TestInitialize]
     public async Task InitializeTest()
     {
-        restClient = Helpers.RestClient();
-        socketClient = Helpers.SocketClient();
-        await socketClient.ConnectAsync();
+        this.restClient = Helpers.RestClient();
+        this.socketClient = Helpers.SocketClient();
+        await this.socketClient.ConnectAsync();
     }
 
     [TestCleanup]
-    public void CleanupTest() => socketClient.Disconnect();
+    public void CleanupTest() => this.socketClient.Disconnect();
 
     [TestMethod]
     public async Task Track_ShouldSyncPresenceBetweenClients()
@@ -38,7 +39,7 @@ public class PresenceTrackingTests
         var tsc2 = new TaskCompletionSource<bool>();
         var guid1 = Guid.NewGuid().ToString();
         var guid2 = Guid.NewGuid().ToString();
-        var channel1 = socketClient.Channel("online-users");
+        var channel1 = this.socketClient.Channel("online-users");
         var presence1 = channel1.Register<PresenceExample>(guid1);
         presence1.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) =>
         {
@@ -62,5 +63,28 @@ public class PresenceTrackingTests
         await presence2.Track(new PresenceExample { Time = DateTime.Now });
         await presence1.Untrack();
         await Task.WhenAll(tsc.Task, tsc2.Task);
+    }
+
+    [TestMethod]
+    public async Task CurrentState_ShouldHoldAnEarlierClient_GivenTheChannelJoinedLater()
+    {
+        var seen = new TaskCompletionSource();
+        var earlier = Guid.NewGuid().ToString();
+        var channel1 = this.socketClient.Channel("late-joiner");
+        var presence1 = channel1.Register<PresenceExample>(earlier);
+        await channel1.Subscribe();
+        await presence1.Track(new PresenceExample());
+        var client2 = Helpers.SocketClient();
+        await client2.ConnectAsync();
+        var channel2 = client2.Channel("late-joiner");
+        var presence2 = channel2.Register<PresenceExample>(Guid.NewGuid().ToString());
+        presence2.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) =>
+        {
+            if (presence2.CurrentState.ContainsKey(earlier))
+                seen.TrySetResult();
+        });
+        await channel2.Subscribe();
+        await seen.Awaiting(source => source.Task).Should().CompleteWithinAsync(TimeSpan.FromSeconds(10), "the snapshot sent on join lists who was already there");
+        client2.Disconnect();
     }
 }
