@@ -34,7 +34,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Exposes all Realtime RealtimeChannel Subscriptions for R/O public consumption 
     /// </summary>
-    [PartialCapability("realtime.client.get_channels", "Active channels exposed as a Subscriptions dictionary; no getChannels() method.")]
+    [ImplementedCapability("realtime.client.get_channels")]
     public ReadOnlyDictionary<string, RealtimeChannel> Subscriptions => new(this.subscriptions);
 
     /// <summary>
