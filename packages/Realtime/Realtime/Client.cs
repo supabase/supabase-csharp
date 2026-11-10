@@ -34,7 +34,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Exposes all Realtime RealtimeChannel Subscriptions for R/O public consumption 
     /// </summary>
-    [PartialCapability("realtime.client.get_channels", "Active channels exposed as a Subscriptions dictionary; no getChannels() method.")]
+    [ImplementedCapability("realtime.client.get_channels")]
     public ReadOnlyDictionary<string, RealtimeChannel> Subscriptions => new(this.subscriptions);
 
     /// <summary>
@@ -43,6 +43,15 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// Most methods of the Client act as proxies to the Socket class.
     /// </summary>
     public IRealtimeSocket? Socket { get; private set; }
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.client.connection_state")]
+    public ConnectionState ConnectionState => this.Socket switch
+    {
+        null => ConnectionState.Closed,
+        RealtimeSocket { IsOpen: true } => ConnectionState.Open,
+        _ => ConnectionState.Connecting
+    };
 
     /// <summary>
     /// Client Options - most of which are regarding Socket connection Options
@@ -225,7 +234,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Adds a listener to be notified when the socket state changes.
     /// </summary>
-    [PartialCapability("realtime.client.connection_state", "Socket state delivered via SocketStateEventHandler events; no synchronous connection-state getter on the client.")]
+    [ImplementedCapability("realtime.client.connection_state")]
     public void AddStateChangedHandler(
         IRealtimeClient<RealtimeSocket, RealtimeChannel>.SocketStateEventHandler handler)
     {

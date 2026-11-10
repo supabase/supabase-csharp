@@ -65,11 +65,12 @@ public class PostgresChangesOptions
     public string? Table { get; set; }
 
     /// <summary>
-    /// The filter for this listener
+    /// The filter for this listener. Comma-joined conditions are applied as AND.
     /// </summary>
     [JsonPropertyName("filter")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [ImplementedCapability("realtime.subscriptions.postgres_changes_filter", "Filter is a hand-built PostgREST string (e.g. 'user_id=eq.{id}'), untied to the model.")]
+    [ImplementedCapability("realtime.subscriptions.postgres_changes_multiple_filters")]
     public string? Filter { get; set; }
 
     /// <summary>
