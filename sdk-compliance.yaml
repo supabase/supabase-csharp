@@ -544,8 +544,7 @@ features:
     symbols:
       - Client.Disconnect
   realtime.client.get_channels:
-    status: partially_implemented
-    note: "Active channels exposed as a Subscriptions dictionary; no getChannels() method."
+    status: implemented
     symbols:
       - Client.Subscriptions
   realtime.client.listen_heartbeats:
@@ -601,6 +600,10 @@ features:
   realtime.subscriptions.postgres_changes_filter:
     status: implemented
     note: "Filter is a hand-built PostgREST string (e.g. 'user_id=eq.{id}'), untied to the model."
+    symbols:
+      - PostgresChangesOptions.Filter
+  realtime.subscriptions.postgres_changes_multiple_filters:
+    status: implemented
     symbols:
       - PostgresChangesOptions.Filter
   realtime.subscriptions.private_channel:
