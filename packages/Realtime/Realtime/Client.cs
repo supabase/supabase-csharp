@@ -137,6 +137,8 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     [ImplementedCapability("realtime.client.connect")]
     public async Task<IRealtimeClient<RealtimeSocket, RealtimeChannel>> ConnectAsync()
     {
+        await this.RefreshAuthAsync().ConfigureAwait(false);
+
         var tsc = new TaskCompletionSource<IRealtimeClient<RealtimeSocket, RealtimeChannel>>();
 
         if (this.Socket != null)
@@ -327,10 +329,22 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Sets the current Access Token every heartbeat (see: https://github.com/supabase/realtime-js/blob/59bd47956ebe4e23b3e1a6c07f5fe2cfe943e8ad/src/RealtimeClient.ts#L437)
     /// </summary>
-    private void HandleSocketHeartbeat(IRealtimeSocket sender, SocketResponse message)
+    private void HandleSocketHeartbeat(IRealtimeSocket sender, SocketResponse message) => _ = this.RefreshAuthAsync();
+
+    private async Task RefreshAuthAsync()
     {
-        if (!string.IsNullOrEmpty(this.AccessToken))
-            this.SetAuth(this.AccessToken!);
+        try
+        {
+            var token = this.Options.RetrieveAccessToken != null
+                ? await this.Options.RetrieveAccessToken().ConfigureAwait(false)
+                : this.AccessToken;
+            if (!string.IsNullOrEmpty(token))
+                this.SetAuth(token!);
+        }
+        catch (Exception ex)
+        {
+            Debugger.Instance.Log(this, ex.Message, ex);
+        }
     }
 
     /// <summary>
