@@ -35,6 +35,27 @@ public static class Constants
     }
 
     /// <summary>
+    /// The state of the connection, used in <see cref="Client"/>
+    /// </summary>
+    public enum ConnectionState
+    {
+        /// <summary>
+        /// Not connected
+        /// </summary>
+        Closed,
+
+        /// <summary>
+        /// Connecting, or reconnecting after a lost connection
+        /// </summary>
+        Connecting,
+
+        /// <summary>
+        /// Connected
+        /// </summary>
+        Open
+    }
+
+    /// <summary>
     /// The heartbeat status, used in <see cref="RealtimeSocket"/>
     /// </summary>
     public enum HeartbeatStatus

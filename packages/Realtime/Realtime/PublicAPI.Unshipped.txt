@@ -1,1 +1,7 @@
 #nullable enable
+Supabase.Realtime.Client.ConnectionState.get -> Supabase.Realtime.Constants.ConnectionState
+Supabase.Realtime.Constants.ConnectionState
+Supabase.Realtime.Constants.ConnectionState.Closed = 0 -> Supabase.Realtime.Constants.ConnectionState
+Supabase.Realtime.Constants.ConnectionState.Connecting = 1 -> Supabase.Realtime.Constants.ConnectionState
+Supabase.Realtime.Constants.ConnectionState.Open = 2 -> Supabase.Realtime.Constants.ConnectionState
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ConnectionState.get -> Supabase.Realtime.Constants.ConnectionState
