@@ -12,7 +12,6 @@ using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Common;
-using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.Exceptions;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;

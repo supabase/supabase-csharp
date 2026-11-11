@@ -30,6 +30,7 @@ using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateSsoProvider;
 using Supabase.Gotrue.VerifyRecoveryCode;
 using static Supabase.Gotrue.Constants;
 
@@ -873,6 +874,15 @@ public class Api : IGotrueApi<User, Session>
         var body = CreateSsoProviderBody.For(metadata, options);
         var created = await this.MakeRequestAsync<SsoProviderResponse>(HttpMethod.Post, $"{this.Url}/admin/sso/providers", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return SsoProviderResponse.Read(created);
+    }
+
+    /// <inheritdoc />
+    public async Task<SsoProvider> UpdateSsoProviderAsync(string jwt, SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default)
+    {
+        var url = this.SsoProviderUrl(provider);
+        var body = UpdateSsoProviderBody.For(changes);
+        var updated = await this.MakeRequestAsync<SsoProviderResponse>(HttpMethod.Put, url, body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return SsoProviderResponse.Read(updated);
     }
 
     private string SsoProviderUrl(SsoProviderReference provider) =>
