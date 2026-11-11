@@ -1,5 +1,29 @@
 # Changelog
 
+## [8.12.0](https://github.com/supabase/supabase-csharp/compare/v8.11.0...v8.12.0) (2026-11-11)
+
+
+### Features
+
+* **auth:** change a single sign-on identity provider as an admin ([#728](https://github.com/supabase/supabase-csharp/issues/728)) ([0b8e81b](https://github.com/supabase/supabase-csharp/commit/0b8e81b50aeed83625d04de6ebd64988e6ee2ee6))
+* **auth:** claim concurrent PKCE flows through caller-owned verifiers ([#710](https://github.com/supabase/supabase-csharp/issues/710)) ([e90ed57](https://github.com/supabase/supabase-csharp/commit/e90ed57f16fcbd339dbbfb474de161ab87475c05))
+* **auth:** delete a single sign-on identity provider as an admin ([#721](https://github.com/supabase/supabase-csharp/issues/721)) ([b41c171](https://github.com/supabase/supabase-csharp/commit/b41c171eeb21ca638bc2785b90f3a1e71ac6c0c7))
+* **auth:** fetch a single sign-on identity provider as an admin ([#719](https://github.com/supabase/supabase-csharp/issues/719)) ([d90b5be](https://github.com/supabase/supabase-csharp/commit/d90b5be45df9672f834e37ff4bace704c1fb1750))
+* **auth:** list single sign-on identity providers as an admin, optionally by resource ID or prefix ([#722](https://github.com/supabase/supabase-csharp/issues/722)) ([846db86](https://github.com/supabase/supabase-csharp/commit/846db86ed6d4044e1c35e3c0fbc4d62ea963ce35))
+* **auth:** register a single sign-on identity provider as an admin ([#724](https://github.com/supabase/supabase-csharp/issues/724)) ([328b37c](https://github.com/supabase/supabase-csharp/commit/328b37c43e6887a6121776da3c21cb73ea2859d6))
+* **auth:** sign in with a Solana or Ethereum wallet signature ([#707](https://github.com/supabase/supabase-csharp/issues/707)) ([231265d](https://github.com/supabase/supabase-csharp/commit/231265d69fdbe8428449b1746cd872caad47d628))
+* **auth:** sign up with PKCE and a messaging channel, returning a SignUpState ([#713](https://github.com/supabase/supabase-csharp/issues/713)) ([1176478](https://github.com/supabase/supabase-csharp/commit/1176478253c23f793ec84fa0311ad779cbe08eb3))
+* **auth:** tell listeners why the user was signed out ([#708](https://github.com/supabase/supabase-csharp/issues/708)) ([79cb53e](https://github.com/supabase/supabase-csharp/commit/79cb53e6d95260b489352c4b0b3dae1bd1a59ae9))
+
+
+### Bug Fixes
+
+* **auth:** keep the local session when a global sign-out fails on the server ([#714](https://github.com/supabase/supabase-csharp/issues/714)) ([d9c4814](https://github.com/supabase/supabase-csharp/commit/d9c4814033c77f5a64b9c50014e3ea791f0ad82c))
+* **auth:** resume ExchangeCodeForSession off the caller's synchronization context ([#705](https://github.com/supabase/supabase-csharp/issues/705)) ([c707a22](https://github.com/supabase/supabase-csharp/commit/c707a220e335e21ce95a7419303fc5dfdb38087b))
+* **auth:** return the PKCE verifier from an SSO sign-in ([#709](https://github.com/supabase/supabase-csharp/issues/709)) ([c341327](https://github.com/supabase/supabase-csharp/commit/c341327848ea2f1fb6941d26551ff9e58d7e0800))
+* **auth:** show which provider an SsoProviderReference addresses in ToString ([#730](https://github.com/supabase/supabase-csharp/issues/730)) ([0bda9b4](https://github.com/supabase/supabase-csharp/commit/0bda9b48515941adb9ec537725cc8b0b0fd24046))
+* **supabase:** pass the MFA-verified access token to Realtime instead of throwing ([#704](https://github.com/supabase/supabase-csharp/issues/704)) ([5142a49](https://github.com/supabase/supabase-csharp/commit/5142a49c06919c9005015d713f5262d3d18f9048))
+
 ## [8.11.0](https://github.com/supabase/supabase-csharp/compare/v8.10.0...v8.11.0) (2026-11-11)
 
 
