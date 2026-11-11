@@ -556,19 +556,54 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignOut);
         activity?.SetTag(GotrueInstrumentation.Tags.SignOutScope, scope.ToString());
+        switch (scope)
+        {
+            case SignOutScope.Global:
+                await this.SignOutEverywhereAsync().ConfigureAwait(false);
+                break;
+            case SignOutScope.Local:
+                await this.SignOutThisDeviceAsync().ConfigureAwait(false);
+                break;
+            default:
+                await this.RevokeSessionsAsync(scope).ConfigureAwait(false);
+                break;
+        }
+    }
+
+    private async Task SignOutEverywhereAsync()
+    {
+        await this.RevokeSessionsUnlessUserIsGoneAsync().ConfigureAwait(false);
+        await this.UpdateSessionAsync(null).ConfigureAwait(false);
+    }
+
+    private async Task RevokeSessionsUnlessUserIsGoneAsync()
+    {
         try
         {
-            if (this.CurrentSession?.AccessToken != null)
-            {
-                await this.api.SignOut(this.CurrentSession.AccessToken, scope).ConfigureAwait(false);
-            }
+            await this.RevokeSessionsAsync(SignOutScope.Global).ConfigureAwait(false);
+        }
+        catch (GotrueException ex) when (ex.Reason == UserNotFound)
+        {
+        }
+    }
+
+    private async Task SignOutThisDeviceAsync()
+    {
+        try
+        {
+            await this.RevokeSessionsAsync(SignOutScope.Local).ConfigureAwait(false);
         }
         finally
         {
-            if (scope != SignOutScope.Others)
-            {
-                await this.UpdateSessionAsync(null).ConfigureAwait(false);
-            }
+            await this.UpdateSessionAsync(null).ConfigureAwait(false);
+        }
+    }
+
+    private async Task RevokeSessionsAsync(SignOutScope scope)
+    {
+        if (this.CurrentSession?.AccessToken is { } accessToken)
+        {
+            await this.api.SignOut(accessToken, scope).ConfigureAwait(false);
         }
     }
 

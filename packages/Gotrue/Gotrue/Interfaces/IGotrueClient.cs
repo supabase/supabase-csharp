@@ -404,11 +404,20 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <summary>
     ///     Signs out and invalidates all sessions for a user.
     /// </summary>
+    /// <remarks>
+    ///     What happens to this device's session depends on <paramref name="scope" />:
+    ///     - <see cref="SignOutScope.Global" />: the session is cleared, and <c>SignedOut</c> raised, only once the
+    ///     server has ended the user's sessions, or answers that the user no longer exists. When the server refuses
+    ///     or cannot be reached, the session is kept and the <see cref="GotrueException" /> is thrown, so you can
+    ///     retry, or fall back to <see cref="SignOutScope.Local" /> to sign this device out regardless.
+    ///     - <see cref="SignOutScope.Local" />: the session is always cleared; a server failure is still thrown.
+    ///     - <see cref="SignOutScope.Others" />: the session is never cleared.
+    /// </remarks>
     /// <param name="scope">
     ///     Determines which sessions should be invalidated. By default, it will invalidate all session for a
     ///     user
     /// </param>
-    /// <returns></returns>
+    /// <exception cref="GotrueException">The server refused the sign-out or could not be reached.</exception>
     Task SignOut(SignOutScope scope = SignOutScope.Global);
 
     /// <summary>
