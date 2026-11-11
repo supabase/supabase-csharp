@@ -11,6 +11,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateSsoProvider;
 
 namespace Supabase.Gotrue.Interfaces;
 
@@ -497,4 +498,53 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<SsoProvider> CreateSsoProviderAsync(SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Changes a single sign-on (SAML 2.0) identity provider: the settings set on <paramref name="changes" /> replace
+    /// the stored ones, and those left null are kept. Requires a full-access API key, such as the service_role key:
+    /// call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="provider">
+    /// The provider, addressed <see cref="SsoProviderReference.ById" /> or
+    /// <see cref="SsoProviderReference.ByResourceId" />.
+    /// </param>
+    /// <param name="changes">
+    /// The changes, started from <see cref="SsoProviderChanges.KeepingNameIdFormatOf" />,
+    /// <see cref="SsoProviderChanges.WithNameIdFormat" /> or <see cref="SsoProviderChanges.WithoutNameIdFormat" />,
+    /// since the auth server clears a <c>NameID</c> format the request leaves out. The server only stores a new
+    /// <c>NameID</c> format together with new metadata or a new attribute mapping: a change of the format alone is
+    /// answered as a success but not saved, until the server is fixed. New metadata given
+    /// <see cref="SamlMetadata.FromUrl" /> is fetched by the server before it answers; <paramref name="cancellationToken" />
+    /// bounds that fetch.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider as stored after the change.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="provider" /> or <paramref name="changes" /> is null. Nothing is sent.
+    /// </exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.SsoProviderNotFound" /> when no provider matches
+    /// <paramref name="provider" />, and <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key
+    /// is not a full-access key. Otherwise <see cref="Exceptions.GotrueException.ErrorCode" /> is
+    /// <c>saml_entity_id_mismatch</c> when the new metadata carries another entity ID than the provider's,
+    /// <c>sso_domain_already_exists</c> when another provider already has one of the domains,
+    /// <c>validation_failed</c> when a setting is invalid (for example a metadata URL that is not HTTPS),
+    /// <c>saml_metadata_fetch_failed</c> when the metadata URL answers with an error, <c>conflict</c> when a
+    /// concurrent change made the update fail, and <c>unexpected_failure</c> when the metadata cannot be parsed or
+    /// fetched.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    /// using Supabase.Gotrue.UpdateSsoProvider;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var current = await admin.GetSsoProviderAsync(SsoProviderReference.ByResourceId("acme"));
+    /// var updated = await admin.UpdateSsoProviderAsync(
+    ///     SsoProviderReference.ById(current.Id),
+    ///     SsoProviderChanges.KeepingNameIdFormatOf(current) with { Domains = new[] { "acme.com", "acme.org" } });
+    /// </code>
+    /// </example>
+    Task<SsoProvider> UpdateSsoProviderAsync(SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default);
 }

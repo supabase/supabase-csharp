@@ -3,11 +3,11 @@
 using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Supabase.Gotrue.CreateSsoProvider;
+using Supabase.Gotrue.Common;
 
 #endregion
 
-namespace Gotrue.Tests.CreateSsoProvider;
+namespace Gotrue.Tests.Common;
 
 /// <summary>
 ///     The metadata a provider is registered from: the URLs and XML refused before any request.

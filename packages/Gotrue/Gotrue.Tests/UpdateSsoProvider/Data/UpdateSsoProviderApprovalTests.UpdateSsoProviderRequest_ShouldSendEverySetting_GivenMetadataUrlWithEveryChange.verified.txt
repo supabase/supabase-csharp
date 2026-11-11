@@ -1,0 +1,1 @@
+﻿{"metadata_url":"https://idp.acme.com/saml/metadata","domains":["acme.com"],"attribute_mapping":{"keys":{"email":{"names":["mail","email"]},"groups":{"names":["memberOf"],"array":true},"role":{"names":[],"default":"member"}}},"name_id_format":"urn:oasis:names:tc:SAML:2.0:nameid-format:persistent","resource_id":"acme","disabled":true}

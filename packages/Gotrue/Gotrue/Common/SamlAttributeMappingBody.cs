@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-using Supabase.Gotrue.Common;
 
-namespace Supabase.Gotrue.CreateSsoProvider;
+namespace Supabase.Gotrue.Common;
 
 internal sealed record SamlAttributeMappingBody
 {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Supabase.Gotrue.CreateSsoProvider;
+namespace Supabase.Gotrue.Common;
 
 /// <summary>
 /// Where the auth server reads a SAML 2.0 identity provider's metadata from: a URL it fetches, with

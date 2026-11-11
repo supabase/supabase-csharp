@@ -19,6 +19,7 @@ using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateSsoProvider;
 using static Supabase.Gotrue.Constants;
 
 #pragma warning disable CS1591
@@ -347,6 +348,19 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <exception cref="ArgumentNullException"><paramref name="metadata" /> is null.</exception>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<SsoProvider> CreateSsoProviderAsync(string jwt, SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Changes a single sign-on (SAML 2.0) identity provider: the settings set on <paramref name="changes" /> replace
+    /// the stored ones, and those left null are kept.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="provider">The provider, addressed by id or by resource ID.</param>
+    /// <param name="changes">The changes, which always state the <c>NameID</c> format the provider keeps.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider as stored after the change.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> or <paramref name="changes" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<SsoProvider> UpdateSsoProviderAsync(string jwt, SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Links an oauth identity to an existing user.

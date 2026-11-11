@@ -17,7 +17,7 @@ internal sealed record CreateSsoProviderBody
         this.MetadataXml = metadata.Xml;
         this.Domains = options.Domains;
         this.AttributeMapping = SamlAttributeMappingBody.From(options.AttributeMapping);
-        this.NameIdFormat = UrnOf(options.NameIdFormat);
+        this.NameIdFormat = SamlNameIdFormatUrn.Of(options.NameIdFormat);
         this.ResourceId = options.ResourceId;
         this.Disabled = !options.Enabled;
     }
@@ -55,7 +55,4 @@ internal sealed record CreateSsoProviderBody
 
     internal static CreateSsoProviderBody For(SamlMetadata metadata, SsoProviderOptions? options) =>
         new(metadata ?? throw new ArgumentNullException(nameof(metadata)), options ?? NoOptions);
-
-    private static string? UrnOf(SamlNameIdFormat? format) =>
-        format.HasValue ? Core.Helpers.GetMappedToAttr(format.Value).Mapping : null;
 }
