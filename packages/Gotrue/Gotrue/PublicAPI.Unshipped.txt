@@ -1,12 +1,13 @@
 #nullable enable
-override Supabase.Gotrue.SignUp.SignUpState.Equals(object? obj) -> bool
-override Supabase.Gotrue.SignUp.SignUpState.GetHashCode() -> int
-override Supabase.Gotrue.SignUp.SignUpState.ToString() -> string!
-static Supabase.Gotrue.SignUp.SignUpState.operator !=(Supabase.Gotrue.SignUp.SignUpState? left, Supabase.Gotrue.SignUp.SignUpState? right) -> bool
-static Supabase.Gotrue.SignUp.SignUpState.operator ==(Supabase.Gotrue.SignUp.SignUpState? left, Supabase.Gotrue.SignUp.SignUpState? right) -> bool
 Supabase.Gotrue.Api.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
+Supabase.Gotrue.Client.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?
 Supabase.Gotrue.Client.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
+Supabase.Gotrue.Common.SignOutReason
+Supabase.Gotrue.Common.SignOutReason.SessionExpired = 1 -> Supabase.Gotrue.Common.SignOutReason
+Supabase.Gotrue.Common.SignOutReason.SessionMissing = 2 -> Supabase.Gotrue.Common.SignOutReason
+Supabase.Gotrue.Common.SignOutReason.UserInitiated = 0 -> Supabase.Gotrue.Common.SignOutReason
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.SignUp.SignUpState
 Supabase.Gotrue.SignUp.SignUpState.<Clone>$() -> Supabase.Gotrue.SignUp.SignUpState!
@@ -20,3 +21,8 @@ Supabase.Gotrue.SignUp.SignUpState.User.get -> Supabase.Gotrue.User?
 Supabase.Gotrue.SignUp.SignUpState.User.init -> void
 Supabase.Gotrue.SignUpOptions.Channel.get -> Supabase.Gotrue.SignInWithPasswordlessPhoneOptions.MessagingChannel
 Supabase.Gotrue.SignUpOptions.Channel.set -> void
+override Supabase.Gotrue.SignUp.SignUpState.Equals(object? obj) -> bool
+override Supabase.Gotrue.SignUp.SignUpState.GetHashCode() -> int
+override Supabase.Gotrue.SignUp.SignUpState.ToString() -> string!
+static Supabase.Gotrue.SignUp.SignUpState.operator !=(Supabase.Gotrue.SignUp.SignUpState? left, Supabase.Gotrue.SignUp.SignUpState? right) -> bool
+static Supabase.Gotrue.SignUp.SignUpState.operator ==(Supabase.Gotrue.SignUp.SignUpState? left, Supabase.Gotrue.SignUp.SignUpState? right) -> bool

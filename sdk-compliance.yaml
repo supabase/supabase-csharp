@@ -119,6 +119,10 @@ features:
     status: implemented
     symbols:
       - Client.SignOut
+  auth.session.sign_out_reason:
+    status: implemented
+    symbols:
+      - Client.SignOutReason
   auth.session.subscribe_auth_events:
     status: implemented
     symbols:
