@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
@@ -392,6 +393,34 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<SsoProvider> GetSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the single sign-on (SAML 2.0) identity providers registered on the project, optionally only those a
+    /// filter selects. Requires a full-access API key, such as the service_role key: call it from a server, never
+    /// from a client app.
+    /// </summary>
+    /// <param name="filter">
+    /// Only the provider with a resource ID, <see cref="SsoProviderFilter.ByResourceId" />, or those whose resource ID
+    /// starts with a prefix, <see cref="SsoProviderFilter.ByResourceIdPrefix" />; every provider when null.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>
+    /// The providers, empty when none matches. Their <see cref="SamlConfiguration.MetadataXml" /> is always null:
+    /// fetch a provider with <see cref="GetSsoProviderAsync" /> for it.
+    /// </returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.ListSsoProviders;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var acmeProviders = await admin.ListSsoProvidersAsync(SsoProviderFilter.ByResourceIdPrefix("acme-"));
+    /// </code>
+    /// </example>
+    Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(SsoProviderFilter? filter = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a single sign-on (SAML 2.0) identity provider, together with its email domains: their users can no

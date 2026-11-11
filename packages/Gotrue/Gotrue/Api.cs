@@ -18,6 +18,7 @@ using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
+using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.RenamePasskey;
@@ -867,6 +868,13 @@ public class Api : IGotrueApi<User, Session>
 
     private string SsoProviderUrl(SsoProviderReference provider) =>
         $"{this.Url}/admin/sso/providers/{(provider ?? throw new ArgumentNullException(nameof(provider))).RouteSegment}";
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(string jwt, SsoProviderFilter? filter = null, CancellationToken cancellationToken = default)
+    {
+        var listed = await this.MakeRequestAsync<SsoProviderListResponse>(HttpMethod.Get, $"{this.Url}/admin/sso/providers", ListSsoProvidersQuery.For(filter), this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return SsoProviderListResponse.Read(listed);
+    }
 
     /// <inheritdoc />
     public async Task<ProviderAuthState> LinkIdentity(string token, Provider provider, SignInOptions options)
