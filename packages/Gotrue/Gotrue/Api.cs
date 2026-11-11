@@ -24,6 +24,7 @@ using Supabase.Gotrue.RenamePasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
 using Supabase.Gotrue.VerifyRecoveryCode;
@@ -713,11 +714,18 @@ public class Api : IGotrueApi<User, Session>
     public async Task<Session> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
     {
         var signedIn = await this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/verify", SignInWithPasskeyBody.For(challengeId, credential), this.Headers, cancellationToken).ConfigureAwait(false);
-        return RetrievePasskeySessionOrThrow(signedIn);
+        return RetrieveSessionOrThrow(signedIn, "passkey");
     }
 
-    private static Session RetrievePasskeySessionOrThrow(Session? signedIn) =>
-        string.IsNullOrEmpty(signedIn?.AccessToken) ? throw new GotrueException("The auth server returned no session for the passkey sign-in.", FailureHint.Reason.Unknown) : signedIn!;
+    /// <inheritdoc />
+    public async Task<Session> SignInWithWeb3Async(Web3Credentials credentials, SignInWithWeb3Options? options = null, CancellationToken cancellationToken = default)
+    {
+        var signedIn = await this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=web3", SignInWithWeb3Body.For(credentials, options), this.Headers, cancellationToken).ConfigureAwait(false);
+        return RetrieveSessionOrThrow(signedIn, "Web3");
+    }
+
+    private static Session RetrieveSessionOrThrow(Session? signedIn, string signInMethod) =>
+        string.IsNullOrEmpty(signedIn?.AccessToken) ? throw new GotrueException($"The auth server returned no session for the {signInMethod} sign-in.", FailureHint.Reason.Unknown) : signedIn!;
 
     /// <inheritdoc />
     public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)

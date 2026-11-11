@@ -15,6 +15,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignInWithWeb3;
 using static Supabase.Gotrue.Constants;
 
 #endregion
@@ -693,6 +694,36 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     </code>
     /// </example>
     Task<TSession> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Signs in with a Web3 wallet (Solana or Ethereum): the server checks the wallet's signature of a Sign in with
+    ///     Solana / Sign in with Ethereum message and signs in the user the wallet's address identifies, creating it on
+    ///     first sign-in. The wallet library writes and signs the message; .NET has no injected browser wallet for the
+    ///     SDK to drive. The new session replaces the current one, is persisted, and is announced like any other sign-in.
+    /// </summary>
+    /// <param name="credentials">
+    ///     The signed message, from <see cref="Web3Credentials.ForSolana" /> or <see cref="Web3Credentials.ForEthereum" />.
+    /// </param>
+    /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The signed-in session.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.UserTooManyRequests" /> when the Web3 sign-in rate limit is reached,
+    ///     or the server's rejection of the request: <see cref="GotrueException.ErrorCode" /> <c>web3_provider_disabled</c>
+    ///     when the chain is disabled on the server, <c>validation_failed</c> when the message or signature is malformed,
+    ///     <c>captcha_failed</c> when the CAPTCHA token is missing or invalid; an <c>invalid_grant</c> answer when the
+    ///     signature does not match the message's address, or the message is expired, not yet valid, issued too long
+    ///     ago, or signed for a URI the project does not allow.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var message = siweMessage.ToString();
+    ///     var signature = await wallet.PersonalSignAsync(message);
+    ///     var session = await client.SignInWithWeb3Async(Web3Credentials.ForEthereum(message, signature));
+    ///     </code>
+    /// </example>
+    Task<TSession> SignInWithWeb3Async(Web3Credentials credentials, SignInWithWeb3Options? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Add a listener to get errors that occur outside of a typical Exception flow.

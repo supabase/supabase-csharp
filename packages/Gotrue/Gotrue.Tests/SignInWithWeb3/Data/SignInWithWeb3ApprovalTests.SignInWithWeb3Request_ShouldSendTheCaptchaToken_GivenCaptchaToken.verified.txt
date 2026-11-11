@@ -1,0 +1,1 @@
+﻿{"chain":"solana","message":"localhost:3000 wants you to sign in with your Solana account:\nDRpbCBMxVnDK7maPM5tGv6MvB3v1sRMC86PZ8okm21hy\n\nURI: http://localhost:3000\nVersion: 1\nIssued At: 2026-11-11T10:00:00Z","signature":"AwcLDxMXGx8jJysvMzc7P0NHS09TV1tfY2drb3N3e3-Dh4uPk5ebn6Onq6-zt7u_w8fLz9PX29_j5-vv8_f7_w","gotrue_meta_security":{"captcha_token":"a-captcha-token"}}

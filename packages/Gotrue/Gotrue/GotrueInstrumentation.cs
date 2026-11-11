@@ -71,6 +71,7 @@ internal static class GotrueInstrumentation
         internal const string SignInWithIdToken = "gotrue.sign_in.id_token";
         internal const string StartPasskeySignIn = "gotrue.start_passkey_sign_in";
         internal const string SignInWithPasskey = "gotrue.sign_in.passkey";
+        internal const string SignInWithWeb3 = "gotrue.sign_in.web3";
         internal const string LinkIdentityWithIdToken = "gotrue.link_identity.id_token";
         internal const string GetUserIdentities = "gotrue.get_user_identities";
         internal const string ListPasskeys = "gotrue.list_passkeys";
@@ -105,6 +106,7 @@ internal static class GotrueInstrumentation
         internal const string OtpChannel = "gotrue.otp.channel";
         internal const string SignInType = "gotrue.sign_in.type";
         internal const string SignOutScope = "gotrue.sign_out.scope";
+        internal const string Web3Chain = "gotrue.web3.chain";
     }
 
     /// <summary>Values for the <see cref="Tags.OtpChannel" /> tag.</summary>
