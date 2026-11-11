@@ -28,6 +28,7 @@ namespace Gotrue.Tests.Pkce;
 [TestCategory("Contract")]
 public class PkceContractTests
 {
+    private const string CallerVerifier = "a-caller-supplied-verifier";
     private static readonly ResendParameters SignUpByEmail = new(ResendType.SignUp, "test@example.com", null, null);
 
     private IGotrueClient<User, Session> client = null!;
@@ -69,6 +70,17 @@ public class PkceContractTests
         request.ReadJsonBodyField("code_challenge_method").Should().Be("s256");
         request.ReadJsonBodyField("code_challenge").Should().Be(S256(state.PKCEVerifier!),
             "the server must receive BASE64URL(SHA256(verifier)) per RFC 7636 §4.2");
+    }
+
+    [TestMethod]
+    public async Task ResetPasswordForEmail_ShouldGenerateItsOwnVerifier_GivenDeprecatedOptionsVerifier()
+    {
+        this.StubJsonOk("/recover");
+        var options = new ResetPasswordForEmailOptions("test@example.com") { FlowType = OAuthFlowType.PKCE };
+        typeof(ResetPasswordForEmailOptions).GetProperty("PKCEVerifier")!.SetValue(options, CallerVerifier);
+        var state = await this.client.ResetPasswordForEmail(options);
+        state.PKCEVerifier.Should().NotBe(CallerVerifier,
+            "the options verifier is obsolete and never read: the SDK generates the verifier and returns it on the state");
     }
 
     [TestMethod]
