@@ -535,10 +535,10 @@ features:
       - Client.Connect
       - Client.ConnectAsync
   realtime.client.connection_state:
-    status: partially_implemented
-    note: "Socket state delivered via SocketStateEventHandler events; no synchronous connection-state getter on the client."
+    status: implemented
     symbols:
       - Client.AddStateChangedHandler
+      - Client.ConnectionState
   realtime.client.disconnect:
     status: implemented
     symbols:
@@ -564,6 +564,10 @@ features:
     symbols:
       - Client.SetAuth
 
+  realtime.channel.broadcast_http:
+    status: implemented
+    symbols:
+      - RealtimeChannel.HttpSendAsync
   realtime.channel.broadcast:
     status: implemented
     symbols:
@@ -594,7 +598,7 @@ features:
       - SupabaseTable.On
   realtime.subscriptions.subscribe_presence:
     status: partially_implemented
-    note: "Join/leave/sync handlers exist, but the presence sync diverges from JS (see realtime.presence.presence_state)."
+    note: "Join and Leave handlers get no key or presences, and a presence_state snapshot raises Sync only, not Join or Leave."
     symbols:
       - RealtimePresence
   realtime.subscriptions.postgres_changes_filter:
@@ -629,8 +633,7 @@ features:
       - RealtimeChannel.Register
 
   realtime.presence.presence_state:
-    status: partially_implemented
-    note: "Typed CurrentState/LastState exist, but the initial presence snapshot is dropped, so any client that joins after others undercounts everyone — a behavioral gap, not just a shape gap."
+    status: implemented
     symbols:
       - RealtimePresence.CurrentState
       - RealtimePresence.LastState
@@ -655,6 +658,10 @@ features:
     status: implemented
     symbols:
       - ClientOptions.HeartbeatInterval
+  realtime.configuration.access_token_callback:
+    status: implemented
+    symbols:
+      - ClientOptions.RetrieveAccessToken
   realtime.configuration.deferred_disconnect:
     status: partially_implemented
     note: "Opt-in (null by default, socket otherwise stays open); after the deferred disconnect the caller must call ConnectAsync again before creating channels, there is no automatic reconnect."
