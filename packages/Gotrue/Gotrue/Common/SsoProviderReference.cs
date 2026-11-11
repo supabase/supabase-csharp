@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text;
 
 namespace Supabase.Gotrue.Common;
 
@@ -14,13 +15,19 @@ public sealed record SsoProviderReference
 
     private static readonly string[] CharactersTheServerReadsOnlyUnescaped = { "+", "$", "&", ",", ":", ";", "=", "@" };
 
-    private SsoProviderReference(string routeSegment) => this.RouteSegment = routeSegment;
+    private readonly string addressee;
+
+    private SsoProviderReference(string routeSegment, string addressee)
+    {
+        this.RouteSegment = routeSegment;
+        this.addressee = addressee;
+    }
 
     internal string RouteSegment { get; }
 
     /// <summary>The provider with this id.</summary>
     /// <param name="id">The provider's <see cref="SsoProvider.Id" />.</param>
-    public static SsoProviderReference ById(Guid id) => new(id.ToString());
+    public static SsoProviderReference ById(Guid id) => new(id.ToString(), $"Id = {id}");
 
     /// <summary>The provider registered with this resource ID.</summary>
     /// <param name="resourceId">The provider's <see cref="SsoProvider.ResourceId" />.</param>
@@ -30,7 +37,13 @@ public sealed record SsoProviderReference
     /// by its resource ID. Address it <see cref="ById" /> instead.
     /// </exception>
     public static SsoProviderReference ByResourceId(string resourceId) =>
-        new(ResourceIdPrefix + EscapeForRoute(EnsureAddressable(resourceId)));
+        new(ResourceIdPrefix + EscapeForRoute(EnsureAddressable(resourceId)), $"ResourceId = {resourceId}");
+
+    private bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(this.addressee);
+        return true;
+    }
 
     private static string EnsureAddressable(string resourceId)
     {
