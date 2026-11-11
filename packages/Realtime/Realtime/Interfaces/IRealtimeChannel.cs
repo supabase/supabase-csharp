@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Channel;
@@ -232,6 +233,18 @@ public interface IRealtimeChannel
     /// <param name="timeoutMs"></param>
     /// <returns></returns>
     Task<bool> Send(ChannelEventName eventType, string? type, object payload, int timeoutMs = DefaultTimeout);
+
+    /// <summary>
+    /// Broadcasts through the REST API instead of the websocket, so the channel does not have to be subscribed.
+    /// A <c>byte[]</c> is sent as raw binary, which this client's subscribers do not receive.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var channel = client.Channel("cursor");
+    /// await channel.HttpSendAsync("cursor", new MouseStatus { MouseX = 123, MouseY = 456 });
+    /// </code>
+    /// </example>
+    Task HttpSendAsync(string eventName, object payload, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Register broadcast options, must be called to use <see cref="IRealtimeBroadcast"/>, and prior to <see cref="Subscribe"/>

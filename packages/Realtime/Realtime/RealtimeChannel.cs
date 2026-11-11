@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Supabase.Core.Attributes;
@@ -598,6 +599,11 @@ public class RealtimeChannel : IRealtimeChannel
             ? Task.FromResult(true)
             : PushAwaiter.Await(push);
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.channel.broadcast_http")]
+    public Task HttpSendAsync(string eventName, object payload, CancellationToken cancellationToken = default) =>
+        this.Socket.HttpSendAsync(this, eventName, payload, cancellationToken);
 
     /// <summary>
     /// Awaits a reply for a given <see cref="Channel.Push"/>, resolving with whether a known reply was
