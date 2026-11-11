@@ -69,6 +69,23 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     TUser? CurrentUser { get; }
 
     /// <summary>
+    ///     Why the user was signed out: an explicit sign-out, a session the server rejected, or a stored session
+    ///     that could not be recovered. Read it while handling <see cref="AuthState.SignedOut" /> to tell a
+    ///     voluntary sign-out from an involuntary one. It is <c>null</c> while a user is signed in, and when the
+    ///     client cannot tell why no user is signed in.
+    /// </summary>
+    /// <example>
+    ///     <code>
+    ///     client.AddStateChangedListener((sender, state) =>
+    ///     {
+    ///         if (state == AuthState.SignedOut &amp;&amp; sender.SignOutReason == SignOutReason.SessionExpired)
+    ///             ShowSessionExpiredNotice();
+    ///     });
+    ///     </code>
+    /// </example>
+    SignOutReason? SignOutReason { get; }
+
+    /// <summary>
     ///     Returns the client options.
     /// </summary>
     ClientOptions Options { get; }
@@ -307,7 +324,9 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="options">The redirect uri and captcha token, if any</param>
     /// <returns>
     ///     The Uri returned from supabase auth that a user can use to sign in to their given SSO provider (okta,
-    ///     microsoft entra, gsuite ect...)
+    ///     microsoft entra, gsuite ect...). With the PKCE flow, it also carries the
+    ///     <see cref="ProviderAuthState.PKCEVerifier" /> to pass to <see cref="ExchangeCodeForSession" /> with the code
+    ///     the SSO callback returns.
     /// </returns>
     Task<SSOResponse?> SignInWithSSO(Guid providerId, SignInWithSSOOptions? options = null);
 
@@ -324,7 +343,9 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="options">The redirect uri and captcha token, if any</param>
     /// <returns>
     ///     The Uri returned from supabase auth that a user can use to sign in to their given SSO provider (okta,
-    ///     microsoft entra, gsuite ect...)
+    ///     microsoft entra, gsuite ect...). With the PKCE flow, it also carries the
+    ///     <see cref="ProviderAuthState.PKCEVerifier" /> to pass to <see cref="ExchangeCodeForSession" /> with the code
+    ///     the SSO callback returns.
     /// </returns>
     Task<SSOResponse?> SignInWithSSO(string domain, SignInWithSSOOptions? options = null);
 
@@ -405,11 +426,20 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <summary>
     ///     Signs out and invalidates all sessions for a user.
     /// </summary>
+    /// <remarks>
+    ///     What happens to this device's session depends on <paramref name="scope" />:
+    ///     - <see cref="SignOutScope.Global" />: the session is cleared, and <c>SignedOut</c> raised, only once the
+    ///     server has ended the user's sessions, or answers that the user no longer exists. When the server refuses
+    ///     or cannot be reached, the session is kept and the <see cref="GotrueException" /> is thrown, so you can
+    ///     retry, or fall back to <see cref="SignOutScope.Local" /> to sign this device out regardless.
+    ///     - <see cref="SignOutScope.Local" />: the session is always cleared; a server failure is still thrown.
+    ///     - <see cref="SignOutScope.Others" />: the session is never cleared.
+    /// </remarks>
     /// <param name="scope">
     ///     Determines which sessions should be invalidated. By default, it will invalidate all session for a
     ///     user
     /// </param>
-    /// <returns></returns>
+    /// <exception cref="GotrueException">The server refused the sign-out or could not be reached.</exception>
     Task SignOut(SignOutScope scope = SignOutScope.Global);
 
     /// <summary>

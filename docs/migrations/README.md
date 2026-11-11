@@ -10,3 +10,4 @@ All packages are versioned in lockstep, so a major bump applies to every
 | Version | Guide |
 | --- | --- |
 | 8.0.0 | [Migrating to 8.0.0](./v8.0.0.md) |
+| 9.0.0 (unreleased) | [Migrating to 9.0.0](./v9.0.0.md) |

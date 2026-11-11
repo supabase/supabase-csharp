@@ -21,6 +21,7 @@ using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
 using Supabase.Gotrue.SignInWithWeb3;
+using static Supabase.Gotrue.Common.SignOutReason;
 using static Supabase.Gotrue.Constants;
 using static Supabase.Gotrue.Constants.AuthState;
 using static Supabase.Gotrue.Exceptions.FailureHint.Reason;
@@ -222,6 +223,10 @@ public class Client : IGotrueClient<User, Session>
     /// <inheritdoc />
     [ImplementedCapability("auth.session.get_session")]
     public Session? CurrentSession { get; private set; }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.session.sign_out_reason")]
+    public SignOutReason? SignOutReason { get; private set; }
 
     /// <inheritdoc />
     [PartialCapability("auth.sign_in.sign_up", "API mirrors signUp, but on a session-returning sign-up (confirmations off) C# does NOT adopt the session — CurrentUser/CurrentSession stay null, so 'signed up' != 'signed in' as in JS.")]
@@ -570,19 +575,54 @@ public class Client : IGotrueClient<User, Session>
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignOut);
         activity?.SetTag(GotrueInstrumentation.Tags.SignOutScope, scope.ToString());
+        switch (scope)
+        {
+            case SignOutScope.Global:
+                await this.SignOutEverywhereAsync().ConfigureAwait(false);
+                break;
+            case SignOutScope.Local:
+                await this.SignOutThisDeviceAsync().ConfigureAwait(false);
+                break;
+            default:
+                await this.RevokeSessionsAsync(scope).ConfigureAwait(false);
+                break;
+        }
+    }
+
+    private async Task SignOutEverywhereAsync()
+    {
+        await this.RevokeSessionsUnlessUserIsGoneAsync().ConfigureAwait(false);
+        await this.EndSessionAsync(UserInitiated).ConfigureAwait(false);
+    }
+
+    private async Task RevokeSessionsUnlessUserIsGoneAsync()
+    {
         try
         {
-            if (this.CurrentSession?.AccessToken != null)
-            {
-                await this.api.SignOut(this.CurrentSession.AccessToken, scope).ConfigureAwait(false);
-            }
+            await this.RevokeSessionsAsync(SignOutScope.Global).ConfigureAwait(false);
+        }
+        catch (GotrueException ex) when (ex.Reason == UserNotFound)
+        {
+        }
+    }
+
+    private async Task SignOutThisDeviceAsync()
+    {
+        try
+        {
+            await this.RevokeSessionsAsync(SignOutScope.Local).ConfigureAwait(false);
         }
         finally
         {
-            if (scope != SignOutScope.Others)
-            {
-                await this.UpdateSessionAsync(null).ConfigureAwait(false);
-            }
+            await this.EndSessionAsync(UserInitiated).ConfigureAwait(false);
+        }
+    }
+
+    private async Task RevokeSessionsAsync(SignOutScope scope)
+    {
+        if (this.CurrentSession?.AccessToken is { } accessToken)
+        {
+            await this.api.SignOut(accessToken, scope).ConfigureAwait(false);
         }
     }
 
@@ -811,10 +851,11 @@ public class Client : IGotrueClient<User, Session>
 
     /// <inheritdoc />
     [ImplementedCapability("auth.sign_in.exchange_code_for_session")]
+    [ImplementedCapability("auth.sign_in.concurrent_pkce_flows", "The SDK never stores a code verifier: every PKCE-starting call returns its own verifier and ExchangeCodeForSession takes it explicitly, so concurrent flows cannot overwrite each other and no flow id is needed.")]
     public async Task<Session?> ExchangeCodeForSession(string codeVerifier, string authCode)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.ExchangeCode);
-        var result = await this.api.ExchangeCodeForSession(codeVerifier, authCode);
+        var result = await this.api.ExchangeCodeForSession(codeVerifier, authCode).ConfigureAwait(false);
         if (result != null)
         {
             await this.UpdateSessionAsync(result).ConfigureAwait(false);
@@ -1001,11 +1042,13 @@ public class Client : IGotrueClient<User, Session>
         {
             return;
         }
-        if (this.SetCurrentSession(loaded) is { } stateChanged)
+        if (this.SetCurrentSession(loaded, SignOutReasonOnRestore(loaded)) is { } stateChanged)
         {
             this.NotifyAuthStateChange(stateChanged);
         }
     }
+
+    private static SignOutReason? SignOutReasonOnRestore(Session? loaded) => loaded == null ? SessionMissing : null;
 
     /// <inheritdoc />
     public Task<Settings?> Settings()
@@ -1319,13 +1362,16 @@ public class Client : IGotrueClient<User, Session>
     private string RetrieveAccessTokenOrThrow() =>
         this.CurrentSession?.AccessToken ?? throw new GotrueException("A valid session is required.", NoSessionFound);
 
-    private AuthState? SetCurrentSession(Session? session)
+    private AuthState? SetCurrentSession(Session? session) => this.SetCurrentSession(session, null);
+
+    private AuthState? SetCurrentSession(Session? session, SignOutReason? reason)
     {
         bool dirty;
         lock (this.refreshGate)
         {
             dirty = this.CurrentSession != session;
             this.CurrentSession = session;
+            this.SignOutReason = reason;
             if (session == null)
             {
                 // The session and the in-flight attempt clear together, so a concurrent RefreshToken cannot see one without the other.
@@ -1340,7 +1386,10 @@ public class Client : IGotrueClient<User, Session>
     }
 
     // Writes the session only while the given refresh token is still the current one.
-    private bool TryReplaceSession(Session? session, string expectedRefreshToken)
+    private bool TryReplaceSession(Session? session, string expectedRefreshToken) =>
+        this.TryReplaceSession(session, null, expectedRefreshToken);
+
+    private bool TryReplaceSession(Session? session, SignOutReason? reason, string expectedRefreshToken)
     {
         lock (this.refreshGate)
         {
@@ -1348,9 +1397,15 @@ public class Client : IGotrueClient<User, Session>
             {
                 return false;
             }
-            this.SetCurrentSession(session);
+            this.SetCurrentSession(session, reason);
             return true;
         }
+    }
+
+    private async Task EndSessionAsync(SignOutReason reason)
+    {
+        this.SetCurrentSession(null, reason);
+        await this.NotifyAuthStateChangeAsync(SignedOut).ConfigureAwait(false);
     }
 
     private async Task UpdateSessionAsync(Session? session, CancellationToken cancellationToken = default)
@@ -1370,7 +1425,7 @@ public class Client : IGotrueClient<User, Session>
     // Only signs out the session the token belonged to.
     private async Task ClearRejectedSessionAsync(string refreshToken)
     {
-        if (!this.TryReplaceSession(null, refreshToken) || this.CurrentSession != null)
+        if (!this.TryReplaceSession(null, SessionExpired, refreshToken) || this.CurrentSession != null)
         {
             return;
         }
