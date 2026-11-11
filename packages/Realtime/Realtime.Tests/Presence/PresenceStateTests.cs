@@ -47,6 +47,27 @@ public class PresenceStateTests
         "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\",\"phx_ref_prev\":\"r1\",\"time\":\"2023-09-01T11:00:00Z\"}]}}," +
         "\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\",\"time\":\"2023-09-01T10:00:00Z\"}]}}}}";
 
+    // Two users present, then user-1 re-tracks while user-3 joins and user-2 leaves in the same diff.
+    private const string TwoUsersStateFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_state\",\"ref\":\"s7\"," +
+        "\"payload\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]},\"user-2\":{\"metas\":[{\"phx_ref\":\"q1\"}]}}}";
+
+    private const string TrackAndJoinFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s8\"," +
+        "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\",\"phx_ref_prev\":\"r1\"}]},\"user-3\":{\"metas\":[{\"phx_ref\":\"t1\"}]}}," +
+        "\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]}}}}";
+
+    private const string TrackAndLeaveFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s9\"," +
+        "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\",\"phx_ref_prev\":\"r1\"}]}}," +
+        "\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]},\"user-2\":{\"metas\":[{\"phx_ref\":\"q1\"}]}}}}";
+
+    // The same key joins and leaves, but the leave removes every meta: the user is gone, so both events fire.
+    private const string JoinAndLeaveAllFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s10\"," +
+        "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\"}]}}," +
+        "\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"},{\"phx_ref\":\"r2\"}]}}}}";
+
     private static (RealtimeChannel channel, RealtimePresence<PresenceExample> presence) Presence()
     {
         var channel = Wire.Channel("realtime:online-users");
@@ -106,6 +127,50 @@ public class PresenceStateTests
             syncs.Should().Be(1);
             joins.Should().Be(0, "the user was already present; the join is the replacement meta");
             leaves.Should().Be(0, "the leave is the previous phx_ref and the user is still present");
+        }
+    }
+
+    private static (int joins, int leaves) Replay(string stateFrame, string diffFrame)
+    {
+        var (channel, presence) = Presence();
+        channel.HandleSocketMessage(Wire.Decode(stateFrame));
+        int joins = 0, leaves = 0;
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Join, (_, _) => joins++);
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Leave, (_, _) => leaves++);
+        channel.HandleSocketMessage(Wire.Decode(diffFrame));
+        return (joins, leaves);
+    }
+
+    [TestMethod]
+    public void HandleSocketMessage_ShouldStillRaiseJoin_GivenTrackOfOneUserAndJoinOfAnother()
+    {
+        var (joins, leaves) = Replay(TwoUsersStateFrame, TrackAndJoinFrame);
+        using (new AssertionScope())
+        {
+            joins.Should().Be(1, "user-3 really joined");
+            leaves.Should().Be(0, "user-1 only replaced its meta");
+        }
+    }
+
+    [TestMethod]
+    public void HandleSocketMessage_ShouldStillRaiseLeave_GivenTrackOfOneUserAndLeaveOfAnother()
+    {
+        var (joins, leaves) = Replay(TwoUsersStateFrame, TrackAndLeaveFrame);
+        using (new AssertionScope())
+        {
+            joins.Should().Be(0, "user-1 only replaced its meta");
+            leaves.Should().Be(1, "user-2 really left");
+        }
+    }
+
+    [TestMethod]
+    public void HandleSocketMessage_ShouldRaiseJoinAndLeave_GivenKeyThatEndsAbsent()
+    {
+        var (joins, leaves) = Replay(StateFrame, JoinAndLeaveAllFrame);
+        using (new AssertionScope())
+        {
+            joins.Should().Be(1);
+            leaves.Should().Be(1);
         }
     }
 
