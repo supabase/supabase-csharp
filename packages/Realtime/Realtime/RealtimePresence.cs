@@ -24,20 +24,20 @@ namespace Supabase.Realtime;
 /// If a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state.
 /// </summary>
 /// <typeparam name="TPresenceModel">A model representing expected payload.</typeparam>
-[PartialCapability("realtime.subscriptions.subscribe_presence", "Join/leave/sync handlers exist, but the presence sync diverges from JS (see realtime.presence.presence_state).")]
+[PartialCapability("realtime.subscriptions.subscribe_presence", "Join and Leave handlers get no key or presences, and a presence_state snapshot raises Sync only, not Join or Leave.")]
 public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenceModel : BasePresence
 {
     /// <summary>
     /// The Last State of this Presence instance.
     /// </summary>
-    [PartialCapability("realtime.presence.presence_state", "Typed CurrentState/LastState exist, but the initial presence snapshot is dropped, so any client that joins after others undercounts everyone — a behavioral gap, not just a shape gap.")]
+    [ImplementedCapability("realtime.presence.presence_state")]
     public Dictionary<string, List<TPresenceModel>> LastState { get; private set; } =
         new();
 
     /// <summary>
     /// The Current State of this Presence instance.
     /// </summary>
-    [PartialCapability("realtime.presence.presence_state", "Typed CurrentState/LastState exist, but the initial presence snapshot is dropped, so any client that joins after others undercounts everyone — a behavioral gap, not just a shape gap.")]
+    [ImplementedCapability("realtime.presence.presence_state")]
     public Dictionary<string, List<TPresenceModel>> CurrentState { get; } = new();
 
     private PresenceOptions options;
