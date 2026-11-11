@@ -800,7 +800,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<Session?> ExchangeCodeForSession(string codeVerifier, string authCode)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.ExchangeCode);
-        var result = await this.api.ExchangeCodeForSession(codeVerifier, authCode);
+        var result = await this.api.ExchangeCodeForSession(codeVerifier, authCode).ConfigureAwait(false);
         if (result != null)
         {
             await this.UpdateSessionAsync(result).ConfigureAwait(false);
