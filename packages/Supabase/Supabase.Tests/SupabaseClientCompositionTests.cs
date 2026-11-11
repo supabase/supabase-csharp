@@ -164,6 +164,7 @@ public class SupabaseClientCompositionTests
     [DataRow(AuthState.SignedIn)]
     [DataRow(AuthState.TokenRefreshed)]
     [DataRow(AuthState.UserUpdated)]
+    [DataRow(AuthState.MfaChallengeVerified)]
     public void SupabaseClient_ShouldForwardAccessTokenToRealtime_GivenAuthStateCarriesSession(AuthState state)
     {
         var realtime = RealtimeSubstitute();
