@@ -7,6 +7,7 @@ using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.Interfaces;
+using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
@@ -196,6 +197,16 @@ public class AdminClient : IGotrueAdminClient<User>
     [ImplementedCapability("auth.sso_admin.get_provider")]
     public Task<SsoProvider> GetSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default) =>
         this.api.GetSsoProviderAsync(this.serviceKey, provider, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.list_providers")]
+    public Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(SsoProviderFilter? filter = null, CancellationToken cancellationToken = default) =>
+        this.api.ListSsoProvidersAsync(this.serviceKey, filter, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.delete_provider")]
+    public Task DeleteSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default) =>
+        this.api.DeleteSsoProviderAsync(this.serviceKey, provider, cancellationToken);
 
     /// <inheritdoc />
     [ImplementedCapability("auth.sso_admin.create_provider")]

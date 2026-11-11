@@ -20,7 +20,9 @@ namespace Gotrue.Tests.Common;
 /// <summary>
 ///     Base for end-to-end SSO provider tests against the live stack: each test registers its own provider, with an
 ///     entity ID, domain and resource ID no other test uses, through the admin API directly so the assertions only
-///     exercise the SDK call under test. Every provider the test seeds or creates is removed after it.
+///     exercise the SDK call under test. A test that needs several providers registers the others with
+///     <see cref="SeedAnotherProvider" />, each with an entity ID and domain of its own. Every provider the test
+///     seeds or creates is removed after it.
 /// </summary>
 public abstract class SsoProviderAdminFixture : AdminFixture
 {
@@ -29,9 +31,9 @@ public abstract class SsoProviderAdminFixture : AdminFixture
 
     private readonly List<Guid> providersToRemove = new();
 
-    protected string EntityId { get; } = $"https://idp.{RandomString(12)}.example.com/saml";
+    protected string EntityId { get; } = UniqueEntityId();
 
-    protected string Domain { get; } = $"{RandomString(12)}.example.com";
+    protected string Domain { get; } = UniqueDomain();
 
     [TestCleanup]
     public async Task RemoveProviders()
@@ -40,14 +42,19 @@ public abstract class SsoProviderAdminFixture : AdminFixture
             (await SendAdminRequest(HttpMethod.Delete, $"{TestClients.CliAuthUrl}/admin/sso/providers/{provider}")).Dispose();
     }
 
-    protected async Task<Guid> SeedProvider(string resourceId)
+    protected Task<Guid> SeedProvider(string resourceId) => this.SeedProvider(resourceId, this.EntityId, this.Domain);
+
+    protected Task<Guid> SeedAnotherProvider(string resourceId) =>
+        this.SeedProvider(resourceId, UniqueEntityId(), UniqueDomain());
+
+    private async Task<Guid> SeedProvider(string resourceId, string entityId, string domain)
     {
         using var created = await SendAdminRequest(HttpMethod.Post, $"{TestClients.CliAuthUrl}/admin/sso/providers", JsonSerializer.Serialize(new Dictionary<string, object>
         {
             ["type"] = "saml",
-            ["metadata_xml"] = this.MetadataXml,
+            ["metadata_xml"] = MetadataXmlFor(entityId),
             ["resource_id"] = resourceId,
-            ["domains"] = new[] { this.Domain },
+            ["domains"] = new[] { domain },
             ["name_id_format"] = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress",
             ["attribute_mapping"] = new { keys = new { email = new { name = "mail", names = new[] { "email" } } } },
         }));
@@ -64,6 +71,10 @@ public abstract class SsoProviderAdminFixture : AdminFixture
     protected static string MetadataXmlFor(string entityId) =>
         File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Common", "Data", "saml_idp_metadata.xml"))
             .Replace("{{entity_id}}", entityId);
+
+    private static string UniqueEntityId() => $"https://idp.{RandomString(12)}.example.com/saml";
+
+    private static string UniqueDomain() => $"{RandomString(12)}.example.com";
 
     private static async Task<HttpResponseMessage> SendAdminRequest(HttpMethod method, string url, string? json = null)
     {

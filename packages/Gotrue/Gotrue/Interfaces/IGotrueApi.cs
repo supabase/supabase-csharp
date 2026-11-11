@@ -10,6 +10,7 @@ using Supabase.Gotrue.CreateCustomProvider;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
+using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
@@ -313,6 +314,27 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null.</exception>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<SsoProvider> GetSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the single sign-on (SAML 2.0) identity providers registered on the project, optionally only those a
+    /// filter selects.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="filter">Only the providers this filter selects; every provider when null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The providers, without their metadata XML.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(string jwt, SsoProviderFilter? filter = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a single sign-on (SAML 2.0) identity provider, together with its email domains.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="provider">The provider, addressed by its id or by its resource ID.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task DeleteSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Registers a single sign-on (SAML 2.0) identity provider from its metadata.
