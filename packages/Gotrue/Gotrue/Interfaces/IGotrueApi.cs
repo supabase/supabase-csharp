@@ -7,6 +7,7 @@ using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Mfa;
@@ -312,6 +313,18 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null.</exception>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<SsoProvider> GetSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers a single sign-on (SAML 2.0) identity provider from its metadata.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="metadata">The identity provider's metadata, from a URL the server fetches or as XML.</param>
+    /// <param name="options">Optional settings; the server applies its defaults to those left null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="metadata" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<SsoProvider> CreateSsoProviderAsync(string jwt, SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Links an oauth identity to an existing user.

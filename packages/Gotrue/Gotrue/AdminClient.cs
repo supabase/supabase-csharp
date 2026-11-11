@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
@@ -195,6 +196,11 @@ public class AdminClient : IGotrueAdminClient<User>
     [ImplementedCapability("auth.sso_admin.get_provider")]
     public Task<SsoProvider> GetSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default) =>
         this.api.GetSsoProviderAsync(this.serviceKey, provider, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.create_provider")]
+    public Task<SsoProvider> CreateSsoProviderAsync(SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default) =>
+        this.api.CreateSsoProviderAsync(this.serviceKey, metadata, options, cancellationToken);
 
     /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
@@ -392,4 +393,52 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<SsoProvider> GetSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers a single sign-on (SAML 2.0) identity provider from its metadata. Requires a full-access API key, such
+    /// as the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="metadata">
+    /// The identity provider's metadata, given <see cref="SamlMetadata.FromUrl" /> or
+    /// <see cref="SamlMetadata.FromXml" />. From a URL, the server fetches the metadata before it answers, so the
+    /// call lasts as long as that fetch; <paramref name="cancellationToken" /> bounds it.
+    /// </param>
+    /// <param name="options">
+    /// Optional settings, such as email domains or attribute mapping. The server applies its defaults to those left
+    /// null.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="metadata" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.ErrorCode" /> is
+    /// <c>validation_failed</c> when a setting is invalid (for example a metadata URL that is not HTTPS, or metadata
+    /// without an entity ID), <c>saml_metadata_fetch_failed</c> when the metadata URL answers with an error,
+    /// <c>saml_idp_already_exists</c> when a provider already has the metadata's entity ID,
+    /// <c>sso_domain_already_exists</c> when another provider already has one of the domains, and
+    /// <c>unexpected_failure</c> when the metadata XML cannot be parsed or the metadata URL cannot be reached.
+    /// <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    /// using Supabase.Gotrue.CreateSsoProvider;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var provider = await admin.CreateSsoProviderAsync(
+    ///     SamlMetadata.FromUrl(new Uri("https://idp.acme.com/saml/metadata")),
+    ///     new SsoProviderOptions
+    ///     {
+    ///         Domains = new[] { "acme.com" },
+    ///         ResourceId = "acme",
+    ///         NameIdFormat = SamlNameIdFormat.EmailAddress,
+    ///         AttributeMapping = new Dictionary&lt;string, SamlAttribute&gt;
+    ///         {
+    ///             ["email"] = new() { Names = new[] { "mail", "email" } },
+    ///         },
+    ///     });
+    /// </code>
+    /// </example>
+    Task<SsoProvider> CreateSsoProviderAsync(SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default);
 }

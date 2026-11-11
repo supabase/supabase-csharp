@@ -1,0 +1,1 @@
+﻿{"type":"saml","metadata_xml":"<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"https://idp.acme.com/saml\"/>"}

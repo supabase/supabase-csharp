@@ -20,14 +20,14 @@ namespace Gotrue.Tests.Common;
 /// <summary>
 ///     Base for end-to-end SSO provider tests against the live stack: each test registers its own provider, with an
 ///     entity ID, domain and resource ID no other test uses, through the admin API directly so the assertions only
-///     exercise the SDK call under test. The provider is removed after the test.
+///     exercise the SDK call under test. Every provider the test seeds or creates is removed after it.
 /// </summary>
 public abstract class SsoProviderAdminFixture : AdminFixture
 {
     private static readonly HttpClient AdminApi = new();
     private static readonly string ServiceKey = GenerateServiceRoleToken(TestClients.CliJwtSecret);
 
-    private readonly List<Guid> seededProviders = new();
+    private readonly List<Guid> providersToRemove = new();
 
     protected string EntityId { get; } = $"https://idp.{RandomString(12)}.example.com/saml";
 
@@ -36,7 +36,7 @@ public abstract class SsoProviderAdminFixture : AdminFixture
     [TestCleanup]
     public async Task RemoveProviders()
     {
-        foreach (var provider in this.seededProviders)
+        foreach (var provider in this.providersToRemove)
             (await SendAdminRequest(HttpMethod.Delete, $"{TestClients.CliAuthUrl}/admin/sso/providers/{provider}")).Dispose();
     }
 
@@ -53,13 +53,17 @@ public abstract class SsoProviderAdminFixture : AdminFixture
         }));
         created.EnsureSuccessStatusCode();
         var id = JsonDocument.Parse(await created.Content.ReadAsStringAsync()).RootElement.GetProperty("id").GetGuid();
-        this.seededProviders.Add(id);
+        this.RemoveAfterTest(id);
         return id;
     }
 
-    protected string MetadataXml =>
+    protected void RemoveAfterTest(Guid providerId) => this.providersToRemove.Add(providerId);
+
+    protected string MetadataXml => MetadataXmlFor(this.EntityId);
+
+    protected static string MetadataXmlFor(string entityId) =>
         File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Common", "Data", "saml_idp_metadata.xml"))
-            .Replace("{{entity_id}}", this.EntityId);
+            .Replace("{{entity_id}}", entityId);
 
     private static async Task<HttpResponseMessage> SendAdminRequest(HttpMethod method, string url, string? json = null)
     {
