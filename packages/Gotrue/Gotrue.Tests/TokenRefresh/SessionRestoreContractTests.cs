@@ -15,6 +15,7 @@ using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Supabase.Gotrue;
+using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
 using WireMock.RequestBuilders;
@@ -275,6 +276,28 @@ public class SessionRestoreContractTests
         await refresh;
         client.CurrentSession.Should().BeNull("the refresh belonged to the session that was signed out");
         stateChanges.Should().NotContain(TokenRefreshed);
+    }
+
+    [TestMethod]
+    public async Task SignOut_ShouldBeAnnouncedOnce_GivenTheRefreshInFlightIsRejectedAfterwards()
+    {
+        var handler = new GatedHandler(HttpStatusCode.BadRequest, "token_not_found_error.json");
+        var client = this.Restore(TestClients.Against(this.server, httpClient: new HttpClient(handler)));
+        var signOuts = new List<SignOutReason?>();
+        client.AddStateChangedListener((sender, state) =>
+        {
+            if (state == SignedOut)
+            {
+                signOuts.Add(sender.SignOutReason);
+            }
+        });
+        var refresh = client.RefreshToken();
+        await handler.Started;
+        await client.SignOut();
+        handler.Release();
+        await refresh.ContinueWith(_ => { }, TaskScheduler.Default);
+        signOuts.Should().Equal(new SignOutReason?[] { SignOutReason.UserInitiated },
+            "the rejected refresh belonged to a session the user had already signed out of");
     }
 
     [TestMethod]
