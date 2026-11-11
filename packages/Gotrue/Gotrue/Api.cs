@@ -855,6 +855,16 @@ public class Api : IGotrueApi<User, Session>
         $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}";
 
     /// <inheritdoc />
+    public async Task<SsoProvider> GetSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default)
+    {
+        var found = await this.MakeRequestAsync<SsoProviderResponse>(HttpMethod.Get, this.SsoProviderUrl(provider), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return SsoProviderResponse.Read(found);
+    }
+
+    private string SsoProviderUrl(SsoProviderReference provider) =>
+        $"{this.Url}/admin/sso/providers/{(provider ?? throw new ArgumentNullException(nameof(provider))).RouteSegment}";
+
+    /// <inheritdoc />
     public async Task<ProviderAuthState> LinkIdentity(string token, Provider provider, SignInOptions options)
     {
         var state = Helpers.GetUrlForProvider($"{this.Url}/user/identities/authorize", provider, options);

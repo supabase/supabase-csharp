@@ -303,6 +303,17 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(string jwt, CustomProviderType? type = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Fetches a single sign-on (SAML 2.0) identity provider, including its metadata XML and email domains.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="provider">The provider, addressed by its id or by its resource ID.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<SsoProvider> GetSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Links an oauth identity to an existing user.
     ///
     /// This method requires the PKCE flow.

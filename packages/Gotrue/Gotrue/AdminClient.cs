@@ -192,6 +192,11 @@ public class AdminClient : IGotrueAdminClient<User>
         this.api.ListCustomProvidersAsync(this.serviceKey, type, cancellationToken);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.get_provider")]
+    public Task<SsoProvider> GetSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default) =>
+        this.api.GetSsoProviderAsync(this.serviceKey, provider, cancellationToken);
+
+    /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)
     {
         var result = await this.api.UpdateUser(this.serviceKey, attributes);

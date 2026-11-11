@@ -1,13 +1,89 @@
 #nullable enable
+override Supabase.Gotrue.Common.SamlAttribute.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.SamlAttribute.GetHashCode() -> int
+override Supabase.Gotrue.Common.SamlAttribute.ToString() -> string!
+override Supabase.Gotrue.Common.SamlConfiguration.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.SamlConfiguration.GetHashCode() -> int
+override Supabase.Gotrue.Common.SamlConfiguration.ToString() -> string!
+override Supabase.Gotrue.Common.SsoProvider.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.SsoProvider.GetHashCode() -> int
+override Supabase.Gotrue.Common.SsoProvider.ToString() -> string!
+override Supabase.Gotrue.Common.SsoProviderReference.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.SsoProviderReference.GetHashCode() -> int
+override Supabase.Gotrue.Common.SsoProviderReference.ToString() -> string!
+static Supabase.Gotrue.Common.SamlAttribute.operator !=(Supabase.Gotrue.Common.SamlAttribute? left, Supabase.Gotrue.Common.SamlAttribute? right) -> bool
+static Supabase.Gotrue.Common.SamlAttribute.operator ==(Supabase.Gotrue.Common.SamlAttribute? left, Supabase.Gotrue.Common.SamlAttribute? right) -> bool
+static Supabase.Gotrue.Common.SamlConfiguration.operator !=(Supabase.Gotrue.Common.SamlConfiguration? left, Supabase.Gotrue.Common.SamlConfiguration? right) -> bool
+static Supabase.Gotrue.Common.SamlConfiguration.operator ==(Supabase.Gotrue.Common.SamlConfiguration? left, Supabase.Gotrue.Common.SamlConfiguration? right) -> bool
+static Supabase.Gotrue.Common.SsoProvider.operator !=(Supabase.Gotrue.Common.SsoProvider? left, Supabase.Gotrue.Common.SsoProvider? right) -> bool
+static Supabase.Gotrue.Common.SsoProvider.operator ==(Supabase.Gotrue.Common.SsoProvider? left, Supabase.Gotrue.Common.SsoProvider? right) -> bool
+static Supabase.Gotrue.Common.SsoProviderReference.ById(System.Guid id) -> Supabase.Gotrue.Common.SsoProviderReference!
+static Supabase.Gotrue.Common.SsoProviderReference.ByResourceId(string! resourceId) -> Supabase.Gotrue.Common.SsoProviderReference!
+static Supabase.Gotrue.Common.SsoProviderReference.operator !=(Supabase.Gotrue.Common.SsoProviderReference? left, Supabase.Gotrue.Common.SsoProviderReference? right) -> bool
+static Supabase.Gotrue.Common.SsoProviderReference.operator ==(Supabase.Gotrue.Common.SsoProviderReference? left, Supabase.Gotrue.Common.SsoProviderReference? right) -> bool
+Supabase.Gotrue.AdminClient.GetSsoProviderAsync(Supabase.Gotrue.Common.SsoProviderReference! provider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.SsoProvider!>!
+Supabase.Gotrue.Api.GetSsoProviderAsync(string! jwt, Supabase.Gotrue.Common.SsoProviderReference! provider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.SsoProvider!>!
 Supabase.Gotrue.Api.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session!>!
 Supabase.Gotrue.Api.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.Client.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session!>!
 Supabase.Gotrue.Client.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?
 Supabase.Gotrue.Client.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
+Supabase.Gotrue.Common.SamlAttribute
+Supabase.Gotrue.Common.SamlAttribute.<Clone>$() -> Supabase.Gotrue.Common.SamlAttribute!
+Supabase.Gotrue.Common.SamlAttribute.Default.get -> object?
+Supabase.Gotrue.Common.SamlAttribute.Default.init -> void
+Supabase.Gotrue.Common.SamlAttribute.Equals(Supabase.Gotrue.Common.SamlAttribute? other) -> bool
+Supabase.Gotrue.Common.SamlAttribute.KeepsAllValues.get -> bool
+Supabase.Gotrue.Common.SamlAttribute.KeepsAllValues.init -> void
+Supabase.Gotrue.Common.SamlAttribute.Names.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.SamlAttribute.Names.init -> void
+Supabase.Gotrue.Common.SamlAttribute.SamlAttribute() -> void
+Supabase.Gotrue.Common.SamlConfiguration
+Supabase.Gotrue.Common.SamlConfiguration.<Clone>$() -> Supabase.Gotrue.Common.SamlConfiguration!
+Supabase.Gotrue.Common.SamlConfiguration.AttributeMapping.get -> System.Collections.Generic.IReadOnlyDictionary<string!, Supabase.Gotrue.Common.SamlAttribute!>!
+Supabase.Gotrue.Common.SamlConfiguration.AttributeMapping.init -> void
+Supabase.Gotrue.Common.SamlConfiguration.EntityId.get -> string!
+Supabase.Gotrue.Common.SamlConfiguration.EntityId.init -> void
+Supabase.Gotrue.Common.SamlConfiguration.Equals(Supabase.Gotrue.Common.SamlConfiguration? other) -> bool
+Supabase.Gotrue.Common.SamlConfiguration.MetadataUrl.get -> System.Uri?
+Supabase.Gotrue.Common.SamlConfiguration.MetadataUrl.init -> void
+Supabase.Gotrue.Common.SamlConfiguration.MetadataXml.get -> string?
+Supabase.Gotrue.Common.SamlConfiguration.MetadataXml.init -> void
+Supabase.Gotrue.Common.SamlConfiguration.NameIdFormat.get -> Supabase.Gotrue.Common.SamlNameIdFormat?
+Supabase.Gotrue.Common.SamlConfiguration.NameIdFormat.init -> void
+Supabase.Gotrue.Common.SamlConfiguration.SamlConfiguration() -> void
+Supabase.Gotrue.Common.SamlNameIdFormat
+Supabase.Gotrue.Common.SamlNameIdFormat.EmailAddress = 1 -> Supabase.Gotrue.Common.SamlNameIdFormat
+Supabase.Gotrue.Common.SamlNameIdFormat.Persistent = 0 -> Supabase.Gotrue.Common.SamlNameIdFormat
+Supabase.Gotrue.Common.SamlNameIdFormat.Transient = 2 -> Supabase.Gotrue.Common.SamlNameIdFormat
+Supabase.Gotrue.Common.SamlNameIdFormat.Unspecified = 3 -> Supabase.Gotrue.Common.SamlNameIdFormat
 Supabase.Gotrue.Common.SignOutReason
 Supabase.Gotrue.Common.SignOutReason.SessionExpired = 1 -> Supabase.Gotrue.Common.SignOutReason
 Supabase.Gotrue.Common.SignOutReason.SessionMissing = 2 -> Supabase.Gotrue.Common.SignOutReason
 Supabase.Gotrue.Common.SignOutReason.UserInitiated = 0 -> Supabase.Gotrue.Common.SignOutReason
+Supabase.Gotrue.Common.SsoProvider
+Supabase.Gotrue.Common.SsoProvider.<Clone>$() -> Supabase.Gotrue.Common.SsoProvider!
+Supabase.Gotrue.Common.SsoProvider.CreatedAt.get -> System.DateTimeOffset
+Supabase.Gotrue.Common.SsoProvider.CreatedAt.init -> void
+Supabase.Gotrue.Common.SsoProvider.Domains.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Gotrue.Common.SsoProvider.Domains.init -> void
+Supabase.Gotrue.Common.SsoProvider.Enabled.get -> bool
+Supabase.Gotrue.Common.SsoProvider.Enabled.init -> void
+Supabase.Gotrue.Common.SsoProvider.Equals(Supabase.Gotrue.Common.SsoProvider? other) -> bool
+Supabase.Gotrue.Common.SsoProvider.Id.get -> System.Guid
+Supabase.Gotrue.Common.SsoProvider.Id.init -> void
+Supabase.Gotrue.Common.SsoProvider.ResourceId.get -> string?
+Supabase.Gotrue.Common.SsoProvider.ResourceId.init -> void
+Supabase.Gotrue.Common.SsoProvider.Saml.get -> Supabase.Gotrue.Common.SamlConfiguration!
+Supabase.Gotrue.Common.SsoProvider.Saml.init -> void
+Supabase.Gotrue.Common.SsoProvider.SsoProvider() -> void
+Supabase.Gotrue.Common.SsoProvider.UpdatedAt.get -> System.DateTimeOffset
+Supabase.Gotrue.Common.SsoProvider.UpdatedAt.init -> void
+Supabase.Gotrue.Common.SsoProviderReference
+Supabase.Gotrue.Common.SsoProviderReference.<Clone>$() -> Supabase.Gotrue.Common.SsoProviderReference!
+Supabase.Gotrue.Common.SsoProviderReference.Equals(Supabase.Gotrue.Common.SsoProviderReference? other) -> bool
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GetSsoProviderAsync(Supabase.Gotrue.Common.SsoProviderReference! provider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.SsoProvider!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetSsoProviderAsync(string! jwt, Supabase.Gotrue.Common.SsoProviderReference! provider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.SsoProvider!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession!>!
