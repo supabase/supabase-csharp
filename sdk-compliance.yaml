@@ -52,10 +52,9 @@ features:
     symbols:
       - Client.SignInWithSSO
   auth.sign_in.sign_up:
-    status: partially_implemented
-    note: "API mirrors signUp, but on a session-returning sign-up (confirmations off) C# does NOT adopt the session — CurrentUser/CurrentSession stay null, so 'signed up' != 'signed in' as in JS."
+    status: implemented
     symbols:
-      - Client.SignUp
+      - Client.SignUpAsync
   auth.sign_in.verify_otp:
     status: implemented
     symbols:

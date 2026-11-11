@@ -50,7 +50,7 @@ public class SignInFailureContractTests
         this.server.Given(Request.Create().WithPath("/signup").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(422)
                 .WithHeader("Content-Type", "application/json").WithBody("""{"code":422,"error_code":"user_already_exists","msg":"User already registered"}"""));
-        var signUp = () => this.client.SignUp(RandomEmail(), Password);
+        var signUp = () => this.client.SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         await signUp.Should().ThrowAsync<GotrueException>();
         using (new AssertionScope())
         {

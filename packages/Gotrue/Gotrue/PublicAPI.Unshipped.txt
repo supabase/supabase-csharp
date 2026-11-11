@@ -1,14 +1,18 @@
 #nullable enable
 Supabase.Gotrue.Api.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session!>!
+Supabase.Gotrue.Api.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.Client.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session!>!
 Supabase.Gotrue.Client.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?
+Supabase.Gotrue.Client.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.Common.SignOutReason
 Supabase.Gotrue.Common.SignOutReason.SessionExpired = 1 -> Supabase.Gotrue.Common.SignOutReason
 Supabase.Gotrue.Common.SignOutReason.SessionMissing = 2 -> Supabase.Gotrue.Common.SignOutReason
 Supabase.Gotrue.Common.SignOutReason.UserInitiated = 0 -> Supabase.Gotrue.Common.SignOutReason
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options
 Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.<Clone>$() -> Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options!
 Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.CaptchaToken.get -> string?
@@ -18,15 +22,32 @@ Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.SignInWithWeb3Options() -> 
 Supabase.Gotrue.SignInWithWeb3.Web3Credentials
 Supabase.Gotrue.SignInWithWeb3.Web3Credentials.<Clone>$() -> Supabase.Gotrue.SignInWithWeb3.Web3Credentials!
 Supabase.Gotrue.SignInWithWeb3.Web3Credentials.Equals(Supabase.Gotrue.SignInWithWeb3.Web3Credentials? other) -> bool
+Supabase.Gotrue.SignUp.SignUpState
+Supabase.Gotrue.SignUp.SignUpState.<Clone>$() -> Supabase.Gotrue.SignUp.SignUpState!
+Supabase.Gotrue.SignUp.SignUpState.Equals(Supabase.Gotrue.SignUp.SignUpState? other) -> bool
+Supabase.Gotrue.SignUp.SignUpState.PKCEVerifier.get -> string?
+Supabase.Gotrue.SignUp.SignUpState.PKCEVerifier.init -> void
+Supabase.Gotrue.SignUp.SignUpState.Session.get -> Supabase.Gotrue.Session?
+Supabase.Gotrue.SignUp.SignUpState.Session.init -> void
+Supabase.Gotrue.SignUp.SignUpState.SignUpState() -> void
+Supabase.Gotrue.SignUp.SignUpState.User.get -> Supabase.Gotrue.User?
+Supabase.Gotrue.SignUp.SignUpState.User.init -> void
+Supabase.Gotrue.SignUpOptions.Channel.get -> Supabase.Gotrue.SignInWithPasswordlessPhoneOptions.MessagingChannel
+Supabase.Gotrue.SignUpOptions.Channel.set -> void
 override Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.Equals(object? obj) -> bool
 override Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.GetHashCode() -> int
 override Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.ToString() -> string!
 override Supabase.Gotrue.SignInWithWeb3.Web3Credentials.Equals(object? obj) -> bool
 override Supabase.Gotrue.SignInWithWeb3.Web3Credentials.GetHashCode() -> int
 override Supabase.Gotrue.SignInWithWeb3.Web3Credentials.ToString() -> string!
+override Supabase.Gotrue.SignUp.SignUpState.Equals(object? obj) -> bool
+override Supabase.Gotrue.SignUp.SignUpState.GetHashCode() -> int
+override Supabase.Gotrue.SignUp.SignUpState.ToString() -> string!
 static Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.operator !=(Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? left, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? right) -> bool
 static Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.operator ==(Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? left, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? right) -> bool
 static Supabase.Gotrue.SignInWithWeb3.Web3Credentials.ForEthereum(string! message, string! signature) -> Supabase.Gotrue.SignInWithWeb3.Web3Credentials!
 static Supabase.Gotrue.SignInWithWeb3.Web3Credentials.ForSolana(string! message, byte[]! signature) -> Supabase.Gotrue.SignInWithWeb3.Web3Credentials!
 static Supabase.Gotrue.SignInWithWeb3.Web3Credentials.operator !=(Supabase.Gotrue.SignInWithWeb3.Web3Credentials? left, Supabase.Gotrue.SignInWithWeb3.Web3Credentials? right) -> bool
 static Supabase.Gotrue.SignInWithWeb3.Web3Credentials.operator ==(Supabase.Gotrue.SignInWithWeb3.Web3Credentials? left, Supabase.Gotrue.SignInWithWeb3.Web3Credentials? right) -> bool
+static Supabase.Gotrue.SignUp.SignUpState.operator !=(Supabase.Gotrue.SignUp.SignUpState? left, Supabase.Gotrue.SignUp.SignUpState? right) -> bool
+static Supabase.Gotrue.SignUp.SignUpState.operator ==(Supabase.Gotrue.SignUp.SignUpState? left, Supabase.Gotrue.SignUp.SignUpState? right) -> bool

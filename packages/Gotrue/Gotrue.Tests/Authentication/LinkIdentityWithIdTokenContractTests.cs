@@ -44,19 +44,19 @@ public class LinkIdentityWithIdTokenContractTests
     [TestInitialize]
     public void TestInitializer()
     {
-        server = new MockGotrueServer();
-        api = new Api(server.Url);
+        this.server = new MockGotrueServer();
+        this.api = new Api(this.server.Url);
     }
 
     [TestCleanup]
-    public void TestCleanup() => server.Dispose();
+    public void TestCleanup() => this.server.Dispose();
 
     [TestMethod]
     public async Task LinkIdentityWithIdToken_ShouldPostAuthenticatedIdTokenLinkGrant_GivenSupportedProvider()
     {
-        StubIdTokenGrant();
-        await api.LinkIdentityWithIdToken("user-access-token", new LinkIdentityWithIdTokenOptions(Constants.Provider.Google, "google-id-token"));
-        server.VerifySingleReceivedRequest()
+        this.StubIdTokenGrant();
+        await this.api.LinkIdentityWithIdToken("user-access-token", new LinkIdentityWithIdTokenOptions(Constants.Provider.Google, "google-id-token"));
+        this.server.VerifySingleReceivedRequest()
             .WithMethod(HttpMethod.Post)
             .WithPath("/token")
             .WithQueryParam("grant_type", "id_token")
@@ -70,10 +70,10 @@ public class LinkIdentityWithIdTokenContractTests
     [TestMethod]
     public async Task LinkIdentityWithIdToken_ShouldIncludeCredentialProofs_GivenAccessTokenNonceAndCaptcha()
     {
-        StubIdTokenGrant();
+        this.StubIdTokenGrant();
         var options = new LinkIdentityWithIdTokenOptions(Constants.Provider.Apple, "apple-id-token", "apple-access-token", "the-nonce", "the-captcha");
-        await api.LinkIdentityWithIdToken("user-access-token", options);
-        server.VerifySingleReceivedRequest()
+        await this.api.LinkIdentityWithIdToken("user-access-token", options);
+        this.server.VerifySingleReceivedRequest()
             .WithExactJsonBody("access_token", "apple-access-token")
             .WithExactJsonBody("nonce", "the-nonce")
             .WithNestedJsonBody("gotrue_meta_security", "captcha_token", "the-captcha");
@@ -82,10 +82,10 @@ public class LinkIdentityWithIdTokenContractTests
     [TestMethod]
     public async Task LinkIdentityWithIdToken_ShouldAdoptTheReturnedSession_GivenSignedInUser()
     {
-        var client = await SignedInClient();
+        var client = await this.SignedInClient();
         var stateChanges = new List<Constants.AuthState>();
         client.AddStateChangedListener((_, state) => stateChanges.Add(state));
-        server.Given(Request.Create().WithPath("/token").WithParam("grant_type", "id_token").UsingPost())
+        this.server.Given(Request.Create().WithPath("/token").WithParam("grant_type", "id_token").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(200).WithHeader("Content-Type", "application/json").WithBody(LinkedSession));
         await client.LinkIdentityWithIdToken(new LinkIdentityWithIdTokenOptions(Constants.Provider.Google, "google-id-token"));
         using (new AssertionScope())
@@ -96,16 +96,16 @@ public class LinkIdentityWithIdTokenContractTests
     }
 
     private void StubIdTokenGrant() =>
-        server.Given(Request.Create().WithPath("/token").UsingPost())
+        this.server.Given(Request.Create().WithPath("/token").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(200).WithHeader("Content-Type", "application/json").WithBody(LinkedSession));
 
     private async Task<IGotrueClient<User, Session>> SignedInClient()
     {
-        server.Given(Request.Create().WithPath("/signup").UsingPost())
+        this.server.Given(Request.Create().WithPath("/signup").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(200).WithHeader("Content-Type", "application/json").WithBody(LinkedSession));
-        var client = TestClients.Against(server);
-        await client.SignUp(RandomEmail(), Password);
-        server.Reset();
+        var client = TestClients.Against(this.server);
+        await client.SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
+        this.server.Reset();
         return client;
     }
 }

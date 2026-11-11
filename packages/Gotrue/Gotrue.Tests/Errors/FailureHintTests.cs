@@ -5,6 +5,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Supabase.Gotrue;
 using Supabase.Gotrue.Exceptions;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -47,7 +48,7 @@ public class FailureHintTests
     public async Task DetectReason_ShouldFallBackToStatusCode_GivenNoErrorCode(int statusCode, FailureHint.Reason expected)
     {
         this.StubSignUp(statusCode, "an upstream gateway page");
-        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var signUp = () => TestClients.Against(this.server).SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         exception
             .Which.Reason.Should()
@@ -79,7 +80,7 @@ public class FailureHintTests
     public async Task DetectReason_ShouldMapErrorCodeToReason(string errorCode, FailureHint.Reason expected)
     {
         this.StubSignUp(400, $$"""{"code":400,"error_code":"{{errorCode}}","msg":"a server message"}""");
-        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var signUp = () => TestClients.Against(this.server).SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         exception.Which.Reason.Should().Be(expected, $"error_code \"{errorCode}\" classifies as {expected}");
         exception.Which.ErrorCode.Should().Be(errorCode, "the raw server error_code is exposed for precise handling");
@@ -89,7 +90,7 @@ public class FailureHintTests
     public async Task DetectReason_ShouldClassifyFromErrorCode_GivenConflictingMessageText()
     {
         this.StubSignUp(400, """{"code":400,"error_code":"invalid_credentials","msg":"Email not confirmed"}""");
-        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var signUp = () => TestClients.Against(this.server).SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         exception.Which.Reason.Should()
             .Be(UserBadLogin, "classification comes from the machine-readable error_code, not the message text");
@@ -99,7 +100,7 @@ public class FailureHintTests
     public async Task DetectReason_ShouldBeUnknown_GivenAnUnmappedErrorCode()
     {
         this.StubSignUp(400, """{"code":400,"error_code":"validation_failed","msg":"You must provide a value"}""");
-        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var signUp = () => TestClients.Against(this.server).SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         using (new AssertionScope())
         {
@@ -112,7 +113,7 @@ public class FailureHintTests
     public async Task ErrorCode_ShouldBeNull_GivenANonJsonBody()
     {
         this.StubSignUp(502, "an upstream gateway page");
-        var signUp = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var signUp = () => TestClients.Against(this.server).SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         using (new AssertionScope())
         {

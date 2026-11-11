@@ -25,6 +25,7 @@ using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
 using Supabase.Gotrue.SignInWithWeb3;
+using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
 using Supabase.Gotrue.VerifyRecoveryCode;
@@ -128,6 +129,31 @@ public class Api : IGotrueApi<User, Session>
         var response = await this.MakeRequestAsync(HttpMethod.Post, endpoint, body, this.Headers).ConfigureAwait(false);
         return ReadSignUpResponse(response);
     }
+
+    /// <inheritdoc />
+    public async Task<SignUpState> SignUpAsync(SignUpType type, string identifier, string password, SignUpOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var codeVerifier = CodeVerifierFor(type, options);
+        var body = type switch
+        {
+            SignUpType.Email => SignUpBody.ForEmail(identifier, password, options, codeVerifier),
+            SignUpType.Phone => SignUpBody.ForPhone(identifier, password, options),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
+        };
+        var response = await this.MakeRequestAsync(HttpMethod.Post, Helpers.WithRedirectTo($"{this.Url}/signup", options?.RedirectTo), body, this.Headers, cancellationToken).ConfigureAwait(false);
+        return ToSignUpState(ReadSignUpResponse(response), codeVerifier);
+    }
+
+    private static string? CodeVerifierFor(SignUpType type, SignUpOptions? options) =>
+        type == SignUpType.Email && options?.FlowType == OAuthFlowType.PKCE ? Helpers.GenerateNonce() : null;
+
+    private static SignUpState ToSignUpState(Session? signedUp, string? codeVerifier) =>
+        new()
+        {
+            Session = string.IsNullOrEmpty(signedUp?.AccessToken) ? null : signedUp,
+            User = signedUp?.User,
+            PKCEVerifier = codeVerifier,
+        };
 
     /// <summary>Reads a sign-up response: a session, the bare user returned while confirmation is pending, or null.</summary>
     private static Session? ReadSignUpResponse(BaseResponse response)

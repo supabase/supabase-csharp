@@ -26,7 +26,7 @@ public class UserProfileTests : AuthClientFixture
     public async Task Update_ShouldPersistUserMetadataAndRaiseUserUpdated()
     {
         var email = RandomEmail();
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         this.StateChanges.Clear();
         var updated = await this.Client.Update(new UserAttributes
         {
@@ -43,7 +43,7 @@ public class UserProfileTests : AuthClientFixture
     public async Task GetUser_ShouldReturnTheUser_GivenAccessToken()
     {
         var email = RandomEmail();
-        var session = await this.Client.SignUp(email, Password);
+        var session = (await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password)).Session;
         this.Client.CurrentUser!.Email.Should().Be(email);
         var byToken = (await this.Client.GetUser(session!.AccessToken ?? throw new InvalidOperationException()))!;
         byToken.Email.Should().Be(email);

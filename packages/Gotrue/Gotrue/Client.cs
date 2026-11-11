@@ -21,6 +21,7 @@ using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
 using Supabase.Gotrue.SignInWithWeb3;
+using Supabase.Gotrue.SignUp;
 using static Supabase.Gotrue.Common.SignOutReason;
 using static Supabase.Gotrue.Constants;
 using static Supabase.Gotrue.Constants.AuthState;
@@ -229,11 +230,12 @@ public class Client : IGotrueClient<User, Session>
     public SignOutReason? SignOutReason { get; private set; }
 
     /// <inheritdoc />
-    [PartialCapability("auth.sign_in.sign_up", "API mirrors signUp, but on a session-returning sign-up (confirmations off) C# does NOT adopt the session — CurrentUser/CurrentSession stay null, so 'signed up' != 'signed in' as in JS.")]
+    [Obsolete("Ignores SignUpOptions.FlowType and SignUpOptions.Channel. Favor SignUpAsync instead, which returns a SignUpState. This member will be removed in v9.")]
     public Task<Session?> SignUp(string email, string password, SignUpOptions? options = null) =>
         this.SignUp(SignUpType.Email, email, password, options);
 
     /// <inheritdoc />
+    [Obsolete("Ignores SignUpOptions.FlowType and SignUpOptions.Channel. Favor SignUpAsync instead, which returns a SignUpState. This member will be removed in v9.")]
     public async Task<Session?> SignUp(SignUpType type, string identifier, string password,
         SignUpOptions? options = null)
     {
@@ -254,6 +256,30 @@ public class Client : IGotrueClient<User, Session>
         }
         return session;
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sign_in.sign_up")]
+    public async Task<SignUpState> SignUpAsync(SignUpType type, string identifier, string password, SignUpOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignUp);
+        activity?.SetTag(GotrueInstrumentation.Tags.SignUpType, type.ToString());
+        this.ThrowWhenOffline();
+        var signedUp = await this.api.SignUpAsync(type, identifier, password, options, cancellationToken).ConfigureAwait(false);
+        if (this.SessionToAdopt(signedUp) is not { } session)
+        {
+            return signedUp;
+        }
+        await this.UpdateSessionAsync(session, cancellationToken).ConfigureAwait(false);
+        await this.NotifyAuthStateChangeAsync(SignedIn, cancellationToken).ConfigureAwait(false);
+        return signedUp with { Session = this.CurrentSession };
+    }
+
+    private Session? SessionToAdopt(SignUpState signedUp) =>
+        signedUp.Session ?? this.PendingUserSession(signedUp.User);
+
+    private Session? PendingUserSession(User? pendingUser) =>
+        pendingUser != null && this.Options.AllowUnconfirmedUserSessions ? new Session { User = pendingUser } : null;
 
     /// <inheritdoc />
     [ImplementedCapability("auth.sign_in.sign_in_with_oauth")]

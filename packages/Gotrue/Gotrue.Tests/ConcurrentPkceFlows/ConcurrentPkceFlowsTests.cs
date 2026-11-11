@@ -54,7 +54,7 @@ public class ConcurrentPkceFlowsTests : AuthClientFixture
     private async Task<string> SignUpThenSignOut()
     {
         var email = RandomEmail();
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(SignUpType.Email, email, Password);
         await this.Client.SignOut();
         return email;
     }

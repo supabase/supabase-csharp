@@ -25,6 +25,7 @@ namespace Gotrue.Tests.Authentication;
 ///     session even though <c>AllowUnconfirmedUserSessions</c> is left at its default of false (issue #130).
 ///     Pending signups return the user without adopting a session unless that option is enabled (issue #259).
 /// </summary>
+#pragma warning disable CS0618 // pins the still-shipping obsolete SignUp until it is removed in v9
 [TestClass]
 [TestCategory("Contract")]
 public class SignUpContractTests
@@ -150,3 +151,4 @@ public class SignUpContractTests
         signUp.Should().Throw<GotrueException>();
     }
 }
+#pragma warning restore CS0618
