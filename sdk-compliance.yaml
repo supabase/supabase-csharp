@@ -275,6 +275,11 @@ features:
     symbols:
       - AdminClient.UpdateFactorAsync
 
+  auth.sso_admin.get_provider:
+    status: implemented
+    symbols:
+      - AdminClient.GetSsoProviderAsync
+
   # ── Client Initialization ──────────────────────────────────────────────────
 
   client.authentication_integration.cross_client_token_sync:
