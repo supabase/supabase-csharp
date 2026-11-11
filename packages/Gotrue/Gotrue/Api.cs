@@ -312,7 +312,7 @@ public class Api : IGotrueApi<User, Session>
         return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=id_token", body, this.Headers);
     }
 
-    private Task<SSOResponse?> SignInWithSsoInternal(Guid? providerId = null, string? domain = null, SignInWithSSOOptions? options = null)
+    private async Task<SSOResponse?> SignInWithSsoInternal(Guid? providerId = null, string? domain = null, SignInWithSSOOptions? options = null)
     {
         if (providerId != null && domain != null)
             throw new GotrueException($"Both providerId and domain were provided to the API, " +
@@ -321,11 +321,12 @@ public class Api : IGotrueApi<User, Session>
             throw new GotrueException($"Both providerId and domain were null " +
                                       $"you must supply either one or the other but not both providerId={providerId}, domain={domain}");
 
+        string? codeVerifier = null;
         string? codeChallenge = null;
         string? codeChallengeMethod = null;
         if (options?.FlowType == OAuthFlowType.PKCE)
         {
-            var codeVerifier = Helpers.GenerateNonce();
+            codeVerifier = Helpers.GenerateNonce();
             codeChallenge = Helpers.GeneratePKCENonceVerifier(codeVerifier);
             codeChallengeMethod = "s256";
         }
@@ -346,7 +347,15 @@ public class Api : IGotrueApi<User, Session>
         if (!string.IsNullOrEmpty(options?.CaptchaToken))
             body.Add("gotrue_meta_security", new Dictionary<string, object?> { { "captcha_token", options?.CaptchaToken } });
 
-        return this.MakeRequestAsync<SSOResponse>(HttpMethod.Post, $"{this.Url}/sso", body, this.Headers);
+        var redirect = await this.MakeRequestAsync<SSOResponse>(HttpMethod.Post, $"{this.Url}/sso", body, this.Headers).ConfigureAwait(false);
+        return WithPkceVerifier(redirect, codeVerifier);
+    }
+
+    private static SSOResponse? WithPkceVerifier(SSOResponse? redirect, string? codeVerifier)
+    {
+        if (redirect != null)
+            redirect.PKCEVerifier = codeVerifier;
+        return redirect;
     }
 
     /// <inheritdoc />

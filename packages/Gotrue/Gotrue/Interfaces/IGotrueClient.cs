@@ -306,7 +306,9 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="options">The redirect uri and captcha token, if any</param>
     /// <returns>
     ///     The Uri returned from supabase auth that a user can use to sign in to their given SSO provider (okta,
-    ///     microsoft entra, gsuite ect...)
+    ///     microsoft entra, gsuite ect...). With the PKCE flow, it also carries the
+    ///     <see cref="ProviderAuthState.PKCEVerifier" /> to pass to <see cref="ExchangeCodeForSession" /> with the code
+    ///     the SSO callback returns.
     /// </returns>
     Task<SSOResponse?> SignInWithSSO(Guid providerId, SignInWithSSOOptions? options = null);
 
@@ -323,7 +325,9 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="options">The redirect uri and captcha token, if any</param>
     /// <returns>
     ///     The Uri returned from supabase auth that a user can use to sign in to their given SSO provider (okta,
-    ///     microsoft entra, gsuite ect...)
+    ///     microsoft entra, gsuite ect...). With the PKCE flow, it also carries the
+    ///     <see cref="ProviderAuthState.PKCEVerifier" /> to pass to <see cref="ExchangeCodeForSession" /> with the code
+    ///     the SSO callback returns.
     /// </returns>
     Task<SSOResponse?> SignInWithSSO(string domain, SignInWithSSOOptions? options = null);
 

@@ -28,6 +28,8 @@ namespace Gotrue.Tests.Pkce;
 [TestCategory("Contract")]
 public class PkceContractTests
 {
+    private const string SsoDomain = "example.com";
+    private static readonly Guid SsoProviderId = Guid.Parse("4c9f2a1e-7b3d-4e6a-9f8c-1d2e3b4a5c6d");
     private static readonly ResendParameters SignUpByEmail = new(ResendType.SignUp, "test@example.com", null, null);
 
     private IGotrueClient<User, Session> client = null!;
@@ -102,6 +104,42 @@ public class PkceContractTests
     }
 
     [TestMethod]
+    public async Task SignInWithSSO_ShouldReturnTheVerifierOfTheChallengeItSent_GivenPkceFlow()
+    {
+        this.StubSsoRedirect();
+        var state = await this.client.SignInWithSSO(SsoProviderId, new SignInWithSSOOptions { FlowType = OAuthFlowType.PKCE });
+        var request = this.server.VerifySingleReceivedRequest().WithMethod(HttpMethod.Post).WithPath("/sso");
+        request.ReadJsonBodyField("code_challenge").Should().Be(S256(state!.PKCEVerifier!),
+            "the caller needs the verifier behind the challenge to exchange the code the SSO callback returns (RFC 7636 §4.5)");
+    }
+
+    [TestMethod]
+    public async Task SignInWithSSO_ShouldReturnNoVerifier_GivenImplicitFlow()
+    {
+        this.StubSsoRedirect();
+        var state = await this.client.SignInWithSSO(SsoDomain);
+        state!.PKCEVerifier.Should().BeNull("an implicit flow sends no challenge, so there is no verifier to keep");
+    }
+
+    [TestMethod]
+    public async Task SignInWithSSO_ShouldReturnNull_GivenSuccessWithoutBody()
+    {
+        this.server
+            .Given(Request.Create().WithPath("/sso").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(200).WithHeader("Content-Type", "application/json").WithBody("null"));
+        (await this.client.SignInWithSSO(SsoDomain, new SignInWithSSOOptions { FlowType = OAuthFlowType.PKCE })).Should().BeNull(
+            "an answer without a redirect URL leaves nothing to hand the verifier back on");
+    }
+
+    [TestMethod]
+    public void SignInWithSSO_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
+    {
+        this.StubSsoRedirect();
+        BlockingCaller.Completes(() => this.client.SignInWithSSO(SsoDomain, new SignInWithSSOOptions { FlowType = OAuthFlowType.PKCE })).Should().BeTrue(
+            "a library must not resume on the caller's context: a UI thread blocking on the task would deadlock");
+    }
+
+    [TestMethod]
     public void Resend_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
     {
         this.StubJsonOk("/resend");
@@ -117,6 +155,14 @@ public class PkceContractTests
         var result = await this.client.SignIn(Provider.Github, new SignInOptions { FlowType = OAuthFlowType.PKCE });
         result.Uri.Query.Should().Contain("flow_type=pkce").And.NotContain("state=");
     }
+
+    private void StubSsoRedirect() =>
+        this.server
+            .Given(Request.Create().WithPath("/sso").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody("""{"url":"https://idp.example.com/sso/saml?SAMLRequest=a-request"}"""));
 
     private void StubJsonOk(string path) =>
         this.server
