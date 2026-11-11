@@ -823,10 +823,11 @@ public class Client : IGotrueClient<User, Session>
 
     /// <inheritdoc />
     [ImplementedCapability("auth.sign_in.exchange_code_for_session")]
+    [ImplementedCapability("auth.sign_in.concurrent_pkce_flows", "The SDK never stores a code verifier: every PKCE-starting call returns its own verifier and ExchangeCodeForSession takes it explicitly, so concurrent flows cannot overwrite each other and no flow id is needed.")]
     public async Task<Session?> ExchangeCodeForSession(string codeVerifier, string authCode)
     {
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.ExchangeCode);
-        var result = await this.api.ExchangeCodeForSession(codeVerifier, authCode);
+        var result = await this.api.ExchangeCodeForSession(codeVerifier, authCode).ConfigureAwait(false);
         if (result != null)
         {
             await this.UpdateSessionAsync(result).ConfigureAwait(false);

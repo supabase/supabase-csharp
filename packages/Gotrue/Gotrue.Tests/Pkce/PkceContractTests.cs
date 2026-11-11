@@ -1,6 +1,7 @@
 #region
 
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
@@ -28,6 +29,7 @@ namespace Gotrue.Tests.Pkce;
 [TestCategory("Contract")]
 public class PkceContractTests
 {
+    private const string CallerVerifier = "a-caller-supplied-verifier";
     private static readonly ResendParameters SignUpByEmail = new(ResendType.SignUp, "test@example.com", null, null);
 
     private IGotrueClient<User, Session> client = null!;
@@ -72,6 +74,17 @@ public class PkceContractTests
     }
 
     [TestMethod]
+    public async Task ResetPasswordForEmail_ShouldGenerateItsOwnVerifier_GivenDeprecatedOptionsVerifier()
+    {
+        this.StubJsonOk("/recover");
+        var options = new ResetPasswordForEmailOptions("test@example.com") { FlowType = OAuthFlowType.PKCE };
+        typeof(ResetPasswordForEmailOptions).GetProperty("PKCEVerifier")!.SetValue(options, CallerVerifier);
+        var state = await this.client.ResetPasswordForEmail(options);
+        state.PKCEVerifier.Should().NotBe(CallerVerifier,
+            "the options verifier is obsolete and never read: the SDK generates the verifier and returns it on the state");
+    }
+
+    [TestMethod]
     public async Task Resend_ShouldSendSha256OfVerifierAsCodeChallenge_GivenPkceFlow()
     {
         this.StubJsonOk("/resend");
@@ -110,6 +123,14 @@ public class PkceContractTests
     }
 
     [TestMethod]
+    public void ExchangeCodeForSession_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
+    {
+        this.StubTokenExchange();
+        BlockingCaller.Completes(() => this.client.ExchangeCodeForSession("code-verifier", "auth-code")).Should().BeTrue(
+            "a library must not resume on the caller's context: a UI thread blocking on the task would deadlock");
+    }
+
+    [TestMethod]
     public async Task SignIn_ShouldNotAddStateToAuthUrl_GivenPkceFlow()
     {
         // Provider-side state is owned by the GoTrue server; the SDK must not inject its own or
@@ -125,6 +146,17 @@ public class PkceContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody("{}"));
+
+    private void StubTokenExchange() =>
+        this.server
+            .Given(Request.Create().WithPath("/token").WithParam("grant_type", "pkce").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(Fixture("exchanged_session.json")));
+
+    private static string Fixture(string name) =>
+        File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Pkce", "Data", name));
 
     private static string S256(string verifier)
     {
