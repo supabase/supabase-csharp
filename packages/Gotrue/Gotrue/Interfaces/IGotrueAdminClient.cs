@@ -364,4 +364,32 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(CustomProviderType? type = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Fetches a single sign-on (SAML 2.0) identity provider, including its metadata XML and email domains. Requires
+    /// a full-access API key, such as the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="provider">
+    /// The provider, addressed <see cref="SsoProviderReference.ById" /> or
+    /// <see cref="SsoProviderReference.ByResourceId" />.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.SsoProviderNotFound" /> when no provider matches
+    /// <paramref name="provider" />, and <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key
+    /// is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var provider = await admin.GetSsoProviderAsync(SsoProviderReference.ByResourceId("acme"));
+    /// Console.WriteLine(provider.Saml.EntityId);
+    /// </code>
+    /// </example>
+    Task<SsoProvider> GetSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default);
 }
