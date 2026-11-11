@@ -11,6 +11,9 @@ override Supabase.Gotrue.Common.SsoProvider.ToString() -> string!
 override Supabase.Gotrue.Common.SsoProviderReference.Equals(object? obj) -> bool
 override Supabase.Gotrue.Common.SsoProviderReference.GetHashCode() -> int
 override Supabase.Gotrue.Common.SsoProviderReference.ToString() -> string!
+override Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.Equals(object? obj) -> bool
+override Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.GetHashCode() -> int
+override Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.ToString() -> string!
 static Supabase.Gotrue.Common.SamlAttribute.operator !=(Supabase.Gotrue.Common.SamlAttribute? left, Supabase.Gotrue.Common.SamlAttribute? right) -> bool
 static Supabase.Gotrue.Common.SamlAttribute.operator ==(Supabase.Gotrue.Common.SamlAttribute? left, Supabase.Gotrue.Common.SamlAttribute? right) -> bool
 static Supabase.Gotrue.Common.SamlConfiguration.operator !=(Supabase.Gotrue.Common.SamlConfiguration? left, Supabase.Gotrue.Common.SamlConfiguration? right) -> bool
@@ -21,8 +24,14 @@ static Supabase.Gotrue.Common.SsoProviderReference.ById(System.Guid id) -> Supab
 static Supabase.Gotrue.Common.SsoProviderReference.ByResourceId(string! resourceId) -> Supabase.Gotrue.Common.SsoProviderReference!
 static Supabase.Gotrue.Common.SsoProviderReference.operator !=(Supabase.Gotrue.Common.SsoProviderReference? left, Supabase.Gotrue.Common.SsoProviderReference? right) -> bool
 static Supabase.Gotrue.Common.SsoProviderReference.operator ==(Supabase.Gotrue.Common.SsoProviderReference? left, Supabase.Gotrue.Common.SsoProviderReference? right) -> bool
+static Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.ByResourceId(string! resourceId) -> Supabase.Gotrue.ListSsoProviders.SsoProviderFilter!
+static Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.ByResourceIdPrefix(string! prefix) -> Supabase.Gotrue.ListSsoProviders.SsoProviderFilter!
+static Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.operator !=(Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? left, Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? right) -> bool
+static Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.operator ==(Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? left, Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? right) -> bool
 Supabase.Gotrue.AdminClient.GetSsoProviderAsync(Supabase.Gotrue.Common.SsoProviderReference! provider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.SsoProvider!>!
+Supabase.Gotrue.AdminClient.ListSsoProvidersAsync(Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? filter = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.SsoProvider!>!>!
 Supabase.Gotrue.Api.GetSsoProviderAsync(string! jwt, Supabase.Gotrue.Common.SsoProviderReference! provider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.SsoProvider!>!
+Supabase.Gotrue.Api.ListSsoProvidersAsync(string! jwt, Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? filter = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.SsoProvider!>!>!
 Supabase.Gotrue.Api.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session!>!
 Supabase.Gotrue.Api.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.Client.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session!>!
@@ -83,12 +92,17 @@ Supabase.Gotrue.Common.SsoProviderReference
 Supabase.Gotrue.Common.SsoProviderReference.<Clone>$() -> Supabase.Gotrue.Common.SsoProviderReference!
 Supabase.Gotrue.Common.SsoProviderReference.Equals(Supabase.Gotrue.Common.SsoProviderReference? other) -> bool
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.GetSsoProviderAsync(Supabase.Gotrue.Common.SsoProviderReference! provider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.SsoProvider!>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.ListSsoProvidersAsync(Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? filter = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.SsoProvider!>!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetSsoProviderAsync(string! jwt, Supabase.Gotrue.Common.SsoProviderReference! provider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.SsoProvider!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListSsoProvidersAsync(string! jwt, Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? filter = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.SsoProvider!>!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TSession!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
+Supabase.Gotrue.ListSsoProviders.SsoProviderFilter
+Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.<Clone>$() -> Supabase.Gotrue.ListSsoProviders.SsoProviderFilter!
+Supabase.Gotrue.ListSsoProviders.SsoProviderFilter.Equals(Supabase.Gotrue.ListSsoProviders.SsoProviderFilter? other) -> bool
 Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options
 Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.<Clone>$() -> Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options!
 Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options.CaptchaToken.get -> string?
