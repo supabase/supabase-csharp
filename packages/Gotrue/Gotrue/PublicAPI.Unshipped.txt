@@ -1,1 +1,7 @@
 #nullable enable
+Supabase.Gotrue.Client.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?
+Supabase.Gotrue.Common.SignOutReason
+Supabase.Gotrue.Common.SignOutReason.SessionExpired = 1 -> Supabase.Gotrue.Common.SignOutReason
+Supabase.Gotrue.Common.SignOutReason.SessionMissing = 2 -> Supabase.Gotrue.Common.SignOutReason
+Supabase.Gotrue.Common.SignOutReason.UserInitiated = 0 -> Supabase.Gotrue.Common.SignOutReason
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?

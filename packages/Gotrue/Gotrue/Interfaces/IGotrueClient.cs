@@ -68,6 +68,23 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     TUser? CurrentUser { get; }
 
     /// <summary>
+    ///     Why the user was signed out: an explicit sign-out, a session the server rejected, or a stored session
+    ///     that could not be recovered. Read it while handling <see cref="AuthState.SignedOut" /> to tell a
+    ///     voluntary sign-out from an involuntary one. It is <c>null</c> while a user is signed in, and when the
+    ///     client cannot tell why no user is signed in.
+    /// </summary>
+    /// <example>
+    ///     <code>
+    ///     client.AddStateChangedListener((sender, state) =>
+    ///     {
+    ///         if (state == AuthState.SignedOut &amp;&amp; sender.SignOutReason == SignOutReason.SessionExpired)
+    ///             ShowSessionExpiredNotice();
+    ///     });
+    ///     </code>
+    /// </example>
+    SignOutReason? SignOutReason { get; }
+
+    /// <summary>
     ///     Returns the client options.
     /// </summary>
     ClientOptions Options { get; }
