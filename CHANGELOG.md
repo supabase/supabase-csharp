@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.11.0](https://github.com/supabase/supabase-csharp/compare/v8.10.0...v8.11.0) (2026-11-11)
+
+
+### Features
+
+* **gotrue:** send the PKCE code challenge on resend ([#685](https://github.com/supabase/supabase-csharp/issues/685)) ([bddbc62](https://github.com/supabase/supabase-csharp/commit/bddbc62534b169c9982104bc156951cfba2f60be))
+* **realtime:** add a connection state getter to the client ([#695](https://github.com/supabase/supabase-csharp/issues/695)) ([725745f](https://github.com/supabase/supabase-csharp/commit/725745ff219e87f64be2655353ef5b55e5954099))
+* **realtime:** add an access token callback ([#697](https://github.com/supabase/supabase-csharp/issues/697)) ([001655c](https://github.com/supabase/supabase-csharp/commit/001655c56e9b3488685a090b9b5e10c299f874e2))
+* **realtime:** broadcast over HTTP without subscribing ([#623](https://github.com/supabase/supabase-csharp/issues/623)) ([60e27ff](https://github.com/supabase/supabase-csharp/commit/60e27ff12ba026d12d1879227c0a37cd4751a088))
+* **realtime:** claim get_channels through Subscriptions ([#694](https://github.com/supabase/supabase-csharp/issues/694)) ([f84cae7](https://github.com/supabase/supabase-csharp/commit/f84cae777ab3fa3ee5e5c6ee09aa7fcde1f54b02))
+* **realtime:** claim presence_state ([#698](https://github.com/supabase/supabase-csharp/issues/698)) ([41966ea](https://github.com/supabase/supabase-csharp/commit/41966ea802b39d677add64b55d0445fb48e5bb33))
+
+
+### Bug Fixes
+
+* **realtime:** keep receiving when a frame cannot be decoded ([#683](https://github.com/supabase/supabase-csharp/issues/683)) ([6abb83c](https://github.com/supabase/supabase-csharp/commit/6abb83c8d5f344cfb2a524a6fc774fcc635ce3fc))
+
 ## [8.10.0](https://github.com/supabase/supabase-csharp/compare/v8.9.0...v8.10.0) (2026-11-09)
 
 
