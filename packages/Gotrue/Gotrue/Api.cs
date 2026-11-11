@@ -12,6 +12,7 @@ using Supabase.Core.Http;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.GenerateRecoveryCodes;
@@ -865,6 +866,14 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public Task DeleteSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default) =>
         this.MakeRequestAsync(HttpMethod.Delete, this.SsoProviderUrl(provider), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<SsoProvider> CreateSsoProviderAsync(string jwt, SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var body = CreateSsoProviderBody.For(metadata, options);
+        var created = await this.MakeRequestAsync<SsoProviderResponse>(HttpMethod.Post, $"{this.Url}/admin/sso/providers", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return SsoProviderResponse.Read(created);
+    }
 
     private string SsoProviderUrl(SsoProviderReference provider) =>
         $"{this.Url}/admin/sso/providers/{(provider ?? throw new ArgumentNullException(nameof(provider))).RouteSegment}";
