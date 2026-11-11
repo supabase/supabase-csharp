@@ -1,9 +1,1 @@
 #nullable enable
-Supabase.Gotrue.Api.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters, Supabase.Gotrue.Constants.OAuthFlowType flowType) -> System.Threading.Tasks.Task<Supabase.Gotrue.Resend.ResendState!>!
-Supabase.Gotrue.Client.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters, Supabase.Gotrue.Constants.OAuthFlowType flowType) -> System.Threading.Tasks.Task<Supabase.Gotrue.Resend.ResendState!>!
-Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters, Supabase.Gotrue.Constants.OAuthFlowType flowType) -> System.Threading.Tasks.Task<Supabase.Gotrue.Resend.ResendState!>!
-Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters, Supabase.Gotrue.Constants.OAuthFlowType flowType) -> System.Threading.Tasks.Task<Supabase.Gotrue.Resend.ResendState!>!
-Supabase.Gotrue.Resend.ResendState
-Supabase.Gotrue.Resend.ResendState.PKCEVerifier.get -> string?
-Supabase.Gotrue.Resend.ResendState.PKCEVerifier.set -> void
-Supabase.Gotrue.Resend.ResendState.ResendState() -> void

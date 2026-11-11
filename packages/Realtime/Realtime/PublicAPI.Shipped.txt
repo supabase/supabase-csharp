@@ -59,6 +59,7 @@ Supabase.Realtime.Client.ClearStateChangedHandlers() -> void
 Supabase.Realtime.Client.Client(string! realtimeUrl, Supabase.Realtime.ClientOptions? options = null) -> void
 Supabase.Realtime.Client.Connect(System.Action<Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>!, Supabase.Realtime.Exceptions.RealtimeException?>? callback = null) -> Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>!
 Supabase.Realtime.Client.ConnectAsync() -> System.Threading.Tasks.Task<Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>!>!
+Supabase.Realtime.Client.ConnectionState.get -> Supabase.Realtime.Constants.ConnectionState
 Supabase.Realtime.Client.Disconnect(System.Net.WebSockets.WebSocketCloseStatus code = System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, string! reason = "Programmatic Disconnect") -> Supabase.Realtime.Interfaces.IRealtimeClient<Supabase.Realtime.RealtimeSocket!, Supabase.Realtime.RealtimeChannel!>!
 Supabase.Realtime.Client.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Realtime.Client.GetHeaders.set -> void
@@ -91,6 +92,8 @@ Supabase.Realtime.ClientOptions.PostgrestClient.get -> Supabase.Postgrest.Interf
 Supabase.Realtime.ClientOptions.PostgrestClient.set -> void
 Supabase.Realtime.ClientOptions.ReconnectAfterInterval.get -> System.Func<int, System.TimeSpan>!
 Supabase.Realtime.ClientOptions.ReconnectAfterInterval.set -> void
+Supabase.Realtime.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.Tasks.Task<string?>!>?
+Supabase.Realtime.ClientOptions.RetrieveAccessToken.set -> void
 Supabase.Realtime.ClientOptions.Timeout.get -> System.TimeSpan
 Supabase.Realtime.ClientOptions.Timeout.set -> void
 Supabase.Realtime.ClientOptions.Transport.get -> string!
@@ -108,6 +111,10 @@ Supabase.Realtime.Constants.ChannelState.Errored = 1 -> Supabase.Realtime.Consta
 Supabase.Realtime.Constants.ChannelState.Joined = 2 -> Supabase.Realtime.Constants.ChannelState
 Supabase.Realtime.Constants.ChannelState.Joining = 3 -> Supabase.Realtime.Constants.ChannelState
 Supabase.Realtime.Constants.ChannelState.Leaving = 4 -> Supabase.Realtime.Constants.ChannelState
+Supabase.Realtime.Constants.ConnectionState
+Supabase.Realtime.Constants.ConnectionState.Closed = 0 -> Supabase.Realtime.Constants.ConnectionState
+Supabase.Realtime.Constants.ConnectionState.Connecting = 1 -> Supabase.Realtime.Constants.ConnectionState
+Supabase.Realtime.Constants.ConnectionState.Open = 2 -> Supabase.Realtime.Constants.ConnectionState
 Supabase.Realtime.Constants.EventType
 Supabase.Realtime.Constants.EventType.Broadcast = 3 -> Supabase.Realtime.Constants.EventType
 Supabase.Realtime.Constants.EventType.Delete = 2 -> Supabase.Realtime.Constants.EventType
@@ -151,6 +158,7 @@ Supabase.Realtime.Exceptions.RealtimeException
 Supabase.Realtime.Exceptions.RealtimeException.RealtimeException(string? message) -> void
 Supabase.Realtime.Exceptions.RealtimeException.RealtimeException(string? message, System.Exception? innerException) -> void
 Supabase.Realtime.Exceptions.RealtimeException.Reason.get -> Supabase.Realtime.Exceptions.FailureHint.Reason
+Supabase.Realtime.Exceptions.RealtimeException.StatusCode.get -> int
 Supabase.Realtime.Interfaces.IRealtimeBroadcast
 Supabase.Realtime.Interfaces.IRealtimeBroadcast.AddBroadcastEventHandler(Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler! broadcastEventHandler) -> void
 Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler
@@ -170,6 +178,7 @@ Supabase.Realtime.Interfaces.IRealtimeChannel.ClearPostgresChangeHandlers() -> v
 Supabase.Realtime.Interfaces.IRealtimeChannel.ClearStateChangedHandlers() -> void
 Supabase.Realtime.Interfaces.IRealtimeChannel.ErrorEventHandler
 Supabase.Realtime.Interfaces.IRealtimeChannel.HasJoinedOnce.get -> bool
+Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendAsync(string! eventName, object! payload, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Realtime.Interfaces.IRealtimeChannel.IsClosed.get -> bool
 Supabase.Realtime.Interfaces.IRealtimeChannel.IsErrored.get -> bool
 Supabase.Realtime.Interfaces.IRealtimeChannel.IsJoined.get -> bool
@@ -211,6 +220,7 @@ Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ClearHeartbeatHa
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ClearStateChangedHandlers() -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Connect(System.Action<Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>!, Supabase.Realtime.Exceptions.RealtimeException?>? callback = null) -> Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>!
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ConnectAsync() -> System.Threading.Tasks.Task<Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>!>!
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ConnectionState.get -> Supabase.Realtime.Constants.ConnectionState
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Disconnect(System.Net.WebSockets.WebSocketCloseStatus code = System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, string! reason = "Programmatic Disconnect") -> Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>!
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.HeartbeatEventHandler
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Options.get -> Supabase.Realtime.ClientOptions!
@@ -397,6 +407,7 @@ Supabase.Realtime.RealtimeChannel.ClearMessageReceivedHandlers() -> void
 Supabase.Realtime.RealtimeChannel.ClearPostgresChangeHandlers() -> void
 Supabase.Realtime.RealtimeChannel.ClearStateChangedHandlers() -> void
 Supabase.Realtime.RealtimeChannel.HasJoinedOnce.get -> bool
+Supabase.Realtime.RealtimeChannel.HttpSendAsync(string! eventName, object! payload, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Realtime.RealtimeChannel.IsClosed.get -> bool
 Supabase.Realtime.RealtimeChannel.IsErrored.get -> bool
 Supabase.Realtime.RealtimeChannel.IsJoined.get -> bool
