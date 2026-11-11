@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Realtime.Socket;
@@ -101,4 +102,11 @@ public class ClientOptions
     /// </summary>
     [ImplementedCapability("realtime.configuration.custom_websocket_transport")]
     public IWebSocketFactory? WebSocketFactory { get; set; }
+
+    /// <summary>
+    /// Returns the current access token. Called on connect and on every heartbeat, so a refreshed token reaches
+    /// the server without calling <c>SetAuth</c>. A null result keeps the current token.
+    /// </summary>
+    [ImplementedCapability("realtime.configuration.access_token_callback")]
+    public Func<Task<string?>>? RetrieveAccessToken { get; set; }
 }
