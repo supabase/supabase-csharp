@@ -79,6 +79,7 @@ Supabase.Gotrue.Api.RegenerateRecoveryCodesAsync(string! jwt, System.Threading.C
 Supabase.Gotrue.Api.RegisterPasskeyAsync(string! jwt, System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Api.RenamePasskeyAsync(string! jwt, System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Api.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Api.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters, Supabase.Gotrue.Constants.OAuthFlowType flowType) -> System.Threading.Tasks.Task<Supabase.Gotrue.Resend.ResendState!>!
 Supabase.Gotrue.Api.ResetPasswordForEmail(Supabase.Gotrue.ResetPasswordForEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ResetPasswordForEmailState!>!
 Supabase.Gotrue.Api.ResetPasswordForEmail(string! email) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Api.SendMagicLinkEmail(string! email, Supabase.Gotrue.SignInOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -233,6 +234,7 @@ Supabase.Gotrue.Client.RegisterPasskeyAsync(System.Guid challengeId, System.Text
 Supabase.Gotrue.Client.RemoveStateChangedListener(Supabase.Gotrue.Interfaces.IGotrueClient<Supabase.Gotrue.User!, Supabase.Gotrue.Session!>.AuthEventHandler! authEventHandler) -> void
 Supabase.Gotrue.Client.RenamePasskeyAsync(System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Client.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Client.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters, Supabase.Gotrue.Constants.OAuthFlowType flowType) -> System.Threading.Tasks.Task<Supabase.Gotrue.Resend.ResendState!>!
 Supabase.Gotrue.Client.ResetPasswordForEmail(Supabase.Gotrue.ResetPasswordForEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ResetPasswordForEmailState!>!
 Supabase.Gotrue.Client.ResetPasswordForEmail(string! email) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Client.RetrieveSessionAsync() -> System.Threading.Tasks.Task<Supabase.Gotrue.Session?>!
@@ -637,6 +639,7 @@ Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RegenerateRecoveryCodesAs
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RegisterPasskeyAsync(string! jwt, System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RenamePasskeyAsync(string! jwt, System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters, Supabase.Gotrue.Constants.OAuthFlowType flowType) -> System.Threading.Tasks.Task<Supabase.Gotrue.Resend.ResendState!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ResetPasswordForEmail(Supabase.Gotrue.ResetPasswordForEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ResetPasswordForEmailState!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ResetPasswordForEmail(string! email) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.SendMagicLinkEmail(string! email, Supabase.Gotrue.SignInOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
@@ -709,6 +712,7 @@ Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RegenerateRecoveryCode
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RegisterPasskeyAsync(System.Guid challengeId, System.Text.Json.JsonElement credential, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RenamePasskeyAsync(System.Guid passkeyId, string! friendlyName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.Passkey!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters) -> System.Threading.Tasks.Task<Supabase.Gotrue.Responses.BaseResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.Resend(Supabase.Gotrue.Resend.ResendParameters! resendParameters, Supabase.Gotrue.Constants.OAuthFlowType flowType) -> System.Threading.Tasks.Task<Supabase.Gotrue.Resend.ResendState!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ResetPasswordForEmail(Supabase.Gotrue.ResetPasswordForEmailOptions! options) -> System.Threading.Tasks.Task<Supabase.Gotrue.ResetPasswordForEmailState!>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ResetPasswordForEmail(string! email) -> System.Threading.Tasks.Task<bool>!
 Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RetrieveSessionAsync() -> System.Threading.Tasks.Task<TSession?>!
@@ -972,6 +976,10 @@ Supabase.Gotrue.Resend.ResendParameters.Phone.get -> string?
 Supabase.Gotrue.Resend.ResendParameters.ResendParameters(Supabase.Gotrue.Resend.ResendType type, string? email, string? phone, Supabase.Gotrue.Resend.ResendOptions? options) -> void
 Supabase.Gotrue.Resend.ResendParameters.ToDictionary() -> System.Collections.Generic.Dictionary<string!, object!>!
 Supabase.Gotrue.Resend.ResendParameters.Type.get -> Supabase.Gotrue.Resend.ResendType
+Supabase.Gotrue.Resend.ResendState
+Supabase.Gotrue.Resend.ResendState.PKCEVerifier.get -> string?
+Supabase.Gotrue.Resend.ResendState.PKCEVerifier.set -> void
+Supabase.Gotrue.Resend.ResendState.ResendState() -> void
 Supabase.Gotrue.Resend.ResendType
 Supabase.Gotrue.Resend.ResendType.EmailChange = 3 -> Supabase.Gotrue.Resend.ResendType
 Supabase.Gotrue.Resend.ResendType.PhoneChange = 2 -> Supabase.Gotrue.Resend.ResendType

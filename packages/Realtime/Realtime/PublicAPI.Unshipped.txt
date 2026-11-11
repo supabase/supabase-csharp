@@ -1,12 +1,1 @@
 #nullable enable
-Supabase.Realtime.Client.ConnectionState.get -> Supabase.Realtime.Constants.ConnectionState
-Supabase.Realtime.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.Tasks.Task<string?>!>?
-Supabase.Realtime.ClientOptions.RetrieveAccessToken.set -> void
-Supabase.Realtime.Constants.ConnectionState
-Supabase.Realtime.Constants.ConnectionState.Closed = 0 -> Supabase.Realtime.Constants.ConnectionState
-Supabase.Realtime.Constants.ConnectionState.Connecting = 1 -> Supabase.Realtime.Constants.ConnectionState
-Supabase.Realtime.Constants.ConnectionState.Open = 2 -> Supabase.Realtime.Constants.ConnectionState
-Supabase.Realtime.Exceptions.RealtimeException.StatusCode.get -> int
-Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendAsync(string! eventName, object! payload, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ConnectionState.get -> Supabase.Realtime.Constants.ConnectionState
-Supabase.Realtime.RealtimeChannel.HttpSendAsync(string! eventName, object! payload, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
