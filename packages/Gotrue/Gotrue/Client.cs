@@ -20,6 +20,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
 using static Supabase.Gotrue.Common.SignOutReason;
 using static Supabase.Gotrue.Constants;
@@ -576,6 +577,19 @@ public class Client : IGotrueClient<User, Session>
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInWithPasskey);
         this.ThrowWhenOffline();
         var session = await this.api.SignInWithPasskeyAsync(challengeId, credential, cancellationToken).ConfigureAwait(false);
+        await this.UpdateSessionAsync(session).ConfigureAwait(false);
+        await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
+        return session;
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sign_in.sign_in_with_web3")]
+    public async Task<Session> SignInWithWeb3Async(Web3Credentials credentials, SignInWithWeb3Options? options = null, CancellationToken cancellationToken = default)
+    {
+        using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInWithWeb3);
+        activity?.SetTag(GotrueInstrumentation.Tags.Web3Chain, credentials.Chain);
+        this.ThrowWhenOffline();
+        var session = await this.api.SignInWithWeb3Async(credentials, options, cancellationToken).ConfigureAwait(false);
         await this.UpdateSessionAsync(session).ConfigureAwait(false);
         await this.NotifyAuthStateChangeAsync(SignedIn).ConfigureAwait(false);
         return session;

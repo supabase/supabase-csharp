@@ -1,0 +1,21 @@
+{
+  "access_token": "a-web3-access-token",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "expires_at": 1793720700,
+  "refresh_token": "a-web3-refresh-token",
+  "user": {
+    "id": "22222222-2222-2222-2222-222222222222",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "app_metadata": { "provider": "web3", "providers": ["web3"] },
+    "identities": [
+      {
+        "identity_id": "33333333-3333-3333-3333-333333333333",
+        "id": "web3:ethereum:0x2c7536e3605d9c16a7a3d7b1898e529396a65c23",
+        "user_id": "22222222-2222-2222-2222-222222222222",
+        "provider": "web3"
+      }
+    ]
+  }
+}

@@ -16,6 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="BouncyCastle.Cryptography" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.NET.Test.Sdk"/>
     <PackageReference Include="MSTest.TestAdapter"/>
@@ -46,6 +47,7 @@
     <None Update="RegisterPasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="RenamePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="SignInWithPasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="SignInWithWeb3\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="AdminListPasskeys\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="AdminDeletePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Pkce\Data\*.json" CopyToOutputDirectory="PreserveNewest" />

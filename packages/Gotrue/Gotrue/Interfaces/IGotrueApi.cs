@@ -13,6 +13,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
@@ -170,6 +171,20 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// (<see cref="Exceptions.FailureHint.Reason.Unknown" />).
     /// </exception>
     Task<TSession> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Exchanges a wallet's signature of a Sign in with Solana / Sign in with Ethereum message for a session. Nothing is
+    /// stored: the caller keeps the session.
+    /// </summary>
+    /// <param name="credentials">The signed message, from <see cref="Web3Credentials.ForSolana" /> or <see cref="Web3Credentials.ForEthereum" />.</param>
+    /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The session of the wallet's user.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request, or answered without a session carrying an access token
+    /// (<see cref="Exceptions.FailureHint.Reason.Unknown" />).
+    /// </exception>
+    Task<TSession> SignInWithWeb3Async(Web3Credentials credentials, SignInWithWeb3Options? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Generates the user's one-time set of MFA recovery codes.

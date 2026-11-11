@@ -1,0 +1,5 @@
+{
+  "code": 429,
+  "error_code": "over_request_rate_limit",
+  "msg": "Request rate limit reached"
+}
