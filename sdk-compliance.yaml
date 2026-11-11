@@ -275,6 +275,10 @@ features:
     symbols:
       - AdminClient.UpdateFactorAsync
 
+  auth.sso_admin.create_provider:
+    status: implemented
+    symbols:
+      - AdminClient.CreateSsoProviderAsync
   auth.sso_admin.delete_provider:
     status: implemented
     symbols:
