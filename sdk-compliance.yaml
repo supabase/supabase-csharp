@@ -291,6 +291,10 @@ features:
     status: implemented
     symbols:
       - AdminClient.ListSsoProvidersAsync
+  auth.sso_admin.update_provider:
+    status: implemented
+    symbols:
+      - AdminClient.UpdateSsoProviderAsync
 
   # ── Client Initialization ──────────────────────────────────────────────────
 
