@@ -24,7 +24,7 @@ public class PasswordManagementTests : AuthClientFixture
     {
         var email = RandomEmail();
         const string newPassword = "IAmANewSecretPassword";
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         await this.Client.Update(new UserAttributes { Password = newPassword });
         await this.Client.SignOut();
         var session = await this.Client.SignIn(email, newPassword);
@@ -35,7 +35,7 @@ public class PasswordManagementTests : AuthClientFixture
     public async Task ResetPasswordForEmail_ShouldSucceed_GivenRegisteredEmail()
     {
         var email = RandomEmail();
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         (await this.Client.ResetPasswordForEmail(email)).Should().BeTrue();
     }
 
@@ -43,7 +43,7 @@ public class PasswordManagementTests : AuthClientFixture
     public async Task ResetPasswordForEmail_ShouldReturnPkceVerifier_GivenPkceFlow()
     {
         var email = RandomEmail();
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         var state = await this.Client.ResetPasswordForEmail(new ResetPasswordForEmailOptions(email)
         {
             RedirectTo = "http://localhost:3000",

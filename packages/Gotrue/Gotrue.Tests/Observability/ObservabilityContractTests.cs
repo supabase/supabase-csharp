@@ -113,6 +113,16 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task SignUpSpan_ShouldRecordTheSignUpType()
+    {
+        this.server.Given(Request.Create().WithPath("/signup").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(200).WithHeader("Content-Type", "application/json").WithBody("{}"));
+        await this.client.SignUpAsync(Constants.SignUpType.Phone, "+15555550123", "a-password");
+        this.activities.Single(activity => activity.OperationName == "gotrue.sign_up").GetTagItem("gotrue.sign_up.type")
+            .Should().Be("Phone", "the sign-up span says which credential registered");
+    }
+
+    [TestMethod]
     public async Task DomainSpan_ShouldParentTheHttpSpan()
     {
         this.MockTokenSuccess();

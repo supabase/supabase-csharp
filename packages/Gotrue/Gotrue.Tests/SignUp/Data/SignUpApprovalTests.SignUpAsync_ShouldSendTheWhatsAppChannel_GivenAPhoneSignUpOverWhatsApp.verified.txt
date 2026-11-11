@@ -1,0 +1,1 @@
+﻿{"phone":"+15555550123","password":"super-secret-password","channel":"whatsapp"}

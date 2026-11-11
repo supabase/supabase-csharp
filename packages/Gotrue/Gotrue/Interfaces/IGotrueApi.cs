@@ -13,6 +13,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
 using static Supabase.Gotrue.Constants;
@@ -60,6 +61,18 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task SignOutAsync(string jwt, SignOutScope scope = SignOutScope.Global, CancellationToken cancellationToken = default);
     Task<TSession?> SignUpWithEmail(string email, string password, SignUpOptions? options = null);
     Task<TSession?> SignUpWithPhone(string phone, string password, SignUpOptions? options = null);
+
+    /// <summary>
+    /// Registers a user with an email address or a phone number and a password, without adopting any session.
+    /// </summary>
+    /// <param name="type">Whether <paramref name="identifier" /> is an email address or a phone number.</param>
+    /// <param name="identifier">The email address or phone number to register.</param>
+    /// <param name="password">The new user's password.</param>
+    /// <param name="options">Redirect URL, user metadata, captcha token, PKCE flow type (email) and messaging channel (phone).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The session the server issued, if any, the signed-up user and the PKCE verifier.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the sign-up.</exception>
+    Task<SignUpState> SignUpAsync(SignUpType type, string identifier, string password, SignUpOptions? options = null, CancellationToken cancellationToken = default);
     Task<TUser?> UpdateUser(string jwt, UserAttributes attributes);
     Task<TUser?> UpdateUserById(string jwt, string userId, UserAttributes userData);
     Task<TSession?> VerifyMobileOTP(string phone, string token, MobileOtpType type);

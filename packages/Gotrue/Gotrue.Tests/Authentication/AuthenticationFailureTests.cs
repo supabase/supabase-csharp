@@ -27,14 +27,14 @@ public class AuthenticationFailureTests : AuthClientFixture
     [TestMethod]
     public async Task SignUp_ShouldThrowUserBadPassword_GivenWeakPassword()
     {
-        var signUp = () => this.Client.SignUp(RandomEmail(), "x");
+        var signUp = () => this.Client.SignUpAsync(Constants.SignUpType.Email, RandomEmail(), "x");
         await this.VerifyRejected(signUp, UserBadPassword);
     }
 
     [TestMethod]
     public async Task SignUp_ShouldSurfaceTheServerErrorCode_GivenInvalidEmail()
     {
-        var signUp = () => this.Client.SignUp("not a real email address", Password);
+        var signUp = () => this.Client.SignUpAsync(Constants.SignUpType.Email, "not a real email address", Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         exception.Which.ErrorCode.Should().Be("validation_failed",
             "GoTrue rejects a malformed email with the generic validation_failed code, which the SDK surfaces verbatim rather than guessing a finer reason from the message text");
@@ -45,7 +45,7 @@ public class AuthenticationFailureTests : AuthClientFixture
     public async Task SignUp_ShouldThrowUserBadPhoneNumber_GivenEmptyPhone()
     {
         this.StateChanges.Should().BeEmpty();
-        var signUp = () => this.Client.SignUp(Constants.SignUpType.Phone, "", Password,
+        var signUp = () => this.Client.SignUpAsync(Constants.SignUpType.Phone, "", Password,
             new SignUpOptions { Data = new Dictionary<string, object> { { "firstName", "Testing" } } });
         await this.VerifyRejected(signUp, UserBadPhoneNumber);
     }
@@ -54,11 +54,11 @@ public class AuthenticationFailureTests : AuthClientFixture
     public async Task SignUp_ShouldThrowUserAlreadyRegisteredAndKeepSession_GivenDuplicate()
     {
         var email = RandomEmail();
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         this.StateChanges.Should().Contain(SignedIn);
         this.Persistence.LoadSession().Should().NotBeNull();
         this.StateChanges.Clear();
-        var duplicate = () => this.Client.SignUp(email, Password);
+        var duplicate = () => this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         await this.VerifyRejected(duplicate, UserAlreadyRegistered);
         this.Persistence.LoadSession().Should().NotBeNull();
         this.Client.CurrentSession.Should().NotBeNull();
@@ -68,7 +68,7 @@ public class AuthenticationFailureTests : AuthClientFixture
     public async Task SignIn_ShouldThrow_GivenWrongPassword()
     {
         var email = RandomEmail();
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         await this.Client.SignOut();
         var signIn = () => this.Client.SignIn(email, Password + "$");
         await signIn.Should().ThrowAsync<GotrueException>();

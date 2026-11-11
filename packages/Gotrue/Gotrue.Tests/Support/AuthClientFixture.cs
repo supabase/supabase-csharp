@@ -38,7 +38,7 @@ public abstract class AuthClientFixture
 
     protected async Task<Session> SignUpNewUser()
     {
-        var session = await this.Client.SignUp(RandomEmail(), Password);
+        var session = (await this.Client.SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password)).Session;
         session.Should().NotBeNull();
         return session!;
     }
