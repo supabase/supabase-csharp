@@ -51,6 +51,10 @@ features:
     status: implemented
     symbols:
       - Client.SignInWithSSO
+  auth.sign_in.sign_in_with_web3:
+    status: implemented
+    symbols:
+      - Client.SignInWithWeb3Async
   auth.sign_in.sign_up:
     status: implemented
     symbols:
