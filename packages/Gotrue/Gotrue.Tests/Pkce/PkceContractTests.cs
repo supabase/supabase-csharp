@@ -1,6 +1,7 @@
 #region
 
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
@@ -110,6 +111,14 @@ public class PkceContractTests
     }
 
     [TestMethod]
+    public void ExchangeCodeForSession_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
+    {
+        this.StubTokenExchange();
+        BlockingCaller.Completes(() => this.client.ExchangeCodeForSession("code-verifier", "auth-code")).Should().BeTrue(
+            "a library must not resume on the caller's context: a UI thread blocking on the task would deadlock");
+    }
+
+    [TestMethod]
     public async Task SignIn_ShouldNotAddStateToAuthUrl_GivenPkceFlow()
     {
         // Provider-side state is owned by the GoTrue server; the SDK must not inject its own or
@@ -125,6 +134,17 @@ public class PkceContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody("{}"));
+
+    private void StubTokenExchange() =>
+        this.server
+            .Given(Request.Create().WithPath("/token").WithParam("grant_type", "pkce").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(Fixture("exchanged_session.json")));
+
+    private static string Fixture(string name) =>
+        File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Pkce", "Data", name));
 
     private static string S256(string verifier)
     {

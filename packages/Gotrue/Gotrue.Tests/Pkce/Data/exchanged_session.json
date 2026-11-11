@@ -1,0 +1,13 @@
+{
+  "access_token": "an-exchanged-access-token",
+  "token_type": "bearer",
+  "expires_in": 3600,
+  "expires_at": 1793720700,
+  "refresh_token": "an-exchanged-refresh-token",
+  "user": {
+    "id": "22222222-2222-2222-2222-222222222222",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "example@email.com"
+  }
+}
