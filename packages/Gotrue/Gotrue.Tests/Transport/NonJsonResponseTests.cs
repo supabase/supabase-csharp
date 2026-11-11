@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Supabase.Gotrue;
 using Supabase.Gotrue.Exceptions;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -45,7 +46,7 @@ public class NonJsonResponseTests
     public async Task SignUp_ShouldThrowGotrueException_GivenNonJsonBody()
     {
         this.MockProxyErrorPage("/signup");
-        var act = () => TestClients.Against(this.server).SignUp(RandomEmail(), Password);
+        var act = () => TestClients.Against(this.server).SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         await act.Should().ThrowAsync<GotrueException>()
             .Where(exception => exception.StatusCode == 200 && exception.InnerException is JsonException,
                 "sign-up reads the body outside the generic request path");

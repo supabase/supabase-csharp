@@ -46,7 +46,7 @@ public class AdminSignOutTests : AdminFixture
 
     private static async Task<string> SignUpUser()
     {
-        var session = await TestClients.AgainstCliStack().SignUp(RandomEmail(), Password);
+        var session = (await TestClients.AgainstCliStack().SignUpAsync(SignUpType.Email, RandomEmail(), Password)).Session;
         return session?.AccessToken ?? throw new InvalidOperationException("The local stack returned no session on sign-up.");
     }
 }

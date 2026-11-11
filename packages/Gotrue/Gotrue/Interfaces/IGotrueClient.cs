@@ -15,6 +15,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignUp;
 using static Supabase.Gotrue.Constants;
 
 #endregion
@@ -362,6 +363,7 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     Thrown with <see cref="FailureHint.Reason.UserAlreadyRegistered" /> when the identifier is already
     ///     registered and your project surfaces that as an error rather than an obfuscated user.
     /// </exception>
+    [Obsolete("Ignores SignUpOptions.FlowType and SignUpOptions.Channel. Favor SignUpAsync instead, which returns a SignUpState. This member will be removed in v9.")]
     Task<TSession?> SignUp(SignUpType type, string identifier, string password, SignUpOptions? options = null);
 
     /// <summary>
@@ -391,7 +393,44 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     Thrown with <see cref="FailureHint.Reason.UserAlreadyRegistered" /> when the email is already registered
     ///     and your project surfaces that as an error rather than an obfuscated user.
     /// </exception>
+    [Obsolete("Ignores SignUpOptions.FlowType and SignUpOptions.Channel. Favor SignUpAsync instead, which returns a SignUpState. This member will be removed in v9.")]
     Task<TSession?> SignUp(string email, string password, SignUpOptions? options = null);
+
+    /// <summary>
+    ///     Registers a user with an email address or a phone number and a password.
+    /// </summary>
+    /// <remarks>
+    ///     Whether the user is signed in depends on your project's Confirm email/phone settings:
+    ///     - Confirmation disabled: the server issues a session. The client adopts it as
+    ///     <see cref="CurrentSession" />, persists it, raises <c>SignedIn</c>, and returns it in
+    ///     <see cref="SignUpState.Session" />.
+    ///     - Confirmation required: the server sends a confirmation email or code. <see cref="SignUpState.Session" />
+    ///     is <c>null</c>, <see cref="SignUpState.User" /> is the unconfirmed user, and the client does not sign them
+    ///     in, unless <see cref="ClientOptions.AllowUnconfirmedUserSessions" /> is on.
+    ///     With <see cref="SignInOptions.FlowType" /> set to <see cref="OAuthFlowType.PKCE" />, an email sign-up
+    ///     sends a code challenge, and <see cref="SignUpState.PKCEVerifier" /> is the verifier to pass to
+    ///     <see cref="ExchangeCodeForSession" /> with the code from the confirmation link. A phone sign-up sends its
+    ///     code through <see cref="SignUpOptions.Channel" />.
+    ///     If the identifier already belongs to an account, GoTrue avoids revealing that it exists: either
+    ///     <see cref="SignUpState.User" /> is an obfuscated user whose <see cref="User.Identities" /> is empty, or a
+    ///     <see cref="GotrueException" /> is thrown with <see cref="FailureHint.Reason.UserAlreadyRegistered" />.
+    /// </remarks>
+    /// <param name="type">Whether <paramref name="identifier" /> is an email address or a phone number.</param>
+    /// <param name="identifier">The email address or phone number to register.</param>
+    /// <param name="password">The new user's password.</param>
+    /// <param name="options">Redirect URL, user metadata, captcha token, flow type (email) and messaging channel (phone).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The session the user is signed in with, the signed-up user, and the PKCE verifier.</returns>
+    /// <exception cref="GotrueException">The server rejected the sign-up, or the client is offline.</exception>
+    /// <example>
+    ///     <code>
+    ///     var signedUp = await client.SignUpAsync(SignUpType.Email, "user@example.com", "a-strong-password",
+    ///         new SignUpOptions { FlowType = OAuthFlowType.PKCE, RedirectTo = "https://app.example/confirm" });
+    ///     if (signedUp.Session == null)
+    ///         keep(signedUp.PKCEVerifier);
+    ///     </code>
+    /// </example>
+    Task<SignUpState> SignUpAsync(SignUpType type, string identifier, string password, SignUpOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Used for re-authenticating a user in password changes.

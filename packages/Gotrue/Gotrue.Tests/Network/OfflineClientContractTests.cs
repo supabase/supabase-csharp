@@ -36,7 +36,7 @@ public class OfflineClientContractTests
     public static IEnumerable<object[]> OperationsNeedingTheServer =>
         new[]
         {
-            Operation("SignUp", client => client.SignUp(SignUpType.Email, Email, Password)),
+            Operation("SignUp", client => client.SignUpAsync(SignUpType.Email, Email, Password)),
             Operation("SendMagicLink", client => client.SignIn(Email)),
             Operation("SignInWithIdToken", client => client.SignInWithIdToken(Provider.Google, "an-id-token")),
             Operation("SignInWithEmailOtp", client => client.SignInWithOtp(new SignInWithPasswordlessEmailOptions(Email))),
