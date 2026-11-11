@@ -197,6 +197,11 @@ public class AdminClient : IGotrueAdminClient<User>
         this.api.GetSsoProviderAsync(this.serviceKey, provider, cancellationToken);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.delete_provider")]
+    public Task DeleteSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default) =>
+        this.api.DeleteSsoProviderAsync(this.serviceKey, provider, cancellationToken);
+
+    /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)
     {
         var result = await this.api.UpdateUser(this.serviceKey, attributes);
