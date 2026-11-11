@@ -862,6 +862,10 @@ public class Api : IGotrueApi<User, Session>
         return SsoProviderResponse.Read(found);
     }
 
+    /// <inheritdoc />
+    public Task DeleteSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, this.SsoProviderUrl(provider), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
     private string SsoProviderUrl(SsoProviderReference provider) =>
         $"{this.Url}/admin/sso/providers/{(provider ?? throw new ArgumentNullException(nameof(provider))).RouteSegment}";
 

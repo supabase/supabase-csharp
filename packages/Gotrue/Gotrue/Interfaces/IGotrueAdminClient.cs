@@ -421,4 +421,31 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(SsoProviderFilter? filter = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a single sign-on (SAML 2.0) identity provider, together with its email domains: their users can no
+    /// longer sign in through it. Requires a full-access API key, such as the service_role key: call it from a
+    /// server, never from a client app.
+    /// </summary>
+    /// <param name="provider">
+    /// The provider, addressed <see cref="SsoProviderReference.ById" /> or
+    /// <see cref="SsoProviderReference.ByResourceId" />.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.SsoProviderNotFound" /> when no provider matches
+    /// <paramref name="provider" />, including one already deleted, and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// await admin.DeleteSsoProviderAsync(SsoProviderReference.ById(providerId));
+    /// </code>
+    /// </example>
+    Task DeleteSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default);
 }
