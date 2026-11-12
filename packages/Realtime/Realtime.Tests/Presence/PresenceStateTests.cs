@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Text.Json;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -35,6 +37,16 @@ public class PresenceStateTests
     private const string FirstConnectionLeaveFrame =
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s4\"," +
         "\"payload\":{\"joins\":{},\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]}}}}";
+
+    private const string TrackEchoingNullRefsFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s6\"," +
+        "\"payload\":{\"joins\":{\"user-2\":{\"metas\":[{\"phx_ref\":\"r1\",\"phx_ref\":null,\"phx_ref_prev\":null}]}}," +
+        "\"leaves\":{}}}";
+
+    private const string RetrackEchoingNullRefsFrame =
+        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s7\"," +
+        "\"payload\":{\"joins\":{\"user-2\":{\"metas\":[{\"phx_ref\":\"r2\",\"phx_ref_prev\":\"r1\",\"phx_ref\":null,\"phx_ref_prev\":null}]}}," +
+        "\"leaves\":{\"user-2\":{\"metas\":[{\"phx_ref\":\"r1\",\"phx_ref\":null,\"phx_ref_prev\":null}]}}}}";
 
     private const string StateFrameAfterReconnect =
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_state\",\"ref\":\"s5\"," +
@@ -90,6 +102,24 @@ public class PresenceStateTests
         channel.HandleSocketMessage(Wire.Decode(FirstConnectionLeaveFrame));
         presence.CurrentState.Should().ContainKey("user-1", "the user is still online on the other connection")
             .WhoseValue.Should().ContainSingle().Which.PhoenixRef.Should().Be("r2");
+    }
+
+    [TestMethod]
+    public void HandleSocketMessage_ShouldKeepTheNewMeta_GivenARetrackEchoingNullRefs()
+    {
+        var (channel, presence) = Presence();
+        channel.HandleSocketMessage(Wire.Decode(TrackEchoingNullRefsFrame));
+        channel.HandleSocketMessage(Wire.Decode(RetrackEchoingNullRefsFrame));
+        presence.CurrentState.Should().ContainKey("user-2", "8.0 to 8.10 clients sent null refs and the server echoes them after its own")
+            .WhoseValue.Should().ContainSingle().Which.PhoenixRef.Should().Be("r2");
+    }
+
+    [TestMethod]
+    public void Serialize_ShouldOmitPhoenixRefs_GivenAModelTakenFromCurrentState()
+    {
+        var model = new PresenceExample { PhoenixRef = "r2", PhoenixPrevRef = "r1" };
+        JsonSerializer.SerializeToNode<object>(model, Wire.Settings())!.AsObject().Select(property => property.Key)
+            .Should().Equal(["time"], "the server assigns the refs and echoes any the client sends after its own");
     }
 
     [TestMethod]

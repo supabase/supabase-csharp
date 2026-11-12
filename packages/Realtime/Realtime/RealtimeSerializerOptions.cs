@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Supabase.Postgrest.Attributes;
 using Supabase.Realtime.Converters;
+using Supabase.Realtime.Models;
 using Supabase.Realtime.Socket;
 
 namespace Supabase.Realtime;
@@ -61,6 +62,9 @@ internal static class RealtimeSerializerOptions
             if (property.AttributeProvider is not MemberInfo member)
                 continue;
 
+            if (member.DeclaringType == typeof(BasePresence))
+                KeepServerRefs(property);
+
             var columnAttribute = member.GetCustomAttribute<ColumnAttribute>();
             if (columnAttribute != null)
             {
@@ -78,6 +82,17 @@ internal static class RealtimeSerializerOptions
                 property.ShouldSerialize = (_, _) => shouldInsert;
             }
         }
+    }
+
+    private static void KeepServerRefs(JsonPropertyInfo property)
+    {
+        var set = property.Set!;
+        property.ShouldSerialize = static (_, _) => false;
+        property.Set = (presence, value) =>
+        {
+            if (value != null)
+                set(presence, value);
+        };
     }
 
     private static void DropUntypedRecordProjection(JsonTypeInfo typeInfo)
