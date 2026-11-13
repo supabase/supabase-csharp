@@ -210,7 +210,7 @@ public class TokenRefresh
         var refreshAt = this._client.CurrentSession.CreatedAt.AddSeconds(interval);
 
         var now = this._client.Options.TimeProvider.GetUtcNow().UtcDateTime;
-        var secondsUntilNextRefresh = Convert.ToInt64((refreshAt - now).TotalSeconds);
+        var secondsUntilNextRefresh = Convert.ToInt64(refreshAt.Subtract(now).TotalSeconds);
 
         if (secondsUntilNextRefresh < 0)
             return TimeSpan.Zero;
