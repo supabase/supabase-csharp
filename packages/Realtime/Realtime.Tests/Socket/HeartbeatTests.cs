@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
@@ -64,6 +65,36 @@ public class HeartbeatTests
         clock.Advance(Interval);
         await socket.Awaiting(s => s.Reconnected.Task).Should().CompleteWithinAsync(TimeSpan.FromSeconds(5),
             "a heartbeat still unanswered when the next is due on the supplied clock means a dead connection");
+    }
+
+    [TestMethod]
+    public async Task Heartbeat_ShouldReplaceTheRunningTimer_GivenAReconnect()
+    {
+        var spy = new SpyTimeProvider(new FakeTimeProvider());
+        var socket = await this.Connect(answerHeartbeats: true, spy);
+        socket.RecoverFromLostConnection();
+        var timers = spy.TimersOwnedBy<RealtimeSocket>();
+        timers.Should().HaveCount(2, "each open starts a fresh heartbeat");
+        timers[0].IsDisposed.Should().BeTrue("the old heartbeat must stop, or every reconnect doubles the heartbeats");
+        timers[1].IsDisposed.Should().BeFalse();
+    }
+
+    [TestMethod]
+    public async Task Disconnect_ShouldStopTheHeartbeat()
+    {
+        var spy = new SpyTimeProvider(new FakeTimeProvider());
+        await this.Connect(answerHeartbeats: true, spy);
+        this.client.Socket!.Disconnect();
+        spy.TimersOwnedBy<RealtimeSocket>().Single().IsDisposed.Should().BeTrue("a disconnected socket sends no heartbeats");
+    }
+
+    [TestMethod]
+    public async Task Dispose_ShouldStopTheHeartbeat()
+    {
+        var spy = new SpyTimeProvider(new FakeTimeProvider());
+        await this.Connect(answerHeartbeats: true, spy);
+        ((IDisposable) this.client.Socket!).Dispose();
+        spy.TimersOwnedBy<RealtimeSocket>().Single().IsDisposed.Should().BeTrue("a disposed socket sends no heartbeats");
     }
 
     private async Task<FakeWebsocketClient> Connect(bool answerHeartbeats, TimeProvider? clock = null)

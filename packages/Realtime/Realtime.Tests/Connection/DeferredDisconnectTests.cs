@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Time.Testing;
@@ -63,6 +64,32 @@ public class DeferredDisconnectTests
         while (client.Socket != null && DateTime.UtcNow < deadline)
             await Task.Delay(10);
         client.Socket.Should().BeNull("the deferred disconnect waits on the supplied clock");
+    }
+
+    [TestMethod]
+    public async Task Unsubscribe_ShouldDisconnectWithoutTheCallerContext_GivenTheDelayElapses()
+    {
+        var clock = new FakeTimeProvider();
+        var delay = TimeSpan.FromMinutes(5);
+        var client = await Connect(delay, clock);
+
+        var previous = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new NeverRunsContinuations());
+        try
+        {
+            client.Channel("room").Unsubscribe();
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+
+        // Completing off the captured context forces a Post; completing on it would let the continuation run inline.
+        clock.Advance(delay);
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        while (client.Socket != null && DateTime.UtcNow < deadline)
+            await Task.Delay(10);
+        client.Socket.Should().BeNull("the deferred disconnect must not wait on the caller's context, which may be blocked");
     }
 
     [TestMethod]

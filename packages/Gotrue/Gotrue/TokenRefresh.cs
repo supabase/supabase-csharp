@@ -10,7 +10,7 @@ namespace Supabase.Gotrue;
 /// </summary>
 public class TokenRefresh
 {
-    private readonly Client client;
+    private readonly Client _client;
 
     /// <summary>
     /// Minimum wait between refresh attempts.
@@ -30,7 +30,7 @@ public class TokenRefresh
     ///     <cref>AutoRefreshToken</cref>
     /// </see>
     /// </summary>
-    private ITimer? refreshTimer;
+    private ITimer? _refreshTimer;
 
     /// <summary>
     /// Set by Stop, so nothing re-arms the timer before Start.
@@ -46,7 +46,7 @@ public class TokenRefresh
     /// Sets up the TokenRefresh class, bound to a specific client
     /// </summary>
     /// <param name="client"></param>
-    public TokenRefresh(Client client) => this.client = client;
+    public TokenRefresh(Client client) => this._client = client;
     /// <summary>
     /// Turns the auto-refresh timer on or off based on the current auth state
     /// </summary>
@@ -59,7 +59,7 @@ public class TokenRefresh
         {
             case SignedIn:
                 if (this.Debug)
-                    this.client.Debug("Refresh Timer started");
+                    this._client.Debug("Refresh Timer started");
                 this.CreateNewTimer();
                 // Turn on auto-refresh timer
                 break;
@@ -71,12 +71,12 @@ public class TokenRefresh
                 break;
             case UserUpdated:
                 if (this.Debug)
-                    this.client.Debug("Refresh Timer restarted");
+                    this._client.Debug("Refresh Timer restarted");
                 this.CreateNewTimer();
                 break;
             case TokenRefreshed:
                 if (this.Debug)
-                    this.client.Debug("Refresh Timer restarted");
+                    this._client.Debug("Refresh Timer restarted");
                 // A fresh token needs no refresh within a tick, so a zero expires_in cannot hot-loop.
                 this.CreateNewTimer(AutoRefreshTickDuration);
                 break;
@@ -107,12 +107,12 @@ public class TokenRefresh
         lock (this.timerGate)
         {
             // A sign-in raced this SignedOut, so its timer stays.
-            if (!this.stopped && this.client.CurrentSession != null)
+            if (!this.stopped && this._client.CurrentSession != null)
                 return;
             if (this.Debug)
-                this.client.Debug("Refresh Timer stopped");
-            this.refreshTimer?.Dispose();
-            this.refreshTimer = null;
+                this._client.Debug("Refresh Timer stopped");
+            this._refreshTimer?.Dispose();
+            this._refreshTimer = null;
         }
     }
 
@@ -126,9 +126,9 @@ public class TokenRefresh
         var refreshCompleted = false;
         try
         {
-            if (this.client.Online)
+            if (this._client.Online)
             {
-                await this.client.RefreshToken();
+                await this._client.RefreshToken();
                 refreshCompleted = true;
             }
         }
@@ -136,7 +136,7 @@ public class TokenRefresh
         {
             // Something unusually bad happened!
             if (this.Debug)
-                this.client.Debug(ex.Message, ex);
+                this._client.Debug(ex.Message, ex);
         }
         finally
         {
@@ -168,23 +168,23 @@ public class TokenRefresh
                 refreshDueTime = minimumDelay;
             lock (this.timerGate)
             {
-                if (this.stopped || this.client.CurrentSession == null)
+                if (this.stopped || this._client.CurrentSession == null)
                 {
                     if (this.Debug)
-                        this.client.Debug($"No session, refresh timer not started");
+                        this._client.Debug($"No session, refresh timer not started");
                     return;
                 }
-                this.refreshTimer?.Dispose();
-                this.refreshTimer = this.client.Options.TimeProvider.CreateTimer(this.HandleRefreshTimerTick, null, refreshDueTime, Timeout.InfiniteTimeSpan);
+                this._refreshTimer?.Dispose();
+                this._refreshTimer = this._client.Options.TimeProvider.CreateTimer(this.HandleRefreshTimerTick, null, refreshDueTime, Timeout.InfiniteTimeSpan);
             }
 
             if (this.Debug)
-                this.client.Debug($"Refresh timer scheduled {refreshDueTime.TotalMinutes} minutes");
+                this._client.Debug($"Refresh timer scheduled {refreshDueTime.TotalMinutes} minutes");
         }
         catch (Exception e)
         {
             if (this.Debug)
-                this.client.Debug($"Failed to initialize refresh timer", e);
+                this._client.Debug($"Failed to initialize refresh timer", e);
         }
     }
 
@@ -201,22 +201,22 @@ public class TokenRefresh
     /// <returns>The remaining seconds until the token should be refreshed</returns>
     private TimeSpan GetSecondsUntilNextRefresh()
     {
-        if (this.client.CurrentSession is null || this.client.CurrentSession.AccessToken == null)
+        if (this._client.CurrentSession is null || this._client.CurrentSession.AccessToken == null)
         {
             return TimeSpan.Zero;
         }
 
-        var interval = (long) Math.Floor(this.client.CurrentSession.ExpiresIn * 4.0 / 5.0);
-        var refreshAt = this.client.CurrentSession.CreatedAt.AddSeconds(interval);
+        var interval = (long) Math.Floor(this._client.CurrentSession.ExpiresIn * 4.0 / 5.0);
+        var refreshAt = this._client.CurrentSession.CreatedAt.AddSeconds(interval);
 
-        var now = this.client.Options.TimeProvider.GetUtcNow().UtcDateTime;
+        var now = this._client.Options.TimeProvider.GetUtcNow().UtcDateTime;
         var secondsUntilNextRefresh = Convert.ToInt64((refreshAt - now).TotalSeconds);
 
         if (secondsUntilNextRefresh < 0)
             return TimeSpan.Zero;
 
-        if (secondsUntilNextRefresh > this.client.Options.MaximumRefreshWaitTime)
-            secondsUntilNextRefresh = this.client.Options.MaximumRefreshWaitTime;
+        if (secondsUntilNextRefresh > this._client.Options.MaximumRefreshWaitTime)
+            secondsUntilNextRefresh = this._client.Options.MaximumRefreshWaitTime;
 
         return TimeSpan.FromSeconds(secondsUntilNextRefresh);
     }

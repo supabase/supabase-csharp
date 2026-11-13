@@ -115,10 +115,45 @@ public class RetryExecutorTests
     }
 
     [TestMethod]
+    public async Task SendAsync_ShouldNotResumeOnCallerContext_GivenBackoffDelayCompletes()
+    {
+        var clock = new FakeTimeProvider();
+        var responses = new Queue<HttpStatusCode>([HttpStatusCode.ServiceUnavailable, HttpStatusCode.OK]);
+        var handler = new StubHandler(_ => new HttpResponseMessage(responses.Dequeue()));
+        using var client = new HttpClient(handler);
+        var backoff = TimeSpan.FromMinutes(1);
+        var options = new RetryOptions { MaxRetries = 1, BaseDelay = backoff, MaxDelay = backoff, UseJitter = false, TimeProvider = clock };
+
+        var previous = SynchronizationContext.Current;
+        Task<HttpResponseMessage> send;
+        SynchronizationContext.SetSynchronizationContext(new NeverRunsContinuations());
+        try
+        {
+            send = RetryExecutor.SendAsync(client, Get, options);
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+
+        // Completing off the captured context forces a Post; completing on it would let the continuation run inline.
+        clock.Advance(backoff);
+
+        (await send.WaitAsync(TimeSpan.FromSeconds(5))).StatusCode.Should().Be(HttpStatusCode.OK,
+            "the retry must not wait on the caller's context — a UI thread blocking on the call would deadlock");
+    }
+
+    [TestMethod]
     public void RetryOptions_ShouldDefaultToSystemTimeProvider() =>
         new RetryOptions().TimeProvider.Should().BeSameAs(TimeProvider.System, "unset, backoff keeps waiting on the real clock");
 
     private static HttpRequestMessage Get() => new(HttpMethod.Get, "http://localhost/");
+
+    /// <summary>Plays a blocked UI thread: posted continuations are dropped, so anything resuming on this context never completes.</summary>
+    private sealed class NeverRunsContinuations : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object? state) { }
+    }
 
     private sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler
     {
