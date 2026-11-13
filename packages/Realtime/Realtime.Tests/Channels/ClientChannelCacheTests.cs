@@ -78,6 +78,14 @@ public class ClientChannelCacheTests
     }
 
     [TestMethod]
+    public void Subscriptions_ShouldHoldOnlyTheActiveChannels_GivenOneWasUnsubscribed()
+    {
+        var room = this.client.Channel("room");
+        this.client.Channel("lobby").Unsubscribe();
+        this.client.Subscriptions.Values.Should().Equal(room);
+    }
+
+    [TestMethod]
     public void RemoveAll_ShouldRemoveEveryChannel()
     {
         this.client.Channel("room");

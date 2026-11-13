@@ -15,6 +15,8 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignInWithWeb3;
+using Supabase.Gotrue.SignUp;
 using static Supabase.Gotrue.Constants;
 
 #endregion
@@ -66,6 +68,23 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     <see cref="Update" />>
     /// </summary>
     TUser? CurrentUser { get; }
+
+    /// <summary>
+    ///     Why the user was signed out: an explicit sign-out, a session the server rejected, or a stored session
+    ///     that could not be recovered. Read it while handling <see cref="AuthState.SignedOut" /> to tell a
+    ///     voluntary sign-out from an involuntary one. It is <c>null</c> while a user is signed in, and when the
+    ///     client cannot tell why no user is signed in.
+    /// </summary>
+    /// <example>
+    ///     <code>
+    ///     client.AddStateChangedListener((sender, state) =>
+    ///     {
+    ///         if (state == AuthState.SignedOut &amp;&amp; sender.SignOutReason == SignOutReason.SessionExpired)
+    ///             ShowSessionExpiredNotice();
+    ///     });
+    ///     </code>
+    /// </example>
+    SignOutReason? SignOutReason { get; }
 
     /// <summary>
     ///     Returns the client options.
@@ -306,7 +325,9 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="options">The redirect uri and captcha token, if any</param>
     /// <returns>
     ///     The Uri returned from supabase auth that a user can use to sign in to their given SSO provider (okta,
-    ///     microsoft entra, gsuite ect...)
+    ///     microsoft entra, gsuite ect...). With the PKCE flow, it also carries the
+    ///     <see cref="ProviderAuthState.PKCEVerifier" /> to pass to <see cref="ExchangeCodeForSession" /> with the code
+    ///     the SSO callback returns.
     /// </returns>
     Task<SSOResponse?> SignInWithSSO(Guid providerId, SignInWithSSOOptions? options = null);
 
@@ -323,7 +344,9 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="options">The redirect uri and captcha token, if any</param>
     /// <returns>
     ///     The Uri returned from supabase auth that a user can use to sign in to their given SSO provider (okta,
-    ///     microsoft entra, gsuite ect...)
+    ///     microsoft entra, gsuite ect...). With the PKCE flow, it also carries the
+    ///     <see cref="ProviderAuthState.PKCEVerifier" /> to pass to <see cref="ExchangeCodeForSession" /> with the code
+    ///     the SSO callback returns.
     /// </returns>
     Task<SSOResponse?> SignInWithSSO(string domain, SignInWithSSOOptions? options = null);
 
@@ -362,6 +385,7 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     Thrown with <see cref="FailureHint.Reason.UserAlreadyRegistered" /> when the identifier is already
     ///     registered and your project surfaces that as an error rather than an obfuscated user.
     /// </exception>
+    [Obsolete("Ignores SignUpOptions.FlowType and SignUpOptions.Channel. Favor SignUpAsync instead, which returns a SignUpState. This member will be removed in v9.")]
     Task<TSession?> SignUp(SignUpType type, string identifier, string password, SignUpOptions? options = null);
 
     /// <summary>
@@ -391,7 +415,44 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     Thrown with <see cref="FailureHint.Reason.UserAlreadyRegistered" /> when the email is already registered
     ///     and your project surfaces that as an error rather than an obfuscated user.
     /// </exception>
+    [Obsolete("Ignores SignUpOptions.FlowType and SignUpOptions.Channel. Favor SignUpAsync instead, which returns a SignUpState. This member will be removed in v9.")]
     Task<TSession?> SignUp(string email, string password, SignUpOptions? options = null);
+
+    /// <summary>
+    ///     Registers a user with an email address or a phone number and a password.
+    /// </summary>
+    /// <remarks>
+    ///     Whether the user is signed in depends on your project's Confirm email/phone settings:
+    ///     - Confirmation disabled: the server issues a session. The client adopts it as
+    ///     <see cref="CurrentSession" />, persists it, raises <c>SignedIn</c>, and returns it in
+    ///     <see cref="SignUpState.Session" />.
+    ///     - Confirmation required: the server sends a confirmation email or code. <see cref="SignUpState.Session" />
+    ///     is <c>null</c>, <see cref="SignUpState.User" /> is the unconfirmed user, and the client does not sign them
+    ///     in, unless <see cref="ClientOptions.AllowUnconfirmedUserSessions" /> is on.
+    ///     With <see cref="SignInOptions.FlowType" /> set to <see cref="OAuthFlowType.PKCE" />, an email sign-up
+    ///     sends a code challenge, and <see cref="SignUpState.PKCEVerifier" /> is the verifier to pass to
+    ///     <see cref="ExchangeCodeForSession" /> with the code from the confirmation link. A phone sign-up sends its
+    ///     code through <see cref="SignUpOptions.Channel" />.
+    ///     If the identifier already belongs to an account, GoTrue avoids revealing that it exists: either
+    ///     <see cref="SignUpState.User" /> is an obfuscated user whose <see cref="User.Identities" /> is empty, or a
+    ///     <see cref="GotrueException" /> is thrown with <see cref="FailureHint.Reason.UserAlreadyRegistered" />.
+    /// </remarks>
+    /// <param name="type">Whether <paramref name="identifier" /> is an email address or a phone number.</param>
+    /// <param name="identifier">The email address or phone number to register.</param>
+    /// <param name="password">The new user's password.</param>
+    /// <param name="options">Redirect URL, user metadata, captcha token, flow type (email) and messaging channel (phone).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The session the user is signed in with, the signed-up user, and the PKCE verifier.</returns>
+    /// <exception cref="GotrueException">The server rejected the sign-up, or the client is offline.</exception>
+    /// <example>
+    ///     <code>
+    ///     var signedUp = await client.SignUpAsync(SignUpType.Email, "user@example.com", "a-strong-password",
+    ///         new SignUpOptions { FlowType = OAuthFlowType.PKCE, RedirectTo = "https://app.example/confirm" });
+    ///     if (signedUp.Session == null)
+    ///         keep(signedUp.PKCEVerifier);
+    ///     </code>
+    /// </example>
+    Task<SignUpState> SignUpAsync(SignUpType type, string identifier, string password, SignUpOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Used for re-authenticating a user in password changes.
@@ -404,11 +465,20 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <summary>
     ///     Signs out and invalidates all sessions for a user.
     /// </summary>
+    /// <remarks>
+    ///     What happens to this device's session depends on <paramref name="scope" />:
+    ///     - <see cref="SignOutScope.Global" />: the session is cleared, and <c>SignedOut</c> raised, only once the
+    ///     server has ended the user's sessions, or answers that the user no longer exists. When the server refuses
+    ///     or cannot be reached, the session is kept and the <see cref="GotrueException" /> is thrown, so you can
+    ///     retry, or fall back to <see cref="SignOutScope.Local" /> to sign this device out regardless.
+    ///     - <see cref="SignOutScope.Local" />: the session is always cleared; a server failure is still thrown.
+    ///     - <see cref="SignOutScope.Others" />: the session is never cleared.
+    /// </remarks>
     /// <param name="scope">
     ///     Determines which sessions should be invalidated. By default, it will invalidate all session for a
     ///     user
     /// </param>
-    /// <returns></returns>
+    /// <exception cref="GotrueException">The server refused the sign-out or could not be reached.</exception>
     Task SignOut(SignOutScope scope = SignOutScope.Global);
 
     /// <summary>
@@ -695,6 +765,36 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     Task<TSession> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
 
     /// <summary>
+    ///     Signs in with a Web3 wallet (Solana or Ethereum): the server checks the wallet's signature of a Sign in with
+    ///     Solana / Sign in with Ethereum message and signs in the user the wallet's address identifies, creating it on
+    ///     first sign-in. The wallet library writes and signs the message; .NET has no injected browser wallet for the
+    ///     SDK to drive. The new session replaces the current one, is persisted, and is announced like any other sign-in.
+    /// </summary>
+    /// <param name="credentials">
+    ///     The signed message, from <see cref="Web3Credentials.ForSolana" /> or <see cref="Web3Credentials.ForEthereum" />.
+    /// </param>
+    /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The signed-in session.</returns>
+    /// <exception cref="GotrueException">
+    ///     <see cref="FailureHint.Reason.Offline" /> when the client is offline,
+    ///     <see cref="FailureHint.Reason.UserTooManyRequests" /> when the Web3 sign-in rate limit is reached,
+    ///     or the server's rejection of the request: <see cref="GotrueException.ErrorCode" /> <c>web3_provider_disabled</c>
+    ///     when the chain is disabled on the server, <c>validation_failed</c> when the message or signature is malformed,
+    ///     <c>captcha_failed</c> when the CAPTCHA token is missing or invalid; an <c>invalid_grant</c> answer when the
+    ///     signature does not match the message's address, or the message is expired, not yet valid, issued too long
+    ///     ago, or signed for a URI the project does not allow.
+    /// </exception>
+    /// <example>
+    ///     <code>
+    ///     var message = siweMessage.ToString();
+    ///     var signature = await wallet.PersonalSignAsync(message);
+    ///     var session = await client.SignInWithWeb3Async(Web3Credentials.ForEthereum(message, signature));
+    ///     </code>
+    /// </example>
+    Task<TSession> SignInWithWeb3Async(Web3Credentials credentials, SignInWithWeb3Options? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
     ///     Add a listener to get errors that occur outside of a typical Exception flow.
     ///     In particular, this is used to get errors and messages from the background thread
     ///     that automatically manages refreshing the user's token.
@@ -792,6 +892,14 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     /// <param name="resendParameters"></param>
     /// <returns></returns>
     Task<BaseResponse> Resend(ResendParameters resendParameters);
+
+    /// <summary>
+    /// Resends a confirmation code to a user's email or phone, with the PKCE code challenge on the PKCE flow.
+    /// </summary>
+    /// <param name="resendParameters"></param>
+    /// <param name="flowType"></param>
+    /// <returns></returns>
+    Task<ResendState> Resend(ResendParameters resendParameters, OAuthFlowType flowType);
 
     #region MFA
 

@@ -345,7 +345,7 @@ public class RealtimeChannel : IRealtimeChannel
     private void NotifyMessageReceived(SocketResponse message)
     {
         foreach (var handler in this.messageReceivedHandlers.Snapshot())
-            handler.Invoke(this, message);
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, message));
     }
 
     /// <inheritdoc />
@@ -600,6 +600,11 @@ public class RealtimeChannel : IRealtimeChannel
             ? Task.FromResult(true)
             : PushAwaiter.Await(push);
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.channel.broadcast_http")]
+    public Task HttpSendAsync(string eventName, object payload, CancellationToken cancellationToken = default) =>
+        this.Socket.HttpSendAsync(this, eventName, payload, cancellationToken);
 
     /// <summary>
     /// Awaits a reply for a given <see cref="Channel.Push"/>, resolving with whether a known reply was

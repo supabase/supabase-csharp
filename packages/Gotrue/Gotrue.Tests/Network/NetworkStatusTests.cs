@@ -51,7 +51,7 @@ public class NetworkStatusTests
     {
         var client = new Client(new ClientOptions { AllowUnconfirmedUserSessions = true, Url = UnreachableUrl });
         client.Online = false;
-        var signUp = () => client.SignUp(RandomEmail(), Password);
+        var signUp = () => client.SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         exception.Which.Reason.Should().Be(Offline);
     }
@@ -61,7 +61,7 @@ public class NetworkStatusTests
     {
         var client = TestClients.AgainstCliStack();
         client.Online = true;
-        await client.SignUp(RandomEmail(), Password);
+        await client.SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         client.Online = false;
         var refresh = () => client.RefreshToken();
         (await refresh.Should().ThrowAsync<GotrueException>()).Which.Reason.Should().Be(Offline);

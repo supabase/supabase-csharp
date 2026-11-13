@@ -22,7 +22,7 @@
     <PackageVersion Include="Microsoft.Bcl.TimeProvider" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageVersion Include="MimeMapping" Version="4.0.0" />
-    <PackageVersion Include="PolySharp" Version="1.16.0">
+    <PackageVersion Include="PolySharp" Version="1.17.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
@@ -42,7 +42,8 @@
     <PackageVersion Include="NSubstitute" Version="[6.0.0]" />
     <PackageVersion Include="Verify.MSTest" Version="[32.0.1]" />
     <PackageVersion Include="coverlet.collector" Version="10.1.0" />
-    <PackageVersion Include="WireMock.Net" Version="2.21.0" />
+    <PackageVersion Include="WireMock.Net" Version="2.30.0" />
+    <PackageVersion Include="BouncyCastle.Cryptography" Version="2.7.0" />
     <PackageVersion Include="Npgsql" Version="[8.0.6]" />
     <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.23.0" />
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="8.10.0" />

@@ -12,20 +12,25 @@ using Supabase.Core.Http;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
+using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.RegisterPasskey;
 using Supabase.Gotrue.RenamePasskey;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignInWithWeb3;
+using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateSsoProvider;
 using Supabase.Gotrue.VerifyRecoveryCode;
 using static Supabase.Gotrue.Constants;
 
@@ -127,6 +132,31 @@ public class Api : IGotrueApi<User, Session>
         var response = await this.MakeRequestAsync(HttpMethod.Post, endpoint, body, this.Headers).ConfigureAwait(false);
         return ReadSignUpResponse(response);
     }
+
+    /// <inheritdoc />
+    public async Task<SignUpState> SignUpAsync(SignUpType type, string identifier, string password, SignUpOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var codeVerifier = CodeVerifierFor(type, options);
+        var body = type switch
+        {
+            SignUpType.Email => SignUpBody.ForEmail(identifier, password, options, codeVerifier),
+            SignUpType.Phone => SignUpBody.ForPhone(identifier, password, options),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
+        };
+        var response = await this.MakeRequestAsync(HttpMethod.Post, Helpers.WithRedirectTo($"{this.Url}/signup", options?.RedirectTo), body, this.Headers, cancellationToken).ConfigureAwait(false);
+        return ToSignUpState(ReadSignUpResponse(response), codeVerifier);
+    }
+
+    private static string? CodeVerifierFor(SignUpType type, SignUpOptions? options) =>
+        type == SignUpType.Email && options?.FlowType == OAuthFlowType.PKCE ? Helpers.GenerateNonce() : null;
+
+    private static SignUpState ToSignUpState(Session? signedUp, string? codeVerifier) =>
+        new()
+        {
+            Session = string.IsNullOrEmpty(signedUp?.AccessToken) ? null : signedUp,
+            User = signedUp?.User,
+            PKCEVerifier = codeVerifier,
+        };
 
     /// <summary>Reads a sign-up response: a session, the bare user returned while confirmation is pending, or null.</summary>
     private static Session? ReadSignUpResponse(BaseResponse response)
@@ -312,7 +342,7 @@ public class Api : IGotrueApi<User, Session>
         return this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=id_token", body, this.Headers);
     }
 
-    private Task<SSOResponse?> SignInWithSsoInternal(Guid? providerId = null, string? domain = null, SignInWithSSOOptions? options = null)
+    private async Task<SSOResponse?> SignInWithSsoInternal(Guid? providerId = null, string? domain = null, SignInWithSSOOptions? options = null)
     {
         if (providerId != null && domain != null)
             throw new GotrueException($"Both providerId and domain were provided to the API, " +
@@ -321,11 +351,12 @@ public class Api : IGotrueApi<User, Session>
             throw new GotrueException($"Both providerId and domain were null " +
                                       $"you must supply either one or the other but not both providerId={providerId}, domain={domain}");
 
+        string? codeVerifier = null;
         string? codeChallenge = null;
         string? codeChallengeMethod = null;
         if (options?.FlowType == OAuthFlowType.PKCE)
         {
-            var codeVerifier = Helpers.GenerateNonce();
+            codeVerifier = Helpers.GenerateNonce();
             codeChallenge = Helpers.GeneratePKCENonceVerifier(codeVerifier);
             codeChallengeMethod = "s256";
         }
@@ -346,7 +377,15 @@ public class Api : IGotrueApi<User, Session>
         if (!string.IsNullOrEmpty(options?.CaptchaToken))
             body.Add("gotrue_meta_security", new Dictionary<string, object?> { { "captcha_token", options?.CaptchaToken } });
 
-        return this.MakeRequestAsync<SSOResponse>(HttpMethod.Post, $"{this.Url}/sso", body, this.Headers);
+        var redirect = await this.MakeRequestAsync<SSOResponse>(HttpMethod.Post, $"{this.Url}/sso", body, this.Headers).ConfigureAwait(false);
+        return WithPkceVerifier(redirect, codeVerifier);
+    }
+
+    private static SSOResponse? WithPkceVerifier(SSOResponse? redirect, string? codeVerifier)
+    {
+        if (redirect != null)
+            redirect.PKCEVerifier = codeVerifier;
+        return redirect;
     }
 
     /// <inheritdoc />
@@ -713,11 +752,18 @@ public class Api : IGotrueApi<User, Session>
     public async Task<Session> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default)
     {
         var signedIn = await this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/passkeys/authentication/verify", SignInWithPasskeyBody.For(challengeId, credential), this.Headers, cancellationToken).ConfigureAwait(false);
-        return RetrievePasskeySessionOrThrow(signedIn);
+        return RetrieveSessionOrThrow(signedIn, "passkey");
     }
 
-    private static Session RetrievePasskeySessionOrThrow(Session? signedIn) =>
-        string.IsNullOrEmpty(signedIn?.AccessToken) ? throw new GotrueException("The auth server returned no session for the passkey sign-in.", FailureHint.Reason.Unknown) : signedIn!;
+    /// <inheritdoc />
+    public async Task<Session> SignInWithWeb3Async(Web3Credentials credentials, SignInWithWeb3Options? options = null, CancellationToken cancellationToken = default)
+    {
+        var signedIn = await this.MakeRequestAsync<Session>(HttpMethod.Post, $"{this.Url}/token?grant_type=web3", SignInWithWeb3Body.For(credentials, options), this.Headers, cancellationToken).ConfigureAwait(false);
+        return RetrieveSessionOrThrow(signedIn, "Web3");
+    }
+
+    private static Session RetrieveSessionOrThrow(Session? signedIn, string signInMethod) =>
+        string.IsNullOrEmpty(signedIn?.AccessToken) ? throw new GotrueException($"The auth server returned no session for the {signInMethod} sign-in.", FailureHint.Reason.Unknown) : signedIn!;
 
     /// <inheritdoc />
     public async Task<RecoveryCodes> GenerateRecoveryCodesAsync(string jwt, GenerateRecoveryCodesOptions? options = null, CancellationToken cancellationToken = default)
@@ -810,6 +856,44 @@ public class Api : IGotrueApi<User, Session>
 
     private string CustomProviderUrl(string identifier) =>
         $"{this.Url}/admin/custom-providers/{CustomProviderIdentifier.EnsureRoutable(identifier)}";
+
+    /// <inheritdoc />
+    public async Task<SsoProvider> GetSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default)
+    {
+        var found = await this.MakeRequestAsync<SsoProviderResponse>(HttpMethod.Get, this.SsoProviderUrl(provider), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return SsoProviderResponse.Read(found);
+    }
+
+    /// <inheritdoc />
+    public Task DeleteSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, this.SsoProviderUrl(provider), null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<SsoProvider> CreateSsoProviderAsync(string jwt, SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var body = CreateSsoProviderBody.For(metadata, options);
+        var created = await this.MakeRequestAsync<SsoProviderResponse>(HttpMethod.Post, $"{this.Url}/admin/sso/providers", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return SsoProviderResponse.Read(created);
+    }
+
+    /// <inheritdoc />
+    public async Task<SsoProvider> UpdateSsoProviderAsync(string jwt, SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default)
+    {
+        var url = this.SsoProviderUrl(provider);
+        var body = UpdateSsoProviderBody.For(changes);
+        var updated = await this.MakeRequestAsync<SsoProviderResponse>(HttpMethod.Put, url, body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return SsoProviderResponse.Read(updated);
+    }
+
+    private string SsoProviderUrl(SsoProviderReference provider) =>
+        $"{this.Url}/admin/sso/providers/{(provider ?? throw new ArgumentNullException(nameof(provider))).RouteSegment}";
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(string jwt, SsoProviderFilter? filter = null, CancellationToken cancellationToken = default)
+    {
+        var listed = await this.MakeRequestAsync<SsoProviderListResponse>(HttpMethod.Get, $"{this.Url}/admin/sso/providers", ListSsoProvidersQuery.For(filter), this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return SsoProviderListResponse.Read(listed);
+    }
 
     /// <inheritdoc />
     public async Task<ProviderAuthState> LinkIdentity(string token, Provider provider, SignInOptions options)
@@ -1083,5 +1167,25 @@ public class Api : IGotrueApi<User, Session>
             body,
             this.Headers
         );
+    }
+
+    /// <inheritdoc />
+    public async Task<ResendState> Resend(ResendParameters resendParameters, OAuthFlowType flowType)
+    {
+        var body = resendParameters.ToDictionary();
+        var url = resendParameters.ApplyRedirectTo(this.Url);
+        string? verifier = null;
+
+        if (flowType == OAuthFlowType.PKCE && resendParameters.IsEmail())
+        {
+            verifier = Helpers.GenerateNonce();
+            var challenge = Helpers.GeneratePKCENonceVerifier(verifier);
+            body.Add("code_challenge", challenge);
+            body.Add("code_challenge_method", "s256");
+        }
+
+        await this.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers).ConfigureAwait(false);
+
+        return new ResendState { PKCEVerifier = verifier };
     }
 }

@@ -7,6 +7,11 @@ features:
     status: implemented
     symbols:
       - Client.ExchangeCodeForSession
+  auth.sign_in.concurrent_pkce_flows:
+    status: implemented
+    note: "The SDK never stores a code verifier: every PKCE-starting call returns its own verifier and ExchangeCodeForSession takes it explicitly, so concurrent flows cannot overwrite each other and no flow id is needed."
+    symbols:
+      - Client.ExchangeCodeForSession
   auth.sign_in.reauthenticate:
     status: implemented
     symbols:
@@ -46,11 +51,14 @@ features:
     status: implemented
     symbols:
       - Client.SignInWithSSO
-  auth.sign_in.sign_up:
-    status: partially_implemented
-    note: "API mirrors signUp, but on a session-returning sign-up (confirmations off) C# does NOT adopt the session — CurrentUser/CurrentSession stay null, so 'signed up' != 'signed in' as in JS."
+  auth.sign_in.sign_in_with_web3:
+    status: implemented
     symbols:
-      - Client.SignUp
+      - Client.SignInWithWeb3Async
+  auth.sign_in.sign_up:
+    status: implemented
+    symbols:
+      - Client.SignUpAsync
   auth.sign_in.verify_otp:
     status: implemented
     symbols:
@@ -114,6 +122,10 @@ features:
     status: implemented
     symbols:
       - Client.SignOut
+  auth.session.sign_out_reason:
+    status: implemented
+    symbols:
+      - Client.SignOutReason
   auth.session.subscribe_auth_events:
     status: implemented
     symbols:
@@ -262,6 +274,27 @@ features:
     status: implemented
     symbols:
       - AdminClient.UpdateFactorAsync
+
+  auth.sso_admin.create_provider:
+    status: implemented
+    symbols:
+      - AdminClient.CreateSsoProviderAsync
+  auth.sso_admin.delete_provider:
+    status: implemented
+    symbols:
+      - AdminClient.DeleteSsoProviderAsync
+  auth.sso_admin.get_provider:
+    status: implemented
+    symbols:
+      - AdminClient.GetSsoProviderAsync
+  auth.sso_admin.list_providers:
+    status: implemented
+    symbols:
+      - AdminClient.ListSsoProvidersAsync
+  auth.sso_admin.update_provider:
+    status: implemented
+    symbols:
+      - AdminClient.UpdateSsoProviderAsync
 
   # ── Client Initialization ──────────────────────────────────────────────────
 
@@ -535,19 +568,22 @@ features:
       - Client.Connect
       - Client.ConnectAsync
   realtime.client.connection_state:
-    status: partially_implemented
-    note: "Socket state delivered via SocketStateEventHandler events; no synchronous connection-state getter on the client."
+    status: implemented
     symbols:
       - Client.AddStateChangedHandler
+      - Client.ConnectionState
   realtime.client.disconnect:
     status: implemented
     symbols:
       - Client.Disconnect
   realtime.client.get_channels:
-    status: partially_implemented
-    note: "Active channels exposed as a Subscriptions dictionary; no getChannels() method."
+    status: implemented
     symbols:
       - Client.Subscriptions
+  realtime.client.listen_heartbeats:
+    status: implemented
+    symbols:
+      - Client.AddHeartbeatHandler
   realtime.client.remove_all_channels:
     status: implemented
     symbols:
@@ -561,6 +597,10 @@ features:
     symbols:
       - Client.SetAuth
 
+  realtime.channel.broadcast_http:
+    status: implemented
+    symbols:
+      - RealtimeChannel.HttpSendAsync
   realtime.channel.broadcast:
     status: implemented
     symbols:
@@ -591,12 +631,16 @@ features:
       - SupabaseTable.On
   realtime.subscriptions.subscribe_presence:
     status: partially_implemented
-    note: "Join/leave/sync handlers exist, but the presence sync diverges from JS (see realtime.presence.presence_state)."
+    note: "Join and Leave handlers get no key or presences, and a presence_state snapshot raises Sync only, not Join or Leave."
     symbols:
       - RealtimePresence
   realtime.subscriptions.postgres_changes_filter:
     status: implemented
     note: "Filter is a hand-built PostgREST string (e.g. 'user_id=eq.{id}'), untied to the model."
+    symbols:
+      - PostgresChangesOptions.Filter
+  realtime.subscriptions.postgres_changes_multiple_filters:
+    status: implemented
     symbols:
       - PostgresChangesOptions.Filter
   realtime.subscriptions.private_channel:
@@ -622,8 +666,7 @@ features:
       - RealtimeChannel.Register
 
   realtime.presence.presence_state:
-    status: partially_implemented
-    note: "Typed CurrentState/LastState exist, but the initial presence snapshot is dropped, so any client that joins after others undercounts everyone — a behavioral gap, not just a shape gap."
+    status: implemented
     symbols:
       - RealtimePresence.CurrentState
       - RealtimePresence.LastState
@@ -648,6 +691,10 @@ features:
     status: implemented
     symbols:
       - ClientOptions.HeartbeatInterval
+  realtime.configuration.access_token_callback:
+    status: implemented
+    symbols:
+      - ClientOptions.RetrieveAccessToken
   realtime.configuration.deferred_disconnect:
     status: partially_implemented
     note: "Opt-in (null by default, socket otherwise stays open); after the deferred disconnect the caller must call ConnectAsync again before creating channels, there is no automatic reconnect."

@@ -25,7 +25,7 @@ public class SignInTests : AuthClientFixture
     public async Task SignIn_ShouldReturnSignedInSession_GivenEmailAndPassword()
     {
         var email = RandomEmail();
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         await this.Client.SignOut();
         this.StateChanges.Clear();
         var session = await this.Client.SignIn(email, Password);
@@ -36,7 +36,7 @@ public class SignInTests : AuthClientFixture
     public async Task SignIn_ShouldReturnSignedInSession_GivenPhoneAndPassword()
     {
         var phone = GetRandomPhoneNumber();
-        await this.Client.SignUp(Constants.SignUpType.Phone, phone, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Phone, phone, Password);
         await this.Client.SignOut();
         this.StateChanges.Clear();
         var session = await this.Client.SignIn(Constants.SignInType.Phone, phone, Password);
@@ -46,7 +46,7 @@ public class SignInTests : AuthClientFixture
     [TestMethod]
     public async Task SignIn_ShouldRotateSessionAsTokenRefresh_GivenRefreshToken()
     {
-        var signedUp = await this.Client.SignUp(RandomEmail(), Password);
+        var signedUp = (await this.Client.SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password)).Session;
         var refreshToken = signedUp!.RefreshToken ?? throw new InvalidOperationException();
         this.StateChanges.Clear();
         var refreshed = (await this.Client.SignIn(Constants.SignInType.RefreshToken, refreshToken))!;

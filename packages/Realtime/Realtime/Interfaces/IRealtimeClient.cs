@@ -36,6 +36,11 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     IRealtimeSocket? Socket { get; }
 
     /// <summary>
+    /// The current state of the connection
+    /// </summary>
+    ConnectionState ConnectionState { get; }
+
+    /// <summary>
     /// A collection of channels ordered by topic name
     /// </summary>
     ReadOnlyDictionary<string, TChannel> Subscriptions { get; }
@@ -61,6 +66,28 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     /// Clear socket state listeners
     /// </summary>
     void ClearStateChangedHandlers();
+
+    /// <summary>
+    /// Delegate for handling a heartbeat event, latency is only set on Ok and Error.
+    /// </summary>
+    delegate void HeartbeatEventHandler(IRealtimeClient<TSocket, TChannel> sender, HeartbeatStatus status, TimeSpan? latency);
+
+    /// <summary>
+    /// Add a heartbeat listener
+    /// </summary>
+    /// <param name="handler"></param>
+    void AddHeartbeatHandler(HeartbeatEventHandler handler);
+
+    /// <summary>
+    /// Remove a heartbeat listener
+    /// </summary>
+    /// <param name="handler"></param>
+    void RemoveHeartbeatHandler(HeartbeatEventHandler handler);
+
+    /// <summary>
+    /// Clear heartbeat listeners
+    /// </summary>
+    void ClearHeartbeatHandlers();
 
     /// <summary>
     /// Adds a debug handler, likely used within a logging solution of some kind.

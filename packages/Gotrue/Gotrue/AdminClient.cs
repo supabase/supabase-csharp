@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.Interfaces;
+using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateSsoProvider;
 
 namespace Supabase.Gotrue;
 
@@ -190,6 +193,31 @@ public class AdminClient : IGotrueAdminClient<User>
     [ImplementedCapability("auth.admin.list_providers")]
     public Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(CustomProviderType? type = null, CancellationToken cancellationToken = default) =>
         this.api.ListCustomProvidersAsync(this.serviceKey, type, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.get_provider")]
+    public Task<SsoProvider> GetSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default) =>
+        this.api.GetSsoProviderAsync(this.serviceKey, provider, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.list_providers")]
+    public Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(SsoProviderFilter? filter = null, CancellationToken cancellationToken = default) =>
+        this.api.ListSsoProvidersAsync(this.serviceKey, filter, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.delete_provider")]
+    public Task DeleteSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default) =>
+        this.api.DeleteSsoProviderAsync(this.serviceKey, provider, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.create_provider")]
+    public Task<SsoProvider> CreateSsoProviderAsync(SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default) =>
+        this.api.CreateSsoProviderAsync(this.serviceKey, metadata, options, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.sso_admin.update_provider")]
+    public Task<SsoProvider> UpdateSsoProviderAsync(SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default) =>
+        this.api.UpdateSsoProviderAsync(this.serviceKey, provider, changes, cancellationToken);
 
     /// <inheritdoc />
     public async Task<User?> Update(UserAttributes attributes)

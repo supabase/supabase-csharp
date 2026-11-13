@@ -16,6 +16,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="BouncyCastle.Cryptography" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk"/>
@@ -33,7 +34,9 @@
 
   <ItemGroup>
     <None Update="TokenRefresh\Fixtures\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="SignUp\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Common\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Common\Data\*.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Identities\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="UpdateFactor\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="GetRecoveryCodesStatus\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
@@ -46,8 +49,10 @@
     <None Update="RegisterPasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="RenamePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="SignInWithPasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="SignInWithWeb3\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="AdminListPasskeys\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="AdminDeletePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Pkce\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

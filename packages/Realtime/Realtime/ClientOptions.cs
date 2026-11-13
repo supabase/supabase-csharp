@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Realtime.Socket;
@@ -109,4 +110,11 @@ public class ClientOptions
     /// timers (or a fake clock in tests). The WebSocket transport's own reconnection timing is unaffected.
     /// </summary>
     public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
+    /// <summary>
+    /// Returns the current access token. Called on connect and on every heartbeat, so a refreshed token reaches
+    /// the server without calling <c>SetAuth</c>. A null result keeps the current token.
+    /// </summary>
+    [ImplementedCapability("realtime.configuration.access_token_callback")]
+    public Func<Task<string?>>? RetrieveAccessToken { get; set; }
 }

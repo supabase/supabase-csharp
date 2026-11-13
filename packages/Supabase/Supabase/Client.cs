@@ -264,6 +264,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             case AuthState.SignedIn:
             case AuthState.TokenRefreshed:
             case AuthState.UserUpdated:
+            case AuthState.MfaChallengeVerified:
                 if (this.Auth.CurrentSession?.AccessToken != null)
                     this.Realtime.SetAuth(this.Auth.CurrentSession.AccessToken);
                 break;
@@ -274,7 +275,6 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
                 break;
             case AuthState.PasswordRecovery:
             case AuthState.Shutdown: break;
-            case AuthState.MfaChallengeVerified:
             default: throw new ArgumentOutOfRangeException(nameof(e), e, null);
         }
     }

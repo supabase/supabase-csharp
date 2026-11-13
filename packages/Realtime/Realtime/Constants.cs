@@ -1,4 +1,4 @@
-﻿using Supabase.Core.Attributes;
+using Supabase.Core.Attributes;
 using Supabase.Realtime.Socket;
 
 namespace Supabase.Realtime;
@@ -32,6 +32,53 @@ public static class Constants
         /// Socket has errored
         /// </summary>
         Error
+    }
+
+    /// <summary>
+    /// The state of the connection, used in <see cref="Client"/>
+    /// </summary>
+    public enum ConnectionState
+    {
+        /// <summary>
+        /// Not connected
+        /// </summary>
+        Closed,
+
+        /// <summary>
+        /// Connecting, or reconnecting after a lost connection
+        /// </summary>
+        Connecting,
+
+        /// <summary>
+        /// Connected
+        /// </summary>
+        Open
+    }
+
+    /// <summary>
+    /// The heartbeat status, used in <see cref="RealtimeSocket"/>
+    /// </summary>
+    public enum HeartbeatStatus
+    {
+        /// <summary>
+        /// Heartbeat sent
+        /// </summary>
+        Sent,
+
+        /// <summary>
+        /// Heartbeat answered
+        /// </summary>
+        Ok,
+
+        /// <summary>
+        /// Heartbeat rejected
+        /// </summary>
+        Error,
+
+        /// <summary>
+        /// Heartbeat timed out, socket reconnects
+        /// </summary>
+        Timeout
     }
 
     /// <summary>

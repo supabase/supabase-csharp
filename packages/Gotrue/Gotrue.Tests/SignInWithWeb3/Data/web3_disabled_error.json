@@ -1,0 +1,5 @@
+{
+  "code": 422,
+  "error_code": "web3_provider_disabled",
+  "msg": "Ethereum Web3 provider is disabled"
+}

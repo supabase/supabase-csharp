@@ -3,6 +3,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Supabase.Gotrue;
 using Supabase.Gotrue.Mfa;
 using static Gotrue.Tests.TestUtils;
 
@@ -22,7 +23,7 @@ public class MfaEnrollmentTests : MfaFixture
     public async Task Totp_ShouldRaiseAssuranceToAal2AndReturnToAal1OnUnenroll()
     {
         var email = RandomEmail();
-        var session = await this.Client.SignUp(email, Password);
+        var session = (await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password)).Session;
         this.VerifyGoodSession(session);
         var enrollment = await this.EnrollTotp();
         enrollment.Id.Should().NotBeNull();

@@ -47,16 +47,19 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     /// <summary>When set, <c>StartOrFail</c> reports the client as connected.</summary>
     public bool OpenOnStart { get; init; }
 
-    public Task StartOrFail()
+    /// <summary>When set, <c>StartOrFail</c> waits for it to complete, then reports the client as connected, like a handshake in flight.</summary>
+    public TaskCompletionSource? Handshake { get; init; }
+
+    public async Task StartOrFail()
     {
         this.StartOrFailCallCount++;
-        if (this.OpenOnStart)
+        if (this.Handshake != null)
+            await this.Handshake.Task;
+        if (this.OpenOnStart || this.Handshake != null)
         {
             this.IsRunning = true;
             this.reconnectionHappened.OnNext(ReconnectionInfo.Create(ReconnectionType.Initial));
         }
-
-        return Task.CompletedTask;
     }
 
     public Task<bool> Stop(WebSocketCloseStatus status, string reason)
@@ -70,6 +73,9 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
 
     /// <summary>When set, every heartbeat gets its reply, as from a healthy server.</summary>
     public bool AnswerHeartbeats { get; init; }
+
+    /// <summary>The status of those heartbeat replies.</summary>
+    public string HeartbeatReplyStatus { get; init; } = "ok";
 
     /// <summary>Completes when the socket forces a reconnect.</summary>
     public TaskCompletionSource Reconnected { get; } = new();
@@ -85,15 +91,15 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
         if (JsonNode.Parse(message) is not { } frame || (string?) frame["event"] != "heartbeat")
             return true;
         if (this.AnswerHeartbeats)
-            this.Reply("phoenix", (string?) frame["ref"]);
+            this.Reply("phoenix", (string?) frame["ref"], this.HeartbeatReplyStatus);
         Interlocked.Increment(ref this.heartbeatsSent);
         return true;
     }
 
-    /// <summary>Delivers the server's ok reply to the frame sent with <paramref name="reference" />.</summary>
-    public void Reply(string topic, string? reference) =>
-        this.Receive("""{"topic":"TOPIC","event":"phx_reply","ref":"REF","payload":{"status":"ok","response":{}}}"""
-            .Replace("TOPIC", topic).Replace("REF", reference));
+    /// <summary>Delivers the server's reply to the frame sent with <paramref name="reference" />.</summary>
+    public void Reply(string topic, string? reference, string status = "ok") =>
+        this.Receive("""{"topic":"TOPIC","event":"phx_reply","ref":"REF","payload":{"status":"STATUS","response":{}}}"""
+            .Replace("TOPIC", topic).Replace("REF", reference).Replace("STATUS", status));
 
     public Task Reconnect()
     {

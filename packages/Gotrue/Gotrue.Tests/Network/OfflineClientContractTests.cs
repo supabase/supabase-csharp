@@ -11,6 +11,7 @@ using Supabase.Gotrue;
 using Supabase.Gotrue.Exceptions;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.Mfa;
+using Supabase.Gotrue.SignInWithWeb3;
 using static Supabase.Gotrue.Constants;
 using static Supabase.Gotrue.Exceptions.FailureHint.Reason;
 
@@ -36,7 +37,7 @@ public class OfflineClientContractTests
     public static IEnumerable<object[]> OperationsNeedingTheServer =>
         new[]
         {
-            Operation("SignUp", client => client.SignUp(SignUpType.Email, Email, Password)),
+            Operation("SignUp", client => client.SignUpAsync(SignUpType.Email, Email, Password)),
             Operation("SendMagicLink", client => client.SignIn(Email)),
             Operation("SignInWithIdToken", client => client.SignInWithIdToken(Provider.Google, "an-id-token")),
             Operation("SignInWithEmailOtp", client => client.SignInWithOtp(new SignInWithPasswordlessEmailOptions(Email))),
@@ -60,6 +61,7 @@ public class OfflineClientContractTests
             Operation("RegisterPasskey", client => client.RegisterPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement)),
             Operation("StartPasskeySignIn", client => client.StartPasskeySignInAsync()),
             Operation("SignInWithPasskey", client => client.SignInWithPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement)),
+            Operation("SignInWithWeb3", client => client.SignInWithWeb3Async(Web3Credentials.ForSolana("a-sign-in-message", new byte[64]))),
             Operation("Update", client => client.Update(new UserAttributes { Email = Email })),
             Operation("Reauthenticate", client => client.Reauthenticate()),
             Operation("RefreshSession", client => client.RefreshSession()),

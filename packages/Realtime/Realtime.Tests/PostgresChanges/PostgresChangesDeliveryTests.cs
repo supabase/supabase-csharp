@@ -113,6 +113,22 @@ public class PostgresChangesDeliveryTests
     }
 
     [TestMethod]
+    public async Task OnPostgresChange_ShouldReceiveOnlyMatchingInsert_GivenMultipleFilters()
+    {
+        var first = new TaskCompletionSource<Todo?>();
+        var channel = this.socketClient.Channel("realtime", "public", "todos");
+        channel.OnPostgresChange((_, changes) => first.TrySetResult(changes.Model<Todo>()), ListenType.Inserts,
+            new PostgresChangesFilter { Table = "todos", Filter = "user_id=eq.42,details=eq.both filters match" });
+        await channel.Subscribe();
+        await this.restClient.Table<Todo>().Insert(new Todo { UserId = 42, Details = "only the user matches" });
+        await this.restClient.Table<Todo>().Insert(new Todo { UserId = 7, Details = "both filters match" });
+        await this.restClient.Table<Todo>().Insert(new Todo { UserId = 42, Details = "both filters match" });
+        var delivered = await first.Task;
+        Assert.AreEqual(42, delivered?.UserId);
+        Assert.AreEqual("both filters match", delivered?.Details);
+    }
+
+    [TestMethod]
     public async Task OnPostgresChange_ShouldReceiveUpdateAndFilteredInsert()
     {
         var tsc = new TaskCompletionSource<bool>();

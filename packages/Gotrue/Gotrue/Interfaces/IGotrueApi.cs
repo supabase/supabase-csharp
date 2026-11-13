@@ -7,14 +7,19 @@ using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
+using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Resend;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
+using Supabase.Gotrue.SignInWithWeb3;
+using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateSsoProvider;
 using static Supabase.Gotrue.Constants;
 
 #pragma warning disable CS1591
@@ -60,6 +65,18 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task SignOutAsync(string jwt, SignOutScope scope = SignOutScope.Global, CancellationToken cancellationToken = default);
     Task<TSession?> SignUpWithEmail(string email, string password, SignUpOptions? options = null);
     Task<TSession?> SignUpWithPhone(string phone, string password, SignUpOptions? options = null);
+
+    /// <summary>
+    /// Registers a user with an email address or a phone number and a password, without adopting any session.
+    /// </summary>
+    /// <param name="type">Whether <paramref name="identifier" /> is an email address or a phone number.</param>
+    /// <param name="identifier">The email address or phone number to register.</param>
+    /// <param name="password">The new user's password.</param>
+    /// <param name="options">Redirect URL, user metadata, captcha token, PKCE flow type (email) and messaging channel (phone).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The session the server issued, if any, the signed-up user and the PKCE verifier.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the sign-up.</exception>
+    Task<SignUpState> SignUpAsync(SignUpType type, string identifier, string password, SignUpOptions? options = null, CancellationToken cancellationToken = default);
     Task<TUser?> UpdateUser(string jwt, UserAttributes attributes);
     Task<TUser?> UpdateUserById(string jwt, string userId, UserAttributes userData);
     Task<TSession?> VerifyMobileOTP(string phone, string token, MobileOtpType type);
@@ -157,6 +174,20 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// (<see cref="Exceptions.FailureHint.Reason.Unknown" />).
     /// </exception>
     Task<TSession> SignInWithPasskeyAsync(Guid challengeId, JsonElement credential, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Exchanges a wallet's signature of a Sign in with Solana / Sign in with Ethereum message for a session. Nothing is
+    /// stored: the caller keeps the session.
+    /// </summary>
+    /// <param name="credentials">The signed message, from <see cref="Web3Credentials.ForSolana" /> or <see cref="Web3Credentials.ForEthereum" />.</param>
+    /// <param name="options">The CAPTCHA token, when CAPTCHA protection is enabled.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The session of the wallet's user.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request, or answered without a session carrying an access token
+    /// (<see cref="Exceptions.FailureHint.Reason.Unknown" />).
+    /// </exception>
+    Task<TSession> SignInWithWeb3Async(Web3Credentials credentials, SignInWithWeb3Options? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Generates the user's one-time set of MFA recovery codes.
@@ -275,6 +306,63 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(string jwt, CustomProviderType? type = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Fetches a single sign-on (SAML 2.0) identity provider, including its metadata XML and email domains.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="provider">The provider, addressed by its id or by its resource ID.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<SsoProvider> GetSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the single sign-on (SAML 2.0) identity providers registered on the project, optionally only those a
+    /// filter selects.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="filter">Only the providers this filter selects; every provider when null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The providers, without their metadata XML.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(string jwt, SsoProviderFilter? filter = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a single sign-on (SAML 2.0) identity provider, together with its email domains.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="provider">The provider, addressed by its id or by its resource ID.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task DeleteSsoProviderAsync(string jwt, SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers a single sign-on (SAML 2.0) identity provider from its metadata.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="metadata">The identity provider's metadata, from a URL the server fetches or as XML.</param>
+    /// <param name="options">Optional settings; the server applies its defaults to those left null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="metadata" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<SsoProvider> CreateSsoProviderAsync(string jwt, SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Changes a single sign-on (SAML 2.0) identity provider: the settings set on <paramref name="changes" /> replace
+    /// the stored ones, and those left null are kept.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="provider">The provider, addressed by id or by resource ID.</param>
+    /// <param name="changes">The changes, which always state the <c>NameID</c> format the provider keeps.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider as stored after the change.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> or <paramref name="changes" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<SsoProvider> UpdateSsoProviderAsync(string jwt, SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Links an oauth identity to an existing user.
     ///
     /// This method requires the PKCE flow.
@@ -310,4 +398,12 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="resendParameters"></param>
     /// <returns></returns>
     Task<BaseResponse> Resend(ResendParameters resendParameters);
+
+    /// <summary>
+    /// Resends a confirmation code to a user's email or phone, with the PKCE code challenge on the PKCE flow.
+    /// </summary>
+    /// <param name="resendParameters"></param>
+    /// <param name="flowType"></param>
+    /// <returns></returns>
+    Task<ResendState> Resend(ResendParameters resendParameters, OAuthFlowType flowType);
 }

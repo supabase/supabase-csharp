@@ -23,6 +23,7 @@
 		<PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
 		<PackageReference Include="NSubstitute" />
 		<PackageReference Include="Verify.MSTest" />
+		<PackageReference Include="WireMock.Net" />
 	</ItemGroup>
 
 	<ItemGroup>

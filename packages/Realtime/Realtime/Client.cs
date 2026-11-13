@@ -34,7 +34,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Exposes all Realtime RealtimeChannel Subscriptions for R/O public consumption 
     /// </summary>
-    [PartialCapability("realtime.client.get_channels", "Active channels exposed as a Subscriptions dictionary; no getChannels() method.")]
+    [ImplementedCapability("realtime.client.get_channels")]
     public ReadOnlyDictionary<string, RealtimeChannel> Subscriptions => new(this.subscriptions);
 
     /// <summary>
@@ -43,6 +43,15 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// Most methods of the Client act as proxies to the Socket class.
     /// </summary>
     public IRealtimeSocket? Socket { get; private set; }
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.client.connection_state")]
+    public ConnectionState ConnectionState => this.Socket switch
+    {
+        null => ConnectionState.Closed,
+        RealtimeSocket { IsOpen: true } => ConnectionState.Open,
+        _ => ConnectionState.Connecting
+    };
 
     /// <summary>
     /// Client Options - most of which are regarding Socket connection Options
@@ -86,6 +95,12 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         socketEventHandlers = new();
 
     /// <summary>
+    /// Handlers for notifications of heartbeats.
+    /// </summary>
+    private readonly HandlerCollection<IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler>
+        heartbeatEventHandlers = new();
+
+    /// <summary>
     /// Contains all Realtime RealtimeChannel Subscriptions - state managed internally.
     ///
     /// Keys are of encoded value: `{database}{:schema?}{:table?}{:col.eq.:value?}`
@@ -122,6 +137,8 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     [ImplementedCapability("realtime.client.connect")]
     public async Task<IRealtimeClient<RealtimeSocket, RealtimeChannel>> ConnectAsync()
     {
+        await this.RefreshAuthAsync().ConfigureAwait(false);
+
         var tsc = new TaskCompletionSource<IRealtimeClient<RealtimeSocket, RealtimeChannel>>();
 
         if (this.Socket != null)
@@ -130,7 +147,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             return this;
         }
 
-        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options);
+        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options) { OnHeartbeat = this.NotifyHeartbeat };
         this.Socket.GetHeaders = this.GetHeaders;
 
         IRealtimeSocket.StateEventHandler? socketStateHandler = null;
@@ -183,7 +200,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             return this;
         }
 
-        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options);
+        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options) { OnHeartbeat = this.NotifyHeartbeat };
         IRealtimeSocket.StateEventHandler? socketStateHandler = null;
         IRealtimeSocket.ErrorEventHandler? errorEventHandler = null;
 
@@ -219,7 +236,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Adds a listener to be notified when the socket state changes.
     /// </summary>
-    [PartialCapability("realtime.client.connection_state", "Socket state delivered via SocketStateEventHandler events; no synchronous connection-state getter on the client.")]
+    [ImplementedCapability("realtime.client.connection_state")]
     public void AddStateChangedHandler(
         IRealtimeClient<RealtimeSocket, RealtimeChannel>.SocketStateEventHandler handler)
     {
@@ -268,6 +285,25 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         }
     }
 
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.client.listen_heartbeats")]
+    public void AddHeartbeatHandler(IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler handler) =>
+        this.heartbeatEventHandlers.Add(handler);
+
+    /// <inheritdoc />
+    public void RemoveHeartbeatHandler(IRealtimeClient<RealtimeSocket, RealtimeChannel>.HeartbeatEventHandler handler) =>
+        this.heartbeatEventHandlers.Remove(handler);
+
+    /// <inheritdoc />
+    public void ClearHeartbeatHandlers() =>
+        this.heartbeatEventHandlers.Clear();
+
+    private void NotifyHeartbeat(HeartbeatStatus status, TimeSpan? latency)
+    {
+        foreach (var handler in this.heartbeatEventHandlers.Snapshot())
+            Debugger.Instance.Guard(this, () => handler.Invoke(this, status, latency));
+    }
+
     /// <summary>
     /// Adds a debug handler, likely used within a logging solution of some kind.
     /// </summary>
@@ -293,10 +329,22 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Sets the current Access Token every heartbeat (see: https://github.com/supabase/realtime-js/blob/59bd47956ebe4e23b3e1a6c07f5fe2cfe943e8ad/src/RealtimeClient.ts#L437)
     /// </summary>
-    private void HandleSocketHeartbeat(IRealtimeSocket sender, SocketResponse message)
+    private void HandleSocketHeartbeat(IRealtimeSocket sender, SocketResponse message) => _ = this.RefreshAuthAsync();
+
+    private async Task RefreshAuthAsync()
     {
-        if (!string.IsNullOrEmpty(this.AccessToken))
-            this.SetAuth(this.AccessToken!);
+        try
+        {
+            var token = this.Options.RetrieveAccessToken != null
+                ? await this.Options.RetrieveAccessToken().ConfigureAwait(false)
+                : this.AccessToken;
+            if (!string.IsNullOrEmpty(token))
+                this.SetAuth(token!);
+        }
+        catch (Exception ex)
+        {
+            Debugger.Instance.Log(this, ex.Message, ex);
+        }
     }
 
     /// <summary>

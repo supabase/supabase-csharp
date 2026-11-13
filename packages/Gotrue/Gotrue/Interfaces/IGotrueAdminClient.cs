@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateSsoProvider;
+using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateSsoProvider;
 
 namespace Supabase.Gotrue.Interfaces;
 
@@ -364,4 +367,184 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<IReadOnlyList<CustomProvider>> ListCustomProvidersAsync(CustomProviderType? type = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Fetches a single sign-on (SAML 2.0) identity provider, including its metadata XML and email domains. Requires
+    /// a full-access API key, such as the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="provider">
+    /// The provider, addressed <see cref="SsoProviderReference.ById" /> or
+    /// <see cref="SsoProviderReference.ByResourceId" />.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.SsoProviderNotFound" /> when no provider matches
+    /// <paramref name="provider" />, and <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key
+    /// is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var provider = await admin.GetSsoProviderAsync(SsoProviderReference.ByResourceId("acme"));
+    /// Console.WriteLine(provider.Saml.EntityId);
+    /// </code>
+    /// </example>
+    Task<SsoProvider> GetSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the single sign-on (SAML 2.0) identity providers registered on the project, optionally only those a
+    /// filter selects. Requires a full-access API key, such as the service_role key: call it from a server, never
+    /// from a client app.
+    /// </summary>
+    /// <param name="filter">
+    /// Only the provider with a resource ID, <see cref="SsoProviderFilter.ByResourceId" />, or those whose resource ID
+    /// starts with a prefix, <see cref="SsoProviderFilter.ByResourceIdPrefix" />; every provider when null.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>
+    /// The providers, empty when none matches. Their <see cref="SamlConfiguration.MetadataXml" /> is always null:
+    /// fetch a provider with <see cref="GetSsoProviderAsync" /> for it.
+    /// </returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.ListSsoProviders;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var acmeProviders = await admin.ListSsoProvidersAsync(SsoProviderFilter.ByResourceIdPrefix("acme-"));
+    /// </code>
+    /// </example>
+    Task<IReadOnlyList<SsoProvider>> ListSsoProvidersAsync(SsoProviderFilter? filter = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a single sign-on (SAML 2.0) identity provider, together with its email domains: their users can no
+    /// longer sign in through it. Requires a full-access API key, such as the service_role key: call it from a
+    /// server, never from a client app.
+    /// </summary>
+    /// <param name="provider">
+    /// The provider, addressed <see cref="SsoProviderReference.ById" /> or
+    /// <see cref="SsoProviderReference.ByResourceId" />.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="provider" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.SsoProviderNotFound" /> when no provider matches
+    /// <paramref name="provider" />, including one already deleted, and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// await admin.DeleteSsoProviderAsync(SsoProviderReference.ById(providerId));
+    /// </code>
+    /// </example>
+    Task DeleteSsoProviderAsync(SsoProviderReference provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers a single sign-on (SAML 2.0) identity provider from its metadata. Requires a full-access API key, such
+    /// as the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="metadata">
+    /// The identity provider's metadata, given <see cref="SamlMetadata.FromUrl" /> or
+    /// <see cref="SamlMetadata.FromXml" />. From a URL, the server fetches the metadata before it answers, so the
+    /// call lasts as long as that fetch; <paramref name="cancellationToken" /> bounds it.
+    /// </param>
+    /// <param name="options">
+    /// Optional settings, such as email domains or attribute mapping. The server applies its defaults to those left
+    /// null.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered provider.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="metadata" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.ErrorCode" /> is
+    /// <c>validation_failed</c> when a setting is invalid (for example a metadata URL that is not HTTPS, or metadata
+    /// without an entity ID), <c>saml_metadata_fetch_failed</c> when the metadata URL answers with an error,
+    /// <c>saml_idp_already_exists</c> when a provider already has the metadata's entity ID,
+    /// <c>sso_domain_already_exists</c> when another provider already has one of the domains, and
+    /// <c>unexpected_failure</c> when the metadata XML cannot be parsed or the metadata URL cannot be reached.
+    /// <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    /// using Supabase.Gotrue.CreateSsoProvider;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var provider = await admin.CreateSsoProviderAsync(
+    ///     SamlMetadata.FromUrl(new Uri("https://idp.acme.com/saml/metadata")),
+    ///     new SsoProviderOptions
+    ///     {
+    ///         Domains = new[] { "acme.com" },
+    ///         ResourceId = "acme",
+    ///         NameIdFormat = SamlNameIdFormat.EmailAddress,
+    ///         AttributeMapping = new Dictionary&lt;string, SamlAttribute&gt;
+    ///         {
+    ///             ["email"] = new() { Names = new[] { "mail", "email" } },
+    ///         },
+    ///     });
+    /// </code>
+    /// </example>
+    Task<SsoProvider> CreateSsoProviderAsync(SamlMetadata metadata, SsoProviderOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Changes a single sign-on (SAML 2.0) identity provider: the settings set on <paramref name="changes" /> replace
+    /// the stored ones, and those left null are kept. Requires a full-access API key, such as the service_role key:
+    /// call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="provider">
+    /// The provider, addressed <see cref="SsoProviderReference.ById" /> or
+    /// <see cref="SsoProviderReference.ByResourceId" />.
+    /// </param>
+    /// <param name="changes">
+    /// The changes, started from <see cref="SsoProviderChanges.KeepingNameIdFormatOf" />,
+    /// <see cref="SsoProviderChanges.WithNameIdFormat" /> or <see cref="SsoProviderChanges.WithoutNameIdFormat" />,
+    /// since the auth server clears a <c>NameID</c> format the request leaves out. The server only stores a new
+    /// <c>NameID</c> format together with new metadata or a new attribute mapping: a change of the format alone is
+    /// answered as a success but not saved, until the server is fixed. New metadata given
+    /// <see cref="SamlMetadata.FromUrl" /> is fetched by the server before it answers; <paramref name="cancellationToken" />
+    /// bounds that fetch.
+    /// </param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The provider as stored after the change.</returns>
+    /// <exception cref="ArgumentNullException">
+    /// <paramref name="provider" /> or <paramref name="changes" /> is null. Nothing is sent.
+    /// </exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.SsoProviderNotFound" /> when no provider matches
+    /// <paramref name="provider" />, and <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key
+    /// is not a full-access key. Otherwise <see cref="Exceptions.GotrueException.ErrorCode" /> is
+    /// <c>saml_entity_id_mismatch</c> when the new metadata carries another entity ID than the provider's,
+    /// <c>sso_domain_already_exists</c> when another provider already has one of the domains,
+    /// <c>validation_failed</c> when a setting is invalid (for example a metadata URL that is not HTTPS),
+    /// <c>saml_metadata_fetch_failed</c> when the metadata URL answers with an error, <c>conflict</c> when a
+    /// concurrent change made the update fail, and <c>unexpected_failure</c> when the metadata cannot be parsed or
+    /// fetched.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    /// using Supabase.Gotrue.UpdateSsoProvider;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var current = await admin.GetSsoProviderAsync(SsoProviderReference.ByResourceId("acme"));
+    /// var updated = await admin.UpdateSsoProviderAsync(
+    ///     SsoProviderReference.ById(current.Id),
+    ///     SsoProviderChanges.KeepingNameIdFormatOf(current) with { Domains = new[] { "acme.com", "acme.org" } });
+    /// </code>
+    /// </example>
+    Task<SsoProvider> UpdateSsoProviderAsync(SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default);
 }

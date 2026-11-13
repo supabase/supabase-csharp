@@ -30,7 +30,7 @@ public class ClientConfigurationTests
             Url = "https://badprojecturl.supabase.co",
             AllowUnconfirmedUserSessions = true,
         });
-        var signUp = () => client.SignUp(RandomEmail(), Password);
+        var signUp = () => client.SignUpAsync(Constants.SignUpType.Email, RandomEmail(), Password);
         var exception = await signUp.Should().ThrowAsync<GotrueException>();
         exception.Which.Reason.Should().Be(Offline);
     }

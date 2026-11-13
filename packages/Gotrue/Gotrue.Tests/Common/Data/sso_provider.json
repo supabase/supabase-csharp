@@ -1,0 +1,21 @@
+{
+  "id": "0b3c6a4e-5f21-4d8e-9a7b-2c1d0e9f8a76",
+  "resource_id": "acme",
+  "disabled": true,
+  "saml": {
+    "entity_id": "https://idp.acme.com/saml",
+    "metadata_xml": "<md:EntityDescriptor xmlns:md=\"urn:oasis:names:tc:SAML:2.0:metadata\" entityID=\"https://idp.acme.com/saml\"/>",
+    "metadata_url": "https://idp.acme.com/saml/metadata",
+    "attribute_mapping": {
+      "keys": {
+        "email": { "name": "mail", "names": ["email", "emailaddress"] },
+        "groups": { "names": ["memberOf"], "array": true },
+        "role": { "default": "member" }
+      }
+    },
+    "name_id_format": "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+  },
+  "domains": [{ "domain": "acme.com" }, { "domain": "acme.org" }],
+  "created_at": "2026-11-11T10:25:38.809385Z",
+  "updated_at": "2026-11-11T10:26:03.979103+01:00"
+}

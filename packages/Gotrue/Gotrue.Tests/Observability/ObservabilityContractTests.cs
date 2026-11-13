@@ -13,6 +13,7 @@ using FluentAssertions.Execution;
 using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Gotrue;
+using Supabase.Gotrue.SignInWithWeb3;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 
@@ -113,6 +114,16 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
+    public async Task SignUpSpan_ShouldRecordTheSignUpType()
+    {
+        this.server.Given(Request.Create().WithPath("/signup").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(200).WithHeader("Content-Type", "application/json").WithBody("{}"));
+        await this.client.SignUpAsync(Constants.SignUpType.Phone, "+15555550123", "a-password");
+        this.activities.Single(activity => activity.OperationName == "gotrue.sign_up").GetTagItem("gotrue.sign_up.type")
+            .Should().Be("Phone", "the sign-up span says which credential registered");
+    }
+
+    [TestMethod]
     public async Task DomainSpan_ShouldParentTheHttpSpan()
     {
         this.MockTokenSuccess();
@@ -181,6 +192,28 @@ public class ObservabilityContractTests
         await this.client.SignInWithPasskeyAsync(Guid.NewGuid(), JsonDocument.Parse("{}").RootElement);
         var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.sign_in.passkey").Which;
         this.activities.Should().ContainSingle(a => a.OperationName == "POST /passkeys/authentication/verify").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    public async Task DomainSpan_ShouldParentTheHttpSpan_GivenWeb3SignIn()
+    {
+        this.MockWeb3SignInSuccess();
+        await this.client.SignInWithWeb3Async(Web3Credentials.ForSolana("a-sign-in-message", new byte[64]));
+        var domainSpan = this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.sign_in.web3").Which;
+        this.activities.Should().ContainSingle(a => a.OperationName == "POST /token").Which.ParentSpanId.Should().Be(domainSpan.SpanId);
+    }
+
+    [TestMethod]
+    [DataRow("solana")]
+    [DataRow("ethereum")]
+    public async Task DomainSpan_ShouldTagTheChain_GivenWeb3SignIn(string chain)
+    {
+        this.MockWeb3SignInSuccess();
+        await this.client.SignInWithWeb3Async(chain == "solana"
+            ? Web3Credentials.ForSolana("a-sign-in-message", new byte[64])
+            : Web3Credentials.ForEthereum("a-sign-in-message", new string('a', 130)));
+        this.activities.Should().ContainSingle(a => a.OperationName == "gotrue.sign_in.web3").Which.GetTagItem("gotrue.web3.chain").Should().Be(chain,
+            "a trace tells which chain's wallet signed in");
     }
 
     [TestMethod]
@@ -394,6 +427,14 @@ public class ObservabilityContractTests
                 .WithStatusCode(200)
                 .WithHeader("Content-Type", "application/json")
                 .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SignInWithPasskey", "Data", fixture))));
+
+    private void MockWeb3SignInSuccess() =>
+        this.server
+            .Given(Request.Create().WithPath("/token").WithParam("grant_type", "web3").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SignInWithWeb3", "Data", "signed_in_session.json"))));
 
     private void MockPasskeyRegistrationSuccess(string step, string fixture) =>
         this.server

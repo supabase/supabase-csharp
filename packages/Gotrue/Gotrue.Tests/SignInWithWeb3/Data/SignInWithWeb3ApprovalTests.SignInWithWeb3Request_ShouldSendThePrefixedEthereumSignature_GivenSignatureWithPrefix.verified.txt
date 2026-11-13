@@ -1,0 +1,1 @@
+﻿{"chain":"ethereum","message":"localhost:3000 wants you to sign in with your Ethereum account:\n0x2c7536E3605D9C16a7a3D7b1898e529396a65c23\n\nURI: http://localhost:3000\nVersion: 1\nChain ID: 1\nIssued At: 2026-11-11T10:00:00Z","signature":"0x4f8e2b6d1a9c3e7f5b0d8a2c6e4f1b9d7a3c5e8f2b4d6a1c9e7f3b5d8a2c4e6f1b9d7a3c5e8f2b4d6a1c9e7f3b5d8a2c4e6f1b9d7a3c5e8f2b4d6a1c9e7f3b5d1c"}

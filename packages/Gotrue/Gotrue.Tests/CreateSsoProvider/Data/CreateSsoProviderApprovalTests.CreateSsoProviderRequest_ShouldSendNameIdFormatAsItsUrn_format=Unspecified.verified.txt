@@ -1,0 +1,1 @@
+﻿{"type":"saml","metadata_url":"https://idp.acme.com/saml/metadata","name_id_format":"urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"}

@@ -23,7 +23,7 @@ public class PasswordlessSignInTests : AuthClientFixture
     public async Task SignIn_ShouldSendMagicLinkWithoutChangingState_GivenEmailOnly()
     {
         var email = RandomEmail();
-        await this.Client.SignUp(email, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, email, Password);
         await this.Client.SignOut();
         this.StateChanges.Clear();
         var sent = await this.Client.SignIn(email);
@@ -36,7 +36,7 @@ public class PasswordlessSignInTests : AuthClientFixture
     public async Task SendMagicLink_ShouldSucceedWithAndWithoutRedirect()
     {
         var known = RandomEmail();
-        await this.Client.SignUp(known, Password);
+        await this.Client.SignUpAsync(Constants.SignUpType.Email, known, Password);
         await this.Client.SignOut();
         (await this.Client.SendMagicLink(known)).Should().BeTrue();
         (await this.Client.SendMagicLink(RandomEmail(), new SignInOptions { RedirectTo = $"com.{RandomString(12)}.deeplink://login" }))
