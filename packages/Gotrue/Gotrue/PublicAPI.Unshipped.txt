@@ -1,4 +1,6 @@
 #nullable enable
+Supabase.Gotrue.ClientOptions.TimeProvider.get -> System.TimeProvider!
+Supabase.Gotrue.ClientOptions.TimeProvider.set -> void
 override Supabase.Gotrue.Common.SamlAttribute.Equals(object? obj) -> bool
 override Supabase.Gotrue.Common.SamlAttribute.GetHashCode() -> int
 override Supabase.Gotrue.Common.SamlAttribute.ToString() -> string!

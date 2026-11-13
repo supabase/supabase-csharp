@@ -20,6 +20,8 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="FluentAssertions" />
+		<PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
+		<PackageReference Include="NSubstitute" />
 		<PackageReference Include="Verify.MSTest" />
 		<PackageReference Include="WireMock.Net" />
 	</ItemGroup>

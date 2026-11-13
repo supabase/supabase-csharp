@@ -200,7 +200,7 @@ public partial class Client : IFunctionsClient
         int? statusCode = null;
         string? errorType = null;
 
-        using var timeoutCts = new CancellationTokenSource(options.HttpTimeout);
+        using var timeoutCts = this.Options.Retry.TimeProvider.CreateCancellationTokenSource(options.HttpTimeout);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
         try

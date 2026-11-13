@@ -72,7 +72,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private readonly IWebsocketClient connection;
     private readonly HttpBroadcaster httpBroadcaster;
 
-    private CancellationTokenSource? heartbeatTokenSource;
+    private ITimer? heartbeatTimer;
 
     private bool hasSuccessfullyConnectedOnce;
     private bool hasPendingHeartbeat;
@@ -108,7 +108,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
     void IDisposable.Dispose()
     {
-        this.heartbeatTokenSource?.Cancel();
+        this.StopHeartbeat();
         this.DisposeConnection();
     }
 
@@ -142,7 +142,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     public void Disconnect(WebSocketCloseStatus code = WebSocketCloseStatus.NormalClosure, string reason = "")
     {
         this.disconnectRequested = true;
-        this.heartbeatTokenSource?.Cancel();
+        this.StopHeartbeat();
         this.connection.IsReconnectionEnabled = false;
         this.connection.Stop(code, reason);
     }
@@ -358,10 +358,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
         Debugger.Instance.Log(this, $"Socket Connected to: {this.EndpointUrl}");
 
-        this.heartbeatTokenSource?.Cancel();
-        this.hasPendingHeartbeat = false;
-        this.heartbeatTokenSource = new CancellationTokenSource();
-        Task.Run(this.EmitHeartbeat, this.heartbeatTokenSource.Token);
+        this.StartHeartbeat();
 
         // Send any pending `Push` messages that were queued while socket was disconnected.
         this.FlushBuffer();
@@ -370,14 +367,20 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.NotifySocketStateChange(SocketState.Open);
     }
 
-    private async Task EmitHeartbeat()
+    /// <summary>
+    /// Replaces any running heartbeat with a fresh one on <see cref="ClientOptions.TimeProvider"/>: the first
+    /// heartbeat goes out at once, then one every <see cref="ClientOptions.HeartbeatInterval"/>.
+    /// </summary>
+    private void StartHeartbeat()
     {
-        while (this.heartbeatTokenSource is { IsCancellationRequested: false })
-        {
-            this.SendHeartbeat();
-            await Task.Delay(this.options.HeartbeatInterval, this.heartbeatTokenSource.Token);
-        }
+        var timer = this.options.TimeProvider.CreateTimer(_ => this.SendHeartbeat(), null,
+            Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+        Interlocked.Exchange(ref this.heartbeatTimer, timer)?.Dispose();
+        this.hasPendingHeartbeat = false;
+        timer.Change(TimeSpan.Zero, this.options.HeartbeatInterval);
     }
+
+    private void StopHeartbeat() => Interlocked.Exchange(ref this.heartbeatTimer, null)?.Dispose();
 
     #region Socket Event Handlers
 

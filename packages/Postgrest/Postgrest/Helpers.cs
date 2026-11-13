@@ -147,7 +147,7 @@ internal static class Helpers
         int? statusCode = null;
         string? errorType = null;
 
-        using var timeoutCts = new CancellationTokenSource(clientOptions.Timeout ?? Timeout.InfiniteTimeSpan);
+        using var timeoutCts = clientOptions.Retry.TimeProvider.CreateCancellationTokenSource(clientOptions.Timeout ?? Timeout.InfiniteTimeSpan);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
         try

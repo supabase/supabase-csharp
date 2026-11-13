@@ -29,7 +29,7 @@ public static class RetryExecutor
 
             response?.Dispose();
             attempt++;
-            await Task.Delay(BackoffDelay(options, attempt), cancellationToken).ConfigureAwait(false);
+            await options.TimeProvider.Delay(BackoffDelay(options, attempt), cancellationToken).ConfigureAwait(false);
         }
     }
 

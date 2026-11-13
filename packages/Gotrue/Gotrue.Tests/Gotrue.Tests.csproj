@@ -18,6 +18,7 @@
     </PackageReference>
     <PackageReference Include="BouncyCastle.Cryptography" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk"/>
     <PackageReference Include="MSTest.TestAdapter"/>
     <PackageReference Include="MSTest.TestFramework"/>

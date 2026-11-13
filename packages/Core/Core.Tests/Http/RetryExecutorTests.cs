@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Core.Http;
 
@@ -96,7 +97,63 @@ public class RetryExecutorTests
         handler.CallCount.Should().Be(1, "cancellation fires during the first backoff delay, before a second attempt");
     }
 
+    [TestMethod]
+    public async Task SendAsync_ShouldWaitBackoffOnTimeProvider_GivenCustomTimeProvider()
+    {
+        var clock = new FakeTimeProvider();
+        var responses = new Queue<HttpStatusCode>([HttpStatusCode.ServiceUnavailable, HttpStatusCode.OK]);
+        var handler = new StubHandler(_ => new HttpResponseMessage(responses.Dequeue()));
+        using var client = new HttpClient(handler);
+        var backoff = TimeSpan.FromMinutes(10);
+        var options = new RetryOptions { MaxRetries = 1, BaseDelay = backoff, MaxDelay = backoff, UseJitter = false, TimeProvider = clock };
+        var send = RetryExecutor.SendAsync(client, Get, options);
+        clock.Advance(backoff - TimeSpan.FromTicks(1));
+        handler.CallCount.Should().Be(1, "the retry must wait the full backoff on the supplied clock, not on wall time");
+        clock.Advance(TimeSpan.FromTicks(1));
+        (await send.WaitAsync(TimeSpan.FromSeconds(5))).StatusCode.Should().Be(HttpStatusCode.OK);
+        handler.CallCount.Should().Be(2, "advancing the supplied clock past the backoff releases the retry");
+    }
+
+    [TestMethod]
+    public async Task SendAsync_ShouldNotResumeOnCallerContext_GivenBackoffDelayCompletes()
+    {
+        var clock = new FakeTimeProvider();
+        var responses = new Queue<HttpStatusCode>([HttpStatusCode.ServiceUnavailable, HttpStatusCode.OK]);
+        var handler = new StubHandler(_ => new HttpResponseMessage(responses.Dequeue()));
+        using var client = new HttpClient(handler);
+        var backoff = TimeSpan.FromMinutes(1);
+        var options = new RetryOptions { MaxRetries = 1, BaseDelay = backoff, MaxDelay = backoff, UseJitter = false, TimeProvider = clock };
+
+        var previous = SynchronizationContext.Current;
+        Task<HttpResponseMessage> send;
+        SynchronizationContext.SetSynchronizationContext(new NeverRunsContinuations());
+        try
+        {
+            send = RetryExecutor.SendAsync(client, Get, options);
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(previous);
+        }
+
+        // Completing off the captured context forces a Post; completing on it would let the continuation run inline.
+        clock.Advance(backoff);
+
+        (await send.WaitAsync(TimeSpan.FromSeconds(5))).StatusCode.Should().Be(HttpStatusCode.OK,
+            "the retry must not wait on the caller's context — a UI thread blocking on the call would deadlock");
+    }
+
+    [TestMethod]
+    public void RetryOptions_ShouldDefaultToSystemTimeProvider() =>
+        new RetryOptions().TimeProvider.Should().BeSameAs(TimeProvider.System, "unset, backoff keeps waiting on the real clock");
+
     private static HttpRequestMessage Get() => new(HttpMethod.Get, "http://localhost/");
+
+    /// <summary>Plays a blocked UI thread: posted continuations are dropped, so anything resuming on this context never completes.</summary>
+    private sealed class NeverRunsContinuations : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback d, object? state) { }
+    }
 
     private sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler
     {

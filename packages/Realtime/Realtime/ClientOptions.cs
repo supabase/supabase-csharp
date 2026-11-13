@@ -104,6 +104,14 @@ public class ClientOptions
     public IWebSocketFactory? WebSocketFactory { get; set; }
 
     /// <summary>
+    /// The clock every Realtime timer runs on: the socket heartbeat, push timeouts, the channel rejoin timer
+    /// and the <see cref="DisconnectOnEmptyChannelsAfter"/> delay. Defaults to
+    /// <see cref="System.TimeProvider.System"/>; supply another provider to drive them from a host's own
+    /// timers (or a fake clock in tests). The WebSocket transport's own reconnection timing is unaffected.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
+    /// <summary>
     /// Returns the current access token. Called on connect and on every heartbeat, so a refreshed token reaches
     /// the server without calling <c>SetAuth</c>. A null result keeps the current token.
     /// </summary>

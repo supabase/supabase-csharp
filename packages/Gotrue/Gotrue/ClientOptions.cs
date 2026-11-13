@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -74,4 +75,12 @@ public class ClientOptions
     /// <see cref="Constants.AuthState.SignedIn" /> when confirmation is pending.
     /// </summary>
     public bool AllowUnconfirmedUserSessions { get; set; }
+
+    /// <summary>
+    /// The clock the auto-refresh timer is scheduled on, and the "now" a session's refresh time is measured
+    /// from. Defaults to <see cref="System.TimeProvider.System"/>; supply another provider to run the refresh
+    /// timer on a host's own timers (or a fake clock in tests). HTTP retry backoff waits on
+    /// <see cref="RetryOptions.TimeProvider"/> instead.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 }

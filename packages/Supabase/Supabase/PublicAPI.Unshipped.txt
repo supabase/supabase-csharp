@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.SupabaseOptions.TimeProvider.get -> System.TimeProvider?
+Supabase.SupabaseOptions.TimeProvider.set -> void

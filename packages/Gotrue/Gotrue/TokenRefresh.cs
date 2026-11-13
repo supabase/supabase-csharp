@@ -30,7 +30,7 @@ public class TokenRefresh
     ///     <cref>AutoRefreshToken</cref>
     /// </see>
     /// </summary>
-    private Timer? _refreshTimer;
+    private ITimer? _refreshTimer;
 
     /// <summary>
     /// Set by Stop, so nothing re-arms the timer before Start.
@@ -121,7 +121,7 @@ public class TokenRefresh
     ///
     /// If the user is offline, it won't try to refresh the token.
     /// </summary>
-    private async void HandleRefreshTimerTick(object _)
+    private async void HandleRefreshTimerTick(object? _)
     {
         var refreshCompleted = false;
         try
@@ -156,7 +156,8 @@ public class TokenRefresh
     /// We pass <see cref="Timeout.InfiniteTimeSpan"/> to ensure the handler only runs once.
     /// We create a new timer after each refresh instead of a repeating one, so the next tick is
     /// scheduled from the session we ended up with rather than from a fixed interval.
-    /// The callbacks run on the thread pool, so a timer per refresh is cheap at this cadence.
+    /// The timer comes from <see cref="ClientOptions.TimeProvider"/>; with the default system clock the
+    /// callbacks run on the thread pool, so a timer per refresh is cheap at this cadence.
     /// </summary>
     private void CreateNewTimer(TimeSpan minimumDelay = default)
     {
@@ -174,7 +175,7 @@ public class TokenRefresh
                     return;
                 }
                 this._refreshTimer?.Dispose();
-                this._refreshTimer = new Timer(this.HandleRefreshTimerTick, null, refreshDueTime, Timeout.InfiniteTimeSpan);
+                this._refreshTimer = this._client.Options.TimeProvider.CreateTimer(this.HandleRefreshTimerTick, null, refreshDueTime, Timeout.InfiniteTimeSpan);
             }
 
             if (this.Debug)
@@ -208,7 +209,8 @@ public class TokenRefresh
         var interval = (long) Math.Floor(this._client.CurrentSession.ExpiresIn * 4.0 / 5.0);
         var refreshAt = this._client.CurrentSession.CreatedAt.AddSeconds(interval);
 
-        var secondsUntilNextRefresh = Convert.ToInt64((refreshAt - DateTime.UtcNow).TotalSeconds);
+        var now = this._client.Options.TimeProvider.GetUtcNow().UtcDateTime;
+        var secondsUntilNextRefresh = Convert.ToInt64(refreshAt.Subtract(now).TotalSeconds);
 
         if (secondsUntilNextRefresh < 0)
             return TimeSpan.Zero;
