@@ -56,7 +56,15 @@ internal class Debugger : IRealtimeDebugger
     public void Log(object sender, string message, Exception? exception = null)
     {
         foreach (var l in _debugListeners.Snapshot())
-            l.Invoke(sender, message, exception);
+        {
+            try
+            {
+                l.Invoke(sender, message, exception);
+            }
+            catch
+            {
+            }
+        }
     }
 
     /// <summary>

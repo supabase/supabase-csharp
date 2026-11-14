@@ -43,5 +43,17 @@ public class DebuggerHandlerTests
         calls.Should().Be(0, "a removed listener must not be called");
     }
 
+    [TestMethod]
+    public void Log_ShouldCallTheNextListener_GivenOneThatThrows()
+    {
+        var calls = 0;
+        Debugger.Instance.AddDebugHandler((_, _, _) => throw new InvalidOperationException("boom"));
+        Debugger.Instance.AddDebugHandler((_, _, _) => calls++);
+
+        Debugger.Instance.Log(new object(), "hello");
+
+        calls.Should().Be(1, "a throwing listener must not stop the next one");
+    }
+
     private sealed record LogLine(object Sender, string Message, Exception? Error);
 }
