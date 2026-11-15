@@ -102,6 +102,17 @@ public class PresenceStateTests
     }
 
     [TestMethod]
+    public void ClearPresenceEventHandlers_ShouldKeepTheOtherHandlers_GivenAnEventTypeWithNone()
+    {
+        var (channel, presence) = Presence();
+        var syncs = 0;
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => syncs++);
+        presence.ClearPresenceEventHandlers(IRealtimePresence.EventType.Join);
+        channel.HandleSocketMessage(Wire.Decode(StateFrame));
+        syncs.Should().Be(1, "clearing the join handlers must not remove the sync handler");
+    }
+
+    [TestMethod]
     public void TriggerDiff_ShouldThrow_GivenUnparsableResponse()
     {
         var (_, presence) = Presence();
