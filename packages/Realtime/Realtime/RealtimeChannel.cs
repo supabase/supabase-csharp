@@ -496,11 +496,6 @@ public class RealtimeChannel : IRealtimeChannel
                     sender.RemoveStateChangedHandler(channelCallback!);
                     this.JoinPush.OnTimeout -= joinPushTimeoutCallback;
 
-                    // Clear buffer
-                    foreach (var item in this.buffer)
-                        item.Send();
-                    this.buffer.Clear();
-
                     tsc.TrySetResult(this);
                     break;
                 // Failure
@@ -723,6 +718,15 @@ public class RealtimeChannel : IRealtimeChannel
         this.Rejoin();
     }
 
+    private void NotifyJoined()
+    {
+        this.NotifyStateChanged(ChannelState.Joined);
+
+        foreach (var push in this.buffer)
+            push.Send();
+        this.buffer.Clear();
+    }
+
     /// <summary>
     /// Sends the phoenix server a join message.
     /// </summary>
@@ -769,7 +773,7 @@ public class RealtimeChannel : IRealtimeChannel
                 // If postgres_changes options are specified, we need to wait for a system event
                 // that registers a successful subscription (see HandleSocketMessage.System)
                 if (this.PostgresChangesOptions.Count == 0)
-                    this.NotifyStateChanged(ChannelState.Joined);
+                    this.NotifyJoined();
                 break;
             case PhoenixStatusError:
                 this.rejoinTimer.Stop();
@@ -811,7 +815,7 @@ public class RealtimeChannel : IRealtimeChannel
                 switch (obj.Payload.Status)
                 {
                     case PhoenixStatusOk:
-                        this.NotifyStateChanged(ChannelState.Joined);
+                        this.NotifyJoined();
                         break;
                     case PhoenixStatusError:
                         this.NotifyErrorOccurred(new RealtimeException(message.Json)
