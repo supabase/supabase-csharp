@@ -1,5 +1,7 @@
 #nullable enable
+Supabase.Realtime.Client.PrivateChannel(string! channelName) -> Supabase.Realtime.RealtimeChannel!
 Supabase.Realtime.Client.ProbeConnection() -> void
 Supabase.Realtime.ClientOptions.ProbeTimeout.get -> System.TimeSpan
 Supabase.Realtime.ClientOptions.ProbeTimeout.set -> void
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.PrivateChannel(string! channelName) -> TChannel
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ProbeConnection() -> void

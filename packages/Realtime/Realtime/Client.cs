@@ -414,6 +414,11 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     public RealtimeChannel Channel(string channelName) =>
         this.Channel(channelName, ChannelOptions.Public(this.Options, () => this.AccessToken, this.SerializerSettings));
 
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.subscriptions.private_channel")]
+    public RealtimeChannel PrivateChannel(string channelName) =>
+        this.Channel(channelName, ChannelOptions.Private(this.Options, () => this.AccessToken, this.SerializerSettings));
+
     /// <summary>
     /// Adds a RealtimeChannel subscription with custom options - if a subscription exists with the same signature, the existing subscription will be returned.
     /// </summary>
