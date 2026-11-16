@@ -1,13 +1,15 @@
 namespace Supabase.CapabilityMatrix.Capabilities;
 
 /// <summary>
-/// How completely a feature is implemented. A member that exists is at least partial,
-/// so these are the only two statuses an in-code declaration can express.
+/// The status an in-code declaration can express, ordered from the strongest claim to the
+/// weakest. A member that exists is at least partial; a feature with no member to carry it
+/// is declared not applicable at assembly level.
 /// </summary>
 public enum CapabilityStatus
 {
     Implemented,
     Partial,
+    NotApplicable,
 }
 
 public static class CapabilityStatuses
@@ -17,6 +19,7 @@ public static class CapabilityStatuses
     {
         CapabilityStatus.Implemented => "implemented",
         CapabilityStatus.Partial => "partially_implemented",
+        CapabilityStatus.NotApplicable => "not_applicable",
         _ => throw new ArgumentOutOfRangeException(nameof(status), status, message: null),
     };
 }

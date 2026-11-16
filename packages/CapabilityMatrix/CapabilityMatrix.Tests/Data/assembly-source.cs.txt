@@ -1,0 +1,3 @@
+using Supabase.Core.Attributes;
+
+[assembly: NotApplicableCapability("client.authentication_integration.session_url_detection", "Browser-only redirect detection.")]

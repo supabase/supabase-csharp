@@ -25,4 +25,14 @@ public class CapabilityDeclarationsTests
             new DeclaredCapability("realtime.client.connect", CapabilityStatus.Implemented, null, "IRealtimeClient.Connect", FromPublicApi: true),
             new DeclaredCapability("database.using_filters.eq", CapabilityStatus.Implemented, null, "Constants.Operator.Equals", FromPublicApi: true),
         });
+
+    [TestMethod]
+    public void From_ShouldReadANotApplicableFeatureFromItsFile_GivenAnAssemblyLevelDeclaration() =>
+        CapabilityDeclarations.From([new SourceFile("packages/Supabase/Supabase/NotApplicableCapabilities.cs", Fixtures.Read("assembly-source.cs.txt"))])
+            .Should().BeEquivalentTo(new[]
+            {
+                new DeclaredCapability(
+                    "client.authentication_integration.session_url_detection", CapabilityStatus.NotApplicable,
+                    "Browser-only redirect detection.", "packages/Supabase/Supabase/NotApplicableCapabilities.cs", FromPublicApi: false),
+            });
 }

@@ -6,7 +6,8 @@ namespace Supabase.CapabilityMatrix.ValidatingDeclarations;
 /// <summary>
 /// Reviews the capabilities declared in code against the canonical catalogue, returning
 /// one problem per authoring mistake: a feature key that does not exist, a feature
-/// declared with two statuses, or one implemented only privately yet carrying no note.
+/// declared with two statuses, one implemented only privately yet carrying no note, or one
+/// declared not applicable without a reason.
 /// </summary>
 public static class DeclarationReview
 {
@@ -23,6 +24,7 @@ public static class DeclarationReview
             .. features.Where(feature => !catalogue.Knows(feature.Key)).Select(DeclarationProblem.UnknownFeature),
             .. features.Where(DeclaredWithTwoStatuses).Select(DeclarationProblem.ConflictingStatus),
             .. features.Where(ImplementedOnlyPrivatelyWithoutANote).Select(DeclarationProblem.MissingNote),
+            .. features.Where(NotApplicableWithoutAReason).Select(DeclarationProblem.MissingReason),
         ];
     }
 
@@ -30,6 +32,16 @@ public static class DeclarationReview
         feature.Select(declaration => declaration.Status).Distinct().Count() > 1;
 
     private static bool ImplementedOnlyPrivatelyWithoutANote(IGrouping<string, DeclaredCapability> feature) =>
-        feature.All(declaration => !declaration.FromPublicApi)
-            && feature.All(declaration => string.IsNullOrEmpty(declaration.Note));
+        !NotApplicable(feature)
+            && feature.All(declaration => !declaration.FromPublicApi)
+            && WithoutANote(feature);
+
+    private static bool NotApplicableWithoutAReason(IGrouping<string, DeclaredCapability> feature) =>
+        NotApplicable(feature) && WithoutANote(feature);
+
+    private static bool NotApplicable(IGrouping<string, DeclaredCapability> feature) =>
+        feature.Any(declaration => declaration.Status is CapabilityStatus.NotApplicable);
+
+    private static bool WithoutANote(IGrouping<string, DeclaredCapability> feature) =>
+        feature.All(declaration => string.IsNullOrEmpty(declaration.Note));
 }

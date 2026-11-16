@@ -34,4 +34,11 @@ public class FeatureComplianceTests
         [
             Declared("client.sync", CapabilityStatus.Implemented, "Client.GetAuthHeaders", fromPublicApi: false, note: "callback"),
         ]).Single().Should().BeEquivalentTo(new { NoPublicSymbols = true, Symbols = Array.Empty<string>() });
+
+    [TestMethod]
+    public void Consolidate_ShouldReportNotApplicableWithoutClaimingNoPublicSymbols_GivenANotApplicableDeclaration() =>
+        FeatureCompliance.Consolidate(
+        [
+            Declared("client.detect", CapabilityStatus.NotApplicable, "packages/Supabase/Supabase/NotApplicableCapabilities.cs", fromPublicApi: false, note: "browser-only"),
+        ]).Single().Should().BeEquivalentTo(new { Status = CapabilityStatus.NotApplicable, NoPublicSymbols = false });
 }

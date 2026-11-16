@@ -11,8 +11,9 @@ namespace Supabase.Core.Attributes;
 /// </summary>
 /// <remarks>
 /// The status reported to the matrix is the concrete attribute type:
-/// <see cref="ImplementedCapabilityAttribute" /> or
-/// <see cref="PartialCapabilityAttribute" />.
+/// <see cref="ImplementedCapabilityAttribute" />,
+/// <see cref="PartialCapabilityAttribute" /> or
+/// <see cref="NotApplicableCapabilityAttribute" />.
 /// </remarks>
 [ExcludeFromCodeCoverage]
 internal abstract class CapabilityAttribute : Attribute
@@ -76,6 +77,24 @@ internal sealed class PartialCapabilityAttribute : CapabilityAttribute
     /// <param name="note">A required note explaining what is missing relative to the canonical behaviour.</param>
     public PartialCapabilityAttribute(string key, string note)
         : base(key, note)
+    {
+    }
+}
+
+/// <summary>
+/// Declares, at assembly level, a Supabase capability-matrix feature that does not apply
+/// to this SDK (for example a browser-only API). Such a feature has no member to carry the
+/// annotation, so it is placed on the assembly that would otherwise own it. The reason is
+/// required: it is surfaced as the matrix note explaining why the feature does not apply.
+/// </summary>
+[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+[ExcludeFromCodeCoverage]
+internal sealed class NotApplicableCapabilityAttribute : CapabilityAttribute
+{
+    /// <param name="key">The capability-matrix feature id that does not apply to this SDK.</param>
+    /// <param name="reason">A required explanation of why the feature does not apply.</param>
+    public NotApplicableCapabilityAttribute(string key, string reason)
+        : base(key, reason)
     {
     }
 }
