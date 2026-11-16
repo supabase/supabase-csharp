@@ -66,6 +66,19 @@ public class ClientConnectionTests
     }
 
     [TestMethod]
+    public async Task Subscribe_ShouldJoin_GivenAChannelKeptAcrossAProgrammaticDisconnect()
+    {
+        var client = Helpers.SocketClient();
+        await client.ConnectAsync();
+        var channel = client.Channel("room");
+        await channel.Subscribe();
+        client.Disconnect();
+        await client.ConnectAsync();
+        await channel.Subscribe();
+        client.Subscriptions.Should().ContainValue(channel, "a channel the app kept must join again and get its messages after the client reconnects");
+    }
+
+    [TestMethod]
     public async Task ConnectAsync_ShouldForwardCustomHeaders()
     {
         var client = Helpers.SocketClient();

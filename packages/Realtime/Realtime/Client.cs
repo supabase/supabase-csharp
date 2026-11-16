@@ -445,7 +445,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         if (this.Socket == null)
             throw new Exception("Socket must exist, was `Connect` called?");
 
-        var subscription = new RealtimeChannel(this.Socket!, topic, options);
+        var subscription = this.NewChannel(topic, options);
         subscription.AddStateChangedHandler(this.HandleChannelStateChanged);
         this.subscriptions.Add(topic, subscription);
 
@@ -477,7 +477,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             filter: column != null && value != null ? $"{column}=eq.{value}" : null, parameters: parameters);
         var options = ChannelOptions.Public(this.Options, () => this.AccessToken, this.SerializerSettings);
 
-        var subscription = new RealtimeChannel(this.Socket!, key, options);
+        var subscription = this.NewChannel(key, options);
         subscription.RegisterPostgresChangesOptions(changesOptions);
         subscription.AddStateChangedHandler(this.HandleChannelStateChanged);
 
@@ -485,6 +485,9 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
         return subscription;
     }
+
+    private RealtimeChannel NewChannel(string topic, ChannelOptions options) =>
+        new(this.Socket!, topic, options) { ClientSocket = () => this.subscriptions.ContainsKey(topic) ? null : this.Socket };
 
     // Forget a closed channel so Channel(name) returns a fresh one. If the old one joins again, it comes back.
     private void HandleChannelStateChanged(IRealtimeChannel sender, ChannelState state)

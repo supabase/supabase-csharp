@@ -151,7 +151,8 @@ public class RealtimeChannel : IRealtimeChannel
     /// </summary>
     private readonly List<Push> buffer = new();
 
-    internal readonly IRealtimeSocket Socket;
+    internal IRealtimeSocket Socket { get; private set; }
+    internal Func<IRealtimeSocket?>? ClientSocket;
     private IRealtimePresence? presence;
     private IRealtimeBroadcast? broadcast;
     private RealtimeException? exception;
@@ -483,6 +484,12 @@ public class RealtimeChannel : IRealtimeChannel
 
         if (this.IsSubscribed)
             return Task.FromResult(this as IRealtimeChannel);
+
+        if (this.ClientSocket?.Invoke() is { } socket)
+        {
+            this.Socket = socket;
+            this.Socket.AddStateChangedHandler(this.HandleSocketStateChanged);
+        }
 
         this.PresenceOptions = this.presenceJoinOptions?.Invoke();
         this.JoinPush = this.GenerateJoinPush();
