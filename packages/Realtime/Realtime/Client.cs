@@ -387,9 +387,6 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
         foreach (var channel in this.subscriptions.Values)
         {
-            // See: https://github.com/supabase/realtime-js/pull/126
-            channel.Options.Parameters!["user_token"] = this.AccessToken;
-
             if (channel.HasJoinedOnce && channel.IsJoined)
             {
                 channel.Push(Constants.ChannelAccessToken, payload: new Dictionary<string, string>

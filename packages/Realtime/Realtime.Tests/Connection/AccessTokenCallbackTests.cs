@@ -75,12 +75,16 @@ public class AccessTokenCallbackTests
     [TestMethod]
     public async Task Heartbeat_ShouldResendTheStoredToken_GivenNoCallback()
     {
-        this.client = ClientOver(new FakeWebsocketClient { OpenOnStart = true, AnswerHeartbeats = true }, null);
+        var socket = new FakeWebsocketClient { OpenOnStart = true, AnswerHeartbeats = true, AnswerJoins = true };
+        var afterJoin = socket.SentFrame("access_token", 1);
+        var afterHeartbeat = socket.SentFrame("access_token", 2);
+        this.client = ClientOver(socket, null);
         this.client.SetAuth("stored");
         await this.client.ConnectAsync();
-        var channel = this.client.Channel("room");
-        await this.NextHeartbeatReply();
-        channel.Options.Parameters.Should().Contain("user_token", "stored");
+        await this.client.Channel("room").Subscribe();
+        await afterJoin.WaitAsync(TimeSpan.FromSeconds(5));
+        var resent = await afterHeartbeat.WaitAsync(TimeSpan.FromSeconds(5));
+        ((string?) resent["payload"]!["access_token"]).Should().Be("stored", "every heartbeat re-sends the client's token to the channels it has joined");
     }
 
     [TestMethod]
