@@ -54,6 +54,22 @@ internal static class TestClients
             Headers = new Dictionary<string, string> { { "apikey", MockGotrueServer.ApiKey } },
         });
 
+    internal static IGotrueClient<User, Session> AgainstWithDefaultFlowType(MockGotrueServer server, Constants.OAuthFlowType flowType) =>
+        new Client(new ClientOptions
+        {
+            Url = server.Url,
+            AutoRefreshToken = false,
+            FlowType = flowType,
+            Headers = new Dictionary<string, string> { { "apikey", MockGotrueServer.ApiKey } },
+        });
+
+    internal static IGotrueClient<User, Session> AgainstCliStackWithDefaultFlowType(Constants.OAuthFlowType flowType)
+    {
+        var options = CliOptions();
+        options.FlowType = flowType;
+        return new Client(options);
+    }
+
     internal static StatelessClientOptions StatelessAgainstCliStack()
     {
         var options = new StatelessClientOptions { Url = CliAuthUrl, AllowUnconfirmedUserSessions = true };

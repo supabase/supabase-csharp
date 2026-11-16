@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.SupabaseOptions.AuthFlowType.get -> Supabase.Gotrue.Constants.OAuthFlowType
+Supabase.SupabaseOptions.AuthFlowType.set -> void

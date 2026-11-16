@@ -25,6 +25,22 @@ public class SupabaseOptions
     public bool AutoRefreshToken { get; set; } = true;
 
     /// <summary>
+    /// The OAuth flow type <see cref="Client.Auth"/> uses when a call's own options leave it unset. Defaults to
+    /// <see cref="Constants.OAuthFlowType.Implicit"/>; PKCE is recommended for mobile and server-side applications.
+    /// A flow type set on a call's options (such as <see cref="SignInOptions.FlowType"/>) wins over it. Passed to
+    /// Auth as <see cref="Gotrue.ClientOptions.FlowType"/>.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// var client = new Supabase.Client(url, key, new SupabaseOptions { AuthFlowType = OAuthFlowType.PKCE });
+    /// var state = await client.Auth.SignIn(Provider.Github);
+    /// var session = await client.Auth.ExchangeCodeForSession(state.PKCEVerifier!, codeFromCallback);
+    /// </code>
+    /// </example>
+    [ImplementedCapability("client.authentication_integration.oauth_flow_type")]
+    public Constants.OAuthFlowType AuthFlowType { get; set; } = Constants.OAuthFlowType.Implicit;
+
+    /// <summary>
     /// Should the Client automatically connect to Realtime?
     /// </summary>
     public bool AutoConnectRealtime { get; set; }

@@ -190,7 +190,8 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             AutoRefreshToken = this.options.AutoRefreshToken,
             HttpClient = this.options.HttpClient,
             Proxy = this.options.Proxy,
-            Retry = this.options.GotrueRetry
+            Retry = this.options.GotrueRetry,
+            FlowType = this.options.AuthFlowType
         };
         this.auth = new Gotrue.Client(gotrueOptions);
         this.auth.SetPersistence(this.options.SessionHandler);

@@ -63,6 +63,8 @@ Supabase.Gotrue.Api.UpdateSsoProviderAsync(string! jwt, Supabase.Gotrue.Common.S
 Supabase.Gotrue.Client.SignInWithWeb3Async(Supabase.Gotrue.SignInWithWeb3.Web3Credentials! credentials, Supabase.Gotrue.SignInWithWeb3.SignInWithWeb3Options? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Session!>!
 Supabase.Gotrue.Client.SignOutReason.get -> Supabase.Gotrue.Common.SignOutReason?
 Supabase.Gotrue.Client.SignUpAsync(Supabase.Gotrue.Constants.SignUpType type, string! identifier, string! password, Supabase.Gotrue.SignUpOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.SignUp.SignUpState!>!
+Supabase.Gotrue.ClientOptions.FlowType.get -> Supabase.Gotrue.Constants.OAuthFlowType
+Supabase.Gotrue.ClientOptions.FlowType.set -> void
 Supabase.Gotrue.Common.SamlAttribute
 Supabase.Gotrue.Common.SamlAttribute.<Clone>$() -> Supabase.Gotrue.Common.SamlAttribute!
 Supabase.Gotrue.Common.SamlAttribute.Default.get -> object?

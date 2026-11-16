@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Supabase.Core.Attributes;
 using static Supabase.Gotrue.Constants;
 
 namespace Supabase.Gotrue;
@@ -48,11 +47,26 @@ public class SignInOptions
     /// </summary>
     public Dictionary<string, string>? QueryParams { get; set; }
 
+    private OAuthFlowType? chosenFlowType;
+
     /// <summary>
-    /// Represents an OAuth Flow type, defaults to `Implicit`
-    ///
-    /// PKCE is recommended for mobile and server-side applications.
+    /// The OAuth flow type for this call. PKCE is recommended for mobile and server-side applications.
     /// </summary>
-    [PartialCapability("client.authentication_integration.oauth_flow_type", "Flow type (PKCE/Implicit) is chosen per sign-in via SignInOptions.FlowType, not as a single construction-time client setting.")]
-    public OAuthFlowType FlowType { get; set; } = OAuthFlowType.Implicit;
+    /// <remarks>
+    /// When set, it wins over the client's <see cref="ClientOptions.FlowType"/>. When left unset, the client's
+    /// <see cref="ClientOptions.FlowType"/> applies to the call, while this property still reads
+    /// <see cref="OAuthFlowType.Implicit"/>.
+    /// </remarks>
+    public OAuthFlowType FlowType
+    {
+        get => this.chosenFlowType ?? OAuthFlowType.Implicit;
+        set => this.chosenFlowType = value;
+    }
+
+    internal SignInOptions WithDefaultFlowType(OAuthFlowType defaultFlowType)
+    {
+        var resolved = (SignInOptions) this.MemberwiseClone();
+        resolved.chosenFlowType = this.chosenFlowType ?? defaultFlowType;
+        return resolved;
+    }
 }

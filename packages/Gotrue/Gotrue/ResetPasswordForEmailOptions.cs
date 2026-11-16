@@ -12,10 +12,21 @@ public class ResetPasswordForEmailOptions
     /// </summary>
     public string Email { get; private set; }
 
+    private Constants.OAuthFlowType? chosenFlowType;
+
     /// <summary>
-    /// The OAuth Flow Type. 
+    /// The OAuth flow type for this password reset.
     /// </summary>
-    public Constants.OAuthFlowType FlowType { get; set; } = Constants.OAuthFlowType.Implicit;
+    /// <remarks>
+    /// When set, it wins over the client's <see cref="ClientOptions.FlowType"/>. When left unset, the client's
+    /// <see cref="ClientOptions.FlowType"/> applies to the call, while this property still reads
+    /// <see cref="Constants.OAuthFlowType.Implicit"/>.
+    /// </remarks>
+    public Constants.OAuthFlowType FlowType
+    {
+        get => this.chosenFlowType ?? Constants.OAuthFlowType.Implicit;
+        set => this.chosenFlowType = value;
+    }
 
     /// <summary>
     /// The URL to send the user to after they click the password reset link.
@@ -39,4 +50,11 @@ public class ResetPasswordForEmailOptions
     /// </summary>
     /// <param name="email">The email of the user account for which the password is being reset.</param>
     public ResetPasswordForEmailOptions(string email) => this.Email = email;
+
+    internal ResetPasswordForEmailOptions WithDefaultFlowType(Constants.OAuthFlowType defaultFlowType)
+    {
+        var resolved = (ResetPasswordForEmailOptions) this.MemberwiseClone();
+        resolved.chosenFlowType = this.chosenFlowType ?? defaultFlowType;
+        return resolved;
+    }
 }
