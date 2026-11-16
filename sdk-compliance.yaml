@@ -303,10 +303,9 @@ features:
     no_public_symbols: true
     note: "Umbrella Client listens to auth state changes and injects the current JWT into every sub-client via a shared GetAuthHeaders callback."
   client.authentication_integration.oauth_flow_type:
-    status: partially_implemented
-    note: "Flow type (PKCE/Implicit) is chosen per sign-in via SignInOptions.FlowType, not as a single construction-time client setting."
+    status: implemented
     symbols:
-      - SignInOptions.FlowType
+      - SupabaseOptions.AuthFlowType
   client.authentication_integration.session_url_detection:
     status: not_applicable
     note: "Redirect detection is browser-only: supabase-js reads the current page URL (window.location), which a .NET process does not have. .NET apps receive the OAuth callback through their own route, WebAuthenticator or NavigationManager and pass the callback URI explicitly to GetSessionFromUrl(Uri), or the code to ExchangeCodeForSession(verifier, code) for PKCE."
