@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
@@ -72,8 +73,8 @@ internal static class Helpers
     /// <param name="cancellationToken"></param>
     /// <param name="operation">Logical operation name recorded on telemetry (select/insert/update/…).</param>
     /// <returns></returns>
-    public static async Task<ModeledResponse<T>> MakeRequestAsync<T>(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data = null,
-        Dictionary<string, string>? headers = null, Func<Dictionary<string, string>>? getHeaders = null, CancellationToken cancellationToken = default, string? operation = null) where T : BaseModel, new()
+    public static async Task<ModeledResponse<T>> MakeRequestAsync<T>(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data,
+        Dictionary<string, string> headers, Func<Dictionary<string, string>>? getHeaders = null, CancellationToken cancellationToken = default, string? operation = null) where T : BaseModel, new()
     {
         var baseResponse = await MakeRequestAsync(clientOptions, httpClient, method, url, serializerSettings, data, headers, cancellationToken, operation);
         return new ModeledResponse<T>(baseResponse, serializerSettings, getHeaders);
@@ -92,8 +93,8 @@ internal static class Helpers
     /// <param name="cancellationToken"></param>
     /// <param name="operation">Logical operation name recorded on telemetry (select/insert/update/…).</param>
     /// <returns></returns>
-    public static async Task<BaseResponse> MakeRequestAsync(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data = null,
-        Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default, string? operation = null)
+    public static async Task<BaseResponse> MakeRequestAsync(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data,
+        Dictionary<string, string> headers, CancellationToken cancellationToken = default, string? operation = null)
     {
         var builder = new UriBuilder(url);
         var query = HttpUtility.ParseQueryString(builder.Query);
@@ -122,6 +123,8 @@ internal static class Helpers
             }
         }
 
+        var authorizedHeaders = await AuthorizeAsync(clientOptions, headers, cancellationToken).ConfigureAwait(false);
+
         HttpRequestMessage CreateRequest()
         {
             var requestMessage = new HttpRequestMessage(method, builder.Uri);
@@ -131,12 +134,9 @@ internal static class Helpers
                 requestMessage.Content = new StringContent(body, Encoding.UTF8, "application/json");
             }
 
-            if (headers != null)
+            foreach (var kvp in authorizedHeaders)
             {
-                foreach (var kvp in headers)
-                {
-                    requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
-                }
+                requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
             }
 
             return requestMessage;
@@ -189,6 +189,24 @@ internal static class Helpers
         {
             PostgrestInstrumentation.RecordRequest(method, builder.Uri, operation, statusCode, errorType, startTimestamp);
         }
+    }
+
+    private static async Task<Dictionary<string, string>> AuthorizeAsync(ClientOptions clientOptions, Dictionary<string, string> headers, CancellationToken cancellationToken)
+    {
+        var accessToken = clientOptions.RetrieveAccessToken is null
+            ? null
+            : await clientOptions.RetrieveAccessToken(cancellationToken).ConfigureAwait(false);
+
+        return accessToken is null ? headers : WithBearer(headers, accessToken);
+    }
+
+    private static Dictionary<string, string> WithBearer(Dictionary<string, string> headers, string accessToken)
+    {
+        var authorized = headers
+            .Where(header => !string.Equals(header.Key, "Authorization", StringComparison.OrdinalIgnoreCase))
+            .ToDictionary(header => header.Key, header => header.Value);
+        authorized["Authorization"] = $"Bearer {accessToken}";
+        return authorized;
     }
 
     /// <summary>

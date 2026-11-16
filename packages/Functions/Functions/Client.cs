@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -155,6 +156,23 @@ public partial class Client : IFunctionsClient
         return string.IsNullOrEmpty(content) ? default : JsonSerializer.Deserialize<T>(content, SerializerOptions);
     }
 
+    private async Task<string?> ResolveBearerTokenAsync(string? invocationToken, InvokeFunctionOptions options, CancellationToken cancellationToken)
+    {
+        if (invocationToken is not null)
+            return invocationToken;
+
+        if (this.Options.RetrieveAccessToken is null)
+            return this.token;
+
+        if (CarriesAuthorization(options.Headers))
+            return null;
+
+        return await this.Options.RetrieveAccessToken(cancellationToken).ConfigureAwait(false) ?? this.token;
+    }
+
+    private static bool CarriesAuthorization(Dictionary<string, string> headers) =>
+        headers.Keys.Any(key => string.Equals(key, "Authorization", StringComparison.OrdinalIgnoreCase));
+
     /// <summary>
     /// Internal request handling
     /// </summary>
@@ -179,10 +197,10 @@ public partial class Client : IFunctionsClient
 
         var headers = (this.GetHeaders?.Invoke() ?? new Dictionary<string, string>()).MergeLeft(options.Headers);
 
-        token ??= this.token;
-        if (!string.IsNullOrEmpty(token))
+        var bearerToken = await this.ResolveBearerTokenAsync(token, options, cancellationToken).ConfigureAwait(false);
+        if (!string.IsNullOrEmpty(bearerToken))
         {
-            headers["Authorization"] = $"Bearer {token}";
+            headers["Authorization"] = $"Bearer {bearerToken}";
         }
 
         headers["X-Client-Info"] = Util.GetAssemblyVersion(typeof(Client));
