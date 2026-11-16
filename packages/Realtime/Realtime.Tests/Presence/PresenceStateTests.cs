@@ -261,7 +261,7 @@ public class PresenceStateTests
         presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => events.Add("sync"));
         channel.HandleSocketMessage(Wire.Decode(DiffFrame));
         events.Should().Equal(["join user-2 current=0 new=r2 state=user-1", "leave user-1 current=0 left=r1 time=True", "sync"],
-            "the handlers get the presences the state held and run before it changes");
+            "the handlers must get the presences the state held and run before it changes");
     }
 
     [TestMethod]
@@ -289,8 +289,8 @@ public class PresenceStateTests
         channel.HandleSocketMessage(Wire.Decode(FirstConnectionLeaveFrame));
         using (new AssertionScope())
         {
-            joins.Should().ContainSingle().Which.CurrentPresences.Should().ContainSingle().Which.PhoenixRef.Should().Be("r1");
-            leaves.Should().ContainSingle().Which.CurrentPresences.Should().ContainSingle().Which.PhoenixRef.Should().Be("r2");
+            joins.Should().ContainSingle().Which.CurrentPresences.Should().ContainSingle().Which.PhoenixRef.Should().Be("r1", "a join must carry the presences the key already had");
+            leaves.Should().ContainSingle().Which.CurrentPresences.Should().ContainSingle().Which.PhoenixRef.Should().Be("r2", "a leave must carry the presences the key still has");
         }
     }
 
@@ -325,7 +325,7 @@ public class PresenceStateTests
         channel.HandleSocketMessage(Wire.Decode(StateFrame));
         using (new AssertionScope())
         {
-            presence.CurrentState.Should().ContainKey("user-1");
+            presence.CurrentState.Should().ContainKey("user-1", "a throwing handler must not stop the state from changing");
             syncs.Should().Be(1, "a throwing handler must not stop the others");
         }
     }
@@ -334,7 +334,7 @@ public class PresenceStateTests
     [DataRow(null, 0, 0)]
     [DataRow(IRealtimePresence.EventType.Join, 0, 1)]
     [DataRow(IRealtimePresence.EventType.Leave, 1, 0)]
-    public void ClearPresenceEventHandlers_ShouldDropJoinAndLeaveHandlers(IRealtimePresence.EventType? cleared, int expectedJoins, int expectedLeaves)
+    public void ClearPresenceEventHandlers_ShouldDropTheTypedHandlers_GivenTheirEventTypeOrNone(IRealtimePresence.EventType? cleared, int expectedJoins, int expectedLeaves)
     {
         var (channel, presence) = Presence();
         channel.HandleSocketMessage(Wire.Decode(StateFrame));
@@ -345,8 +345,8 @@ public class PresenceStateTests
         channel.HandleSocketMessage(Wire.Decode(DiffFrame));
         using (new AssertionScope())
         {
-            joins.Should().Be(expectedJoins);
-            leaves.Should().Be(expectedLeaves);
+            joins.Should().Be(expectedJoins, "clearing must drop the join handlers only for Join or for every event type");
+            leaves.Should().Be(expectedLeaves, "clearing must drop the leave handlers only for Leave or for every event type");
         }
     }
 
@@ -364,9 +364,36 @@ public class PresenceStateTests
     }
 
     [TestMethod]
+    public void RemoveJoinHandler_ShouldStopTheCalls_GivenRemoveLeaveHandlerToo()
+    {
+        var (channel, presence) = Presence();
+        var calls = 0;
+        Action<PresenceJoin<PresenceExample>> join = _ => calls++;
+        Action<PresenceLeave<PresenceExample>> leave = _ => calls++;
+        presence.AddJoinHandler(join);
+        presence.AddLeaveHandler(leave);
+        presence.RemoveJoinHandler(join);
+        presence.RemoveLeaveHandler(leave);
+        channel.HandleSocketMessage(Wire.Decode(StateFrame));
+        channel.HandleSocketMessage(Wire.Decode(DiffFrame));
+        calls.Should().Be(0, "a removed handler must not be called again");
+    }
+
+    [TestMethod]
+    public void Unsubscribe_ShouldRaiseNoSync_GivenAnEmptyState()
+    {
+        var (channel, presence) = Presence();
+        var syncs = 0;
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => syncs++);
+        channel.Unsubscribe();
+        syncs.Should().Be(0, "a channel that held no presence must not raise a sync when it closes");
+    }
+
+    [TestMethod]
     public void Unsubscribe_ShouldNotThrow_GivenAThrowingSyncHandler()
     {
         var (channel, presence) = Presence();
+        channel.HandleSocketMessage(Wire.Decode(StateFrame));
         presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => throw new InvalidOperationException());
         channel.Invoking(leaving => leaving.Unsubscribe()).Should().NotThrow("a handler that throws must not stop the client from unsubscribing its other channels");
     }

@@ -71,8 +71,11 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     /// <param name="eventType"></param>
     /// <param name="handler"></param>
     public void AddPresenceEventHandler(IRealtimePresence.EventType eventType,
-        IRealtimePresence.PresenceEventHandler handler) =>
-        this.Add(this.presenceEventListeners.GetOrAdd(eventType, _ => new HandlerCollection<IRealtimePresence.PresenceEventHandler>()), handler);
+        IRealtimePresence.PresenceEventHandler handler)
+    {
+        this.presenceEventListeners.GetOrAdd(eventType, _ => new HandlerCollection<IRealtimePresence.PresenceEventHandler>())
+            .Add(handler);
+    }
 
     /// <summary>
     /// Remove an event handler
@@ -107,17 +110,33 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     /// <summary>
     /// Adds a handler called once for each key that gains presences, with the presences that joined, before <see cref="CurrentState"/> changes.
     /// </summary>
+    /// <param name="handler">The handler to add.</param>
+    /// <exception cref="RealtimeException">The channel is subscribed with presence off, so the handler would never be called.</exception>
     public void AddJoinHandler(Action<PresenceJoin<TPresenceModel>> handler) => this.Add(this.joinHandlers, handler);
+
+    /// <summary>
+    /// Removes a handler added with <see cref="AddJoinHandler"/>.
+    /// </summary>
+    /// <param name="handler">The handler to remove.</param>
+    public void RemoveJoinHandler(Action<PresenceJoin<TPresenceModel>> handler) => this.joinHandlers.Remove(handler);
 
     /// <summary>
     /// Adds a handler called once for each key that loses presences, with the presences that left, before <see cref="CurrentState"/> changes.
     /// </summary>
+    /// <param name="handler">The handler to add.</param>
+    /// <exception cref="RealtimeException">The channel is subscribed with presence off, so the handler would never be called.</exception>
     public void AddLeaveHandler(Action<PresenceLeave<TPresenceModel>> handler) => this.Add(this.leaveHandlers, handler);
 
-    private void Add<THandler>(HandlerCollection<THandler> handlers, THandler handler) where THandler : Delegate
+    /// <summary>
+    /// Removes a handler added with <see cref="AddLeaveHandler"/>.
+    /// </summary>
+    /// <param name="handler">The handler to remove.</param>
+    public void RemoveLeaveHandler(Action<PresenceLeave<TPresenceModel>> handler) => this.leaveHandlers.Remove(handler);
+
+    private void Add<TChange>(HandlerCollection<Action<TChange>> handlers, Action<TChange> handler)
     {
         var presenceOn = this.channel.PresenceOptions is { Enabled: true } || this.trackedJoin == this.channel.JoinPush;
-        if ((this.channel.IsJoining || this.channel.IsJoined) && !presenceOn)
+        if (!this.channel.IsClosed && !presenceOn)
             throw new RealtimeException($"Cannot add presence handlers for {this.channel.Topic} after `Subscribe()` while presence is off.")
             {
                 Reason = FailureHint.Reason.StateInvalid,
@@ -127,11 +146,15 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     }
 
     internal PresenceOptions JoinOptions() =>
-        this.joinHandlers.Snapshot().Length > 0 || this.leaveHandlers.Snapshot().Length > 0 || this.presenceEventListeners.Values.SelectMany(handlers => handlers.Snapshot()).Any()
+        this.joinHandlers.Snapshot().Any() || this.leaveHandlers.Snapshot().Any() || this.presenceEventListeners.Values.SelectMany(handlers => handlers.Snapshot()).Any()
             ? PresenceOptions.WithPresence(this.options.PresenceKey)
             : this.options;
 
-    internal void End() => Debugger.Instance.Guard(this, () => this.Apply(new()));
+    internal void End()
+    {
+        if (this.CurrentState.Count > 0)
+            Debugger.Instance.Guard(this, () => this.Apply(new()));
+    }
 
     /// <summary>
     /// Notifies listeners of state changes

@@ -110,6 +110,15 @@ public class PresenceRegistrationTests
     }
 
     [TestMethod]
+    public void AddPresenceEventHandler_ShouldNotThrow_GivenASubscribedChannelWithPresenceOff()
+    {
+        var channel = Wire.Channel();
+        var presence = channel.Register<PresenceExample>(PresenceOptions.WithoutPresence("some-key"));
+        _ = channel.Subscribe();
+        presence.Invoking(late => late.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => { })).Should().NotThrow("a method that already shipped must keep accepting handlers as it did");
+    }
+
+    [TestMethod]
     public void AddJoinHandler_ShouldNotThrow_GivenASubscribedChannelWithPresenceOn()
     {
         var channel = Wire.Channel();
@@ -122,7 +131,7 @@ public class PresenceRegistrationTests
     public async Task AddJoinHandler_ShouldNotThrow_GivenATrackTurnedPresenceOn()
     {
         var presence = await TrackOnAChannelJoinedWithoutPresence(Constants.PhoenixStatusOk);
-        presence.Invoking(late => late.AddJoinHandler(_ => { })).Should().NotThrow("a track that succeeds turns presence on for a channel that joined with it off");
+        presence.Invoking(late => late.AddJoinHandler(_ => { })).Should().NotThrow("a track that succeeds turns presence on, so a late handler must be accepted");
     }
 
     [TestMethod]

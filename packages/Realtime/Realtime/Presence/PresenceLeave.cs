@@ -6,6 +6,7 @@ namespace Supabase.Realtime.Presence;
 /// <summary>
 /// Presences that left under one key.
 /// </summary>
+/// <typeparam name="TPresenceModel">A model representing expected payload.</typeparam>
 public sealed class PresenceLeave<TPresenceModel> where TPresenceModel : BasePresence
 {
     internal PresenceLeave(string key, IReadOnlyList<TPresenceModel> currentPresences, IReadOnlyList<TPresenceModel> leftPresences)

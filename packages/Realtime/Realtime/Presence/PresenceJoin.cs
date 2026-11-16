@@ -6,6 +6,7 @@ namespace Supabase.Realtime.Presence;
 /// <summary>
 /// Presences that joined under one key.
 /// </summary>
+/// <typeparam name="TPresenceModel">A model representing expected payload.</typeparam>
 public sealed class PresenceJoin<TPresenceModel> where TPresenceModel : BasePresence
 {
     internal PresenceJoin(string key, IReadOnlyList<TPresenceModel> currentPresences, IReadOnlyList<TPresenceModel> newPresences)
