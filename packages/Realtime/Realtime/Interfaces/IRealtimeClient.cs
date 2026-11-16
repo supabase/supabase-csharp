@@ -128,6 +128,25 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     TChannel Channel(string channelName);
 
     /// <summary>
+    /// Initializes a private channel: one the server authorizes against its Row Level Security policies on
+    /// <c>realtime.messages</c>. The join carries the client's current access token, the one set by
+    /// <see cref="SetAuth"/> or returned by <see cref="ClientOptions.RetrieveAccessToken"/>, so a policy using
+    /// <c>auth.uid()</c> sees the signed-in user. To join with a token from another source, use
+    /// <see cref="Channel(string, ChannelOptions)"/> with <see cref="ChannelOptions.Private"/>.
+    /// </summary>
+    /// <param name="channelName">The name of the channel to join.</param>
+    /// <returns>The channel; the existing one when a channel with the same name was already added.</returns>
+    /// <exception cref="Exception">The socket is not connected: call <c>ConnectAsync</c> first.</exception>
+    /// <example>
+    /// <code>
+    /// await client.Realtime.ConnectAsync();
+    /// var channel = client.Realtime.PrivateChannel($"user:{userId}");
+    /// await channel.Subscribe();
+    /// </code>
+    /// </example>
+    TChannel PrivateChannel(string channelName);
+
+    /// <summary>
     /// Adds a RealtimeChannel subscription with custom options - if a subscription exists with the same signature, the existing subscription will be returned.
     /// </summary>
     /// <param name="channelName">The name of the Channel to join</param>

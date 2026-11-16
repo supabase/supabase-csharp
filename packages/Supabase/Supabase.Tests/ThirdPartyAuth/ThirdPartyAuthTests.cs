@@ -10,7 +10,6 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Functions.Exceptions;
 using Supabase.Postgrest.Exceptions;
-using Supabase.Realtime.Channel;
 using Supabase.Tests.Models;
 
 namespace Supabase.Tests.ThirdPartyAuth;
@@ -52,8 +51,7 @@ public class ThirdPartyAuthTests
         var user = await SignUpUserAsync();
         var realtime = ClientReturning(user.AccessToken).Realtime;
         await realtime.ConnectAsync();
-        var currentToken = realtime.Channel("token-probe").Options.RetrieveAccessToken;
-        var channel = realtime.Channel($"user:{user.Id}", ChannelOptions.Private(realtime.Options, currentToken, realtime.SerializerSettings));
+        var channel = realtime.PrivateChannel($"user:{user.Id}");
         await channel.Subscribe();
         channel.IsJoined.Should().BeTrue("the private topic's RLS policy admits only the user whose JWT Realtime received on connect");
         realtime.Disconnect();
