@@ -42,6 +42,8 @@ Supabase.Storage.ClientOptions.HttpUploadClient.set -> void
 Supabase.Storage.ClientOptions.HttpUploadTimeout -> System.TimeSpan
 Supabase.Storage.ClientOptions.Proxy.get -> System.Net.IWebProxy?
 Supabase.Storage.ClientOptions.Proxy.set -> void
+Supabase.Storage.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
+Supabase.Storage.ClientOptions.RetrieveAccessToken.set -> void
 Supabase.Storage.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
 Supabase.Storage.ClientOptions.Retry.set -> void
 Supabase.Storage.CreateSignedUrlResponse

@@ -64,6 +64,8 @@ Supabase.Realtime.Client.Disconnect(System.Net.WebSockets.WebSocketCloseStatus c
 Supabase.Realtime.Client.GetHeaders.get -> System.Func<System.Collections.Generic.Dictionary<string!, string!>!>?
 Supabase.Realtime.Client.GetHeaders.set -> void
 Supabase.Realtime.Client.Options.get -> Supabase.Realtime.ClientOptions!
+Supabase.Realtime.Client.PrivateChannel(string! channelName) -> Supabase.Realtime.RealtimeChannel!
+Supabase.Realtime.Client.ProbeConnection() -> void
 Supabase.Realtime.Client.Remove(Supabase.Realtime.RealtimeChannel! channel) -> void
 Supabase.Realtime.Client.RemoveAll() -> void
 Supabase.Realtime.Client.RemoveDebugHandler(Supabase.Realtime.Interfaces.IRealtimeDebugger.DebugEventHandler! handler) -> void
@@ -90,6 +92,8 @@ Supabase.Realtime.ClientOptions.HeartbeatInterval.set -> void
 Supabase.Realtime.ClientOptions.Parameters -> Supabase.Realtime.Socket.SocketOptionsParameters!
 Supabase.Realtime.ClientOptions.PostgrestClient.get -> Supabase.Postgrest.Interfaces.IPostgrestClient?
 Supabase.Realtime.ClientOptions.PostgrestClient.set -> void
+Supabase.Realtime.ClientOptions.ProbeTimeout.get -> System.TimeSpan
+Supabase.Realtime.ClientOptions.ProbeTimeout.set -> void
 Supabase.Realtime.ClientOptions.ReconnectAfterInterval.get -> System.Func<int, System.TimeSpan>!
 Supabase.Realtime.ClientOptions.ReconnectAfterInterval.set -> void
 Supabase.Realtime.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.Tasks.Task<string?>!>?
@@ -224,6 +228,8 @@ Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ConnectionState.
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Disconnect(System.Net.WebSockets.WebSocketCloseStatus code = System.Net.WebSockets.WebSocketCloseStatus.NormalClosure, string! reason = "Programmatic Disconnect") -> Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>!
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.HeartbeatEventHandler
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Options.get -> Supabase.Realtime.ClientOptions!
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.PrivateChannel(string! channelName) -> TChannel
+Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.ProbeConnection() -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.Remove(TChannel channel) -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveAll() -> void
 Supabase.Realtime.Interfaces.IRealtimeClient<TSocket, TChannel>.RemoveDebugHandler(Supabase.Realtime.Interfaces.IRealtimeDebugger.DebugEventHandler! handler) -> void
