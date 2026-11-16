@@ -56,6 +56,8 @@ Supabase.Postgrest.ClientOptions.Proxy.get -> System.Net.IWebProxy?
 Supabase.Postgrest.ClientOptions.Proxy.set -> void
 Supabase.Postgrest.ClientOptions.QueryParams.get -> System.Collections.Generic.Dictionary<string!, string!>!
 Supabase.Postgrest.ClientOptions.QueryParams.set -> void
+Supabase.Postgrest.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
+Supabase.Postgrest.ClientOptions.RetrieveAccessToken.set -> void
 Supabase.Postgrest.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
 Supabase.Postgrest.ClientOptions.Retry.set -> void
 Supabase.Postgrest.ClientOptions.Schema.get -> string!

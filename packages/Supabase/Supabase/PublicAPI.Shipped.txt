@@ -49,6 +49,8 @@ Supabase.SupabaseDiagnostics
 Supabase.SupabaseModel
 Supabase.SupabaseModel.SupabaseModel() -> void
 Supabase.SupabaseOptions
+Supabase.SupabaseOptions.AuthFlowType.get -> Supabase.Gotrue.Constants.OAuthFlowType
+Supabase.SupabaseOptions.AuthFlowType.set -> void
 Supabase.SupabaseOptions.AuthUrlFormat.get -> string!
 Supabase.SupabaseOptions.AuthUrlFormat.set -> void
 Supabase.SupabaseOptions.AutoConnectRealtime.get -> bool
@@ -82,6 +84,8 @@ Supabase.SupabaseOptions.StorageClientOptions.set -> void
 Supabase.SupabaseOptions.StorageUrlFormat.get -> string!
 Supabase.SupabaseOptions.StorageUrlFormat.set -> void
 Supabase.SupabaseOptions.SupabaseOptions() -> void
+Supabase.SupabaseOptions.ThirdPartyAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
+Supabase.SupabaseOptions.ThirdPartyAccessToken.set -> void
 Supabase.SupabaseOptions.WebSocketFactory.get -> Supabase.Realtime.Sockets.IWebSocketFactory?
 Supabase.SupabaseOptions.WebSocketFactory.set -> void
 Supabase.SupabaseTable<TModel>
