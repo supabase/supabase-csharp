@@ -298,6 +298,10 @@ features:
 
   # ── Client Initialization ──────────────────────────────────────────────────
 
+  client.authentication_integration.third_party_auth:
+    status: implemented
+    symbols:
+      - SupabaseOptions.ThirdPartyAccessToken
   client.authentication_integration.cross_client_token_sync:
     status: implemented
     no_public_symbols: true
