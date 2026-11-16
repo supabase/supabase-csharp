@@ -655,6 +655,7 @@ features:
     status: implemented
     symbols:
       - ChannelOptions.Private
+      - Client.PrivateChannel
   realtime.subscriptions.broadcast_self:
     status: implemented
     symbols:
