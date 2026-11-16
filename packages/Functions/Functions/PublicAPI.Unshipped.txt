@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.Functions.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
+Supabase.Functions.ClientOptions.RetrieveAccessToken.init -> void

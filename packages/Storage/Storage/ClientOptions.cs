@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Supabase.Core.Http;
 
 namespace Supabase.Storage;
@@ -40,6 +41,13 @@ public class ClientOptions
 
     /// <summary>A proxy to route requests through. Only applies to clients this options object builds itself (i.e. when the corresponding HttpXClient above is not supplied).</summary>
     public IWebProxy? Proxy { get; set; }
+
+    /// <summary>
+    /// Supplies the access token sent as <c>Authorization: Bearer</c>, replacing any Authorization header.
+    /// Awaited before every request; a null token leaves the headers unchanged. Uploads to a signed URL
+    /// keep the URL's own token.
+    /// </summary>
+    public Func<CancellationToken, Task<string?>>? RetrieveAccessToken { get; set; }
 
     /// <summary>
     /// Retry policy applied to metadata/API requests (list, create, delete, sign, etc.). Not applied to

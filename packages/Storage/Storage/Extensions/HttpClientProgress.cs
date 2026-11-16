@@ -58,7 +58,7 @@ internal static class HttpClientProgress
                     message,
                     HttpCompletionOption.ResponseHeadersRead,
                     cancellationToken
-                )
+                ).ConfigureAwait(false)
             )
             {
                 statusCode = (int) response.StatusCode;
