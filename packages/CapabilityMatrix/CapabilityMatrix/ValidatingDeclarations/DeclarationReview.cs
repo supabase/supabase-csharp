@@ -32,15 +32,12 @@ public static class DeclarationReview
         feature.Select(declaration => declaration.Status).Distinct().Count() > 1;
 
     private static bool ImplementedOnlyPrivatelyWithoutANote(IGrouping<string, DeclaredCapability> feature) =>
-        !NotApplicable(feature)
-            && feature.All(declaration => !declaration.FromPublicApi)
+        feature.All(declaration => !declaration.FromPublicApi)
             && WithoutANote(feature);
 
     private static bool NotApplicableWithoutAReason(IGrouping<string, DeclaredCapability> feature) =>
-        NotApplicable(feature) && WithoutANote(feature);
-
-    private static bool NotApplicable(IGrouping<string, DeclaredCapability> feature) =>
-        feature.Any(declaration => declaration.Status is CapabilityStatus.NotApplicable);
+        feature.Any(declaration => declaration.Status is CapabilityStatus.NotApplicable)
+            && WithoutANote(feature);
 
     private static bool WithoutANote(IGrouping<string, DeclaredCapability> feature) =>
         feature.All(declaration => string.IsNullOrEmpty(declaration.Note));

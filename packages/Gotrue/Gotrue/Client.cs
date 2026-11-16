@@ -780,6 +780,7 @@ public class Client : IGotrueClient<User, Session>
     /// <param name="uri"></param>
     /// <param name="storeSession"></param>
     /// <returns></returns>
+    [NotApplicableCapability("client.authentication_integration.session_url_detection", "Redirect detection is browser-only: supabase-js reads the current page URL (window.location), which a .NET process does not have. .NET apps receive the OAuth callback through their own route, WebAuthenticator or NavigationManager and pass the callback URI explicitly to GetSessionFromUrl(Uri), or the code to ExchangeCodeForSession(verifier, code) for PKCE.")]
     public async Task<Session?> GetSessionFromUrl(Uri uri, bool storeSession = true)
     {
         var query = string.IsNullOrEmpty(uri.Fragment)

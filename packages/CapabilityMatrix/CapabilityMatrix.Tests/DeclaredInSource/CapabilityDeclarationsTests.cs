@@ -21,18 +21,9 @@ public class CapabilityDeclarationsTests
             new DeclaredCapability("auth.session.get_user", CapabilityStatus.Implemented, null, "Client.CurrentUser", FromPublicApi: true),
             new DeclaredCapability("client.authentication_integration.cross_client_token_sync", CapabilityStatus.Implemented, "Injected into sub-clients via a shared callback.", "Client.GetAuthHeaders", FromPublicApi: false),
             new DeclaredCapability("functions.invocation.invoke", CapabilityStatus.Implemented, "Three return shapes.", "Client.Invoke", FromPublicApi: true),
+            new DeclaredCapability("client.authentication_integration.session_url_detection", CapabilityStatus.NotApplicable, "Browser-only redirect detection.", "Client.GetSessionFromUrl", FromPublicApi: true),
             new DeclaredCapability("client.request_configuration.global_headers", CapabilityStatus.Implemented, null, "Options.Headers", FromPublicApi: true),
             new DeclaredCapability("realtime.client.connect", CapabilityStatus.Implemented, null, "IRealtimeClient.Connect", FromPublicApi: true),
             new DeclaredCapability("database.using_filters.eq", CapabilityStatus.Implemented, null, "Constants.Operator.Equals", FromPublicApi: true),
         });
-
-    [TestMethod]
-    public void From_ShouldReadANotApplicableFeatureFromItsFile_GivenAnAssemblyLevelDeclaration() =>
-        CapabilityDeclarations.From([new SourceFile("packages/Supabase/Supabase/NotApplicableCapabilities.cs", Fixtures.Read("assembly-source.cs.txt"))])
-            .Should().BeEquivalentTo(new[]
-            {
-                new DeclaredCapability(
-                    "client.authentication_integration.session_url_detection", CapabilityStatus.NotApplicable,
-                    "Browser-only redirect detection.", "packages/Supabase/Supabase/NotApplicableCapabilities.cs", FromPublicApi: false),
-            });
 }

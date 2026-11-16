@@ -2,8 +2,8 @@ namespace Supabase.CapabilityMatrix.Capabilities;
 
 /// <summary>
 /// The status an in-code declaration can express, ordered from the strongest claim to the
-/// weakest. A member that exists is at least partial; a feature with no member to carry it
-/// is declared not applicable at assembly level.
+/// weakest. A feature that does not apply is declared on the public member that is this
+/// SDK's answer to it.
 /// </summary>
 public enum CapabilityStatus
 {

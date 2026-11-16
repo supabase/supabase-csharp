@@ -13,23 +13,16 @@ public sealed record SourceFile(string Path, string Text);
 /// syntax only — no compilation, no assembly loading — so the same files always yield
 /// the same declarations. A member's symbol is named the way the matrix spells it:
 /// the containing-type chain with the namespace stripped (e.g. <c>Constants.Operator.Equals</c>).
-/// An assembly-level declaration has no member, so it is named by the file that carries it.
 /// </summary>
 public static class CapabilityDeclarations
 {
     public static IReadOnlyList<DeclaredCapability> From(IEnumerable<SourceFile> sources) =>
         sources
-            .SelectMany(InFile)
+            .SelectMany(source => CSharpSyntaxTree.ParseText(source.Text).GetCompilationUnitRoot().Members)
+            .SelectMany(member => In(member, containingTypes: [], containerIsPublic: true))
             .OrderBy(declaration => declaration.Symbol, StringComparer.Ordinal)
             .ThenBy(declaration => declaration.FeatureKey, StringComparer.Ordinal)
             .ToList();
-
-    private static IEnumerable<DeclaredCapability> InFile(SourceFile source)
-    {
-        var file = CSharpSyntaxTree.ParseText(source.Text).GetCompilationUnitRoot();
-        return DeclaredBy(file.AttributeLists, source.Path, fromPublicApi: false)
-            .Concat(file.Members.SelectMany(member => In(member, containingTypes: [], containerIsPublic: true)));
-    }
 
     private static IEnumerable<DeclaredCapability> In(
         MemberDeclarationSyntax node, IReadOnlyList<string> containingTypes, bool containerIsPublic) =>

@@ -3,8 +3,8 @@ namespace Supabase.CapabilityMatrix.Capabilities;
 /// <summary>
 /// One feature's compliance, consolidated from every member that declares it: the
 /// status, the note, and the public symbols that evidence it. When only non-public
-/// members declare a feature they implement there is no symbol to cite, which the matrix
-/// records as <c>no_public_symbols</c>; a not-applicable feature has nothing to cite at all.
+/// members declare it there is no symbol to cite, which the matrix records as
+/// <c>no_public_symbols</c>.
 /// </summary>
 public sealed record FeatureCompliance(
     string FeatureKey,
@@ -40,6 +40,6 @@ public sealed record FeatureCompliance(
             .Select(declaration => declaration.Note)
             .FirstOrDefault(note => !string.IsNullOrEmpty(note));
 
-        return new FeatureCompliance(feature.Key, status, note, symbols, NoPublicSymbols: symbols.Count == 0 && status is not CapabilityStatus.NotApplicable);
+        return new FeatureCompliance(feature.Key, status, note, symbols, NoPublicSymbols: symbols.Count == 0);
     }
 }

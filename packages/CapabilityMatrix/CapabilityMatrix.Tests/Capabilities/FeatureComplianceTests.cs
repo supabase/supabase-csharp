@@ -36,9 +36,9 @@ public class FeatureComplianceTests
         ]).Single().Should().BeEquivalentTo(new { NoPublicSymbols = true, Symbols = Array.Empty<string>() });
 
     [TestMethod]
-    public void Consolidate_ShouldReportNotApplicableWithoutClaimingNoPublicSymbols_GivenANotApplicableDeclaration() =>
+    public void Consolidate_ShouldReportNotApplicable_GivenANotApplicableDeclaration() =>
         FeatureCompliance.Consolidate(
         [
-            Declared("client.detect", CapabilityStatus.NotApplicable, "packages/Supabase/Supabase/NotApplicableCapabilities.cs", fromPublicApi: false, note: "browser-only"),
-        ]).Single().Should().BeEquivalentTo(new { Status = CapabilityStatus.NotApplicable, NoPublicSymbols = false });
+            Declared("client.detect", CapabilityStatus.NotApplicable, "Client.GetSessionFromUrl", note: "browser-only"),
+        ]).Single().Status.Should().Be(CapabilityStatus.NotApplicable);
 }

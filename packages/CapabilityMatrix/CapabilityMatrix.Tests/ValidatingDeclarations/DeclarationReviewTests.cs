@@ -39,31 +39,24 @@ public class DeclarationReviewTests
 
     [TestMethod]
     public void Of_ShouldReturnNoProblems_GivenANotApplicableFeatureWithAReason() =>
-        Review(Declared("auth.sign_in.sign_up", CapabilityStatus.NotApplicable, fromPublicApi: false, note: "browser-only")).Should().BeEmpty();
+        Review(Declared("auth.sign_in.sign_up", CapabilityStatus.NotApplicable, note: "browser-only")).Should().BeEmpty();
 
     [TestMethod]
     public void Of_ShouldFlagANotApplicableFeature_GivenItAlsoClaimsAnImplementation() =>
         Review(
             Declared("auth.sign_in.sign_up"),
-            Declared("auth.sign_in.sign_up", CapabilityStatus.NotApplicable, fromPublicApi: false, note: "browser-only"))
+            Declared("auth.sign_in.sign_up", CapabilityStatus.NotApplicable, note: "browser-only"))
             .Should().ContainSingle().Which.Message.Should().Contain("one status");
 
     [TestMethod]
     public void Of_ShouldFlagANotApplicableFeature_GivenItLacksAReason() =>
-        Review(Declared("auth.sign_in.sign_up", CapabilityStatus.NotApplicable, fromPublicApi: false)).Should().ContainSingle()
+        Review(Declared("auth.sign_in.sign_up", CapabilityStatus.NotApplicable)).Should().ContainSingle()
             .Which.Message.Should().Contain("reason");
-
-    [TestMethod]
-    public void Of_ShouldReturnNoProblems_GivenAFeatureWithoutANoteIsAlsoDeclaredPublicly() =>
-        Review(
-            Declared("auth.session.get_user"),
-            Declared("auth.session.get_user", fromPublicApi: false))
-            .Should().BeEmpty();
 
     [TestMethod]
     public void Of_ShouldAskForAReason_GivenOnlyOneOfTheConflictingDeclarationsIsNotApplicable() =>
         Review(
             Declared("auth.sign_in.sign_up"),
-            Declared("auth.sign_in.sign_up", CapabilityStatus.NotApplicable, fromPublicApi: false))
+            Declared("auth.sign_in.sign_up", CapabilityStatus.NotApplicable))
             .Should().Contain(problem => problem.Message.Contains("reason"));
 }

@@ -82,17 +82,20 @@ internal sealed class PartialCapabilityAttribute : CapabilityAttribute
 }
 
 /// <summary>
-/// Declares, at assembly level, a Supabase capability-matrix feature that does not apply
-/// to this SDK (for example a browser-only API). Such a feature has no member to carry the
-/// annotation, so it is placed on the assembly that would otherwise own it. The reason is
-/// required: it is surfaced as the matrix note explaining why the feature does not apply.
+/// Marks a public member as this SDK's answer to a Supabase capability-matrix feature that
+/// does not apply to it (for example a browser-only API whose .NET counterpart is an explicit
+/// call). The reason is required: it is surfaced as the matrix note explaining why the
+/// feature does not apply and what the member offers instead.
 /// </summary>
-[AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
+[AttributeUsage(
+    AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum |
+    AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field,
+    AllowMultiple = true)]
 [ExcludeFromCodeCoverage]
 internal sealed class NotApplicableCapabilityAttribute : CapabilityAttribute
 {
     /// <param name="key">The capability-matrix feature id that does not apply to this SDK.</param>
-    /// <param name="reason">A required explanation of why the feature does not apply.</param>
+    /// <param name="reason">A required explanation of why the feature does not apply and what this member offers instead.</param>
     public NotApplicableCapabilityAttribute(string key, string reason)
         : base(key, reason)
     {

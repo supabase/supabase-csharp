@@ -46,9 +46,9 @@ public class ComplianceFileTests
             .Should().Contain("    no_public_symbols: true\n").And.NotContain("    symbols:");
 
     [TestMethod]
-    public void For_ShouldRecordNotApplicableWithItsReason_GivenANotApplicableFeature() =>
-        Render(Feature("auth.sign_in.sign_up", CapabilityStatus.NotApplicable, "browser-only", noPublicSymbols: false))
-            .Should().Contain("  auth.sign_in.sign_up:\n    status: not_applicable\n    note: \"browser-only\"\n");
+    public void For_ShouldRecordNotApplicableWithItsReasonAndSymbol_GivenANotApplicableFeature() =>
+        Render(Feature("auth.sign_in.sign_up", CapabilityStatus.NotApplicable, "browser-only", false, "Client.GetSessionFromUrl"))
+            .Should().Contain("  auth.sign_in.sign_up:\n    status: not_applicable\n    note: \"browser-only\"\n    symbols:\n      - Client.GetSessionFromUrl\n");
 
     private static IEnumerable<string> FeatureKeysIn(string yaml) =>
         yaml.Split('\n')
