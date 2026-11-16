@@ -511,7 +511,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     {
         if (this.subscriptions.ContainsKey(channel.Topic))
         {
-            if (channel.IsJoined)
+            if (!channel.IsClosed)
                 channel.Unsubscribe();
 
             this.subscriptions.Remove(channel.Topic);
