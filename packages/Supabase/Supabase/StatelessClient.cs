@@ -35,7 +35,8 @@ public static class StatelessClient
             Headers = headers,
             HttpClient = options.HttpClient,
             Proxy = options.Proxy,
-            Retry = options.GotrueRetry
+            Retry = options.GotrueRetry,
+            FlowType = options.AuthFlowType
         };
     }
 

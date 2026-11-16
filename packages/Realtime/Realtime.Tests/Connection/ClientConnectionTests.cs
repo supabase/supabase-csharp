@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Realtime;
 using Supabase.Realtime.Exceptions;
+using static Supabase.Realtime.Constants;
 
 namespace Realtime.Tests.Connection;
 
@@ -70,5 +74,21 @@ public class ClientConnectionTests
         Assert.IsNotNull(client.Socket);
         Assert.IsNotNull(client.Socket.GetHeaders);
         Assert.AreEqual("123", client.Socket.GetHeaders!()["testing"]);
+    }
+
+    [TestMethod]
+    public async Task ProbeConnection_ShouldGetAHeartbeatReplyBeforeTheNextInterval_GivenALiveServer()
+    {
+        var patience = TimeSpan.FromSeconds(5);
+        var answers = new SemaphoreSlim(0);
+        var client = Helpers.SocketClient();
+        client.AddHeartbeatHandler((_, status, _) =>
+        {
+            if (status == HeartbeatStatus.Ok) answers.Release();
+        });
+        await client.ConnectAsync();
+        await answers.WaitAsync(patience);
+        client.ProbeConnection();
+        (await answers.WaitAsync(patience)).Should().BeTrue("the probe does not wait for the 20 second heartbeat interval");
     }
 }

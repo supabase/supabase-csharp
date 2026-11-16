@@ -61,17 +61,17 @@ internal static class Helpers
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="httpClient">The resolved client to send through.</param>
-    /// <param name="retry">Retry policy applied to this request.</param>
+    /// <param name="options">The options carrying this request's retry policy and access token.</param>
     /// <param name="method"></param>
     /// <param name="url"></param>
     /// <param name="data"></param>
     /// <param name="headers"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task<T?> MakeRequestAsync<T>(HttpClient httpClient, RetryOptions retry, HttpMethod method, string url, object? data = null,
-        Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default) where T : class
+    public static async Task<T?> MakeRequestAsync<T>(HttpClient httpClient, ClientOptions options, HttpMethod method, string url, object? data,
+        Dictionary<string, string> headers, CancellationToken cancellationToken = default) where T : class
     {
-        var response = await MakeRequestAsync(httpClient, retry, method, url, data, headers, cancellationToken);
+        var response = await MakeRequestAsync(httpClient, options, method, url, data, headers, cancellationToken).ConfigureAwait(false);
         var content = await response.Content.ReadAsStringAsync();
 
         return JsonBodyReader.Deserialize<T>(content, SerializerOptions, e => new SupabaseStorageException(e.Message, e)
@@ -86,14 +86,14 @@ internal static class Helpers
     /// Helper to make a request using the defined parameters to an API Endpoint.
     /// </summary>
     /// <param name="httpClient">The resolved client to send through.</param>
-    /// <param name="retry">Retry policy applied to this request.</param>
+    /// <param name="options">The options carrying this request's retry policy and access token.</param>
     /// <param name="method"></param>
     /// <param name="url"></param>
     /// <param name="data"></param>
     /// <param name="headers"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public static async Task<HttpResponseMessage> MakeRequestAsync(HttpClient httpClient, RetryOptions retry, HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null, CancellationToken cancellationToken = default)
+    public static async Task<HttpResponseMessage> MakeRequestAsync(HttpClient httpClient, ClientOptions options, HttpMethod method, string url, object? data, Dictionary<string, string> headers, CancellationToken cancellationToken = default)
     {
         var builder = new UriBuilder(url);
         var query = HttpUtility.ParseQueryString(builder.Query);
@@ -114,6 +114,8 @@ internal static class Helpers
             ? JsonSerializer.Serialize(data, SerializerOptions)
             : null;
 
+        var authorizedHeaders = await AuthorizeAsync(options, headers, cancellationToken).ConfigureAwait(false);
+
         HttpRequestMessage CreateRequest()
         {
             var requestMessage = new HttpRequestMessage(method, builder.Uri);
@@ -121,11 +123,8 @@ internal static class Helpers
             if (body != null)
                 requestMessage.Content = new StringContent(body, Encoding.UTF8, "application/json");
 
-            if (headers != null)
-            {
-                foreach (var kvp in headers)
-                    requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
-            }
+            foreach (var kvp in authorizedHeaders)
+                requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
 
             return requestMessage;
         }
@@ -137,7 +136,7 @@ internal static class Helpers
 
         try
         {
-            var response = await RetryExecutor.SendAsync(httpClient, CreateRequest, retry, cancellationToken).ConfigureAwait(false);
+            var response = await RetryExecutor.SendAsync(httpClient, CreateRequest, options.Retry, cancellationToken).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 
@@ -173,6 +172,28 @@ internal static class Helpers
         {
             StorageInstrumentation.RecordRequest(method, builder.Uri, statusCode, errorType, startTimestamp);
         }
+    }
+
+    /// <summary>
+    /// Returns the headers with <c>Authorization: Bearer</c> set to the token from
+    /// <see cref="ClientOptions.RetrieveAccessToken"/>, or the headers unchanged when there is no token.
+    /// </summary>
+    internal static async Task<Dictionary<string, string>> AuthorizeAsync(ClientOptions options, Dictionary<string, string> headers, CancellationToken cancellationToken)
+    {
+        var accessToken = options.RetrieveAccessToken is null
+            ? null
+            : await options.RetrieveAccessToken(cancellationToken).ConfigureAwait(false);
+
+        return accessToken is null ? headers : WithBearer(headers, accessToken);
+    }
+
+    private static Dictionary<string, string> WithBearer(Dictionary<string, string> headers, string accessToken)
+    {
+        var authorized = headers
+            .Where(header => !string.Equals(header.Key, "Authorization", StringComparison.OrdinalIgnoreCase))
+            .ToDictionary(header => header.Key, header => header.Value);
+        authorized["Authorization"] = $"Bearer {accessToken}";
+        return authorized;
     }
 
     /// <summary>

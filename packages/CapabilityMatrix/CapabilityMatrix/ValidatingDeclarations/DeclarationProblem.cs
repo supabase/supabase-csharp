@@ -9,10 +9,13 @@ public sealed record DeclarationProblem(string Message)
         new($"'{feature.Key}' is not a capability-matrix feature id (declared by {Symbols(feature)}). Check for a typo.");
 
     public static DeclarationProblem ConflictingStatus(IGrouping<string, DeclaredCapability> feature) =>
-        new($"'{feature.Key}' is declared both implemented and partial across members — a feature has one status.");
+        new($"'{feature.Key}' is declared with different statuses across members — a feature has one status.");
 
     public static DeclarationProblem MissingNote(IGrouping<string, DeclaredCapability> feature) =>
         new($"'{feature.Key}' is implemented only through non-public API and needs a note explaining how it is exposed.");
+
+    public static DeclarationProblem MissingReason(IGrouping<string, DeclaredCapability> feature) =>
+        new($"'{feature.Key}' is declared not applicable and needs a reason explaining why it does not apply to this SDK.");
 
     private static string Symbols(IGrouping<string, DeclaredCapability> feature) =>
         string.Join(", ", feature.Select(declaration => declaration.Symbol).Distinct(StringComparer.Ordinal));

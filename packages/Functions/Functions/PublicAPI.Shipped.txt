@@ -36,6 +36,8 @@ Supabase.Functions.ClientOptions.HttpClient.get -> System.Net.Http.HttpClient?
 Supabase.Functions.ClientOptions.HttpClient.init -> void
 Supabase.Functions.ClientOptions.Proxy.get -> System.Net.IWebProxy?
 Supabase.Functions.ClientOptions.Proxy.init -> void
+Supabase.Functions.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
+Supabase.Functions.ClientOptions.RetrieveAccessToken.init -> void
 Supabase.Functions.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
 Supabase.Functions.ClientOptions.Retry.init -> void
 Supabase.Functions.Exceptions.FailureHint

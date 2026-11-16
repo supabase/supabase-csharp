@@ -15,7 +15,7 @@ public sealed record FeatureCompliance(
 {
     /// <summary>
     /// Folds the scattered declarations into one entry per feature, ordered by key.
-    /// Partial wins a mixed status (the conservative reading); a conflict between
+    /// The weakest claim wins a mixed status (the conservative reading); a conflict between
     /// declarations is a validation concern, not this projection's to resolve.
     /// </summary>
     public static IReadOnlyList<FeatureCompliance> Consolidate(IEnumerable<DeclaredCapability> declarations) =>
@@ -34,9 +34,7 @@ public sealed record FeatureCompliance(
             .OrderBy(symbol => symbol, StringComparer.Ordinal)
             .ToList();
 
-        var status = feature.Any(declaration => declaration.Status is CapabilityStatus.Partial)
-            ? CapabilityStatus.Partial
-            : CapabilityStatus.Implemented;
+        var status = feature.Max(declaration => declaration.Status);
 
         var note = feature
             .Select(declaration => declaration.Note)

@@ -76,7 +76,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// <returns></returns>
     [ImplementedCapability("storage.file_buckets.list_file_buckets")]
     public Task<List<Bucket>?> ListBuckets() =>
-         Helpers.MakeRequestAsync<List<Bucket>>(this.requestClient, this.Options.Retry, HttpMethod.Get, $"{this.Url}/bucket", null, this.Headers);
+         Helpers.MakeRequestAsync<List<Bucket>>(this.requestClient, this.Options, HttpMethod.Get, $"{this.Url}/bucket", null, this.Headers);
 
     /// <summary>
     /// Retrieves the details of an existing Storage bucket.
@@ -88,7 +88,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     {
         try
         {
-            var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options.Retry, HttpMethod.Get, $"{this.Url}/bucket/{id}", null, this.Headers);
+            var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options, HttpMethod.Get, $"{this.Url}/bucket/{id}", null, this.Headers);
             return result;
         }
         catch (SupabaseStorageException ex)
@@ -120,7 +120,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
             AllowedMimes = options.AllowedMimes
         };
 
-        var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options.Retry, HttpMethod.Post, $"{this.Url}/bucket", data, this.Headers);
+        var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options, HttpMethod.Post, $"{this.Url}/bucket", data, this.Headers);
 
         return result?.Name!;
     }
@@ -144,7 +144,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
             AllowedMimes = options.AllowedMimes
         };
 
-        var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options.Retry, HttpMethod.Put, $"{this.Url}/bucket/{id}", data, this.Headers);
+        var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options, HttpMethod.Put, $"{this.Url}/bucket/{id}", data, this.Headers);
 
         return result;
     }
@@ -156,7 +156,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// <returns></returns>
     [ImplementedCapability("storage.file_buckets.empty_bucket")]
     public Task<GenericResponse?> EmptyBucket(string id) =>
-        Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Post, $"{this.Url}/bucket/{id}/empty", null, this.Headers);
+        Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options, HttpMethod.Post, $"{this.Url}/bucket/{id}/empty", null, this.Headers);
 
     /// <summary>
     /// Deletes an existing bucket. A bucket can't be deleted with existing objects inside it.
@@ -166,7 +166,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     /// <returns></returns>
     [ImplementedCapability("storage.file_buckets.delete_file_bucket")]
     public Task<GenericResponse?> DeleteBucket(string id) =>
-        Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Delete, $"{this.Url}/bucket/{id}", null, this.Headers);
+        Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options, HttpMethod.Delete, $"{this.Url}/bucket/{id}", null, this.Headers);
 
     /// <inheritdoc />
     [ImplementedCapability("storage.file_buckets.purge_bucket_cache")]
@@ -177,6 +177,6 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     )
     {
         var url = options.ToPurgeUrl($"{this.Url}/cdn/{Helpers.EncodePath(id)}");
-        return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
+        return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
     }
 }

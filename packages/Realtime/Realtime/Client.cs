@@ -298,6 +298,10 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     public void ClearHeartbeatHandlers() =>
         this.heartbeatEventHandlers.Clear();
 
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.configuration.foreground_liveness_probe", "The app calls ProbeConnection when it returns to the foreground.")]
+    public void ProbeConnection() => (this.Socket as RealtimeSocket)?.Probe();
+
     private void NotifyHeartbeat(HeartbeatStatus status, TimeSpan? latency)
     {
         foreach (var handler in this.heartbeatEventHandlers.Snapshot())
@@ -329,22 +333,22 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Sets the current Access Token every heartbeat (see: https://github.com/supabase/realtime-js/blob/59bd47956ebe4e23b3e1a6c07f5fe2cfe943e8ad/src/RealtimeClient.ts#L437)
     /// </summary>
-    private void HandleSocketHeartbeat(IRealtimeSocket sender, SocketResponse message) => _ = this.RefreshAuthAsync();
+    private void HandleSocketHeartbeat(IRealtimeSocket sender, SocketResponse message) =>
+        _ = this.RefreshAuthAsync().ContinueWith(this.LogRefreshFailure, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Default);
+
+    private void LogRefreshFailure(Task refresh)
+    {
+        var failure = refresh.Exception!.InnerException!;
+        Debugger.Instance.Log(this, failure.Message, failure);
+    }
 
     private async Task RefreshAuthAsync()
     {
-        try
-        {
-            var token = this.Options.RetrieveAccessToken != null
-                ? await this.Options.RetrieveAccessToken().ConfigureAwait(false)
-                : this.AccessToken;
-            if (!string.IsNullOrEmpty(token))
-                this.SetAuth(token!);
-        }
-        catch (Exception ex)
-        {
-            Debugger.Instance.Log(this, ex.Message, ex);
-        }
+        var token = this.Options.RetrieveAccessToken != null
+            ? await this.Options.RetrieveAccessToken().ConfigureAwait(false)
+            : this.AccessToken;
+        if (!string.IsNullOrEmpty(token))
+            this.SetAuth(token!);
     }
 
     /// <summary>
@@ -383,9 +387,6 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
         foreach (var channel in this.subscriptions.Values)
         {
-            // See: https://github.com/supabase/realtime-js/pull/126
-            channel.Options.Parameters!["user_token"] = this.AccessToken;
-
             if (channel.HasJoinedOnce && channel.IsJoined)
             {
                 channel.Push(Constants.ChannelAccessToken, payload: new Dictionary<string, string>
@@ -409,6 +410,11 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     [ImplementedCapability("realtime.client.channel", "Plain-topic form plus a typed convenience overload Channel(db, schema, table, col, value).")]
     public RealtimeChannel Channel(string channelName) =>
         this.Channel(channelName, ChannelOptions.Public(this.Options, () => this.AccessToken, this.SerializerSettings));
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.subscriptions.private_channel")]
+    public RealtimeChannel PrivateChannel(string channelName) =>
+        this.Channel(channelName, ChannelOptions.Private(this.Options, () => this.AccessToken, this.SerializerSettings));
 
     /// <summary>
     /// Adds a RealtimeChannel subscription with custom options - if a subscription exists with the same signature, the existing subscription will be returned.

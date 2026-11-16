@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Core.Http;
 #pragma warning disable CS1591
@@ -31,6 +33,12 @@ public class ClientOptions
     public bool SerializeEnumsAsStrings { get; set; }
 
     public Dictionary<string, string> Headers { get; set; } = new Dictionary<string, string>();
+
+    /// <summary>
+    /// Supplies the access token sent as <c>Authorization: Bearer</c>, replacing any Authorization header.
+    /// Awaited before every request; a null token leaves the headers unchanged.
+    /// </summary>
+    public Func<CancellationToken, Task<string?>>? RetrieveAccessToken { get; set; }
 
     public Dictionary<string, string> QueryParams { get; set; } = new Dictionary<string, string>();
 

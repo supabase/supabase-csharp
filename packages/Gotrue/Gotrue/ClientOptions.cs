@@ -44,6 +44,24 @@ public class ClientOptions
     public bool AutoRefreshToken { get; set; } = true;
 
     /// <summary>
+    /// The OAuth flow type the client uses when a call's own options leave it unset. Defaults to
+    /// <see cref="OAuthFlowType.Implicit"/>; PKCE is recommended for mobile and server-side applications.
+    /// </summary>
+    /// <remarks>
+    /// It applies to OAuth, SSO, identity linking, email sign-up, email one-time password and password reset flows.
+    /// A flow type set on a call's options (such as <see cref="SignInOptions.FlowType"/>) wins over it.
+    /// <c>Resend</c> takes its flow type explicitly and does not read it.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var client = new Client(new ClientOptions { Url = authUrl, FlowType = OAuthFlowType.PKCE });
+    /// var state = await client.SignIn(Provider.Github);
+    /// var session = await client.ExchangeCodeForSession(state.PKCEVerifier!, codeFromCallback);
+    /// </code>
+    /// </example>
+    public OAuthFlowType FlowType { get; set; } = OAuthFlowType.Implicit;
+
+    /// <summary>
     /// Ask the TokenRefresh system to log extra debug info
     /// </summary>
     public bool DebugRefreshToken { get; set; } = false;

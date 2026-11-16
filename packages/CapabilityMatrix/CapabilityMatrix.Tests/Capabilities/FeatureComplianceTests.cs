@@ -34,4 +34,11 @@ public class FeatureComplianceTests
         [
             Declared("client.sync", CapabilityStatus.Implemented, "Client.GetAuthHeaders", fromPublicApi: false, note: "callback"),
         ]).Single().Should().BeEquivalentTo(new { NoPublicSymbols = true, Symbols = Array.Empty<string>() });
+
+    [TestMethod]
+    public void Consolidate_ShouldReportNotApplicable_GivenANotApplicableDeclaration() =>
+        FeatureCompliance.Consolidate(
+        [
+            Declared("client.detect", CapabilityStatus.NotApplicable, "Client.GetSessionFromUrl", note: "browser-only"),
+        ]).Single().Status.Should().Be(CapabilityStatus.NotApplicable);
 }

@@ -266,7 +266,7 @@ public class Client : IGotrueClient<User, Session>
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignUp);
         activity?.SetTag(GotrueInstrumentation.Tags.SignUpType, type.ToString());
         this.ThrowWhenOffline();
-        var signedUp = await this.api.SignUpAsync(type, identifier, password, options, cancellationToken).ConfigureAwait(false);
+        var signedUp = await this.api.SignUpAsync(type, identifier, password, this.WithClientFlowType(options), cancellationToken).ConfigureAwait(false);
         if (this.SessionToAdopt(signedUp) is not { } session)
         {
             return signedUp;
@@ -314,7 +314,7 @@ public class Client : IGotrueClient<User, Session>
         using var activity = GotrueInstrumentation.Source.StartActivity(GotrueInstrumentation.Spans.SignInWithOtp);
         activity?.SetTag(GotrueInstrumentation.Tags.OtpChannel, GotrueInstrumentation.Channels.Email);
         this.ThrowWhenOffline();
-        return await this.api.SignInWithOtp(options);
+        return await this.api.SignInWithOtp(options.WithDefaultFlowType(this.Options.FlowType));
     }
 
     /// <inheritdoc />
@@ -400,7 +400,7 @@ public class Client : IGotrueClient<User, Session>
     public async Task<ProviderAuthState> SignIn(Provider provider, SignInOptions? options = null)
     {
         this.ThrowWhenOffline();
-        return this.api.GetUriForProvider(provider, options);
+        return this.api.GetUriForProvider(provider, this.WithClientFlowType(options));
     }
 
     /// <inheritdoc />
@@ -408,15 +408,18 @@ public class Client : IGotrueClient<User, Session>
     public async Task<SSOResponse?> SignInWithSSO(Guid providerId, SignInWithSSOOptions? options = null)
     {
         this.ThrowWhenOffline();
-        return await this.api.SignInWithSSO(providerId, options).ConfigureAwait(false);
+        return await this.api.SignInWithSSO(providerId, this.WithClientFlowType(options)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task<SSOResponse?> SignInWithSSO(string domain, SignInWithSSOOptions? options = null)
     {
         this.ThrowWhenOffline();
-        return await this.api.SignInWithSSO(domain, options).ConfigureAwait(false);
+        return await this.api.SignInWithSSO(domain, this.WithClientFlowType(options)).ConfigureAwait(false);
     }
+
+    private TOptions WithClientFlowType<TOptions>(TOptions? options) where TOptions : SignInOptions, new() =>
+        (TOptions) (options ?? new TOptions()).WithDefaultFlowType(this.Options.FlowType);
 
     /// <inheritdoc />
     [ImplementedCapability("auth.sign_in.sign_in_anonymously")]
@@ -488,11 +491,12 @@ public class Client : IGotrueClient<User, Session>
         {
             throw new GotrueException("A valid session is required.", NoSessionFound);
         }
-        if (options.FlowType != OAuthFlowType.PKCE)
+        var resolved = this.WithClientFlowType(options);
+        if (resolved.FlowType != OAuthFlowType.PKCE)
         {
             throw new GotrueException("PKCE flow type is required for this action.", InvalidFlowType);
         }
-        return this.api.LinkIdentity(this.CurrentSession.AccessToken!, provider, options);
+        return this.api.LinkIdentity(this.CurrentSession.AccessToken!, provider, resolved);
     }
 
     /// <inheritdoc />
@@ -701,7 +705,7 @@ public class Client : IGotrueClient<User, Session>
     /// <inheritdoc />
     public async Task<ResetPasswordForEmailState> ResetPasswordForEmail(ResetPasswordForEmailOptions options)
     {
-        var state = await this.api.ResetPasswordForEmail(options);
+        var state = await this.api.ResetPasswordForEmail(options.WithDefaultFlowType(this.Options.FlowType));
         return state;
     }
 
@@ -781,6 +785,7 @@ public class Client : IGotrueClient<User, Session>
     /// <param name="uri"></param>
     /// <param name="storeSession"></param>
     /// <returns></returns>
+    [NotApplicableCapability("client.authentication_integration.session_url_detection", "Redirect detection is browser-only: supabase-js reads the current page URL (window.location), which a .NET process does not have. .NET apps receive the OAuth callback through their own route, WebAuthenticator or NavigationManager and pass the callback URI explicitly to GetSessionFromUrl(Uri), or the code to ExchangeCodeForSession(verifier, code) for PKCE.")]
     public async Task<Session?> GetSessionFromUrl(Uri uri, bool storeSession = true)
     {
         var query = string.IsNullOrEmpty(uri.Fragment)

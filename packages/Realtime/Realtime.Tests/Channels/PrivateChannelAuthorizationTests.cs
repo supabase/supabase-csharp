@@ -43,6 +43,36 @@ public class PrivateChannelAuthorizationTests
             "the JWT authorizes only the user's own topic, so joining another user's topic must be denied by RLS");
     }
 
+    [TestMethod]
+    public async Task PrivateChannel_ShouldJoinTheUsersOwnTopic_GivenTheClientHoldsTheUsersJwt()
+    {
+        var userId = Guid.NewGuid().ToString();
+        var channel = await SubscribeThroughPrivateChannel(topicUserId: userId, jwtUserId: userId);
+
+        Assert.IsTrue(channel.IsJoined,
+            "PrivateChannel joins with the token SetAuth gave the client, which the RLS policy admits on the user's own topic");
+    }
+
+    [TestMethod]
+    public async Task PrivateChannel_ShouldBeRejected_GivenAnotherUsersTopic()
+    {
+        var otherUserId = Guid.NewGuid().ToString();
+        var ownUserId = Guid.NewGuid().ToString();
+
+        await Assert.ThrowsAsync<RealtimeException>(() => SubscribeThroughPrivateChannel(topicUserId: otherUserId, jwtUserId: ownUserId),
+            "the client's token authorizes only the user's own topic, so RLS denies another user's");
+    }
+
+    private static async Task<Supabase.Realtime.RealtimeChannel> SubscribeThroughPrivateChannel(string topicUserId, string jwtUserId)
+    {
+        var client = Helpers.SocketClient();
+        await client.ConnectAsync();
+        client.SetAuth(MintUserJwt(jwtUserId));
+        var channel = client.PrivateChannel($"user:{topicUserId}");
+        channel.Register<BroadcastExample>();
+        return (Supabase.Realtime.RealtimeChannel) await channel.Subscribe();
+    }
+
     private async Task<Supabase.Realtime.RealtimeChannel> SubscribePrivate(string topicUserId, string jwtUserId)
     {
         var client = Helpers.SocketClient();

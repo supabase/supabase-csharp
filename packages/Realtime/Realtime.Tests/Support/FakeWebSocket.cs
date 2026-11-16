@@ -71,7 +71,7 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     public TaskCompletionSource FirstSend { get; } = new();
 
     /// <summary>When set, every heartbeat gets its reply, as from a healthy server.</summary>
-    public bool AnswerHeartbeats { get; init; }
+    public bool AnswerHeartbeats { get; set; }
 
     /// <summary>The status of those heartbeat replies.</summary>
     public string HeartbeatReplyStatus { get; init; } = "ok";
@@ -79,13 +79,45 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     /// <summary>Completes when the socket forces a reconnect.</summary>
     public TaskCompletionSource Reconnected { get; } = new();
 
+    /// <summary>When set, every channel join gets an <c>ok</c> reply, as from a server that authorizes it.</summary>
+    public bool AnswerJoins { get; init; }
+
+    private readonly List<SentFrameWaiter> sentFrameWaiters = new();
+    private readonly Dictionary<string, int> sentFrameCounts = new();
+
     public bool Send(string message)
     {
         this.FirstSend.TrySetResult();
-        if (this.AnswerHeartbeats && JsonNode.Parse(message) is { } frame && (string?) frame["event"] == "heartbeat")
+        var frame = JsonNode.Parse(message)!;
+        var eventName = (string?) frame["event"];
+        if (this.AnswerHeartbeats && eventName == "heartbeat")
             this.Reply("phoenix", (string?) frame["ref"], this.HeartbeatReplyStatus);
+        if (this.AnswerJoins && eventName == "phx_join")
+            this.Reply((string) frame["topic"]!, (string?) frame["ref"]);
+        this.Record(eventName ?? string.Empty, frame);
         return true;
     }
+
+    /// <summary>Completes with the <paramref name="occurrence" />-th frame (1-based) the socket sends with <paramref name="eventName" />.</summary>
+    public Task<JsonNode> SentFrame(string eventName, int occurrence)
+    {
+        var waiter = new SentFrameWaiter(eventName, occurrence, new TaskCompletionSource<JsonNode>(TaskCreationOptions.RunContinuationsAsynchronously));
+        lock (this.sentFrameWaiters)
+            this.sentFrameWaiters.Add(waiter);
+        return waiter.Frame.Task;
+    }
+
+    private void Record(string eventName, JsonNode frame)
+    {
+        lock (this.sentFrameWaiters)
+        {
+            var occurrence = this.sentFrameCounts[eventName] = this.sentFrameCounts.GetValueOrDefault(eventName) + 1;
+            foreach (var waiter in this.sentFrameWaiters.FindAll(waiter => waiter.EventName == eventName && waiter.Occurrence == occurrence))
+                waiter.Frame.TrySetResult(frame);
+        }
+    }
+
+    private sealed record SentFrameWaiter(string EventName, int Occurrence, TaskCompletionSource<JsonNode> Frame);
 
     /// <summary>Delivers the server's reply to the frame sent with <paramref name="reference" />.</summary>
     public void Reply(string topic, string? reference, string status = "ok") =>

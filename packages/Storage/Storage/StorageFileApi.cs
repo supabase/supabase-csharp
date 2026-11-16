@@ -201,7 +201,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
 
         var response = await Helpers.MakeRequestAsync<CreateSignedUrlResponse>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Post,
             url,
             body,
@@ -239,7 +239,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         };
         var response = await Helpers.MakeRequestAsync<List<CreateSignedUrlsResponse>>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Post,
             $"{this.Url}/object/sign/{this.BucketId}",
             body,
@@ -283,7 +283,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
 
         var response = await Helpers.MakeRequestAsync<List<FileObject>>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Post,
             $"{this.Url}/object/list/{this.BucketId}",
             body,
@@ -300,7 +300,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     public Task<SearchV2Result?> ListV2Async(SearchV2Options? options = null, CancellationToken cancellationToken = default) =>
         Helpers.MakeRequestAsync<SearchV2Result>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Post,
             $"{this.Url}/object/list-v2/{this.BucketId}",
             options ?? new SearchV2Options(),
@@ -318,7 +318,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     {
         var response = await Helpers.MakeRequestAsync<FileObjectV2>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Get,
             $"{this.Url}/object/info/{this.BucketId}/{path}",
             null,
@@ -359,7 +359,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (inferContentType)
             options.ContentType = MimeMapping.MimeUtility.GetMimeMapping(localFilePath);
 
-        var result = await this.UploadOrUpdate(localFilePath, supabasePath, options, onProgress, cancellationToken);
+        var result = await this.UploadOrUpdate(localFilePath, supabasePath, options, onProgress, cancellationToken).ConfigureAwait(false);
         return result;
     }
 
@@ -410,7 +410,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (inferContentType)
             options.ContentType = MimeMapping.MimeUtility.GetMimeMapping(supabasePath);
 
-        var result = await this.UploadOrUpdate(data, supabasePath, options, onProgress, cancellationToken);
+        var result = await this.UploadOrUpdate(data, supabasePath, options, onProgress, cancellationToken).ConfigureAwait(false);
         return result;
     }
 
@@ -630,7 +630,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         };
         await Helpers.MakeRequestAsync<GenericResponse>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Post,
             $"{this.Url}/object/move",
             body,
@@ -664,7 +664,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
 
         await Helpers.MakeRequestAsync<GenericResponse>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Post,
             $"{this.Url}/object/copy",
             body,
@@ -825,7 +825,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         var data = new Dictionary<string, object> { { "prefixes", paths } };
         var response = await Helpers.MakeRequestAsync<List<FileObject>>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Delete,
             $"{this.Url}/object/{this.BucketId}",
             data,
@@ -848,7 +848,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         var url = $"{this.Url}/object/upload/sign/{path}";
         var response = await Helpers.MakeRequestAsync<CreatedUploadSignedUrlResponse>(
             this.requestClient,
-            this.Options.Retry,
+            this.Options,
             HttpMethod.Post,
             url,
             null,
@@ -880,7 +880,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     )
     {
         var url = options.ToPurgeUrl($"{this.Url}/cdn/{Helpers.EncodePath(this.GetFinalPath(path))}");
-        return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options.Retry, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
+        return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
     }
 
     private async Task<string> UploadOrUpdate(
@@ -894,7 +894,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         var uri = new Uri($"{this.Url}/object/{this.GetFinalPath(supabasePath)}");
 
         var headers = new Header();
-        headers.Add(this.StorageHeader.Get());
+        headers.Add(await Helpers.AuthorizeAsync(this.Options, this.StorageHeader.Get(), cancellationToken).ConfigureAwait(false));
         headers.Add("cache-control", $"max-age={options.CacheControl}");
         headers.Add("content-type", options.ContentType);
 
@@ -930,7 +930,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         var uri = new Uri($"{this.Url}/upload/resumable");
 
         var headers = new Header();
-        headers.Add(this.StorageHeader.Get());
+        headers.Add(await Helpers.AuthorizeAsync(this.Options, this.StorageHeader.Get(), cancellationToken).ConfigureAwait(false));
         headers.Add("cache-control", $"max-age={options.CacheControl}");
 
         var metadata = new MetadataCollection
@@ -977,7 +977,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         var uri = new Uri($"{this.Url}/upload/resumable");
 
         var headers = new Header();
-        headers.Add(this.StorageHeader.Get());
+        headers.Add(await Helpers.AuthorizeAsync(this.Options, this.StorageHeader.Get(), cancellationToken).ConfigureAwait(false));
         headers.Add("cache-control", $"max-age={options.CacheControl}");
 
         var metadata = new MetadataCollection
@@ -1032,7 +1032,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         var uri = new Uri($"{this.Url}/object/{this.GetFinalPath(supabasePath)}");
 
         var headers = new Header();
-        headers.Add(this.StorageHeader.Get());
+        headers.Add(await Helpers.AuthorizeAsync(this.Options, this.StorageHeader.Get(), cancellationToken).ConfigureAwait(false));
         headers.Add("cache-control", $"max-age={options.CacheControl}");
         headers.Add("content-type", options.ContentType);
 
@@ -1083,10 +1083,10 @@ public class StorageFileApi : IStorageFileApi<FileObject>
 
         var stream = await this.downloadClient.DownloadDataAsync(
             builder.Uri,
-            this.Headers,
+            await Helpers.AuthorizeAsync(this.Options, this.Headers, cancellationToken).ConfigureAwait(false),
             progress,
             cancellationToken
-        );
+        ).ConfigureAwait(false);
 
         using var fileStream = new FileStream(
             localPath,
@@ -1124,10 +1124,10 @@ public class StorageFileApi : IStorageFileApi<FileObject>
 
         var stream = await this.downloadClient.DownloadDataAsync(
             builder.Uri,
-            this.Headers,
+            await Helpers.AuthorizeAsync(this.Options, this.Headers, cancellationToken).ConfigureAwait(false),
             progress,
             cancellationToken
-        );
+        ).ConfigureAwait(false);
 
         return stream.ToArray();
     }

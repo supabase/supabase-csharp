@@ -90,6 +90,20 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     void ClearHeartbeatHandlers();
 
     /// <summary>
+    /// Checks the connection now instead of waiting for the next heartbeat, and reconnects when no reply arrives within
+    /// <see cref="ClientOptions.ProbeTimeout"/>. Call it when the app returns to the foreground.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// void OnApplicationPause(bool paused)
+    /// {
+    ///     if (!paused) supabase.Realtime.ProbeConnection();
+    /// }
+    /// </code>
+    /// </example>
+    void ProbeConnection();
+
+    /// <summary>
     /// Adds a debug handler, likely used within a logging solution of some kind.
     /// </summary>
     /// <param name="handler"></param>
@@ -112,6 +126,25 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     /// <param name="channelName"></param>
     /// <returns></returns>
     TChannel Channel(string channelName);
+
+    /// <summary>
+    /// Initializes a private channel: one the server authorizes against its Row Level Security policies on
+    /// <c>realtime.messages</c>. The join carries the client's current access token, the one set by
+    /// <see cref="SetAuth"/> or returned by <see cref="ClientOptions.RetrieveAccessToken"/>, so a policy using
+    /// <c>auth.uid()</c> sees the signed-in user. To join with a token from another source, use
+    /// <see cref="Channel(string, ChannelOptions)"/> with <see cref="ChannelOptions.Private"/>.
+    /// </summary>
+    /// <param name="channelName">The name of the channel to join.</param>
+    /// <returns>The channel; the existing one when a channel with the same name was already added.</returns>
+    /// <exception cref="Exception">The socket is not connected: call <c>ConnectAsync</c> first.</exception>
+    /// <example>
+    /// <code>
+    /// await client.Realtime.ConnectAsync();
+    /// var channel = client.Realtime.PrivateChannel($"user:{userId}");
+    /// await channel.Subscribe();
+    /// </code>
+    /// </example>
+    TChannel PrivateChannel(string channelName);
 
     /// <summary>
     /// Adds a RealtimeChannel subscription with custom options - if a subscription exists with the same signature, the existing subscription will be returned.
