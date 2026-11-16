@@ -88,6 +88,7 @@ public static class CapabilityDeclarations
     {
         "ImplementedCapability" => CapabilityStatus.Implemented,
         "PartialCapability" => CapabilityStatus.Partial,
+        "NotApplicableCapability" => CapabilityStatus.NotApplicable,
         _ => null,
     };
 
