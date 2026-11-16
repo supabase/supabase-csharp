@@ -40,14 +40,18 @@ public class PresenceStateTests
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_state\",\"ref\":\"s5\"," +
         "\"payload\":{\"user-2\":{\"metas\":[{\"phx_ref\":\"r2\"}]}}}";
 
-    // Track while already joined: the server joins the new meta (phx_ref_prev = the old ref)
-    // and leaves the previous phx_ref in the same diff. The key stays present.
+    /// <summary>
+    /// Track while already joined: the server joins the new meta (<c>phx_ref_prev</c> = the old ref)
+    /// and leaves the previous <c>phx_ref</c> in the same diff. The key stays present.
+    /// </summary>
     private const string TrackWhileJoinedFrame =
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s6\"," +
         "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\",\"phx_ref_prev\":\"r1\",\"time\":\"2023-09-01T11:00:00Z\"}]}}," +
         "\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\",\"time\":\"2023-09-01T10:00:00Z\"}]}}}}";
 
-    // Two users present, then user-1 re-tracks while user-3 joins and user-2 leaves in the same diff.
+    /// <summary>
+    /// Two users present, then user-1 re-tracks while user-3 joins and user-2 leaves in the same diff.
+    /// </summary>
     private const string TwoUsersStateFrame =
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_state\",\"ref\":\"s7\"," +
         "\"payload\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]},\"user-2\":{\"metas\":[{\"phx_ref\":\"q1\"}]}}}";
@@ -62,7 +66,9 @@ public class PresenceStateTests
         "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\",\"phx_ref_prev\":\"r1\"}]}}," +
         "\"leaves\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r1\"}]},\"user-2\":{\"metas\":[{\"phx_ref\":\"q1\"}]}}}}";
 
-    // The same key joins and leaves, but the leave removes every meta: the user is gone, so both events fire.
+    /// <summary>
+    /// The same key joins and leaves, but the leave removes every meta: the user is gone, so both events fire.
+    /// </summary>
     private const string JoinAndLeaveAllFrame =
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s10\"," +
         "\"payload\":{\"joins\":{\"user-1\":{\"metas\":[{\"phx_ref\":\"r2\"}]}}," +

@@ -142,24 +142,41 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
 
         this.TriggerSync(response);
 
-        // Tracking someone who is already present puts the new meta in joins and the
-        // previous phx_ref in leaves. SetState keeps that key. Those two entries cancel:
-        // the caller would otherwise see Leave after Join and treat the user as gone.
-        if (obj.Payload.Joins!.Keys.Any(key => !this.IsTrackedUpdate(key, obj.Payload)))
+        var changes = PresenceChanges.From(obj.Payload, this.CurrentState);
+        if (changes.HasJoins)
             this.NotifyPresenceEventHandlers(IRealtimePresence.EventType.Join);
 
-        if (obj.Payload.Leaves!.Keys.Any(key => !this.IsTrackedUpdate(key, obj.Payload)))
+        if (changes.HasLeaves)
             this.NotifyPresenceEventHandlers(IRealtimePresence.EventType.Leave);
     }
 
     /// <summary>
-    /// True when <paramref name="key"/> is in both sides of this diff and still present.
-    /// That is a payload update (new <c>phx_ref</c>, leave of <c>phx_ref_prev</c>), not a join or a leave.
+    /// The joins and leaves of a presence diff that a handler should hear about.
+    /// A key that replaces its metas (a new join and a leave of the previous <c>phx_ref</c>
+    /// in the same diff) and is still present has neither joined nor left.
     /// </summary>
-    private bool IsTrackedUpdate(string key, PresenceDiffPayload<TPresenceModel> payload) =>
-        payload.Joins!.ContainsKey(key)
-        && payload.Leaves!.ContainsKey(key)
-        && this.CurrentState.ContainsKey(key);
+    private sealed class PresenceChanges
+    {
+        public bool HasJoins { get; }
+        public bool HasLeaves { get; }
+
+        private PresenceChanges(bool hasJoins, bool hasLeaves)
+        {
+            this.HasJoins = hasJoins;
+            this.HasLeaves = hasLeaves;
+        }
+
+        public static PresenceChanges From(PresenceDiffPayload<TPresenceModel> diff,
+            IReadOnlyDictionary<string, List<TPresenceModel>> currentState)
+        {
+            var replaced = diff.Joins!.Keys.Intersect(diff.Leaves!.Keys)
+                .Where(currentState.ContainsKey).ToHashSet();
+
+            return new PresenceChanges(
+                diff.Joins.Keys.Except(replaced).Any(),
+                diff.Leaves.Keys.Except(replaced).Any());
+        }
+    }
 
     /// <summary>
     /// "Tracks" an event, used with <see cref="Presence"/>.
