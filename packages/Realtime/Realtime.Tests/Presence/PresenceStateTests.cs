@@ -53,10 +53,6 @@ public class PresenceStateTests
     private const string StateFrameWithoutPayload =
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_state\",\"ref\":\"s7\",\"payload\":null}";
 
-    private const string StaleLeaveFrame =
-        "{\"topic\":\"realtime:online-users\",\"event\":\"presence_diff\",\"ref\":\"s6\"," +
-        "\"payload\":{\"joins\":{},\"leaves\":{\"user-9\":{\"metas\":[{\"phx_ref\":\"r9\"}]}}}}";
-
     private const string StateFrameAfterReconnect =
         "{\"topic\":\"realtime:online-users\",\"event\":\"presence_state\",\"ref\":\"s5\"," +
         "\"payload\":{\"user-2\":{\"metas\":[{\"phx_ref\":\"r2\"}]}}}";
@@ -273,16 +269,11 @@ public class PresenceStateTests
     {
         var (channel, presence) = Presence();
         channel.HandleSocketMessage(Wire.Decode(StateFrame));
-        var joined = new List<string>();
-        var left = new List<string>();
-        presence.AddJoinHandler(join => joined.Add(join.Key));
-        presence.AddLeaveHandler(leave => left.Add(leave.Key));
+        var events = new List<string>();
+        presence.AddJoinHandler(join => events.Add($"join {join.Key}"));
+        presence.AddLeaveHandler(leave => events.Add($"leave {leave.Key}"));
         channel.HandleSocketMessage(Wire.Decode(StateFrameAfterReconnect));
-        using (new AssertionScope())
-        {
-            joined.Should().Equal("user-2");
-            left.Should().Equal("user-1");
-        }
+        events.Should().Equal(["join user-2", "leave user-1"], "a second presence_state must report only what changed while the channel was away");
     }
 
     [TestMethod]
@@ -304,7 +295,7 @@ public class PresenceStateTests
     }
 
     [TestMethod]
-    public void HandleSocketMessage_ShouldRaiseNoJoinOrLeave_GivenFramesThatChangeNothing()
+    public void HandleSocketMessage_ShouldRaiseNoJoinOrLeave_GivenAPresenceStateThatChangesNothing()
     {
         var (channel, presence) = Presence();
         channel.HandleSocketMessage(Wire.Decode(StateFrame));
@@ -312,8 +303,7 @@ public class PresenceStateTests
         presence.AddJoinHandler(_ => changes++);
         presence.AddLeaveHandler(_ => changes++);
         channel.HandleSocketMessage(Wire.Decode(StateFrame));
-        channel.HandleSocketMessage(Wire.Decode(StaleLeaveFrame));
-        changes.Should().Be(0);
+        changes.Should().Be(0, "a presence_state that repeats the state must not report anyone as joined or left");
     }
 
     [TestMethod]
@@ -322,7 +312,7 @@ public class PresenceStateTests
         var (channel, presence) = Presence();
         channel.HandleSocketMessage(Wire.Decode(StateFrame));
         channel.HandleSocketMessage(Wire.Decode(StateFrameWithoutPayload));
-        presence.CurrentState.Should().ContainKey("user-1");
+        presence.CurrentState.Should().ContainKey("user-1", "a presence_state without a payload must not clear the state");
     }
 
     [TestMethod]
@@ -341,10 +331,10 @@ public class PresenceStateTests
     }
 
     [TestMethod]
-    [DataRow(null)]
-    [DataRow(IRealtimePresence.EventType.Join)]
-    [DataRow(IRealtimePresence.EventType.Leave)]
-    public void ClearPresenceEventHandlers_ShouldDropJoinAndLeaveHandlers(IRealtimePresence.EventType? cleared)
+    [DataRow(null, 0, 0)]
+    [DataRow(IRealtimePresence.EventType.Join, 0, 1)]
+    [DataRow(IRealtimePresence.EventType.Leave, 1, 0)]
+    public void ClearPresenceEventHandlers_ShouldDropJoinAndLeaveHandlers(IRealtimePresence.EventType? cleared, int expectedJoins, int expectedLeaves)
     {
         var (channel, presence) = Presence();
         channel.HandleSocketMessage(Wire.Decode(StateFrame));
@@ -355,9 +345,30 @@ public class PresenceStateTests
         channel.HandleSocketMessage(Wire.Decode(DiffFrame));
         using (new AssertionScope())
         {
-            joins.Should().Be(cleared == IRealtimePresence.EventType.Leave ? 1 : 0);
-            leaves.Should().Be(cleared == IRealtimePresence.EventType.Join ? 1 : 0);
+            joins.Should().Be(expectedJoins);
+            leaves.Should().Be(expectedLeaves);
         }
+    }
+
+    [TestMethod]
+    public void Unsubscribe_ShouldRaiseLeaveForEveryKeyThenSync()
+    {
+        var (channel, presence) = Presence();
+        channel.HandleSocketMessage(Wire.Decode(TwoUsersStateFrame));
+        var events = new List<string>();
+        presence.AddLeaveHandler(leave => events.Add($"leave {leave.Key} current={leave.CurrentPresences.Count} left={leave.LeftPresences.Single().PhoenixRef}"));
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => events.Add($"sync state={presence.CurrentState.Count}"));
+        channel.Unsubscribe();
+        events.Should().Equal(["leave user-1 current=0 left=r1", "leave user-2 current=0 left=q1", "sync state=0"],
+            "unsubscribing ends the presence state, so everyone it held must be reported as left");
+    }
+
+    [TestMethod]
+    public void Unsubscribe_ShouldNotThrow_GivenAThrowingSyncHandler()
+    {
+        var (channel, presence) = Presence();
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => throw new InvalidOperationException());
+        channel.Invoking(leaving => leaving.Unsubscribe()).Should().NotThrow("a handler that throws must not stop the client from unsubscribing its other channels");
     }
 
     [TestMethod]

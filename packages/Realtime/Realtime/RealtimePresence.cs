@@ -24,7 +24,7 @@ namespace Supabase.Realtime;
 /// If a client is suddenly disconnected (for example, they go offline), their state will be automatically removed from the shared state.
 /// </summary>
 /// <typeparam name="TPresenceModel">A model representing expected payload.</typeparam>
-[PartialCapability("realtime.subscriptions.subscribe_presence", "Unsubscribing raises no Leave, and adding a handler does not turn presence on for the channel.")]
+[ImplementedCapability("realtime.subscriptions.subscribe_presence")]
 public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenceModel : BasePresence
 {
     /// <summary>
@@ -49,6 +49,7 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
 
     private readonly HandlerCollection<Action<PresenceJoin<TPresenceModel>>> joinHandlers = new();
     private readonly HandlerCollection<Action<PresenceLeave<TPresenceModel>>> leaveHandlers = new();
+    private Push? trackedJoin;
 
     /// <summary>
     /// Initializes a realtime presence helper class.
@@ -70,11 +71,8 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     /// <param name="eventType"></param>
     /// <param name="handler"></param>
     public void AddPresenceEventHandler(IRealtimePresence.EventType eventType,
-        IRealtimePresence.PresenceEventHandler handler)
-    {
-        this.presenceEventListeners.GetOrAdd(eventType, _ => new HandlerCollection<IRealtimePresence.PresenceEventHandler>())
-            .Add(handler);
-    }
+        IRealtimePresence.PresenceEventHandler handler) =>
+        this.Add(this.presenceEventListeners.GetOrAdd(eventType, _ => new HandlerCollection<IRealtimePresence.PresenceEventHandler>()), handler);
 
     /// <summary>
     /// Remove an event handler
@@ -109,12 +107,31 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     /// <summary>
     /// Adds a handler called once for each key that gains presences, with the presences that joined, before <see cref="CurrentState"/> changes.
     /// </summary>
-    public void AddJoinHandler(Action<PresenceJoin<TPresenceModel>> handler) => this.joinHandlers.Add(handler);
+    public void AddJoinHandler(Action<PresenceJoin<TPresenceModel>> handler) => this.Add(this.joinHandlers, handler);
 
     /// <summary>
     /// Adds a handler called once for each key that loses presences, with the presences that left, before <see cref="CurrentState"/> changes.
     /// </summary>
-    public void AddLeaveHandler(Action<PresenceLeave<TPresenceModel>> handler) => this.leaveHandlers.Add(handler);
+    public void AddLeaveHandler(Action<PresenceLeave<TPresenceModel>> handler) => this.Add(this.leaveHandlers, handler);
+
+    private void Add<THandler>(HandlerCollection<THandler> handlers, THandler handler) where THandler : Delegate
+    {
+        var presenceOn = this.channel.PresenceOptions is { Enabled: true } || this.trackedJoin == this.channel.JoinPush;
+        if ((this.channel.IsJoining || this.channel.IsJoined) && !presenceOn)
+            throw new RealtimeException($"Cannot add presence handlers for {this.channel.Topic} after `Subscribe()` while presence is off.")
+            {
+                Reason = FailureHint.Reason.StateInvalid,
+            };
+
+        handlers.Add(handler);
+    }
+
+    internal PresenceOptions JoinOptions() =>
+        this.joinHandlers.Snapshot().Length > 0 || this.leaveHandlers.Snapshot().Length > 0 || this.presenceEventListeners.Values.SelectMany(handlers => handlers.Snapshot()).Any()
+            ? PresenceOptions.WithPresence(this.options.PresenceKey)
+            : this.options;
+
+    internal void End() => Debugger.Instance.Guard(this, () => this.Apply(new()));
 
     /// <summary>
     /// Notifies listeners of state changes
@@ -187,9 +204,9 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     private void Apply(Dictionary<string, List<TPresenceModel>> next)
     {
         this.Raise(this.joinHandlers, Changes(this.CurrentState, next)
-            .Select(change => new PresenceJoin<TPresenceModel>(change.Key, change.Current, change.Changed)));
+            .Select(change => new PresenceJoin<TPresenceModel>(change.Key, change.Current, change.Changed)).ToList());
         this.Raise(this.leaveHandlers, Changes(next, this.CurrentState)
-            .Select(change => new PresenceLeave<TPresenceModel>(change.Key, change.Current, change.Changed)));
+            .Select(change => new PresenceLeave<TPresenceModel>(change.Key, change.Current, change.Changed)).ToList());
 
         this.LastState = new Dictionary<string, List<TPresenceModel>>(this.CurrentState);
         this.CurrentState.Clear();
@@ -259,7 +276,13 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
 
         var tcs = new TaskCompletionSource<Push>();
 
-        void Handler(IRealtimePush<RealtimeChannel, SocketResponse> chanel, SocketResponse response) => tcs.TrySetResult(push);
+        void Handler(IRealtimePush<RealtimeChannel, SocketResponse> chanel, SocketResponse response)
+        {
+            if (response.Payload?.Status == PhoenixStatusOk)
+                this.trackedJoin = this.channel.JoinPush;
+
+            tcs.TrySetResult(push);
+        }
 
         push.AddMessageReceivedHandler(Handler);
 

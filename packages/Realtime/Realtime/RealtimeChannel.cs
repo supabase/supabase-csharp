@@ -78,7 +78,7 @@ public class RealtimeChannel : IRealtimeChannel
     public BroadcastOptions? BroadcastOptions { get; private set; } = new();
 
     /// <summary>
-    /// The saved Presence Options, set in <see cref="Register{TPresenceResponse}(string)"/> or <see cref="Register{TPresenceResponse}(PresenceOptions)"/>
+    /// The Presence Options sent with the join, set in <see cref="Register{TPresenceResponse}(string)"/> or <see cref="Register{TPresenceResponse}(PresenceOptions)"/> and turned on by a presence handler added before <see cref="Subscribe"/>.
     /// </summary>
     public PresenceOptions? PresenceOptions { get; private set; }
 
@@ -143,6 +143,8 @@ public class RealtimeChannel : IRealtimeChannel
     internal BroadcastEventHandler? BroadcastHandler;
     internal PresenceDiffHandler? PresenceDiff;
     internal PresenceSyncHandler? PresenceSync;
+    private Func<PresenceOptions>? presenceJoinOptions;
+    private Action? endPresence;
 
     /// <summary>
     /// Buffer of Pushes held because of Socket availability
@@ -269,6 +271,8 @@ public class RealtimeChannel : IRealtimeChannel
 
         this.PresenceSync = (_, response) => this.presence.TriggerSync(response);
         this.PresenceDiff = (_, response) => this.presence.TriggerDiff(response);
+        this.presenceJoinOptions = instance.JoinOptions;
+        this.endPresence = instance.End;
 
         return instance;
     }
@@ -480,6 +484,7 @@ public class RealtimeChannel : IRealtimeChannel
         if (this.IsSubscribed)
             return Task.FromResult(this as IRealtimeChannel);
 
+        this.PresenceOptions = this.presenceJoinOptions?.Invoke();
         this.JoinPush = this.GenerateJoinPush();
         StateChangedHandler? channelCallback = null;
         EventHandler? joinPushTimeoutCallback = null;
@@ -550,6 +555,7 @@ public class RealtimeChannel : IRealtimeChannel
         leavePush.Send();
 
         this.NotifyStateChanged(ChannelState.Closed, false);
+        this.endPresence?.Invoke();
 
         return this;
     }

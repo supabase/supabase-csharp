@@ -37,7 +37,7 @@ public class PresenceOptions
     public static PresenceOptions WithPresence(string presenceKey) => new(presenceKey);
 
     /// <summary>
-    /// Creates presence options that do not receive presence updates from other clients. This client can still make itself visible to others via <c>Track</c>.
+    /// Creates presence options that do not receive presence updates from other clients, unless a presence handler is added before subscribing. This client can still make itself visible to others via <c>Track</c>.
     /// </summary>
     /// <param name="presenceKey">Used to track presence payload across clients</param>
     public static PresenceOptions WithoutPresence(string presenceKey) => new(presenceKey) { Enabled = false };
