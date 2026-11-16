@@ -1,3 +1,5 @@
 #nullable enable
 Supabase.SupabaseOptions.AuthFlowType.get -> Supabase.Gotrue.Constants.OAuthFlowType
 Supabase.SupabaseOptions.AuthFlowType.set -> void
+Supabase.SupabaseOptions.ThirdPartyAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
+Supabase.SupabaseOptions.ThirdPartyAccessToken.set -> void

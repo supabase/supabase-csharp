@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
@@ -53,6 +55,42 @@ public class SupabaseOptions
     [ImplementedCapability("client.session_management.custom_storage")]
     [PartialCapability("client.session_management.persist_session", "No boolean persist toggle; in-memory-only behavior is achievable only by supplying a no-op IGotrueSessionPersistence handler.")]
     public IGotrueSessionPersistence<Session> SessionHandler { get; set; } = new DefaultSupabaseSessionHandler();
+
+    /// <summary>
+    /// Authenticates the client through a third-party auth provider (e.g. Clerk, Auth0, Firebase, Cognito) instead
+    /// of Supabase Auth. The callback returns the provider's current JWT, or null when no user is signed in.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It is awaited before every Database, Storage and Edge Functions request, and the token it returns is sent as
+    /// <c>Authorization: Bearer</c>. Realtime asks it for the token on connect and on every heartbeat. A null token
+    /// sends the request with the project API key, as when no user is signed in. A callback that throws fails the
+    /// request that called it with the same exception; the client never falls back to the API key.
+    /// </para>
+    /// <para>
+    /// The client then builds no Supabase Auth client: <see cref="Client.Auth"/> and <see cref="Client.AdminAuth"/>
+    /// throw <see cref="InvalidOperationException"/>, so resolving the Auth client from dependency injection throws
+    /// too. <see cref="Client.InitializeAsync"/> restores no session and only connects Realtime when
+    /// <see cref="AutoConnectRealtime"/> is set. <see cref="SessionHandler"/>, <see cref="AutoRefreshToken"/> and
+    /// <see cref="AuthFlowType"/> are ignored. The project must be configured to trust the provider's JWTs.
+    /// </para>
+    /// <para>
+    /// Only the <see cref="Client(string, string?, SupabaseOptions?)"/> constructor reads it: the constructor that
+    /// takes ready-made sub-clients and <see cref="StatelessClient"/> ignore it. It cannot be combined with an
+    /// <c>Authorization</c> entry in <see cref="Headers"/>.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var client = new Supabase.Client(url, publishableKey, new SupabaseOptions
+    /// {
+    ///     ThirdPartyAccessToken = cancellationToken => clerk.GetTokenAsync(cancellationToken)
+    /// });
+    /// var todos = await client.From&lt;Todo&gt;().Get();
+    /// </code>
+    /// </example>
+    [ImplementedCapability("client.authentication_integration.third_party_auth")]
+    public Func<CancellationToken, Task<string?>>? ThirdPartyAccessToken { get; set; }
 
     /// <summary>
     /// Allows developer to specify options that will be passed to all child Supabase clients.

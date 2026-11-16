@@ -16,6 +16,7 @@ using Supabase.Realtime;
 using Supabase.Realtime.Interfaces;
 using Supabase.Storage;
 using Supabase.Storage.Interfaces;
+using Supabase.ThirdPartyAuth;
 using static Supabase.Gotrue.Constants;
 
 namespace Supabase;
@@ -28,19 +29,23 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
     /// <summary>
     /// Supabase Auth allows you to create and manage user sessions for access to data that is secured by access policies.
     /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// <see cref="SupabaseOptions.ThirdPartyAccessToken"/> is set, so the client has no Supabase Auth client.
+    /// </exception>
     public IGotrueClient<User, Session> Auth
     {
-        get => this.auth;
+        get => this.OwnAuth;
         set
         {
-            // Remove existing internal state listener (if applicable)
-            this.auth.RemoveStateChangedListener(this.Auth_StateChanged);
+            this.OwnAuth.RemoveStateChangedListener(this.Auth_StateChanged);
             this.auth = value;
-            this.auth.AddStateChangedListener(this.Auth_StateChanged);
+            value.AddStateChangedListener(this.Auth_StateChanged);
         }
     }
 
-    private IGotrueClient<User, Session> auth;
+    private IGotrueClient<User, Session>? auth;
+
+    private IGotrueClient<User, Session> OwnAuth => this.auth ?? throw ThirdPartyAuthorization.AuthDisabled();
 
     /// <summary>
     /// Returns a Stateless Gotrue Admin client given a service_key JWT. This should really only be accessed from a
@@ -51,7 +56,13 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
     /// RLS-bypassing access, so only supply it from a secure server environment.
     /// </param>
     /// <returns>An admin client scoped to the supplied service key.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// <see cref="SupabaseOptions.ThirdPartyAccessToken"/> is set, so the client has no Supabase Auth client.
+    /// </exception>
     public IGotrueAdminClient<User> AdminAuth(string serviceKey) =>
+        this.auth is null ? throw ThirdPartyAuthorization.AuthDisabled() : this.AdminClientFor(serviceKey);
+
+    private AdminClient AdminClientFor(string serviceKey) =>
         new AdminClient(serviceKey, new Gotrue.ClientOptions
         {
             Url = string.Format(this.options.AuthUrlFormat, this.supabaseUrl),
@@ -162,6 +173,8 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
         this.options = options ?? new SupabaseOptions();
 
         ApiKey.CheckFormat(supabaseKey);
+        ThirdPartyAuthorization.RejectConflictingAuthorizationHeader(this.options);
+        var thirdPartyAccessToken = this.options.ThirdPartyAccessToken;
 
         var authUrl = string.Format(this.options.AuthUrlFormat, supabaseUrl);
         var restUrl = string.Format(this.options.RestUrlFormat, supabaseUrl);
@@ -183,27 +196,15 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             functionsUrl = string.Format(this.options.FunctionsUrlFormat, supabaseUrl);
         }
 
-        // Init Auth
-        var gotrueOptions = new Gotrue.ClientOptions
-        {
-            Url = authUrl,
-            AutoRefreshToken = this.options.AutoRefreshToken,
-            HttpClient = this.options.HttpClient,
-            Proxy = this.options.Proxy,
-            Retry = this.options.GotrueRetry,
-            FlowType = this.options.AuthFlowType
-        };
-        this.auth = new Gotrue.Client(gotrueOptions);
-        this.auth.SetPersistence(this.options.SessionHandler);
-        this.auth.AddStateChangedListener(this.Auth_StateChanged);
-        this.auth.GetHeaders = () => this.GetAuthHeaders();
+        this.auth = thirdPartyAccessToken is null ? this.SupabaseAuth(authUrl) : null;
         this.postgrest = new Postgrest.Client(restUrl, new Postgrest.ClientOptions
         {
             Schema = schema,
             Retry = this.options.PostgrestRetry,
             Timeout = this.options.PostgrestTimeout,
             HttpClient = this.options.HttpClient,
-            Proxy = this.options.Proxy
+            Proxy = this.options.Proxy,
+            RetrieveAccessToken = thirdPartyAccessToken
         });
         this.postgrest.GetHeaders = () => this.GetAuthHeaders();
 
@@ -213,7 +214,8 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
         {
             Parameters = { ApiKey = this.supabaseKey },
             PostgrestClient = this.postgrest,
-            WebSocketFactory = this.options.WebSocketFactory
+            WebSocketFactory = this.options.WebSocketFactory,
+            RetrieveAccessToken = ThirdPartyAuthorization.RealtimeAccessToken(thirdPartyAccessToken, this.supabaseKey)
         };
         this.realtime = new Realtime.Client(realtimeUrl, realtimeOptions);
         this.realtime.GetHeaders = () =>
@@ -226,31 +228,54 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
         {
             HttpClient = this.options.HttpClient,
             Proxy = this.options.Proxy,
-            Retry = this.options.FunctionsRetry
+            Retry = this.options.FunctionsRetry,
+            RetrieveAccessToken = thirdPartyAccessToken
         });
         // Edge Functions must not receive a new-format (opaque) API key on the Authorization
         // header — the gateway would try to parse it as a JWT and reject the request.
         this.functions.GetHeaders = () => this.GetAuthHeaders(omitApiKeyAsBearer: true);
-        this.storage = new Storage.Client(storageUrl, this.options.StorageClientOptions);
+        this.storage = new Storage.Client(storageUrl, ThirdPartyAuthorization.StorageOptions(this.options.StorageClientOptions, thirdPartyAccessToken));
         this.storage.GetHeaders = () => this.GetAuthHeaders();
     }
 
+    private IGotrueClient<User, Session> SupabaseAuth(string authUrl)
+    {
+        var supabaseAuth = new Gotrue.Client(new Gotrue.ClientOptions
+        {
+            Url = authUrl,
+            AutoRefreshToken = this.options.AutoRefreshToken,
+            HttpClient = this.options.HttpClient,
+            Proxy = this.options.Proxy,
+            Retry = this.options.GotrueRetry,
+            FlowType = this.options.AuthFlowType
+        });
+        supabaseAuth.SetPersistence(this.options.SessionHandler);
+        supabaseAuth.AddStateChangedListener(this.Auth_StateChanged);
+        supabaseAuth.GetHeaders = () => this.GetAuthHeaders();
+        return supabaseAuth;
+    }
 
     /// <summary>
-    /// Restores the session persisted by <see cref="SupabaseOptions.SessionHandler"/>, refreshes it, and connects to realtime (if `options.AutoConnectRealtime` is set)
+    /// Restores the session persisted by <see cref="SupabaseOptions.SessionHandler"/>, refreshes it, and connects to realtime (if `options.AutoConnectRealtime` is set).
+    /// With <see cref="SupabaseOptions.ThirdPartyAccessToken"/> set there is no session to restore, so it only connects to realtime.
     /// </summary>
     public async Task<ISupabaseClient<User, Session, RealtimeSocket, RealtimeChannel, Bucket, FileObject>>
         InitializeAsync()
     {
-        // Don't clobber a session already set by the caller with a stale one from disk.
-        if (this.Auth.CurrentSession == null)
-            await this.Auth.LoadSessionAsync().ConfigureAwait(false);
-        await this.Auth.RetrieveSessionAsync();
+        if (this.auth is not null)
+            await RestoreSessionAsync(this.auth).ConfigureAwait(false);
 
         if (this.options.AutoConnectRealtime)
             await this.Realtime.ConnectAsync();
 
         return this;
+    }
+
+    private static async Task RestoreSessionAsync(IGotrueClient<User, Session> supabaseAuth)
+    {
+        if (supabaseAuth.CurrentSession == null)
+            await supabaseAuth.LoadSessionAsync().ConfigureAwait(false);
+        await supabaseAuth.RetrieveSessionAsync().ConfigureAwait(false);
     }
 
     private void Auth_StateChanged(object sender, AuthState e)
@@ -317,7 +342,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
         }
         else
         {
-            var accessToken = this.Auth.CurrentSession?.AccessToken;
+            var accessToken = this.auth?.CurrentSession?.AccessToken;
             if (accessToken != null)
                 headers["Authorization"] = $"Bearer {accessToken}";
             else if (!(omitApiKeyAsBearer && ApiKey.IsNewApiKey(this.supabaseKey)))
