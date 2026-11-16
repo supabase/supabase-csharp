@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
 
@@ -61,8 +62,9 @@ internal class Debugger : IRealtimeDebugger
             {
                 l.Invoke(sender, message, exception);
             }
-            catch
+            catch (Exception ex)
             {
+                Trace.TraceWarning("Supabase Realtime: a debug handler threw: {0}", ex);
             }
         }
     }
