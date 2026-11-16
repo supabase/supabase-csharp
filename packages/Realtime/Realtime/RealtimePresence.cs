@@ -94,7 +94,7 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
     {
         if (eventType != null && this.presenceEventListeners.TryGetValue(eventType.Value, out var list))
             list.Clear();
-        else
+        else if (eventType == null)
             this.presenceEventListeners.Clear();
     }
 

@@ -71,7 +71,7 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     public TaskCompletionSource FirstSend { get; } = new();
 
     /// <summary>When set, every heartbeat gets its reply, as from a healthy server.</summary>
-    public bool AnswerHeartbeats { get; init; }
+    public bool AnswerHeartbeats { get; set; }
 
     /// <summary>The status of those heartbeat replies.</summary>
     public string HeartbeatReplyStatus { get; init; } = "ok";

@@ -77,6 +77,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private bool hasSuccessfullyConnectedOnce;
     private bool hasPendingHeartbeat;
     private string? pendingHeartbeatRef;
+    private string? probedHeartbeatRef;
+    private readonly object heartbeatLock = new();
     private readonly Stopwatch heartbeatStopwatch = new();
 
     private readonly List<Task> buffer = new();
@@ -322,6 +324,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
         if (this.hasPendingHeartbeat)
         {
+            if (this.pendingHeartbeatRef == this.probedHeartbeatRef) return;
+
             this.hasPendingHeartbeat = false;
             Debugger.Instance.Log(this, "Socket Heartbeat Timeout: Attempting to re-establish a connection.");
             this.OnHeartbeat?.Invoke(HeartbeatStatus.Timeout, null);
@@ -374,8 +378,37 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     {
         while (this.heartbeatTokenSource is { IsCancellationRequested: false })
         {
-            this.SendHeartbeat();
+            lock (this.heartbeatLock)
+                this.SendHeartbeat();
             await Task.Delay(this.options.HeartbeatInterval, this.heartbeatTokenSource.Token);
+        }
+    }
+
+    internal void Probe() => Task.Run(this.ProbeAsync);
+
+    private async Task ProbeAsync()
+    {
+        string? probed;
+
+        lock (this.heartbeatLock)
+        {
+            if (!this.isOpen) return;
+
+            if (!this.hasPendingHeartbeat)
+                this.SendHeartbeat();
+
+            probed = this.pendingHeartbeatRef;
+            this.probedHeartbeatRef = probed;
+        }
+
+        await Task.Delay(this.options.ProbeTimeout);
+
+        lock (this.heartbeatLock)
+        {
+            if (!this.hasPendingHeartbeat || this.pendingHeartbeatRef != probed) return;
+
+            this.probedHeartbeatRef = null;
+            this.SendHeartbeat();
         }
     }
 

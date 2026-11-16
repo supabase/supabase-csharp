@@ -20,6 +20,9 @@ namespace Supabase.Gotrue
 
         [Supabase.Core.Attributes.ImplementedCapability(key: "functions.invocation.invoke", note: "Three return shapes.")]
         public void Invoke() { }
+
+        [NotApplicableCapability("client.authentication_integration.session_url_detection", "Browser-only redirect detection.")]
+        public void GetSessionFromUrl() { }
     }
 
     public class Options

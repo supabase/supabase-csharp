@@ -298,6 +298,10 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     public void ClearHeartbeatHandlers() =>
         this.heartbeatEventHandlers.Clear();
 
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.configuration.foreground_liveness_probe", "The app calls ProbeConnection when it returns to the foreground.")]
+    public void ProbeConnection() => (this.Socket as RealtimeSocket)?.Probe();
+
     private void NotifyHeartbeat(HeartbeatStatus status, TimeSpan? latency)
     {
         foreach (var handler in this.heartbeatEventHandlers.Snapshot())
