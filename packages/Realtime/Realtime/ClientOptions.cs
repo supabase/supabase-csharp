@@ -46,6 +46,11 @@ public class ClientOptions
     public TimeSpan HeartbeatInterval { get; set; } = TimeSpan.FromSeconds(20);
 
     /// <summary>
+    /// How long <c>ProbeConnection</c> waits for the heartbeat reply before the socket reconnects. Defaults to 5 seconds.
+    /// </summary>
+    public TimeSpan ProbeTimeout { get; set; } = TimeSpan.FromSeconds(5);
+
+    /// <summary>
     /// When set, the socket disconnects once the last channel has been closed for this long. Call
     /// <c>ConnectAsync</c> again before creating new channels. Left null, the socket stays open.
     /// </summary>

@@ -90,6 +90,20 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     void ClearHeartbeatHandlers();
 
     /// <summary>
+    /// Checks the connection now instead of waiting for the next heartbeat, and reconnects when no reply arrives within
+    /// <see cref="ClientOptions.ProbeTimeout"/>. Call it when the app returns to the foreground.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// void OnApplicationPause(bool paused)
+    /// {
+    ///     if (!paused) supabase.Realtime.ProbeConnection();
+    /// }
+    /// </code>
+    /// </example>
+    void ProbeConnection();
+
+    /// <summary>
     /// Adds a debug handler, likely used within a logging solution of some kind.
     /// </summary>
     /// <param name="handler"></param>
