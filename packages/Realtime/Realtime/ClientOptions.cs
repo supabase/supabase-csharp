@@ -110,7 +110,8 @@ public class ClientOptions
 
     /// <summary>
     /// Returns the current access token. Called on connect and on every heartbeat, so a refreshed token reaches
-    /// the server without calling <c>SetAuth</c>. A null result keeps the current token.
+    /// the server without calling <c>SetAuth</c>. A null result keeps the current token. A failure on connect
+    /// propagates out of <c>ConnectAsync</c>; a failure on a heartbeat is logged and keeps the current token.
     /// </summary>
     [ImplementedCapability("realtime.configuration.access_token_callback")]
     public Func<Task<string?>>? RetrieveAccessToken { get; set; }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -38,15 +37,28 @@ public class AccessTokenCallbackTests
     }
 
     [TestMethod]
-    public async Task ConnectAsync_ShouldLogTheFailure_GivenTheCallbackThrows()
+    public async Task ConnectAsync_ShouldThrowTheCallbackFailure_GivenTheCallbackThrows()
     {
         var failure = new InvalidOperationException("boom");
-        var logged = new List<Exception?>();
         this.client = ClientOver(new FakeWebsocketClient { OpenOnStart = true }, () => throw failure);
-        this.client.AddDebugHandler((_, _, error) => logged.Add(error));
+        var connecting = () => this.client.ConnectAsync();
+        (await connecting.Should().ThrowAsync<InvalidOperationException>()).Which.Should().BeSameAs(failure,
+            "a token that cannot be resolved must fail the connect rather than open the socket with a stale or lower-privilege token (client.authentication_integration.third_party_auth)");
+    }
+
+    [TestMethod]
+    public async Task Heartbeat_ShouldKeepTheCurrentTokenAndLogTheFailure_GivenTheCallbackThrows()
+    {
+        var failure = new InvalidOperationException("boom");
+        var calls = 0;
+        var logged = new TaskCompletionSource<Exception>();
+        this.client = ClientOver(new FakeWebsocketClient { OpenOnStart = true, AnswerHeartbeats = true },
+            () => ++calls == 1 ? Task.FromResult<string?>("first") : throw failure);
         await this.client.ConnectAsync();
+        this.client.AddDebugHandler((_, _, error) => _ = error is null || logged.TrySetResult(error));
+        (await logged.Task.WaitAsync(TimeSpan.FromSeconds(5))).Should().BeSameAs(failure, "a heartbeat has no caller to throw to, so its failure is logged");
         this.client.ClearDebugHandlers();
-        logged.Should().Contain(failure);
+        this.CurrentToken().Should().Be("first", "a failed heartbeat refresh keeps the token the socket already holds");
     }
 
     [TestMethod]

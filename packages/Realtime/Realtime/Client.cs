@@ -333,22 +333,22 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// <summary>
     /// Sets the current Access Token every heartbeat (see: https://github.com/supabase/realtime-js/blob/59bd47956ebe4e23b3e1a6c07f5fe2cfe943e8ad/src/RealtimeClient.ts#L437)
     /// </summary>
-    private void HandleSocketHeartbeat(IRealtimeSocket sender, SocketResponse message) => _ = this.RefreshAuthAsync();
+    private void HandleSocketHeartbeat(IRealtimeSocket sender, SocketResponse message) =>
+        _ = this.RefreshAuthAsync().ContinueWith(this.LogRefreshFailure, CancellationToken.None, TaskContinuationOptions.OnlyOnFaulted, TaskScheduler.Default);
+
+    private void LogRefreshFailure(Task refresh)
+    {
+        var failure = refresh.Exception!.InnerException!;
+        Debugger.Instance.Log(this, failure.Message, failure);
+    }
 
     private async Task RefreshAuthAsync()
     {
-        try
-        {
-            var token = this.Options.RetrieveAccessToken != null
-                ? await this.Options.RetrieveAccessToken().ConfigureAwait(false)
-                : this.AccessToken;
-            if (!string.IsNullOrEmpty(token))
-                this.SetAuth(token!);
-        }
-        catch (Exception ex)
-        {
-            Debugger.Instance.Log(this, ex.Message, ex);
-        }
+        var token = this.Options.RetrieveAccessToken != null
+            ? await this.Options.RetrieveAccessToken().ConfigureAwait(false)
+            : this.AccessToken;
+        if (!string.IsNullOrEmpty(token))
+            this.SetAuth(token!);
     }
 
     /// <summary>
