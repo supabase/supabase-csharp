@@ -153,6 +153,14 @@ public class PkceContractTests
     }
 
     [TestMethod]
+    public void SignInWithSSO_ShouldComplete_GivenAProviderIdAndCallerBlockingOnContextThatNeverRunsContinuations()
+    {
+        this.StubSsoRedirect();
+        BlockingCaller.Completes(() => this.client.SignInWithSSO(SsoProviderId, new SignInWithSSOOptions { FlowType = OAuthFlowType.PKCE })).Should().BeTrue(
+            "a library must not resume on the caller's context: a UI thread blocking on the task would deadlock");
+    }
+
+    [TestMethod]
     public void Resend_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
     {
         this.StubJsonOk("/resend");
