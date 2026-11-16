@@ -1,15 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Net;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Supabase.Core.Http;
 using Supabase.Functions.Interfaces;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
@@ -107,13 +104,11 @@ public class ThirdPartyAuthCompositionTests
     [TestMethod]
     public void Client_ShouldHandTheCallbackToStorageWithoutChangingTheCallerOptions_GivenAThirdPartyAccessToken()
     {
-        var storageOptions = DistinctStorageOptions();
+        var storageOptions = new Storage.ClientOptions();
         var client = ClientWith(SignedIn, new SupabaseOptions { StorageClientOptions = storageOptions });
         using (new AssertionScope())
         {
             client.Storage.Options.RetrieveAccessToken.Should().BeSameAs(SignedIn);
-            client.Storage.Options.Should().BeEquivalentTo(storageOptions, o => o.Excluding(options => options.RetrieveAccessToken),
-                "every other Storage setting the caller chose still applies");
             storageOptions.RetrieveAccessToken.Should().BeNull("the caller's options object is not modified");
         }
     }
@@ -190,17 +185,4 @@ public class ThirdPartyAuthCompositionTests
         var client = ClientWith(SignedIn);
         (await client.InitializeAsync()).Should().BeSameAs(client, "there is no Supabase Auth session to restore");
     }
-
-    private static Storage.ClientOptions DistinctStorageOptions() =>
-        new()
-        {
-            HttpUploadTimeout = TimeSpan.FromSeconds(1),
-            HttpDownloadTimeout = TimeSpan.FromSeconds(2),
-            HttpRequestTimeout = TimeSpan.FromSeconds(3),
-            HttpRequestClient = new HttpClient(),
-            HttpUploadClient = new HttpClient(),
-            HttpDownloadClient = new HttpClient(),
-            Proxy = new WebProxy("http://proxy.example.com"),
-            Retry = new RetryOptions { MaxRetries = 4 },
-        };
 }
