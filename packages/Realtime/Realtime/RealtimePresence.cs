@@ -142,11 +142,40 @@ public class RealtimePresence<TPresenceModel> : IRealtimePresence where TPresenc
 
         this.TriggerSync(response);
 
-        if (obj.Payload.Joins!.Count > 0)
+        var changes = PresenceChanges.From(obj.Payload, this.CurrentState);
+        if (changes.HasJoins)
             this.NotifyPresenceEventHandlers(IRealtimePresence.EventType.Join);
 
-        if (obj.Payload.Leaves!.Count > 0)
+        if (changes.HasLeaves)
             this.NotifyPresenceEventHandlers(IRealtimePresence.EventType.Leave);
+    }
+
+    /// <summary>
+    /// The joins and leaves of a presence diff that a handler should hear about.
+    /// A key that replaces its metas (a new join and a leave of the previous <c>phx_ref</c>
+    /// in the same diff) and is still present has neither joined nor left.
+    /// </summary>
+    private sealed class PresenceChanges
+    {
+        public bool HasJoins { get; }
+        public bool HasLeaves { get; }
+
+        private PresenceChanges(bool hasJoins, bool hasLeaves)
+        {
+            this.HasJoins = hasJoins;
+            this.HasLeaves = hasLeaves;
+        }
+
+        public static PresenceChanges From(PresenceDiffPayload<TPresenceModel> diff,
+            IReadOnlyDictionary<string, List<TPresenceModel>> currentState)
+        {
+            var replaced = diff.Joins!.Keys.Intersect(diff.Leaves!.Keys)
+                .Where(currentState.ContainsKey).ToHashSet();
+
+            return new PresenceChanges(
+                diff.Joins.Keys.Except(replaced).Any(),
+                diff.Leaves.Keys.Except(replaced).Any());
+        }
     }
 
     /// <summary>
