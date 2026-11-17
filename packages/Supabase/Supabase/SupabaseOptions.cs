@@ -124,10 +124,24 @@ public class SupabaseOptions
     public Supabase.Core.Http.RetryOptions FunctionsRetry { get; set; } = new();
 
     /// <summary>
-    /// An HttpClient shared by the Auth, Postgrest, and Functions clients. Storage configures its own set
-    /// of clients via <see cref="StorageClientOptions"/>; Realtime has no HTTP transport (see
-    /// <see cref="WebSocketFactory"/>). When null, each client builds and owns its own.
+    /// The HttpClient every Database, Auth, Storage and Edge Functions request is sent through. The SDK sets the
+    /// <c>apikey</c> and <c>Authorization</c> headers on each request and never changes the client, so one client can
+    /// serve several Supabase clients. When null, each sub-client builds and owns its own. Realtime has no HTTP
+    /// transport here (see <see cref="WebSocketFactory"/>).
     /// </summary>
+    /// <remarks>
+    /// Storage uses this client for requests, uploads and downloads alike, unless
+    /// <see cref="StorageClientOptions"/> names a client for one of them. The client's own
+    /// <see cref="System.Net.Http.HttpClient.Timeout"/> then governs uploads and downloads, so set it to
+    /// <see cref="System.Threading.Timeout.InfiniteTimeSpan"/> when you transfer large files.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var http = new HttpClient(new MyLoggingHandler());
+    /// var client = new Supabase.Client(url, key, new SupabaseOptions { HttpClient = http });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("client.request_configuration.custom_http_client")]
     public HttpClient? HttpClient { get; set; }
 
     /// <summary>

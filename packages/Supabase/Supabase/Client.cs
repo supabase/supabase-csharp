@@ -234,7 +234,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
         // Edge Functions must not receive a new-format (opaque) API key on the Authorization
         // header — the gateway would try to parse it as a JWT and reject the request.
         this.functions.GetHeaders = () => this.GetAuthHeaders(omitApiKeyAsBearer: true);
-        this.storage = new Storage.Client(storageUrl, ThirdPartyAuthorization.StorageOptions(this.options.StorageClientOptions, thirdPartyAccessToken));
+        this.storage = new Storage.Client(storageUrl, StorageConfiguration.For(this.options, thirdPartyAccessToken));
         this.storage.GetHeaders = () => this.GetAuthHeaders();
     }
 
