@@ -46,6 +46,14 @@ public class ClientOptions
     public RetryOptions Retry { get; set; } = new RetryOptions();
 
     /// <summary>
+    /// Whether the SDK adds the current trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each
+    /// request. Defaults to <see cref="TracePropagation.Enabled"/>. <see cref="TracePropagation.Disabled"/> stops the SDK
+    /// from injecting it; the .NET runtime's own injection is controlled through
+    /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>.
+    /// </summary>
+    public TracePropagation TracePropagation { get; set; } = TracePropagation.Enabled;
+
+    /// <summary>
     /// Fails a request that runs longer than this, retries included, with a TaskCanceledException.
     /// The HttpClient timeout, 100 seconds by default, still applies.
     /// </summary>

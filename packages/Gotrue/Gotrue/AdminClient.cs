@@ -40,7 +40,10 @@ public class AdminClient : IGotrueAdminClient<User>
 
         options ??= new ClientOptions();
         this.Options = options;
-        this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry);
+        this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
+        {
+            TracePropagation = options.TracePropagation
+        };
     }
 
     /// <summary>

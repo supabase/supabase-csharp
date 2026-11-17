@@ -136,7 +136,7 @@ internal static class Helpers
 
         try
         {
-            var response = await RetryExecutor.SendAsync(httpClient, CreateRequest, options.Retry, cancellationToken).ConfigureAwait(false);
+            var response = await RetryExecutor.SendAsync(httpClient, CreateRequest, options.Retry, options.TracePropagation, cancellationToken).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 

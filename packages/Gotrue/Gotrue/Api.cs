@@ -68,6 +68,8 @@ public class Api : IGotrueApi<User, Session>
     private readonly HttpClient? httpClient;
     private readonly RetryOptions retry;
 
+    internal TracePropagation TracePropagation { get; init; } = TracePropagation.Enabled;
+
     /// <summary>
     /// Creates a new API client
     /// </summary>
@@ -87,12 +89,12 @@ public class Api : IGotrueApi<User, Session>
     /// <summary>Routes through the resolved <see cref="httpClient"/> and <see cref="retry"/> policy.</summary>
     private Task<BaseResponse> MakeRequestAsync(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null,
         CancellationToken cancellationToken = default) =>
-        Helpers.MakeRequestAsync(method, url, data, headers, this.httpClient, this.retry, cancellationToken);
+        Helpers.MakeRequestAsync(method, url, data, headers, this.httpClient, this.retry, this.TracePropagation, cancellationToken);
 
     /// <summary>Routes through the resolved <see cref="httpClient"/> and <see cref="retry"/> policy.</summary>
     private Task<T?> MakeRequestAsync<T>(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null,
         CancellationToken cancellationToken = default) where T : class =>
-        Helpers.MakeRequestAsync<T>(method, url, data, headers, this.httpClient, this.retry, cancellationToken);
+        Helpers.MakeRequestAsync<T>(method, url, data, headers, this.httpClient, this.retry, this.TracePropagation, cancellationToken);
 
     /// <summary>
     /// Signs a user up using an email address and password.

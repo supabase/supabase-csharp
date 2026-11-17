@@ -115,7 +115,10 @@ public class Client : IGotrueClient<User, Session>
     {
         options ??= new ClientOptions();
         this.Options = options;
-        this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry);
+        this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
+        {
+            TracePropagation = options.TracePropagation
+        };
         if (options.AutoRefreshToken)
             this.StartAutoRefresh();
     }
