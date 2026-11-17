@@ -48,13 +48,13 @@ public class SupabaseOptions
     public bool AutoConnectRealtime { get; set; }
 
     /// <summary>
-    /// Functions passed to Gotrue that handle sessions. 
-    /// 
-    /// **By default these do nothing for persistence.**
+    /// Where Gotrue persists the session. Defaults to <see cref="SessionPersistence.Disabled"/>: nothing is
+    /// persisted and the session lives only in memory for the lifetime of the client instance. Supply your own
+    /// <see cref="IGotrueSessionPersistence{TSession}"/> to persist it.
     /// </summary>
     [ImplementedCapability("client.session_management.custom_storage")]
-    [PartialCapability("client.session_management.persist_session", "No boolean persist toggle; in-memory-only behavior is achievable only by supplying a no-op IGotrueSessionPersistence handler.")]
-    public IGotrueSessionPersistence<Session> SessionHandler { get; set; } = new DefaultSupabaseSessionHandler();
+    [ImplementedCapability("client.session_management.persist_session")]
+    public IGotrueSessionPersistence<Session> SessionHandler { get; set; } = SessionPersistence.Disabled;
 
     /// <summary>
     /// Authenticates the client through a third-party auth provider (e.g. Clerk, Auth0, Firebase, Cognito) instead
