@@ -384,6 +384,11 @@ features:
     status: implemented
     symbols:
       - Table.Insert
+  database.mutate.missing_defaults:
+    status: implemented
+    note: "Applied to bulk Insert/Upsert; sends Prefer: missing=default."
+    symbols:
+      - QueryOptions.MissingFields
   database.mutate.update:
     status: implemented
     symbols:
