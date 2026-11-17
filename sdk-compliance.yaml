@@ -339,6 +339,10 @@ features:
     status: implemented
     symbols:
       - SupabaseOptions.TracePropagation
+  client.observability.diagnostic_logging:
+    status: implemented
+    symbols:
+      - SupabaseOptions.LoggerFactory
 
   # ── Database (PostgREST) ───────────────────────────────────────────────────
 
