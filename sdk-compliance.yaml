@@ -366,6 +366,11 @@ features:
     symbols:
       - Table.Select
 
+  database.mutate.bulk_rows_with_differing_fields:
+    status: implemented
+    symbols:
+      - Table.Insert
+      - Table.Upsert
   database.mutate.count:
     status: implemented
     note: "Applied to Insert/Upsert/Update/Delete; the count is read back from ModeledResponse.Count."
