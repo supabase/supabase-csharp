@@ -15,4 +15,7 @@ public class SparseUser : BaseModel
 
     [Column("catchphrase", NullValueHandling = JsonIgnoreCondition.WhenWritingNull)]
     public string? Catchphrase { get; set; }
+
+    [Column("status", NullValueHandling = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Status { get; set; }
 }
