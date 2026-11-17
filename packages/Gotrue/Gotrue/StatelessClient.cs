@@ -113,7 +113,10 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
 
     /// <inheritdoc />
     public IGotrueApi<User, Session> GetApi(StatelessClientOptions options) =>
-        new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry);
+        new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
+        {
+            TracePropagation = options.TracePropagation
+        };
 
     /// <inheritdoc />
     public Task<Session?> SignUp(string email, string password, StatelessClientOptions options, SignUpOptions? signUpOptions = null) => this.SignUp(SignUpType.Email, email, password, options, signUpOptions);
@@ -360,6 +363,14 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
         ///     Retry policy applied to each request. Default (<see cref="RetryOptions.MaxRetries"/> 0) sends once, unretried.
         /// </summary>
         public RetryOptions Retry { get; set; } = new RetryOptions();
+
+        /// <summary>
+        /// Whether the SDK adds the current trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each
+        /// request. Defaults to <see cref="TracePropagation.Enabled"/>. <see cref="TracePropagation.Disabled"/> stops the SDK
+        /// from injecting it; the .NET runtime's own injection is controlled through
+        /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>.
+        /// </summary>
+        public TracePropagation TracePropagation { get; set; } = TracePropagation.Enabled;
 
         /// <summary>
         ///     Allows sign-in to return a session for an unconfirmed user. Defaults to false.

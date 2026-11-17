@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.Postgrest.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Postgrest.ClientOptions.TracePropagation.set -> void

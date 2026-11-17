@@ -1,1 +1,5 @@
 #nullable enable
+Supabase.Gotrue.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Gotrue.ClientOptions.TracePropagation.set -> void
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.TracePropagation.set -> void

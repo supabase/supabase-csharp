@@ -16,14 +16,22 @@ public static class RetryExecutor
         RetryOptions options, CancellationToken cancellationToken = default) =>
         SendAsync(client, requestFactory, options, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
+    internal static Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
+        RetryOptions options, TracePropagation tracePropagation, CancellationToken cancellationToken) =>
+        SendAsync(client, requestFactory, options, tracePropagation, HttpCompletionOption.ResponseContentRead, cancellationToken);
+
     /// <summary>Sends a request with the specified <paramref name="completionOption"/>.</summary>
-    public static async Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
-        RetryOptions options, HttpCompletionOption completionOption, CancellationToken cancellationToken)
+    public static Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
+        RetryOptions options, HttpCompletionOption completionOption, CancellationToken cancellationToken) =>
+        SendAsync(client, requestFactory, options, TracePropagation.Enabled, completionOption, cancellationToken);
+
+    internal static async Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
+        RetryOptions options, TracePropagation tracePropagation, HttpCompletionOption completionOption, CancellationToken cancellationToken)
     {
         var attempt = 0;
         while (true)
         {
-            var (response, exception) = await Attempt(client, requestFactory, completionOption, cancellationToken).ConfigureAwait(false);
+            var (response, exception) = await Attempt(client, requestFactory, tracePropagation, completionOption, cancellationToken).ConfigureAwait(false);
             if (!ShouldRetry(response, exception, attempt, options))
                 return response ?? throw exception!;
 
@@ -34,9 +42,10 @@ public static class RetryExecutor
     }
 
     private static async Task<(HttpResponseMessage? Response, HttpRequestException? Exception)> Attempt(
-        HttpClient client, Func<HttpRequestMessage> requestFactory, HttpCompletionOption completionOption, CancellationToken cancellationToken)
+        HttpClient client, Func<HttpRequestMessage> requestFactory, TracePropagation tracePropagation, HttpCompletionOption completionOption, CancellationToken cancellationToken)
     {
         using var request = requestFactory();
+        TraceContext.Inject(request.Headers, tracePropagation);
         try
         {
             return (await client.SendAsync(request, completionOption, cancellationToken).ConfigureAwait(false), null);
