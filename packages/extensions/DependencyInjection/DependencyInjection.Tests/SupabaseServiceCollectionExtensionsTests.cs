@@ -66,6 +66,20 @@ public class SupabaseServiceCollectionExtensionsTests
     }
 
     [TestMethod]
+    public void AddSupabase_ShouldKeepStorageOnItsOwnNamedClients_NotTheSharedOne()
+    {
+        var services = new ServiceCollection();
+        services.AddSupabase(SupabaseUrl, SupabaseKey);
+        using var provider = services.BuildServiceProvider();
+        using var scope = provider.CreateScope();
+        var client = scope.ServiceProvider.GetRequiredService<Client>();
+
+        new[] { client.Storage.Options.HttpRequestClient, client.Storage.Options.HttpUploadClient, client.Storage.Options.HttpDownloadClient }
+            .Should().NotContain(client.Auth.Options.HttpClient,
+                "explicit Storage clients win over the shared client, keeping their independent timeout profiles");
+    }
+
+    [TestMethod]
     public void AddSupabase_ShouldApplyConfigureOptions_ButOverwriteAnyHttpClientItSets()
     {
         var callerSuppliedClient = new HttpClient();
