@@ -53,6 +53,43 @@ public class BulkWriteE2ETests
         }
     }
 
+    [TestMethod]
+    public async Task Insert_ShouldApplyColumnDefault_GivenColumnDefaultMissingFields()
+    {
+        var client = LocalStack.Client();
+        var explicitStatus = new SparseUser { Username = Guid.NewGuid().ToString(), Status = "OFFLINE" };
+        var omittedStatus = new SparseUser { Username = Guid.NewGuid().ToString(), Catchphrase = "hello" };
+        try
+        {
+            var response = await client.Table<SparseUser>().Insert(new List<SparseUser> { explicitStatus, omittedStatus },
+                new QueryOptions { MissingFields = QueryOptions.MissingFieldType.ColumnDefault }, this.TestContext.CancellationToken);
+            response.Models.Single(row => row.Username == omittedStatus.Username).Status.Should().Be("ONLINE", "the omitted status takes the column default (missing_defaults spec)");
+            response.Models.Single(row => row.Username == explicitStatus.Username).Status.Should().Be("OFFLINE");
+        }
+        finally
+        {
+            await this.Remove(client, explicitStatus, omittedStatus);
+        }
+    }
+
+    [TestMethod]
+    public async Task Insert_ShouldWriteNull_GivenTheDefaultMissingFields()
+    {
+        var client = LocalStack.Client();
+        var explicitStatus = new SparseUser { Username = Guid.NewGuid().ToString(), Status = "OFFLINE" };
+        var omittedStatus = new SparseUser { Username = Guid.NewGuid().ToString(), Catchphrase = "hello" };
+        try
+        {
+            var response = await client.Table<SparseUser>().Insert(new List<SparseUser> { explicitStatus, omittedStatus },
+                cancellationToken: this.TestContext.CancellationToken);
+            response.Models.Single(row => row.Username == omittedStatus.Username).Status.Should().BeNull("without the option an omitted field becomes NULL (missing_defaults spec)");
+        }
+        finally
+        {
+            await this.Remove(client, explicitStatus, omittedStatus);
+        }
+    }
+
     private async Task Remove(Client client, params SparseUser[] rows)
     {
         foreach (var row in rows)

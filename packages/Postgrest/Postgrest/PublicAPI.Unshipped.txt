@@ -5,4 +5,9 @@ Supabase.Postgrest.ClientOptions.TracePropagation.get -> Supabase.Core.Http.Trac
 Supabase.Postgrest.ClientOptions.TracePropagation.set -> void
 Supabase.Postgrest.Exceptions.FailureHint.Reason.MaxAffectedExceeded = 9 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.MaxAffected(int rows) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.QueryOptions.MissingFields.get -> Supabase.Postgrest.QueryOptions.MissingFieldType
+Supabase.Postgrest.QueryOptions.MissingFields.set -> void
+Supabase.Postgrest.QueryOptions.MissingFieldType
+Supabase.Postgrest.QueryOptions.MissingFieldType.ColumnDefault = 1 -> Supabase.Postgrest.QueryOptions.MissingFieldType
+Supabase.Postgrest.QueryOptions.MissingFieldType.Null = 0 -> Supabase.Postgrest.QueryOptions.MissingFieldType
 Supabase.Postgrest.Table<TModel>.MaxAffected(int rows) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!

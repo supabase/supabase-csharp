@@ -39,4 +39,23 @@ public class QueryOptionsHeaderTests
     public void ToHeaders_ShouldAppendCount_GivenACountAlgorithm() =>
         new QueryOptions { Returning = QueryOptions.ReturnType.Minimal, Count = QueryOptions.CountType.Exact }
             .ToHeaders()["Prefer"].Should().Be("return=minimal,count=exact");
+
+    [TestMethod]
+    public void ToHeaders_ShouldAppendMissingDefault_GivenColumnDefault() =>
+        new QueryOptions { Returning = QueryOptions.ReturnType.Minimal, MissingFields = QueryOptions.MissingFieldType.ColumnDefault }
+            .ToHeaders()["Prefer"].Should().Be("return=minimal,missing=default");
+
+    [TestMethod]
+    public void ToHeaders_ShouldKeepEveryPreference_GivenColumnDefaultWithResolutionAndCount() =>
+        new QueryOptions
+        {
+            Upsert = true,
+            Count = QueryOptions.CountType.Exact,
+            MissingFields = QueryOptions.MissingFieldType.ColumnDefault
+        }.ToHeaders()["Prefer"].Should().Be("resolution=merge-duplicates,return=representation,count=exact,missing=default",
+            "the missing preference is independent of return, resolution and count (missing_defaults spec)");
+
+    [TestMethod]
+    public void ToHeaders_ShouldNotMentionMissing_GivenTheDefaultOption() =>
+        new QueryOptions().ToHeaders()["Prefer"].Should().NotContain("missing", "null is PostgREST's own default, so existing requests stay byte-identical");
 }
