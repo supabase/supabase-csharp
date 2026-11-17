@@ -441,6 +441,23 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     IPostgrestTable<TModel> Set(Expression<Func<TModel, KeyValuePair<object, object?>>> keyValuePairExpression);
 
     /// <summary>
+    /// Sets the maximum number of rows an <c>Update</c> or <c>Delete</c> may affect. When the mutation would
+    /// affect more rows, PostgREST rolls it back and the call throws. Needs PostgREST 13 or later: an older
+    /// server ignores the limit.
+    /// </summary>
+    /// <param name="rows">The most rows the mutation may affect; zero forbids any affected row.</param>
+    /// <returns>The same table, for chaining.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="rows"/> is negative.</exception>
+    /// <exception cref="InvalidOperationException">The terminal call is not an Update or a Delete.</exception>
+    /// <exception cref="Exceptions.PostgrestException">The mutation would affect more than <paramref name="rows"/> rows (<see cref="Exceptions.FailureHint.Reason.MaxAffectedExceeded"/>).</exception>
+    /// <example>
+    /// <code>
+    /// await client.Table&lt;Todo&gt;().Filter("done", Operator.Equals, "true").MaxAffected(10).Delete();
+    /// </code>
+    /// </example>
+    IPostgrestTable<TModel> MaxAffected(int rows);
+
+    /// <summary>
     /// Leaves null values out of the returned rows. Needs PostgREST 11.2 or later.
     /// </summary>
     IPostgrestTable<TModel> StripNulls();

@@ -19,7 +19,8 @@ public static class FailureHint
         UndefinedTable,
         UndefinedFunction,
         InvalidArgument,
-        UriTooLong
+        UriTooLong,
+        MaxAffectedExceeded
     }
 
     public static Reason DetectReason(PostgrestException pgex)
@@ -35,6 +36,7 @@ public static class FailureHint
             404 when pgex.Content.Contains("42P01") => UndefinedFunction,
             409 when pgex.Content.Contains("23503") => ForeignKeyViolation,
             409 when pgex.Content.Contains("23505") => UniquenessViolation,
+            400 when pgex.Content.Contains("PGRST124") => MaxAffectedExceeded,
             414 => UriTooLong,
             500 => ServerError,
             _ => Unknown
