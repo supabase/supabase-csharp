@@ -420,8 +420,8 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     IPostgrestTable<TModel> Where(Expression<Func<TModel, bool>> predicate);
 
     /// <summary>
-    /// Executes a query that expects to have a single object returned, rather than returning list of models
-    /// it will return a single model. Returns null when the query matches no rows.
+    /// Executes a query that returns at most one row, as a single model rather than a list.
+    /// Returns null when the query matches no rows. To have no match throw instead, use <see cref="SingleOrThrowAsync"/>.
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <exception cref="Exceptions.PostgrestException">The query matches more than one row.</exception>
