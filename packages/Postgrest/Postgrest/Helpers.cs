@@ -76,7 +76,7 @@ internal static class Helpers
     public static async Task<ModeledResponse<T>> MakeRequestAsync<T>(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data,
         Dictionary<string, string> headers, Func<Dictionary<string, string>>? getHeaders = null, CancellationToken cancellationToken = default, string? operation = null) where T : BaseModel, new()
     {
-        var baseResponse = await MakeRequestAsync(clientOptions, httpClient, method, url, serializerSettings, data, headers, cancellationToken, operation);
+        var baseResponse = await MakeRequestAsync(clientOptions, httpClient, method, url, serializerSettings, data, headers, cancellationToken, operation).ConfigureAwait(false);
         return new ModeledResponse<T>(baseResponse, serializerSettings, getHeaders);
     }
 
