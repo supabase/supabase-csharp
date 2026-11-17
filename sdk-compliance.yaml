@@ -529,6 +529,10 @@ features:
     status: implemented
     symbols:
       - Table.Range
+  database.using_modifiers.single_row:
+    status: implemented
+    symbols:
+      - Table.SingleOrThrowAsync
   database.using_modifiers.strip_nulls:
     status: implemented
     symbols:
