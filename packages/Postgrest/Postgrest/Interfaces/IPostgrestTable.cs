@@ -429,6 +429,25 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     Task<TModel?> Single(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Executes a read that must match exactly one row, and returns that row. The server enforces the count
+    /// by answering with a single object, so a query that matches no row or several rows throws.
+    /// </summary>
+    /// <remarks>
+    /// This is the strict twin of <see cref="Single"/>, which is the lenient "at most one row" read: it
+    /// returns null for no match. In v9, <c>Single</c> becomes the strict one and <c>MaybeSingle</c> the lenient one.
+    /// Only reads are supported: a write takes its row expectation from <see cref="QueryOptions"/>, and an RPC call is terminal.
+    /// </remarks>
+    /// <param name="cancellationToken"></param>
+    /// <returns>The only row the query matches.</returns>
+    /// <exception cref="Exceptions.PostgrestException">The query matches no row or more than one row (<see cref="Exceptions.FailureHint.Reason.UnexpectedRowCount"/>).</exception>
+    /// <example>
+    /// <code>
+    /// var todo = await client.Table&lt;Todo&gt;().Filter("id", Operator.Equals, "1").SingleOrThrowAsync();
+    /// </code>
+    /// </example>
+    Task<TModel> SingleOrThrowAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Specifies a key and value to be updated. Should be combined with filters/where clauses.
     /// 
     /// Can be called multiple times to set multiple values.

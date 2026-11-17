@@ -4,5 +4,8 @@ Supabase.Postgrest.ClientOptions.Logger.set -> void
 Supabase.Postgrest.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Postgrest.ClientOptions.TracePropagation.set -> void
 Supabase.Postgrest.Exceptions.FailureHint.Reason.MaxAffectedExceeded = 9 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
+Supabase.Postgrest.Exceptions.FailureHint.Reason.UnexpectedRowCount = 10 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.MaxAffected(int rows) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.SingleOrThrowAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel!>!
 Supabase.Postgrest.Table<TModel>.MaxAffected(int rows) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Table<TModel>.SingleOrThrowAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel!>!

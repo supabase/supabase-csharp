@@ -22,6 +22,7 @@ using Supabase.Postgrest.LimitAffectedRows;
 using Supabase.Postgrest.Linq;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
+using Supabase.Postgrest.SingleOrThrow;
 using static Supabase.Postgrest.Constants;
 
 namespace Supabase.Postgrest;
@@ -72,7 +73,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
     private string? onConflict;
 
-    private bool stripNulls;
+    private RowRepresentation representation = RowRepresentation.Default;
 
     private AffectedRowsLimit? affectedRowsLimit;
 
@@ -465,7 +466,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     [ImplementedCapability("database.using_modifiers.strip_nulls")]
     public IPostgrestTable<TModel> StripNulls()
     {
-        this.stripNulls = true;
+        this.representation = this.representation.WithNullsStripped();
         return this;
     }
 
@@ -655,6 +656,27 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
         return result.Models.FirstOrDefault();
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.single_row")]
+    public async Task<TModel> SingleOrThrowAsync(CancellationToken cancellationToken = default)
+    {
+        this.method = HttpMethod.Get;
+        this.representation = this.representation.AsSingleObject();
+        var request = this.Send<TModel>(this.method, null, null, cancellationToken);
+        this.Clear();
+        return OnlyRowOf(await request.ConfigureAwait(false));
+    }
+
+    private static TModel OnlyRowOf(ModeledResponse<TModel> response) =>
+        response.Models.Count == 1
+            ? response.Models[0]
+            : throw new PostgrestException($"The query matched {response.Models.Count} rows when exactly one was expected.")
+            {
+                Response = response.ResponseMessage,
+                StatusCode = (int) HttpStatusCode.NotAcceptable,
+                Reason = FailureHint.Reason.UnexpectedRowCount
+            };
 
     /// <inheritdoc />
     [ImplementedCapability("database.using_modifiers.request_cancellation", "Every terminal (Get/Insert/Update/Delete/Single/Count) accepts a CancellationToken.")]
@@ -954,7 +976,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         this.offset = int.MinValue;
         this.offsetForeignKey = null;
         this.onConflict = null;
-        this.stripNulls = false;
+        this.representation = RowRepresentation.Default;
         this.affectedRowsLimit = null;
     }
 
@@ -1022,8 +1044,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
         this.affectedRowsLimit?.ApplyTo(method, requestHeaders);
 
-        if (this.stripNulls)
-            requestHeaders.TryAdd("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
+        this.representation.ApplyTo(requestHeaders);
 
         var preparedData = this.PrepareRequestData(data, isInsert, isUpdate, isUpsert);
         this.SpecifyColumnsOfBulkRows(preparedData);
