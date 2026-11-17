@@ -1,1 +1,3 @@
 #nullable enable
+static Supabase.Gotrue.SessionPersistence.Disabled.get -> Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<Supabase.Gotrue.Session!>!
+Supabase.Gotrue.SessionPersistence
