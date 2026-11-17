@@ -146,12 +146,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="message"></param>
     private void HandleSocketMessageReceived(IRealtimeSocket sender, SocketResponse message)
     {
-        // Needs to verify if realtime server won't send the message below anymore after receive a track presence event
-        // {"ref":"bd07efe5-ca06-4257-b080-79779c6f76c4","event":"phx_reply","payload":{"status":"ok","response":{}},"topic":"realtime:online-users"}
-        // the message was used to stop timeout handler
-        // All tests still work on version before 2.34.21
-        var isPresenceDiff = message is { Event: Constants.EventType.PresenceDiff };
-        if (!isPresenceDiff && message.Ref != this.Ref) return;
+        if (message.Ref != this.Ref) return;
 
         this.CancelTimeout();
         this.Response = message;

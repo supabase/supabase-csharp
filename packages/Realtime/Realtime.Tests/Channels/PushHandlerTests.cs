@@ -46,6 +46,16 @@ public class PushHandlerTests
     }
 
     [TestMethod]
+    public void Push_ShouldNotCallTheHandler_GivenAPresenceDiff()
+    {
+        var push = new Push(this.channel.Socket, this.channel, ChannelAccessToken);
+        push.AddMessageReceivedHandler((_, _) => this.calls++);
+        push.Send();
+        this.socket.Receive("""{"topic":"realtime:room","event":"presence_diff","ref":null,"payload":{"joins":{},"leaves":{}}}""");
+        this.calls.Should().Be(0, "a presence message must not be taken for the reply to a push");
+    }
+
+    [TestMethod]
     public void Push_ShouldNotCallTheHandler_GivenItWasRemoved()
     {
         var push = new Push(this.channel.Socket, this.channel, ChannelAccessToken);
