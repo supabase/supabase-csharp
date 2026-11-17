@@ -35,6 +35,14 @@ public class QueryOptions
         IgnoreDuplicates
     }
 
+    public enum MissingFieldType
+    {
+        [MapTo("null")]
+        Null,
+        [MapTo("default")]
+        ColumnDefault
+    }
+
     /// <summary>
     /// By default the new record is returned. Set this to 'Minimal' if you don't need this value.
     /// </summary>
@@ -51,6 +59,19 @@ public class QueryOptions
     /// </summary>
     [ImplementedCapability("database.mutate.count", "Applied to Insert/Upsert/Update/Delete; the count is read back from ModeledResponse.Count.")]
     public CountType Count { get; set; } = CountType.None;
+
+    /// <summary>
+    /// What a bulk insert or upsert writes for a field that some rows omit: SQL NULL (default), or the column's
+    /// database DEFAULT with <see cref="MissingFieldType.ColumnDefault"/>. An explicitly supplied null stays null.
+    /// Only affects bulk writes, which name the union of the rows' fields in the columns parameter.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// await table.Insert(rows, new QueryOptions { MissingFields = QueryOptions.MissingFieldType.ColumnDefault });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("database.mutate.missing_defaults", "Applied to bulk Insert/Upsert; sends Prefer: missing=default.")]
+    public MissingFieldType MissingFields { get; set; } = MissingFieldType.Null;
 
     /// <summary>
     /// If the record should be upserted
@@ -85,6 +106,11 @@ public class QueryOptions
         if (this.Count != CountType.None && countAttr != null)
         {
             prefersHeaders.Add($"count={countAttr.Mapping}");
+        }
+
+        if (this.MissingFields == MissingFieldType.ColumnDefault)
+        {
+            prefersHeaders.Add($"missing={this.MissingFields.GetAttribute<MapToAttribute>()?.Mapping}");
         }
 
         headers.Add("Prefer", string.Join(",", prefersHeaders.ToArray()));

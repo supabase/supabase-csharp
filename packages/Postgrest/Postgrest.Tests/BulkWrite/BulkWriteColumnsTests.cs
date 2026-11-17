@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Postgrest.Tests.Support;
+using Supabase.Postgrest;
 
 namespace Postgrest.Tests.BulkWrite;
 
@@ -62,5 +64,26 @@ public class BulkWriteColumnsTests : RequestApprovalFixture
     {
         await this.Client.Table<SparseUser>().Columns(new[] { "username" }).Insert(RowsWithDifferingFields());
         this.EmittedRequestQuery["columns"].Should().Be("username", "an explicit column list is the caller's choice and wins over the union");
+    }
+
+    [TestMethod]
+    public async Task Insert_ShouldPreferMissingDefault_GivenColumnDefault()
+    {
+        await this.Client.Table<SparseUser>().Insert(RowsWithDifferingFields(), new QueryOptions { MissingFields = QueryOptions.MissingFieldType.ColumnDefault });
+        this.EmittedPreferHeaders.Single().Should().Be("return=representation,missing=default", "bulk rows with differing fields take column defaults for omitted fields (missing_defaults spec)");
+    }
+
+    [TestMethod]
+    public async Task Upsert_ShouldPreferMissingDefault_GivenColumnDefault()
+    {
+        await this.Client.Table<SparseUser>().Upsert(RowsWithDifferingFields(), new QueryOptions { MissingFields = QueryOptions.MissingFieldType.ColumnDefault });
+        this.EmittedPreferHeaders.Single().Should().Be("resolution=merge-duplicates,return=representation,missing=default", "upsert preserves its resolution next to missing (missing_defaults spec)");
+    }
+
+    [TestMethod]
+    public async Task Insert_ShouldNotPreferMissing_GivenNoOptions()
+    {
+        await this.Client.Table<SparseUser>().Insert(RowsWithDifferingFields());
+        this.EmittedPreferHeaders.Single().Should().Be("return=representation", "omitting the option leaves existing requests byte-identical");
     }
 }
