@@ -89,6 +89,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private bool isOpen;
     private bool disconnectRequested;
     private int reconnectionAttempts = 0;
+    private readonly Timer reconnectTimer;
 
     /// <summary>
     /// Initializes this Socket instance.
@@ -106,6 +107,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.connection = (options.WebSocketFactory ?? DefaultWebSocketFactory.Instance)
             .Create(new Uri(this.EndpointUrl), () => this.Headers);
         this.httpBroadcaster = new HttpBroadcaster(endpoint, options, () => this.Headers);
+        this.reconnectTimer = new Timer(_ => this.Reconnect());
     }
 
     Task IRealtimeSocket.HttpSendAsync(RealtimeChannel channel, string eventName, object payload, CancellationToken cancellationToken) =>
@@ -126,8 +128,9 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
         this.disconnectRequested = false;
 
-        this.connection.ReconnectTimeout = this.options.ReconnectAfterInterval(this.reconnectionAttempts);
-        this.connection.ErrorReconnectTimeout = TimeSpan.FromSeconds(30);
+        var heartbeat = this.options.HeartbeatInterval;
+        this.connection.ReconnectTimeout = heartbeat > TimeSpan.Zero ? heartbeat * 1.5 : null;
+        this.connection.ErrorReconnectTimeout = null;
 
         this.connection.ReconnectionHappened.Subscribe(this.HandleSocketReconnectionHappened);
         this.connection.DisconnectionHappened.Subscribe(this.HandleSocketDisconnectionHappened);
@@ -354,6 +357,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// </summary>
     private void HandleSocketOpened()
     {
+        this.reconnectTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
         this.reconnectionAttempts = 0;
         this.hasSuccessfullyConnectedOnce = true;
 
@@ -498,8 +502,12 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
             case true:
                 {
                     this.isReconnecting = true;
-                    this.connection.ReconnectTimeout = this.options.ReconnectAfterInterval(++this.reconnectionAttempts);
-                    var nextInterval = DateTime.Now.AddSeconds(this.connection.ReconnectTimeout.Value.Seconds).ToLocalTime();
+                    if (disconnectionInfo is not { Type: DisconnectionType.Error })
+                        break;
+
+                    var delay = new TimeSpan(Math.Max(0, this.options.ReconnectAfterInterval(++this.reconnectionAttempts).Ticks));
+                    this.reconnectTimer.Change(delay, Timeout.InfiniteTimeSpan);
+                    var nextInterval = DateTime.Now.Add(delay);
                     Debugger.Instance.Log(this, $"Next reconnection attempt will occur at: {nextInterval}");
                     this.options.Logger.BackgroundWorkEvent(LogComponent, "reconnection attempt scheduled");
                     break;
@@ -508,6 +516,12 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
                 this.NotifyErrorOccurred(RealtimeException.FromDisconnectionInfo(disconnectionInfo));
                 break;
         }
+    }
+
+    private void Reconnect()
+    {
+        if (!this.disconnectRequested && !this.connection.IsRunning)
+            _ = this.connection.Reconnect();
     }
 
     /// <summary>
