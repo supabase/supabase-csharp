@@ -507,6 +507,10 @@ features:
     symbols:
       - Table.Limit
       - Table.Offset
+  database.using_modifiers.max_affected_rows:
+    status: implemented
+    symbols:
+      - Table.MaxAffected
   database.using_modifiers.maybe_single_row:
     status: implemented
     symbols:
