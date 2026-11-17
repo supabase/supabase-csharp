@@ -146,6 +146,15 @@ public class ClientChannelCacheTests
     }
 
     [TestMethod]
+    public void Remove_ShouldCloseTheChannel_GivenAChannelStillJoining()
+    {
+        var channel = this.client.Channel("room");
+        _ = channel.Subscribe();
+        this.client.Remove(channel);
+        channel.IsClosed.Should().BeTrue("a channel removed while joining must not finish the join and come back on the next reconnect");
+    }
+
+    [TestMethod]
     public void Disconnect_ShouldFailSubscribe_GivenAChannelStillJoining()
     {
         var subscribing = this.client.Channel("room").Subscribe();
