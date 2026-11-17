@@ -336,6 +336,11 @@ features:
     symbols:
       - SupabaseOptions.Headers
 
+  client.observability.trace_propagation:
+    status: implemented
+    symbols:
+      - SupabaseOptions.TracePropagation
+
   # ── Database (PostgREST) ───────────────────────────────────────────────────
 
   database.query.from_table:
