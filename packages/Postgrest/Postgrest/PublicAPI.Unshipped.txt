@@ -3,3 +3,6 @@ Supabase.Postgrest.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILog
 Supabase.Postgrest.ClientOptions.Logger.set -> void
 Supabase.Postgrest.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Postgrest.ClientOptions.TracePropagation.set -> void
+Supabase.Postgrest.Exceptions.FailureHint.Reason.MaxAffectedExceeded = 9 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.MaxAffected(int rows) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Table<TModel>.MaxAffected(int rows) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!

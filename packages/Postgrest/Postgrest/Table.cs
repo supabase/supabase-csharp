@@ -18,6 +18,7 @@ using Supabase.Postgrest.BulkWrite;
 using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Extensions;
 using Supabase.Postgrest.Interfaces;
+using Supabase.Postgrest.LimitAffectedRows;
 using Supabase.Postgrest.Linq;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
@@ -72,6 +73,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     private string? onConflict;
 
     private bool stripNulls;
+
+    private AffectedRowsLimit? affectedRowsLimit;
 
     #endregion
 
@@ -445,6 +448,15 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     {
         this.offset = offset;
         this.offsetForeignKey = foreignTableName;
+        return this;
+    }
+
+
+    /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.max_affected_rows")]
+    public IPostgrestTable<TModel> MaxAffected(int rows)
+    {
+        this.affectedRowsLimit = AffectedRowsLimit.Of(rows);
         return this;
     }
 
@@ -943,6 +955,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         this.offsetForeignKey = null;
         this.onConflict = null;
         this.stripNulls = false;
+        this.affectedRowsLimit = null;
     }
 
 
@@ -979,6 +992,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             requestHeaders = this.GetHeaders().MergeLeft(requestHeaders);
         }
 
+        this.affectedRowsLimit?.ApplyTo(method, requestHeaders);
+
         var url = this.GenerateUrl();
         var preparedData = this.PrepareRequestData(data, isInsert, isUpdate, isUpsert);
 
@@ -1004,6 +1019,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
         if (this.GetHeaders != null)
             requestHeaders = this.GetHeaders().MergeLeft(requestHeaders);
+
+        this.affectedRowsLimit?.ApplyTo(method, requestHeaders);
 
         if (this.stripNulls)
             requestHeaders.TryAdd("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
