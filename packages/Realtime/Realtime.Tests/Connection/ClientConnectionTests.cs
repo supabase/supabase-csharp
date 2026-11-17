@@ -79,6 +79,14 @@ public class ClientConnectionTests
     }
 
     [TestMethod]
+    public async Task Subscribe_ShouldJoin_GivenAClientThatNeverConnected()
+    {
+        var channel = Helpers.SocketClient().Channel("room");
+        await channel.Subscribe();
+        channel.IsJoined.Should().BeTrue("a channel must connect the client by itself and join");
+    }
+
+    [TestMethod]
     public async Task ConnectAsync_ShouldForwardCustomHeaders()
     {
         var client = Helpers.SocketClient();

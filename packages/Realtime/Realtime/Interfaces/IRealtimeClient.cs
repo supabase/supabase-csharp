@@ -152,7 +152,6 @@ public interface IRealtimeClient<TSocket, TChannel> : IGettableHeaders
     /// <param name="channelName">The name of the Channel to join</param>
     /// <param name="options">Custom channel options for configuring the subscription</param>
     /// <returns>A RealtimeChannel instance representing the subscription</returns>
-    /// <exception cref="Exception">Thrown when Socket is null, indicating Connect() was not called</exception>
     TChannel Channel(string channelName, ChannelOptions options);
 
     /// <summary>

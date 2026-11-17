@@ -153,6 +153,7 @@ public class RealtimeChannel : IRealtimeChannel
 
     internal IRealtimeSocket Socket { get; private set; }
     internal Func<IRealtimeSocket?>? ClientSocket;
+    internal Func<Task?>? ConnectClient;
     private IRealtimePresence? presence;
     private IRealtimeBroadcast? broadcast;
     private RealtimeException? exception;
@@ -163,6 +164,7 @@ public class RealtimeChannel : IRealtimeChannel
 
     private bool CanPush => this.IsJoined && this.Socket.IsConnected;
     private bool hasJoinedOnce;
+    private bool unsubscribed;
     private readonly Timer rejoinTimer;
     private bool isRejoining;
 
@@ -474,7 +476,7 @@ public class RealtimeChannel : IRealtimeChannel
     }
 
     /// <summary>
-    /// Subscribes to the channel given supplied Options/params.
+    /// Subscribes to the channel given supplied Options/params. Connects the client first when it has no socket.
     /// </summary>
     /// <param name="timeoutMs"></param>
     [ImplementedCapability("realtime.channel.subscribe")]
@@ -484,6 +486,9 @@ public class RealtimeChannel : IRealtimeChannel
 
         if (this.IsSubscribed)
             return Task.FromResult(this as IRealtimeChannel);
+
+        if (this.ConnectClient?.Invoke() is { } connecting)
+            return this.SubscribeOnceConnected(connecting, timeoutMs).Unwrap();
 
         if (this.ClientSocket?.Invoke() is { } socket)
         {
@@ -515,9 +520,7 @@ public class RealtimeChannel : IRealtimeChannel
                 case ChannelState.Errored:
                     sender.RemoveStateChangedHandler(channelCallback!);
                     this.JoinPush.OnTimeout -= joinPushTimeoutCallback;
-                    tsc.TrySetException(state == ChannelState.Errored
-                        ? this.exception
-                        : new RealtimeException("Channel closed before it joined") { Reason = FailureHint.Reason.ChannelJoinFailure });
+                    tsc.TrySetException(state == ChannelState.Errored ? this.exception : ClosedBeforeItJoined());
                     break;
             }
         };
@@ -543,12 +546,26 @@ public class RealtimeChannel : IRealtimeChannel
         return tsc.Task;
     }
 
+    private async Task<Task<IRealtimeChannel>> SubscribeOnceConnected(Task connecting, int timeoutMs)
+    {
+        this.unsubscribed = false;
+        await connecting.ConfigureAwait(false);
+        if (this.unsubscribed)
+            throw ClosedBeforeItJoined();
+
+        return this.Subscribe(timeoutMs);
+    }
+
+    private static RealtimeException ClosedBeforeItJoined() =>
+        new("Channel closed before it joined") { Reason = FailureHint.Reason.ChannelJoinFailure };
+
     /// <summary>
     /// Unsubscribes from the channel.
     /// </summary>
     [ImplementedCapability("realtime.channel.unsubscribe")]
     public IRealtimeChannel Unsubscribe()
     {
+        this.unsubscribed = true;
         this.IsSubscribed = false;
 
         this.NotifyStateChanged(ChannelState.Leaving);

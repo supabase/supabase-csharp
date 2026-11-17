@@ -55,7 +55,7 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     {
         this.StartOrFailCallCount++;
         if (this.Handshake != null)
-            await this.Handshake.Task;
+            await this.Handshake.Task.ConfigureAwait(false);
         if (this.OpenOnStart || this.Handshake != null)
         {
             this.IsRunning = true;

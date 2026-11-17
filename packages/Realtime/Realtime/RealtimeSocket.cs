@@ -136,7 +136,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.connection.DisconnectionHappened.Subscribe(this.HandleSocketDisconnectionHappened);
         this.connection.MessageReceived.Subscribe(this.HandleSocketMessage);
 
-        await this.connection.StartOrFail();
+        await this.connection.StartOrFail().ConfigureAwait(false);
 
         if (this.disconnectRequested)
             throw new RealtimeException("Disconnected before the socket opened.") { Reason = FailureHint.Reason.SocketError };

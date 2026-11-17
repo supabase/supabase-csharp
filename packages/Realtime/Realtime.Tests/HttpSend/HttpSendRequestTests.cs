@@ -125,12 +125,21 @@ public class HttpSendRequestTests
     }
 
     [TestMethod]
+    public async Task HttpSendAsync_ShouldSendTheClientHeaders_GivenAChannelCreatedWhileDisconnected()
+    {
+        var client = new Client(this.SocketUrl, this.clientOptions) { GetHeaders = () => new() { ["X-Tenant"] = "acme" } };
+        await client.Channel("room").HttpSendAsync("cursor", new { x = 1 });
+        this.SentRequest().Headers!["X-Tenant"].Should().ContainSingle().Which.Should().Be("acme", "a channel must be able to send over HTTP without a socket connection");
+    }
+
+    [TestMethod]
     public void HttpSendAsync_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations() =>
         BlockingCaller.Completes(() => this.Channel().HttpSendAsync("cursor", new { x = 1 })).Should().BeTrue();
 
     private RealtimeChannel Channel(string topic = "realtime:room", ChannelOptions? options = null) =>
-        new(new RealtimeSocket($"{this.server.Url!.Replace("http", "ws")}/realtime/v1", this.clientOptions), topic,
-            options ?? Wire.PublicOptions());
+        new(new RealtimeSocket(this.SocketUrl, this.clientOptions), topic, options ?? Wire.PublicOptions());
+
+    private string SocketUrl => $"{this.server.Url!.Replace("http", "ws")}/realtime/v1";
 
     private IRequestMessage SentRequest() => this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!;
 }
