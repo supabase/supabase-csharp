@@ -638,8 +638,7 @@ features:
       - RealtimeChannel.Register
       - SupabaseTable.On
   realtime.subscriptions.subscribe_presence:
-    status: partially_implemented
-    note: "Join and Leave handlers get no key or presences, and a presence_state snapshot raises Sync only, not Join or Leave."
+    status: implemented
     symbols:
       - RealtimePresence
   realtime.subscriptions.postgres_changes_filter:
