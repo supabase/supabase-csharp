@@ -327,6 +327,10 @@ features:
     symbols:
       - SupabaseOptions.SessionHandler
 
+  client.request_configuration.custom_http_client:
+    status: implemented
+    symbols:
+      - SupabaseOptions.HttpClient
   client.request_configuration.global_headers:
     status: implemented
     symbols:
