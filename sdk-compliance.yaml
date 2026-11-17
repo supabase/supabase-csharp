@@ -322,8 +322,7 @@ features:
       - Client.SetPersistence
       - SupabaseOptions.SessionHandler
   client.session_management.persist_session:
-    status: partially_implemented
-    note: "No boolean persist toggle; in-memory-only behavior is achievable only by supplying a no-op IGotrueSessionPersistence handler."
+    status: implemented
     symbols:
       - SupabaseOptions.SessionHandler
 
