@@ -161,7 +161,7 @@ versions, see [the migration guides](./docs/migrations).
 
 ## Contributing
 
-Contributions are welcome — please open an issue to discuss substantial changes, then submit a PR.
+Contributions are welcome -- please open an issue to discuss substantial changes, then submit a PR.
 
 <a href="https://github.com/supabase/supabase-csharp/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=supabase-community/supabase-csharp" alt="Contributors" />
