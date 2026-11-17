@@ -61,22 +61,18 @@ public class AccessTokenCallbackTests
     }
 
     [TestMethod]
-    public async Task ConnectAsync_ShouldConnect_GivenTheIdleDelayOfAnEarlierDisconnectPassesWhileTheCallbackIsPending()
+    public async Task ConnectAsync_ShouldConnect_GivenTheIdleDelayPassesWhileTheCallbackIsPending()
     {
         var token = new TaskCompletionSource<string?>();
-        var calls = 0;
-        this.client = new Client("ws://localhost/socket", new ClientOptions
-        {
-            WebSocketFactory = new FakeWebSocketFactory(new FakeWebsocketClient { OpenOnStart = true }),
-            DisconnectOnEmptyChannelsAfter = TimeSpan.FromMilliseconds(50),
-            RetrieveAccessToken = () => ++calls == 1 ? Task.FromResult<string?>("first") : token.Task,
-        });
+        this.client = ClientOver(new FakeWebsocketClient { OpenOnStart = true }, null);
+        this.client.Options.DisconnectOnEmptyChannelsAfter = TimeSpan.FromMilliseconds(50);
         await this.client.ConnectAsync();
         this.client.Channel("room");
         this.client.Disconnect();
+        this.client.Options.RetrieveAccessToken = () => token.Task;
         var connecting = this.client.ConnectAsync();
         await Task.Delay(200);
-        token.SetResult("second");
+        token.SetResult("jwt");
         await connecting.Awaiting(connect => connect).Should().NotThrowAsync("the idle delay of a connection that is already closed must not end the next connect");
     }
 
