@@ -20,6 +20,7 @@ public class PushHandlerTests
     private readonly FakeWebsocketClient socket = new() { OpenOnStart = true };
     private Client client = null!;
     private RealtimeChannel channel = null!;
+    private const string PresenceDiff = """{"topic":"realtime:room","event":"presence_diff","ref":null,"payload":{"joins":{},"leaves":{}}}""";
     private int calls;
 
     [TestInitialize]
@@ -27,6 +28,7 @@ public class PushHandlerTests
     {
         this.client = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(this.socket) });
         await this.client.ConnectAsync();
+        await this.socket.FirstSend.Task;
         this.channel = this.client.Channel("room");
     }
 
@@ -46,13 +48,24 @@ public class PushHandlerTests
     }
 
     [TestMethod]
-    public void Push_ShouldNotCallTheHandler_GivenAPresenceDiff()
+    public void Push_ShouldWaitForItsReply_GivenAPresenceDiff()
     {
         var push = new Push(this.channel.Socket, this.channel, ChannelAccessToken);
         push.AddMessageReceivedHandler((_, _) => this.calls++);
         push.Send();
-        this.socket.Receive("""{"topic":"realtime:room","event":"presence_diff","ref":null,"payload":{"joins":{},"leaves":{}}}""");
+        this.socket.Receive(PresenceDiff);
         this.calls.Should().Be(0, "a presence message must not be taken for the reply to a push");
+        this.socket.Reply(this.channel.Topic, push.Ref);
+        this.calls.Should().Be(1, "the push still hears its own reply");
+    }
+
+    [TestMethod]
+    public void Push_ShouldNotCallTheHandler_GivenAPresenceDiffBeforeItIsSent()
+    {
+        var push = new Push(this.channel.Socket, this.channel, ChannelAccessToken);
+        push.AddMessageReceivedHandler((_, _) => this.calls++);
+        this.socket.Receive(PresenceDiff);
+        this.calls.Should().Be(0, "a push that was not sent yet has no reply to hear");
     }
 
     [TestMethod]

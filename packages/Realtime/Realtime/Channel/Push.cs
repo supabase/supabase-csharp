@@ -146,7 +146,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="message"></param>
     private void HandleSocketMessageReceived(IRealtimeSocket sender, SocketResponse message)
     {
-        if (message.Ref != this.Ref) return;
+        if (message.Ref is null || message.Ref != this.Ref) return;
 
         this.CancelTimeout();
         this.Response = message;
