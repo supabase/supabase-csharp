@@ -21,7 +21,7 @@ public class DefaultSupabaseSessionHandlerTests
     private static readonly Type HandlerType = typeof(Supabase.Client).Assembly.GetType("Supabase.DefaultSupabaseSessionHandler")!;
 
     private static IGotrueSessionPersistence<Session> NewHandler() =>
-        (IGotrueSessionPersistence<Session>)Activator.CreateInstance(HandlerType)!;
+        (IGotrueSessionPersistence<Session>) Activator.CreateInstance(HandlerType)!;
 
     [TestMethod]
     public void DefaultSupabaseSessionHandler_ShouldPointToSessionPersistenceDisabled_GivenItIsObsolete() =>
