@@ -45,7 +45,7 @@ public class TraceContextTests
         var handler = new CapturingHandler();
         using var client = new HttpClient(handler);
         (await RetryExecutor.SendAsync(client, request ?? (() => new HttpRequestMessage(HttpMethod.Get, "http://localhost/")),
-            new RetryOptions(), propagation, CancellationToken.None)).Dispose();
+            new RetryOptions(), propagation, null, CancellationToken.None)).Dispose();
         return handler.Sent!;
     }
 

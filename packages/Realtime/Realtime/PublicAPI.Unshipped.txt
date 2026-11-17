@@ -1,4 +1,6 @@
 #nullable enable
+Supabase.Realtime.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
+Supabase.Realtime.ClientOptions.Logger.set -> void
 Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>
 Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>.CurrentPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
 Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>.Key.get -> string!

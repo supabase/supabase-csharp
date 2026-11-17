@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
+using Supabase.Core.Logging;
 using Supabase.Realtime.Channel;
 using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
@@ -340,6 +341,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     {
         var failure = refresh.Exception!.InnerException!;
         Debugger.Instance.Log(this, failure.Message, failure);
+        this.Options.Logger.BackgroundWorkFailed("Supabase.Realtime", "Access token refresh on heartbeat", failure);
     }
 
     private async Task RefreshAuthAsync()

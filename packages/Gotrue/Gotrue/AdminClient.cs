@@ -42,7 +42,8 @@ public class AdminClient : IGotrueAdminClient<User>
         this.Options = options;
         this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
         {
-            TracePropagation = options.TracePropagation
+            TracePropagation = options.TracePropagation,
+            Logger = options.Logger
         };
     }
 

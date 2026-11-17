@@ -37,6 +37,7 @@ public static class StatelessClient
             Proxy = options.Proxy,
             Retry = options.GotrueRetry,
             TracePropagation = options.TracePropagation,
+            Logger = options.LoggerFor(Supabase.Gotrue.GotrueDiagnostics.SourceName),
             FlowType = options.AuthFlowType
         };
     }
@@ -59,6 +60,7 @@ public static class StatelessClient
             Headers = headers,
             Retry = options.PostgrestRetry,
             TracePropagation = options.TracePropagation,
+            Logger = options.LoggerFor(Supabase.Postgrest.PostgrestDiagnostics.SourceName),
             Timeout = options.PostgrestTimeout,
             HttpClient = options.HttpClient,
             Proxy = options.Proxy
@@ -112,7 +114,8 @@ public static class StatelessClient
             HttpClient = options.HttpClient,
             Proxy = options.Proxy,
             Retry = options.FunctionsRetry,
-            TracePropagation = options.TracePropagation
+            TracePropagation = options.TracePropagation,
+            Logger = options.LoggerFor(Supabase.Functions.FunctionsDiagnostics.SourceName)
         });
         client.GetHeaders = () => headers;
 

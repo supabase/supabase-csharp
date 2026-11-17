@@ -173,6 +173,28 @@ public class SupabaseOptions
     public Supabase.Core.Http.TracePropagation TracePropagation { get; set; } = Supabase.Core.Http.TracePropagation.Enabled;
 
     /// <summary>
+    /// Receives the diagnostics of every sub-client: request outcomes with timing and retry decisions at
+    /// <c>Debug</c>, and failures of background work (token refresh, session persistence, Realtime reconnection) at
+    /// <c>Warning</c>. Each sub-client logs under its own category (<c>Supabase.Gotrue</c>, <c>Supabase.Postgrest</c>,
+    /// <c>Supabase.Storage</c>, <c>Supabase.Functions</c>, <c>Supabase.Realtime</c>). Left null, the SDK logs nothing.
+    /// </summary>
+    /// <remarks>
+    /// Credentials, tokens, request and response bodies, query strings and header values are never logged. A logger that
+    /// throws never changes the outcome of a call. Storage uploads and downloads and Realtime's HTTP broadcast are not logged.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var client = new Supabase.Client(url, key, new SupabaseOptions { LoggerFactory = loggerFactory });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("client.observability.diagnostic_logging")]
+    public Microsoft.Extensions.Logging.ILoggerFactory? LoggerFactory { get; set; }
+
+    internal const string RealtimeLoggerCategory = "Supabase.Realtime";
+
+    internal Microsoft.Extensions.Logging.ILogger? LoggerFor(string category) => this.LoggerFactory?.CreateLogger(category);
+
+    /// <summary>
     /// The Supabase Auth Url Format
     /// </summary>
     public string AuthUrlFormat { get; set; } = "{0}/auth/v1";

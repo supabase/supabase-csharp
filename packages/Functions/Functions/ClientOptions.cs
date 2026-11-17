@@ -34,4 +34,11 @@ public sealed record ClientOptions
     /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>.
     /// </summary>
     public TracePropagation TracePropagation { get; init; } = TracePropagation.Enabled;
+
+    /// <summary>
+    /// Receives the diagnostics of this client: request outcomes and retry decisions at <c>Debug</c>, and failures of work that
+    /// runs in the background at <c>Warning</c>. Left null, the client logs nothing. Never carries credentials, tokens, bodies,
+    /// query strings or header values.
+    /// </summary>
+    public Microsoft.Extensions.Logging.ILogger? Logger { get; init; }
 }

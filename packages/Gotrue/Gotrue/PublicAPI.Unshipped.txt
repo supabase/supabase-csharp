@@ -1,7 +1,11 @@
 #nullable enable
+Supabase.Gotrue.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
+Supabase.Gotrue.ClientOptions.Logger.set -> void
 static Supabase.Gotrue.SessionPersistence.Disabled.get -> Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<Supabase.Gotrue.Session!>!
 Supabase.Gotrue.SessionPersistence
 Supabase.Gotrue.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Gotrue.ClientOptions.TracePropagation.set -> void
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.Logger.set -> void
 Supabase.Gotrue.StatelessClient.StatelessClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Gotrue.StatelessClient.StatelessClientOptions.TracePropagation.set -> void
