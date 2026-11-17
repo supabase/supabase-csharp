@@ -137,7 +137,15 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
 
     /// <summary>
     /// Executes a BULK INSERT query using the defined query params on the current instance.
+    /// Rows may carry different fields (for example when a column omits its null value): the request names the
+    /// union of the fields in the `columns` query parameter, unless <see cref="Columns(string[])"/> was called.
+    /// An empty collection writes nothing.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// await client.Table&lt;User&gt;().Insert(new[] { new User { Username = "ann" }, new User { Username = "bob", Data = "{}" } });
+    /// </code>
+    /// </example>
     /// <param name="models"></param>
     /// <param name="options"></param>
     /// <param name="cancellationToken"></param>
@@ -471,6 +479,8 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     /// By default the new record is returned. Set QueryOptions.ReturnType to Minimal if you don't need this value.
     /// By specifying the QueryOptions.OnConflict parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
     /// QueryOptions.DuplicateResolution.IgnoreDuplicates Specifies if duplicate rows should be ignored and not inserted.
+    /// Rows may carry different fields: the request names the union of the fields in the `columns` query parameter,
+    /// unless <see cref="Columns(string[])"/> was called.
     /// </summary>
     /// <param name="model"></param>
     /// <param name="options"></param>

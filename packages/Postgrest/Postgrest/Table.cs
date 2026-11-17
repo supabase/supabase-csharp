@@ -14,6 +14,7 @@ using System.Web;
 using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
 using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.BulkWrite;
 using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Extensions;
 using Supabase.Postgrest.Interfaces;
@@ -465,6 +466,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.bulk_rows_with_differing_fields")]
     public Task<ModeledResponse<TModel>> Insert(ICollection<TModel> models, QueryOptions? options = null,
         CancellationToken cancellationToken = default) =>
         this.PerformInsert(models, options, cancellationToken);
@@ -485,6 +487,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.bulk_rows_with_differing_fields")]
     public Task<ModeledResponse<TModel>> Upsert(ICollection<TModel> model, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
@@ -1005,8 +1008,9 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         if (this.stripNulls)
             requestHeaders.TryAdd("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
 
-        var url = this.GenerateUrl();
         var preparedData = this.PrepareRequestData(data, isInsert, isUpdate, isUpsert);
+        this.SpecifyColumnsOfBulkRows(preparedData);
+        var url = this.GenerateUrl();
 
         Hooks.Instance.NotifyOnRequestPreparedHandlers(this, this.options, method, url, this.serializerSettings,
             preparedData, requestHeaders);
@@ -1018,6 +1022,12 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
         var operation = PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert);
         return Helpers.MakeRequestAsync<TU>(this.options, this.httpClient, method, url, this.serializerSettings, preparedData, requestHeaders, this.GetHeaders, cancellationToken, operation);
+    }
+
+    private void SpecifyColumnsOfBulkRows(object? preparedData)
+    {
+        if (this.columns.Count == 0)
+            this.columns.AddRange(BulkColumns.UnionOf(preparedData));
     }
 
     private static string FindTableName(object? obj = null)
