@@ -1,3 +1,5 @@
 #nullable enable
+Supabase.Postgrest.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
+Supabase.Postgrest.ClientOptions.Logger.set -> void
 Supabase.Postgrest.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Postgrest.ClientOptions.TracePropagation.set -> void

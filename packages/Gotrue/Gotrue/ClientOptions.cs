@@ -46,6 +46,13 @@ public class ClientOptions
     public TracePropagation TracePropagation { get; set; } = TracePropagation.Enabled;
 
     /// <summary>
+    /// Receives the diagnostics of this client: request outcomes and retry decisions at <c>Debug</c>, and failures of work that
+    /// runs in the background at <c>Warning</c>. Left null, the client logs nothing. Never carries credentials, tokens, bodies,
+    /// query strings or header values.
+    /// </summary>
+    public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
+
+    /// <summary>
     /// Should the Client automatically handle refreshing the User's Token?
     /// </summary>
     [ImplementedCapability("auth.session.auto_refresh")]

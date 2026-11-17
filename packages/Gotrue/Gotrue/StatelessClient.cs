@@ -115,7 +115,8 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
     public IGotrueApi<User, Session> GetApi(StatelessClientOptions options) =>
         new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
         {
-            TracePropagation = options.TracePropagation
+            TracePropagation = options.TracePropagation,
+            Logger = options.Logger
         };
 
     /// <inheritdoc />
@@ -371,6 +372,13 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
         /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>.
         /// </summary>
         public TracePropagation TracePropagation { get; set; } = TracePropagation.Enabled;
+
+        /// <summary>
+        /// Receives the diagnostics of this client: request outcomes and retry decisions at <c>Debug</c>, and failures of work that
+        /// runs in the background at <c>Warning</c>. Left null, the client logs nothing. Never carries credentials, tokens, bodies,
+        /// query strings or header values.
+        /// </summary>
+        public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
 
         /// <summary>
         ///     Allows sign-in to return a session for an unconfirmed user. Defaults to false.

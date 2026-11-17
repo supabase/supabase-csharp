@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Supabase.Core.Logging;
 using Supabase.Gotrue.Interfaces;
 using static Supabase.Gotrue.Constants.AuthState;
 
@@ -37,10 +38,14 @@ public class TokenRefresh
     /// </summary>
     private volatile bool stopped;
 
+    private const string Component = GotrueDiagnostics.SourceName;
+
     /// <summary>
     /// Turn on debug logging for the TokenRefresh
     /// </summary>
     public bool Debug;
+
+    internal Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
 
     /// <summary>
     /// Sets up the TokenRefresh class, bound to a specific client
@@ -113,6 +118,7 @@ public class TokenRefresh
                 this._client.Debug("Refresh Timer stopped");
             this._refreshTimer?.Dispose();
             this._refreshTimer = null;
+            this.Logger.BackgroundWorkEvent(Component, "refresh timer stopped");
         }
     }
 
@@ -134,6 +140,7 @@ public class TokenRefresh
         }
         catch (Exception ex)
         {
+            this.Logger.BackgroundWorkFailed(Component, "Token refresh", ex);
             // Something unusually bad happened!
             if (this.Debug)
                 this._client.Debug(ex.Message, ex);
@@ -177,11 +184,14 @@ public class TokenRefresh
                 this._refreshTimer = new Timer(this.HandleRefreshTimerTick, null, refreshDueTime, Timeout.InfiniteTimeSpan);
             }
 
+            this.Logger.BackgroundWorkEvent(Component, "refresh timer scheduled");
+
             if (this.Debug)
                 this._client.Debug($"Refresh timer scheduled {refreshDueTime.TotalMinutes} minutes");
         }
         catch (Exception e)
         {
+            this.Logger.BackgroundWorkFailed(Component, "Refresh timer initialization", e);
             if (this.Debug)
                 this._client.Debug($"Failed to initialize refresh timer", e);
         }

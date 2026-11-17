@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Extensions;
+using Supabase.Core.Logging;
 using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.HttpSend;
 using Supabase.Realtime.Interfaces;
@@ -68,6 +69,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private readonly HandlerCollection<IRealtimeSocket.ErrorEventHandler> errorEventHandlers = new();
 
     private readonly string endpoint;
+    private const string LogComponent = "Supabase.Realtime";
+
     private readonly ClientOptions options;
     private readonly IWebsocketClient connection;
     private readonly HttpBroadcaster httpBroadcaster;
@@ -328,6 +331,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
             this.hasPendingHeartbeat = false;
             Debugger.Instance.Log(this, "Socket Heartbeat Timeout: Attempting to re-establish a connection.");
+            this.options.Logger.BackgroundWorkEvent(LogComponent, "heartbeat timed out, reconnecting");
             this.OnHeartbeat?.Invoke(HeartbeatStatus.Timeout, null);
             _ = this.connection.Reconnect();
             return;
@@ -361,6 +365,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.isReconnecting = false;
 
         Debugger.Instance.Log(this, $"Socket Connected to: {this.EndpointUrl}");
+        this.options.Logger.BackgroundWorkEvent(LogComponent, "connected");
 
         this.heartbeatTokenSource?.Cancel();
         this.hasPendingHeartbeat = false;
@@ -421,6 +426,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private void HandleSocketReconnectionHappened(ReconnectionInfo reconnectionInfo)
     {
         Debugger.Instance.Log(this, $"Socket Reconnection: {reconnectionInfo.Type}");
+        this.options.Logger.BackgroundWorkEvent(LogComponent, $"reconnection {reconnectionInfo.Type}");
 
         if (this.disconnectRequested)
         {
@@ -441,6 +447,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private void HandleSocketDisconnectionHappened(DisconnectionInfo disconnectionInfo)
     {
         Debugger.Instance.Log(this, $"Socket Disconnection: {disconnectionInfo.Type}", disconnectionInfo.Exception);
+        this.options.Logger.BackgroundWorkEvent(LogComponent, $"disconnected ({disconnectionInfo.Type})");
 
         if (this.isOpen)
         {
@@ -494,6 +501,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
                     this.connection.ReconnectTimeout = this.options.ReconnectAfterInterval(++this.reconnectionAttempts);
                     var nextInterval = DateTime.Now.AddSeconds(this.connection.ReconnectTimeout.Value.Seconds).ToLocalTime();
                     Debugger.Instance.Log(this, $"Next reconnection attempt will occur at: {nextInterval}");
+                    this.options.Logger.BackgroundWorkEvent(LogComponent, "reconnection attempt scheduled");
                     break;
                 }
             case false when disconnectionInfo is { Exception: not RealtimeException }:

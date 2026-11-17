@@ -1,8 +1,12 @@
 using System;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Supabase.Core.Logging;
 
 namespace Supabase.Core.Http;
 
@@ -17,44 +21,60 @@ public static class RetryExecutor
         SendAsync(client, requestFactory, options, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
     internal static Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
-        RetryOptions options, TracePropagation tracePropagation, CancellationToken cancellationToken) =>
-        SendAsync(client, requestFactory, options, tracePropagation, HttpCompletionOption.ResponseContentRead, cancellationToken);
+        RetryOptions options, TracePropagation tracePropagation, ILogger? logger, CancellationToken cancellationToken) =>
+        SendAsync(client, requestFactory, options, tracePropagation, logger, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
     /// <summary>Sends a request with the specified <paramref name="completionOption"/>.</summary>
     public static Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
         RetryOptions options, HttpCompletionOption completionOption, CancellationToken cancellationToken) =>
-        SendAsync(client, requestFactory, options, TracePropagation.Enabled, completionOption, cancellationToken);
+        SendAsync(client, requestFactory, options, TracePropagation.Enabled, null, completionOption, cancellationToken);
 
     internal static async Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
-        RetryOptions options, TracePropagation tracePropagation, HttpCompletionOption completionOption, CancellationToken cancellationToken)
+        RetryOptions options, TracePropagation tracePropagation, ILogger? logger, HttpCompletionOption completionOption, CancellationToken cancellationToken)
     {
         var attempt = 0;
         while (true)
         {
-            var (response, exception) = await Attempt(client, requestFactory, tracePropagation, completionOption, cancellationToken).ConfigureAwait(false);
+            var (response, exception, sent) = await Attempt(client, requestFactory, tracePropagation, logger, completionOption, cancellationToken).ConfigureAwait(false);
             if (!ShouldRetry(response, exception, attempt, options))
                 return response ?? throw exception!;
 
-            response?.Dispose();
             attempt++;
-            await Task.Delay(BackoffDelay(options, attempt), cancellationToken).ConfigureAwait(false);
+            var delay = BackoffDelay(options, attempt);
+            logger.RetryScheduled(sent.Method, sent.Uri, attempt, RetryReason(response, exception), delay);
+            response?.Dispose();
+            await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
         }
     }
 
-    private static async Task<(HttpResponseMessage? Response, HttpRequestException? Exception)> Attempt(
-        HttpClient client, Func<HttpRequestMessage> requestFactory, TracePropagation tracePropagation, HttpCompletionOption completionOption, CancellationToken cancellationToken)
+    private static async Task<(HttpResponseMessage? Response, HttpRequestException? Exception, SentRequest Sent)> Attempt(
+        HttpClient client, Func<HttpRequestMessage> requestFactory, TracePropagation tracePropagation, ILogger? logger,
+        HttpCompletionOption completionOption, CancellationToken cancellationToken)
     {
         using var request = requestFactory();
         TraceContext.Inject(request.Headers, tracePropagation);
+        var sent = new SentRequest(request.Method, request.RequestUri!);
+        var startTimestamp = Stopwatch.GetTimestamp();
         try
         {
-            return (await client.SendAsync(request, completionOption, cancellationToken).ConfigureAwait(false), null);
+            var response = await client.SendAsync(request, completionOption, cancellationToken).ConfigureAwait(false);
+            logger.RequestCompleted(sent.Method, sent.Uri, (int) response.StatusCode, ElapsedSince(startTimestamp));
+            return (response, null, sent);
         }
         catch (HttpRequestException e)
         {
-            return (null, e);
+            logger.RequestFailed(sent.Method, sent.Uri, e, ElapsedSince(startTimestamp));
+            return (null, e, sent);
         }
     }
+
+    private static TimeSpan ElapsedSince(long startTimestamp) =>
+        TimeSpan.FromSeconds((Stopwatch.GetTimestamp() - startTimestamp) / (double) Stopwatch.Frequency);
+
+    private static string RetryReason(HttpResponseMessage? response, HttpRequestException? exception) =>
+        exception is null ? ((int) response!.StatusCode).ToString(CultureInfo.InvariantCulture) : exception.GetType().Name;
+
+    private sealed record SentRequest(HttpMethod Method, Uri Uri);
 
     private static bool ShouldRetry(HttpResponseMessage? response, HttpRequestException? exception, int attempt, RetryOptions options) =>
         attempt < options.MaxRetries && (exception != null || options.RetryableStatusCodes.Contains((int) response!.StatusCode));
