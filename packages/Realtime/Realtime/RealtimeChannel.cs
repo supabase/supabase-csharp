@@ -164,7 +164,7 @@ public class RealtimeChannel : IRealtimeChannel
 
     private bool CanPush => this.IsJoined && this.Socket.IsConnected;
     private bool hasJoinedOnce;
-    private bool unsubscribed;
+    private int subscribeCancellations;
     private readonly Timer rejoinTimer;
     private bool isRejoining;
 
@@ -548,13 +548,15 @@ public class RealtimeChannel : IRealtimeChannel
 
     private async Task<Task<IRealtimeChannel>> SubscribeOnceConnected(Task connecting, int timeoutMs)
     {
-        this.unsubscribed = false;
+        var cancellations = this.subscribeCancellations;
         await connecting.ConfigureAwait(false);
-        if (this.unsubscribed)
+        if (cancellations != this.subscribeCancellations)
             throw ClosedBeforeItJoined();
 
         return this.Subscribe(timeoutMs);
     }
+
+    internal void CancelSubscribe() => this.subscribeCancellations++;
 
     private static RealtimeException ClosedBeforeItJoined() =>
         new("Channel closed before it joined") { Reason = FailureHint.Reason.ChannelJoinFailure };
@@ -565,7 +567,7 @@ public class RealtimeChannel : IRealtimeChannel
     [ImplementedCapability("realtime.channel.unsubscribe")]
     public IRealtimeChannel Unsubscribe()
     {
-        this.unsubscribed = true;
+        this.CancelSubscribe();
         this.IsSubscribed = false;
 
         this.NotifyStateChanged(ChannelState.Leaving);

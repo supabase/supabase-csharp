@@ -69,8 +69,8 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         {
             this.getHeaders = value;
 
-            if (this.Socket != null)
-                this.Socket.GetHeaders = value;
+            if ((this.Socket ?? this.nextSocket) is { } socket)
+                socket.GetHeaders = value;
         }
     }
 
@@ -155,7 +155,6 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         }
 
         (this.Socket, this.nextSocket) = (this.NextSocket(), null);
-        this.Socket.GetHeaders = this.GetHeaders;
 
         IRealtimeSocket.StateEventHandler? socketStateHandler = null;
         socketStateHandler = (sender, state) =>
@@ -530,7 +529,9 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     {
         if (this.subscriptions.ContainsKey(channel.Topic))
         {
-            if (!channel.IsClosed)
+            if (channel.IsClosed)
+                channel.CancelSubscribe();
+            else
                 channel.Unsubscribe();
 
             this.subscriptions.Remove(channel.Topic);
