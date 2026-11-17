@@ -21,9 +21,6 @@ internal static class ThirdPartyAuthorization
     internal static InvalidOperationException AuthDisabled() =>
         new($"Supabase Auth is not available because {nameof(SupabaseOptions)}.{nameof(SupabaseOptions.ThirdPartyAccessToken)} is set: sign-in and sessions belong to the third-party auth provider.");
 
-    internal static Storage.ClientOptions StorageOptions(Storage.ClientOptions options, Func<CancellationToken, Task<string?>>? accessToken) =>
-        accessToken is null ? options : StorageOptionsCarrying(options, accessToken);
-
     internal static Func<Task<string?>>? RealtimeAccessToken(Func<CancellationToken, Task<string?>>? accessToken, string? apiKey) =>
         accessToken is null ? null : () => AccessTokenOrApiKeyAsync(accessToken, apiKey);
 
@@ -32,18 +29,4 @@ internal static class ThirdPartyAuthorization
 
     private static bool CarriesAuthorization(Dictionary<string, string> headers) =>
         headers.Keys.Any(key => string.Equals(key, AuthorizationHeader, StringComparison.OrdinalIgnoreCase));
-
-    private static Storage.ClientOptions StorageOptionsCarrying(Storage.ClientOptions options, Func<CancellationToken, Task<string?>> accessToken) =>
-        new()
-        {
-            HttpUploadTimeout = options.HttpUploadTimeout,
-            HttpDownloadTimeout = options.HttpDownloadTimeout,
-            HttpRequestTimeout = options.HttpRequestTimeout,
-            HttpRequestClient = options.HttpRequestClient,
-            HttpUploadClient = options.HttpUploadClient,
-            HttpDownloadClient = options.HttpDownloadClient,
-            Proxy = options.Proxy,
-            Retry = options.Retry,
-            RetrieveAccessToken = accessToken,
-        };
 }

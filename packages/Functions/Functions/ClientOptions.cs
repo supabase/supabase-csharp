@@ -26,4 +26,12 @@ public sealed record ClientOptions
 
     /// <summary>Retry policy applied to each request. Default (<see cref="RetryOptions.MaxRetries"/> 0) sends once, unretried.</summary>
     public RetryOptions Retry { get; init; } = new();
+
+    /// <summary>
+    /// Whether the SDK adds the current trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each
+    /// request. Defaults to <see cref="TracePropagation.Enabled"/>. <see cref="TracePropagation.Disabled"/> stops the SDK
+    /// from injecting it; the .NET runtime's own injection is controlled through
+    /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>.
+    /// </summary>
+    public TracePropagation TracePropagation { get; init; } = TracePropagation.Enabled;
 }

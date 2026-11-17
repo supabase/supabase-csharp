@@ -31,6 +31,7 @@ public class StorageOptionsCopyTests
         [typeof(HttpClient)] = _ => new HttpClient(),
         [typeof(IWebProxy)] = _ => new WebProxy("http://proxy.example.com"),
         [typeof(RetryOptions)] = position => new RetryOptions { MaxRetries = position + 1 },
+        [typeof(TracePropagation)] = _ => TracePropagation.Disabled,
     };
 
     public static IEnumerable<object[]> CarriedSettings => CarriedSettingsOf().Select(setting => new object[] { setting.Name });

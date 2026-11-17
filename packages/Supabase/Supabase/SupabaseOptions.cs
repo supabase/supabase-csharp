@@ -124,10 +124,24 @@ public class SupabaseOptions
     public Supabase.Core.Http.RetryOptions FunctionsRetry { get; set; } = new();
 
     /// <summary>
-    /// An HttpClient shared by the Auth, Postgrest, and Functions clients. Storage configures its own set
-    /// of clients via <see cref="StorageClientOptions"/>; Realtime has no HTTP transport (see
-    /// <see cref="WebSocketFactory"/>). When null, each client builds and owns its own.
+    /// The HttpClient every Database, Auth, Storage and Edge Functions request is sent through. The SDK sets the
+    /// <c>apikey</c> and <c>Authorization</c> headers on each request and never changes the client, so one client can
+    /// serve several Supabase clients. When null, each sub-client builds and owns its own. Realtime has no HTTP
+    /// transport here (see <see cref="WebSocketFactory"/>).
     /// </summary>
+    /// <remarks>
+    /// Storage uses this client for requests, uploads and downloads alike, unless
+    /// <see cref="StorageClientOptions"/> names a client for one of them. The client's own
+    /// <see cref="System.Net.Http.HttpClient.Timeout"/> then governs uploads and downloads, so set it to
+    /// <see cref="System.Threading.Timeout.InfiniteTimeSpan"/> when you transfer large files.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var http = new HttpClient(new MyLoggingHandler());
+    /// var client = new Supabase.Client(url, key, new SupabaseOptions { HttpClient = http });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("client.request_configuration.custom_http_client")]
     public HttpClient? HttpClient { get; set; }
 
     /// <summary>
@@ -141,6 +155,22 @@ public class SupabaseOptions
     /// <see cref="System.Net.WebSockets.ClientWebSocket"/>-backed transport is used.
     /// </summary>
     public IWebSocketFactory? WebSocketFactory { get; set; }
+
+    /// <summary>
+    /// Whether the SDK adds the current trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each request it
+    /// sends. Defaults to <see cref="Supabase.Core.Http.TracePropagation.Enabled"/>; <see cref="Supabase.Core.Http.TracePropagation.Disabled"/> stops the SDK from
+    /// injecting it, and the .NET runtime's own injection is controlled through
+    /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>. Passed to the Auth, Database, Storage and Edge
+    /// Functions clients; Realtime does not propagate trace context.
+    /// </summary>
+    /// <example>
+    /// <code>
+    /// using var activity = source.StartActivity("checkout");
+    /// await client.From&lt;Order&gt;().Get();
+    /// </code>
+    /// </example>
+    [ImplementedCapability("client.observability.trace_propagation")]
+    public Supabase.Core.Http.TracePropagation TracePropagation { get; set; } = Supabase.Core.Http.TracePropagation.Enabled;
 
     /// <summary>
     /// The Supabase Auth Url Format

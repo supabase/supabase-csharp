@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.Functions.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Functions.ClientOptions.TracePropagation.init -> void

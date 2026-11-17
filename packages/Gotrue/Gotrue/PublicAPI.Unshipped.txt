@@ -1,3 +1,7 @@
 #nullable enable
 static Supabase.Gotrue.SessionPersistence.Disabled.get -> Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<Supabase.Gotrue.Session!>!
 Supabase.Gotrue.SessionPersistence
+Supabase.Gotrue.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Gotrue.ClientOptions.TracePropagation.set -> void
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.TracePropagation.set -> void
