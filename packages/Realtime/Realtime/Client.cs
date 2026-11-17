@@ -527,11 +527,10 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     [ImplementedCapability("realtime.client.remove_channel")]
     public void Remove(RealtimeChannel channel)
     {
+        channel.CancelSubscribe();
         if (this.subscriptions.ContainsKey(channel.Topic))
         {
-            if (channel.IsClosed)
-                channel.CancelSubscribe();
-            else
+            if (!channel.IsClosed)
                 channel.Unsubscribe();
 
             this.subscriptions.Remove(channel.Topic);
