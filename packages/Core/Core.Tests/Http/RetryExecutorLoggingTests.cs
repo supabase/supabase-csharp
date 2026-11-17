@@ -27,6 +27,8 @@ public class RetryExecutorLoggingTests
 
     private static readonly RetryOptions Fast = new() { MaxRetries = 2, BaseDelay = TimeSpan.FromMilliseconds(1), MaxDelay = TimeSpan.FromMilliseconds(5) };
 
+    private static readonly RetryOptions Delayed = new() { MaxRetries = 2, BaseDelay = TimeSpan.FromMilliseconds(30), MaxDelay = TimeSpan.FromMilliseconds(30), UseJitter = false };
+
     private static HttpRequestMessage Get() => new(HttpMethod.Get, $"http://localhost/rest/v1/todos?{SecretQuery}");
 
     private static async Task Send(HttpMessageHandler handler, ILogger? logger, RetryOptions? retry = null)
@@ -47,6 +49,15 @@ public class RetryExecutorLoggingTests
             record.EventName.Should().Be("RequestCompleted");
             record.Message.Should().StartWith("GET http://localhost/rest/v1/todos responded 200 in ");
         }
+    }
+
+    [TestMethod]
+    public async Task SendAsync_ShouldLogTheTimeTheAttemptTook()
+    {
+        var capture = new LogCapture();
+        await Send(new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)), capture.Logger);
+        var elapsedMs = double.Parse(capture.Records.Single().Message.Split(" in ")[1].Replace(" ms", string.Empty), System.Globalization.CultureInfo.InvariantCulture);
+        elapsedMs.Should().BeInRange(0, 10_000, "the elapsed time is measured from the start of the attempt");
     }
 
     [TestMethod]
@@ -125,6 +136,52 @@ public class RetryExecutorLoggingTests
         var handler = new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.OK));
         await Send(handler, logger);
         handler.CallCount.Should().Be(1, "a logger that throws never changes the outcome of a call");
+    }
+
+    [TestMethod]
+    public void SendAsync_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
+    {
+        var responses = new Queue<HttpStatusCode>([HttpStatusCode.ServiceUnavailable, HttpStatusCode.OK]);
+        using var client = new HttpClient(new SlowHandler(() => responses.Dequeue()));
+        BlockingCaller.Completes(() => RetryExecutor.SendAsync(client, Get, Delayed, TracePropagation.Disabled, new LogCapture().Logger, CancellationToken.None))
+            .Should().BeTrue("the SDK never resumes on the caller's synchronization context");
+    }
+
+    [TestMethod]
+    public async Task SendAsync_ShouldDisposeTheResponseItRetries()
+    {
+        var disposed = new List<bool>();
+        var attempts = 0;
+        await Send(new StubHandler(_ => ++attempts == 1
+            ? new HttpResponseMessage(HttpStatusCode.ServiceUnavailable) { Content = new DisposalTrackingContent(disposed) }
+            : new HttpResponseMessage(HttpStatusCode.OK)), null, Fast);
+        disposed.Should().Equal([true], "the response of an attempt that is retried is released before the next one");
+    }
+
+    private sealed class DisposalTrackingContent(List<bool> disposed) : HttpContent
+    {
+        protected override Task SerializeToStreamAsync(System.IO.Stream stream, System.Net.TransportContext? context) => Task.CompletedTask;
+
+        protected override bool TryComputeLength(out long length)
+        {
+            length = 0;
+            return true;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            disposed.Add(true);
+            base.Dispose(disposing);
+        }
+    }
+
+    private sealed class SlowHandler(Func<HttpStatusCode> respond) : HttpMessageHandler
+    {
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            await Task.Delay(20, cancellationToken).ConfigureAwait(false);
+            return new HttpResponseMessage(respond());
+        }
     }
 
     private sealed class StubHandler(Func<HttpRequestMessage, HttpResponseMessage> respond) : HttpMessageHandler

@@ -28,37 +28,32 @@ internal static class SdkLog
 
     internal static void RequestCompleted(this ILogger? logger, HttpMethod method, Uri uri, int statusCode, TimeSpan elapsed)
     {
-        if (logger is null)
-            return;
-        TryWrite(logger, LogLevel.Debug, () => Completed(logger, method.Method, UrlSanitizer.Sanitize(uri), statusCode, elapsed.TotalMilliseconds, null));
+        if (logger is not null)
+            TryWrite(logger, LogLevel.Debug, () => Completed(logger, method.Method, UrlSanitizer.Sanitize(uri), statusCode, elapsed.TotalMilliseconds, null));
     }
 
     internal static void RequestFailed(this ILogger? logger, HttpMethod method, Uri uri, Exception error, TimeSpan elapsed)
     {
-        if (logger is null)
-            return;
-        TryWrite(logger, LogLevel.Debug, () => Failed(logger, method.Method, UrlSanitizer.Sanitize(uri), error.GetType().Name, elapsed.TotalMilliseconds, null));
+        if (logger is not null)
+            TryWrite(logger, LogLevel.Debug, () => Failed(logger, method.Method, UrlSanitizer.Sanitize(uri), error.GetType().Name, elapsed.TotalMilliseconds, null));
     }
 
     internal static void RetryScheduled(this ILogger? logger, HttpMethod method, Uri uri, int attempt, string reason, TimeSpan delay)
     {
-        if (logger is null)
-            return;
-        TryWrite(logger, LogLevel.Debug, () => Retrying(logger, method.Method, UrlSanitizer.Sanitize(uri), attempt, reason, delay.TotalMilliseconds, null));
+        if (logger is not null)
+            TryWrite(logger, LogLevel.Debug, () => Retrying(logger, method.Method, UrlSanitizer.Sanitize(uri), attempt, reason, delay.TotalMilliseconds, null));
     }
 
     internal static void BackgroundWorkEvent(this ILogger? logger, string component, string description)
     {
-        if (logger is null)
-            return;
-        TryWrite(logger, LogLevel.Debug, () => BackgroundEvent(logger, component, description, null));
+        if (logger is not null)
+            TryWrite(logger, LogLevel.Debug, () => BackgroundEvent(logger, component, description, null));
     }
 
     internal static void BackgroundWorkFailed(this ILogger? logger, string component, string operation, Exception error)
     {
-        if (logger is null)
-            return;
-        TryWrite(logger, LogLevel.Warning, () => BackgroundFailure(logger, component, operation, error.GetType().Name, null));
+        if (logger is not null)
+            TryWrite(logger, LogLevel.Warning, () => BackgroundFailure(logger, component, operation, error.GetType().Name, null));
     }
 
     private static void TryWrite(ILogger logger, LogLevel level, Action write)
