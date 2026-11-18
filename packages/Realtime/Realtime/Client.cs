@@ -110,6 +110,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     private readonly Dictionary<string, RealtimeChannel> subscriptions;
 
     private int disconnectGeneration;
+    private int disconnects;
 
     /// <summary>
     /// Initializes a Client instance, this method should be called prior to any other method.
@@ -138,7 +139,10 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     [ImplementedCapability("realtime.client.connect")]
     public async Task<IRealtimeClient<RealtimeSocket, RealtimeChannel>> ConnectAsync()
     {
+        var disconnectsBefore = this.disconnects;
         await this.RefreshAuthAsync().ConfigureAwait(false);
+        if (disconnectsBefore != this.disconnects)
+            throw new RealtimeException("Disconnected before the socket opened.") { Reason = FailureHint.Reason.SocketError };
 
         var tsc = new TaskCompletionSource<IRealtimeClient<RealtimeSocket, RealtimeChannel>>();
 
@@ -363,6 +367,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     public IRealtimeClient<RealtimeSocket, RealtimeChannel> Disconnect(
         WebSocketCloseStatus code = WebSocketCloseStatus.NormalClosure, string reason = "Programmatic Disconnect")
     {
+        Interlocked.Increment(ref this.disconnects);
         if (this.Socket != null)
         {
             this.Socket.RemoveMessageReceivedHandler(this.HandleSocketMessageReceived);
@@ -500,7 +505,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         var socket = this.Socket;
         var generation = Interlocked.Increment(ref this.disconnectGeneration);
         await Task.Delay(delay).ConfigureAwait(false);
-        if (generation == this.disconnectGeneration && this.Socket == socket && this.subscriptions.Count == 0)
+        if (generation == this.disconnectGeneration && socket != null && this.Socket == socket && this.subscriptions.Count == 0)
             this.Disconnect();
     }
 

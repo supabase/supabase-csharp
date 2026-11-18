@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
+using Supabase.Realtime.Exceptions;
 
 namespace Realtime.Tests.Connection;
 
@@ -44,6 +45,35 @@ public class AccessTokenCallbackTests
         var connecting = () => this.client.ConnectAsync();
         (await connecting.Should().ThrowAsync<InvalidOperationException>()).Which.Should().BeSameAs(failure,
             "a token that cannot be resolved must fail the connect rather than open the socket with a stale or lower-privilege token (client.authentication_integration.third_party_auth)");
+    }
+
+    [TestMethod]
+    public async Task ConnectAsync_ShouldThrow_GivenDisconnectWhileTheCallbackIsPending()
+    {
+        var token = new TaskCompletionSource<string?>();
+        this.client = ClientOver(new FakeWebsocketClient { OpenOnStart = true }, () => token.Task);
+        var connecting = this.client.ConnectAsync();
+        this.client.Disconnect();
+        token.SetResult("jwt");
+        var act = () => connecting.WaitAsync(TimeSpan.FromSeconds(5));
+        (await act.Should().ThrowAsync<RealtimeException>().WithMessage("Disconnected before the socket opened.")).Which.Reason.Should().Be(FailureHint.Reason.SocketError,
+            "a Disconnect during the token lookup must not leave a socket that opens afterwards");
+    }
+
+    [TestMethod]
+    public async Task ConnectAsync_ShouldConnect_GivenTheIdleDelayPassesWhileTheCallbackIsPending()
+    {
+        var token = new TaskCompletionSource<string?>();
+        this.client = ClientOver(new FakeWebsocketClient { OpenOnStart = true }, null);
+        this.client.Options.DisconnectOnEmptyChannelsAfter = TimeSpan.FromMilliseconds(50);
+        await this.client.ConnectAsync();
+        this.client.Channel("room");
+        this.client.Disconnect();
+        this.client.Options.RetrieveAccessToken = () => token.Task;
+        var connecting = this.client.ConnectAsync();
+        await Task.Delay(200);
+        token.SetResult("jwt");
+        await connecting.Awaiting(connect => connect).Should().NotThrowAsync("the idle delay of a connection that is already closed must not end the next connect");
     }
 
     [TestMethod]
