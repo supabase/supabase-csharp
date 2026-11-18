@@ -12,8 +12,10 @@ using Websocket.Client;
 
 namespace Realtime.Tests.Support;
 
-internal sealed class FakeWebSocketFactory(IWebsocketClient client) : IWebSocketFactory
+internal sealed class FakeWebSocketFactory(params IWebsocketClient[] clients) : IWebSocketFactory
 {
+    private int created;
+
     public Uri? CreatedUri { get; private set; }
     public Func<Dictionary<string, string>>? HeadersProvider { get; private set; }
 
@@ -21,7 +23,7 @@ internal sealed class FakeWebSocketFactory(IWebsocketClient client) : IWebSocket
     {
         this.CreatedUri = uri;
         this.HeadersProvider = headers;
-        return client;
+        return clients[Math.Min(this.created++, clients.Length - 1)];
     }
 }
 
@@ -53,7 +55,7 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     {
         this.StartOrFailCallCount++;
         if (this.Handshake != null)
-            await this.Handshake.Task;
+            await this.Handshake.Task.ConfigureAwait(false);
         if (this.OpenOnStart || this.Handshake != null)
         {
             this.IsRunning = true;
