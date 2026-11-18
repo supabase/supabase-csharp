@@ -229,4 +229,9 @@ public class AdminClient : IGotrueAdminClient<User>
         var result = await this.api.UpdateUser(this.serviceKey, attributes);
         return result;
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.delete_client")]
+    public Task DeleteOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default) =>
+        this.api.DeleteOAuthClientAsync(this.serviceKey, clientId, cancellationToken);
 }

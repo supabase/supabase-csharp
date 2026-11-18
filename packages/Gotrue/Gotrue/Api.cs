@@ -1192,4 +1192,8 @@ public class Api : IGotrueApi<User, Session>
 
         return new ResendState { PKCEVerifier = verifier };
     }
+
+    /// <inheritdoc />
+    public Task DeleteOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/oauth/clients/{clientId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 }

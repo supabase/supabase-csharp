@@ -406,4 +406,13 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="flowType"></param>
     /// <returns></returns>
     Task<ResendState> Resend(ResendParameters resendParameters, OAuthFlowType flowType);
+
+    /// <summary>
+    /// Deletes an OAuth client registered with the project's OAuth 2.1 server.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="clientId">The id of the OAuth client to delete.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task DeleteOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default);
 }

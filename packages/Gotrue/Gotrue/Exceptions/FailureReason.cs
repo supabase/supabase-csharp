@@ -140,6 +140,11 @@ public static class FailureHint
         /// No user has the requested id.
         /// </summary>
         UserNotFound,
+
+        /// <summary>
+        /// No OAuth client has the requested id, or it was deleted.
+        /// </summary>
+        OAuthClientNotFound,
     }
 
     /// <summary>
@@ -168,6 +173,7 @@ public static class FailureHint
         ["sso_provider_not_found"] = SsoProviderNotFound,
         ["custom_provider_not_found"] = CustomProviderNotFound,
         ["user_not_found"] = UserNotFound,
+        ["oauth_client_not_found"] = OAuthClientNotFound,
         ["mfa_verification_failed"] = MfaChallengeUnverified,
         ["mfa_verification_rejected"] = MfaChallengeUnverified,
         ["mfa_challenge_expired"] = MfaChallengeUnverified,
