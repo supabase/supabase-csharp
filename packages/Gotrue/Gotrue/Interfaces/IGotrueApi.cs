@@ -20,6 +20,7 @@ using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
 using static Supabase.Gotrue.Constants;
 
@@ -457,4 +458,17 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <returns>The registered clients; empty when there are none.</returns>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates an OAuth client registered with the project's OAuth 2.1 server.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="clientId">The id of the OAuth client to update.</param>
+    /// <param name="changes">The changes; members left null keep their current value.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The updated client.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="changes" /> is null.</exception>
+    /// <exception cref="ArgumentException">No member of <paramref name="changes" /> is set.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<OAuthClient> UpdateOAuthClientAsync(string jwt, Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default);
 }

@@ -32,6 +32,7 @@ using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
 using Supabase.Gotrue.VerifyRecoveryCode;
 using static Supabase.Gotrue.Constants;
@@ -1226,5 +1227,13 @@ public class Api : IGotrueApi<User, Session>
     {
         var listed = await this.MakeRequestAsync<OAuthClientListResponse>(HttpMethod.Get, $"{this.Url}/admin/oauth/clients", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
         return OAuthClientListResponse.Read(listed);
+    }
+
+    /// <inheritdoc />
+    public async Task<OAuthClient> UpdateOAuthClientAsync(string jwt, Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default)
+    {
+        var body = UpdateOAuthClientBody.For(changes);
+        var updated = await this.MakeRequestAsync<OAuthClientResponse>(HttpMethod.Put, $"{this.Url}/admin/oauth/clients/{clientId}", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientResponse.Read(updated);
     }
 }

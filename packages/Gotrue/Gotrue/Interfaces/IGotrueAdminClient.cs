@@ -12,6 +12,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
 
 namespace Supabase.Gotrue.Interfaces;
@@ -671,4 +672,37 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates an OAuth client. Only the members set on <paramref name="changes" /> are sent; the others keep their
+    /// current value. Requires a full-access API key, such as the service_role key: call it from a server, never from
+    /// a client app.
+    /// </summary>
+    /// <param name="clientId">The id of the OAuth client to update.</param>
+    /// <param name="changes">The changes. A member left null cannot be cleared: the server reads it as unchanged.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The updated client, without its client secret.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="changes" /> is null. Nothing is sent.</exception>
+    /// <exception cref="ArgumentException">No member of <paramref name="changes" /> is set. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.OAuthClientNotFound" /> when no OAuth client has this id and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>validation_failed</c> when a setting is invalid (for
+    /// example a token endpoint authentication method that does not suit the client's type, more than ten redirect
+    /// URIs, or an unknown grant type) and <c>feature_disabled</c> when the OAuth server is disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.UpdateOAuthClient;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var updated = await admin.UpdateOAuthClientAsync(clientId, new OAuthClientChanges
+    /// {
+    ///     Name = "My App (production)",
+    ///     RedirectUris = new[] { new Uri("https://app.example.com/callback") },
+    /// });
+    /// </code>
+    /// </example>
+    Task<OAuthClient> UpdateOAuthClientAsync(Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default);
 }
