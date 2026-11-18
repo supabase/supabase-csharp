@@ -20,6 +20,7 @@ using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
+using Supabase.Gotrue.ListOAuthClients;
 using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.RegisterPasskey;
@@ -1205,4 +1206,11 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public Task DeleteOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default) =>
         this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/oauth/clients/{clientId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var listed = await this.MakeRequestAsync<OAuthClientListResponse>(HttpMethod.Get, $"{this.Url}/admin/oauth/clients", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientListResponse.Read(listed);
+    }
 }
