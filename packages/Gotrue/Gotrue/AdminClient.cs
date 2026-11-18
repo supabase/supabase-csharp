@@ -13,6 +13,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
 
 namespace Supabase.Gotrue;
@@ -240,4 +241,9 @@ public class AdminClient : IGotrueAdminClient<User>
     [ImplementedCapability("auth.oauth_admin.delete_client")]
     public Task DeleteOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default) =>
         this.api.DeleteOAuthClientAsync(this.serviceKey, clientId, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.update_client")]
+    public Task<OAuthClient> UpdateOAuthClientAsync(Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default) =>
+        this.api.UpdateOAuthClientAsync(this.serviceKey, clientId, changes, cancellationToken);
 }
