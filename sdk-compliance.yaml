@@ -748,7 +748,7 @@ features:
       - ClientOptions.RetrieveAccessToken
   realtime.configuration.deferred_disconnect:
     status: partially_implemented
-    note: "Opt-in (null by default, socket otherwise stays open); after the deferred disconnect the caller must call ConnectAsync again before creating channels, there is no automatic reconnect."
+    note: "Opt-in: null by default, so the socket stays open. Closing an idle socket by default is a breaking change planned for 9.0.0."
     symbols:
       - ClientOptions.DisconnectOnEmptyChannelsAfter
   realtime.configuration.custom_logger:
