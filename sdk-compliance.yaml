@@ -253,6 +253,10 @@ features:
     symbols:
       - AdminClient.UpdateUserById
 
+  auth.oauth_admin.create_client:
+    status: implemented
+    symbols:
+      - AdminClient.CreateOAuthClientAsync
   auth.oauth_admin.delete_client:
     status: implemented
     symbols:
