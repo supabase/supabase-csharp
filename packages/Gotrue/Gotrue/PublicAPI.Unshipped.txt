@@ -92,6 +92,11 @@ Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.TokenEndpointAuthMethod.get -> 
 Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Type.get -> Supabase.Gotrue.Common.OAuthClientType
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateOAuthClientAsync(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateOAuthClientAsync(string! jwt, Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
+Supabase.Gotrue.AdminClient.DeleteOAuthClientAsync(System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Gotrue.Api.DeleteOAuthClientAsync(string! jwt, System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Gotrue.Exceptions.FailureHint.Reason.OAuthClientNotFound = 25 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteOAuthClientAsync(System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteOAuthClientAsync(string! jwt, System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.SessionPersistence
 Supabase.Gotrue.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Gotrue.ClientOptions.TracePropagation.set -> void

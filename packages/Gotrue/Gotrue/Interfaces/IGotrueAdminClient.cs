@@ -580,4 +580,26 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<OAuthClientCredentials> CreateOAuthClientAsync(NewOAuthClient client, OAuthClientOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes an OAuth client registered with the project's OAuth 2.1 server. The client can no longer be retrieved,
+    /// and its credentials stop being accepted. Requires a full-access API key, such as the service_role key: call
+    /// it from a server, never from a client app.
+    /// </summary>
+    /// <param name="clientId">The id of the OAuth client to delete.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.OAuthClientNotFound" /> when no OAuth client has this id, including
+    /// one that was already deleted, and <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key
+    /// is not a full-access key; <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when
+    /// the OAuth server is disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// await admin.DeleteOAuthClientAsync(clientId);
+    /// </code>
+    /// </example>
+    Task DeleteOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default);
 }
