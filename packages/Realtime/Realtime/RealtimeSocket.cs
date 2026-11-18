@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Net.NetworkInformation;
 using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
@@ -70,6 +72,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
     private readonly string endpoint;
     private const string LogComponent = "Supabase.Realtime";
+    private const long NotWaiting = long.MaxValue;
+    private static readonly TimeSpan NetworkWakeSpacing = TimeSpan.FromSeconds(2);
 
     private readonly ClientOptions options;
     private readonly IWebsocketClient connection;
@@ -90,6 +94,10 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private bool disconnectRequested;
     private int reconnectionAttempts = 0;
     private readonly Timer reconnectTimer;
+    private readonly object reconnectLock = new();
+    private readonly Stopwatch attemptClock = new();
+    private long reconnectDueAt = NotWaiting;
+    private Action stopWatchingNetworkPath = () => { };
 
     /// <summary>
     /// Initializes this Socket instance.
@@ -115,6 +123,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
     void IDisposable.Dispose()
     {
+        this.disconnectRequested = true;
+        this.stopWatchingNetworkPath();
         this.heartbeatTokenSource?.Cancel();
         this.DisposeConnection();
     }
@@ -138,8 +148,14 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
         await this.connection.StartOrFail().ConfigureAwait(false);
 
+        if (this.options.MonitorsNetworkPath)
+            Debugger.Instance.Guard(this, () => this.stopWatchingNetworkPath = this.WatchNetworkPath(this.WakeReconnect));
+
         if (this.disconnectRequested)
+        {
+            this.stopWatchingNetworkPath();
             throw new RealtimeException("Disconnected before the socket opened.") { Reason = FailureHint.Reason.SocketError };
+        }
     }
 
     /// <summary>
@@ -150,6 +166,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     public void Disconnect(WebSocketCloseStatus code = WebSocketCloseStatus.NormalClosure, string reason = "")
     {
         this.disconnectRequested = true;
+        this.stopWatchingNetworkPath();
         this.heartbeatTokenSource?.Cancel();
         this.connection.IsReconnectionEnabled = false;
         this.connection.Stop(code, reason);
@@ -453,6 +470,9 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         Debugger.Instance.Log(this, $"Socket Disconnection: {disconnectionInfo.Type}", disconnectionInfo.Exception);
         this.options.Logger.BackgroundWorkEvent(LogComponent, $"disconnected ({disconnectionInfo.Type})");
 
+        if (disconnectionInfo.Type != DisconnectionType.Error)
+            this.MarkAttemptStarted();
+
         if (this.isOpen)
         {
             this.isOpen = false;
@@ -506,7 +526,12 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
                         break;
 
                     var delay = new TimeSpan(Math.Max(0, this.options.ReconnectAfterInterval(++this.reconnectionAttempts).Ticks));
-                    this.reconnectTimer.Change(delay, Timeout.InfiniteTimeSpan);
+                    lock (this.reconnectLock)
+                    {
+                        this.reconnectDueAt = this.attemptClock.Elapsed.Ticks + delay.Ticks;
+                        this.reconnectTimer.Change(delay, Timeout.InfiniteTimeSpan);
+                    }
+
                     var nextInterval = DateTime.Now.Add(delay);
                     Debugger.Instance.Log(this, $"Next reconnection attempt will occur at: {nextInterval}");
                     this.options.Logger.BackgroundWorkEvent(LogComponent, "reconnection attempt scheduled");
@@ -520,8 +545,48 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
     private void Reconnect()
     {
+        this.MarkAttemptStarted();
         if (!this.disconnectRequested && !this.connection.IsRunning)
             _ = this.connection.Reconnect();
+    }
+
+    private void MarkAttemptStarted()
+    {
+        lock (this.reconnectLock)
+        {
+            this.reconnectDueAt = NotWaiting;
+            this.reconnectTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+            this.attemptClock.Restart();
+        }
+    }
+
+    private void WakeReconnect()
+    {
+        lock (this.reconnectLock)
+        {
+            if (this.reconnectDueAt != NotWaiting)
+            {
+                var wakeAt = Math.Min(this.reconnectDueAt, NetworkWakeSpacing.Ticks);
+                this.reconnectTimer.Change(new TimeSpan(Math.Max(0, wakeAt - this.attemptClock.Elapsed.Ticks)), Timeout.InfiniteTimeSpan);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Watches the platform's network monitor: runs <paramref name="networkIsBack"/> each time the platform reports a
+    /// network change that leaves the device with a network, until the returned action is called.
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    internal virtual Action WatchNetworkPath(Action networkIsBack)
+    {
+        void Report(object? sender, EventArgs change) => Debugger.Instance.Guard(this, () =>
+        {
+            if (NetworkInterface.GetIsNetworkAvailable())
+                networkIsBack();
+        });
+
+        NetworkChange.NetworkAddressChanged += Report;
+        return () => NetworkChange.NetworkAddressChanged -= Report;
     }
 
     /// <summary>

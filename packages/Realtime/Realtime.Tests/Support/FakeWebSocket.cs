@@ -81,6 +81,9 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     /// <summary>Completes when the socket forces a reconnect.</summary>
     public TaskCompletionSource Reconnected { get; } = new();
 
+    /// <summary>How many times the socket forced a reconnect.</summary>
+    public int ReconnectCallCount { get; private set; }
+
     /// <summary>When set, every channel join gets an <c>ok</c> reply, as from a server that authorizes it.</summary>
     public bool AnswerJoins { get; init; }
 
@@ -128,6 +131,7 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
 
     public Task Reconnect()
     {
+        this.ReconnectCallCount++;
         this.Reconnected.TrySetResult();
         return Task.CompletedTask;
     }

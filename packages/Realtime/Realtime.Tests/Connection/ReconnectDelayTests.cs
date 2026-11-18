@@ -79,6 +79,16 @@ public class ReconnectDelayTests
     }
 
     [TestMethod]
+    public async Task ReconnectAfterInterval_ShouldForgetTheWait_GivenTheTransportStartedItsOwnAttempt()
+    {
+        this.delay = TimeSpan.FromMilliseconds(100);
+        await this.client.ConnectAsync();
+        this.FailAnAttempt();
+        this.socket.Fail(new InvalidOperationException("reset"), DisconnectionType.Lost);
+        await this.socket.Awaiting(s => s.Reconnected.Task).Should().NotCompleteWithinAsync(AfterTheDelay, "the client must not retry on top of an attempt the transport started itself");
+    }
+
+    [TestMethod]
     public async Task ReconnectAfterInterval_ShouldNotBeAsked_GivenALostConnection()
     {
         await this.client.ConnectAsync();
