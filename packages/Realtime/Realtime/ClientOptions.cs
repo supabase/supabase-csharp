@@ -57,7 +57,7 @@ public class ClientOptions
     /// When set, the socket disconnects once the last channel has been closed for this long, and the next
     /// <c>Subscribe</c> connects again. Left null, the socket stays open.
     /// </summary>
-    [PartialCapability("realtime.configuration.deferred_disconnect", "Opt-in (null by default, socket otherwise stays open).")]
+    [PartialCapability("realtime.configuration.deferred_disconnect", "Opt-in: null by default, so the socket stays open. Closing an idle socket by default is a breaking change planned for 9.0.0.")]
     public TimeSpan? DisconnectOnEmptyChannelsAfter { get; set; }
 
     /// <summary>
