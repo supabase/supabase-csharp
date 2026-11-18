@@ -265,6 +265,10 @@ features:
     status: implemented
     symbols:
       - AdminClient.GetOAuthClientAsync
+  auth.oauth_admin.list_clients:
+    status: implemented
+    symbols:
+      - AdminClient.ListOAuthClientsAsync
   auth.oauth_admin.regenerate_client_secret:
     status: implemented
     symbols:
