@@ -261,6 +261,14 @@ features:
     status: implemented
     symbols:
       - AdminClient.DeleteOAuthClientAsync
+  auth.oauth_admin.get_client:
+    status: implemented
+    symbols:
+      - AdminClient.GetOAuthClientAsync
+  auth.oauth_admin.list_clients:
+    status: implemented
+    symbols:
+      - AdminClient.ListOAuthClientsAsync
   auth.oauth_admin.regenerate_client_secret:
     status: implemented
     symbols:

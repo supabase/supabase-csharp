@@ -253,6 +253,11 @@ public class AdminClient : IGotrueAdminClient<User>
         this.api.GetOAuthClientAsync(this.serviceKey, clientId, cancellationToken);
 
     /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.list_clients")]
+    public Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(CancellationToken cancellationToken = default) =>
+        this.api.ListOAuthClientsAsync(this.serviceKey, cancellationToken);
+
+    /// <inheritdoc />
     [ImplementedCapability("auth.oauth_admin.update_client")]
     public Task<OAuthClient> UpdateOAuthClientAsync(Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default) =>
         this.api.UpdateOAuthClientAsync(this.serviceKey, clientId, changes, cancellationToken);
