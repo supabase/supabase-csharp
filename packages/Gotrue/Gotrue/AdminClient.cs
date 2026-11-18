@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateOAuthClient;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListSsoProviders;
@@ -229,6 +230,11 @@ public class AdminClient : IGotrueAdminClient<User>
         var result = await this.api.UpdateUser(this.serviceKey, attributes);
         return result;
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.create_client")]
+    public Task<OAuthClientCredentials> CreateOAuthClientAsync(NewOAuthClient client, OAuthClientOptions? options = null, CancellationToken cancellationToken = default) =>
+        this.api.CreateOAuthClientAsync(this.serviceKey, client, options, cancellationToken);
 
     /// <inheritdoc />
     [ImplementedCapability("auth.oauth_admin.delete_client")]

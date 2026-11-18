@@ -12,6 +12,7 @@ using Supabase.Core.Http;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateOAuthClient;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
@@ -1191,6 +1192,14 @@ public class Api : IGotrueApi<User, Session>
         await this.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers).ConfigureAwait(false);
 
         return new ResendState { PKCEVerifier = verifier };
+    }
+
+    /// <inheritdoc />
+    public async Task<OAuthClientCredentials> CreateOAuthClientAsync(string jwt, NewOAuthClient client, OAuthClientOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var body = CreateOAuthClientBody.For(client, options);
+        var created = await this.MakeRequestAsync<OAuthClientResponse>(HttpMethod.Post, $"{this.Url}/admin/oauth/clients", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientResponse.ReadCredentials(created);
     }
 
     /// <inheritdoc />

@@ -1,0 +1,1 @@
+﻿{"client_name":"My App","client_type":"confidential","token_endpoint_auth_method":"client_secret_basic","redirect_uris":["https://app.example.com/callback"]}
