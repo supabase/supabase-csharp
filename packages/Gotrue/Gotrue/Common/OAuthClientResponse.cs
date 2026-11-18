@@ -47,6 +47,9 @@ internal sealed record OAuthClientResponse
     internal static OAuthClientCredentials ReadCredentials(OAuthClientResponse? response) =>
         Require(response).ToCredentials();
 
+    internal static OAuthClient Read(OAuthClientResponse? response) =>
+        Require(response).ToOAuthClient();
+
     private static OAuthClientResponse Require(OAuthClientResponse? response) =>
         response ?? throw new GotrueException("The auth server returned no OAuth client.");
 
