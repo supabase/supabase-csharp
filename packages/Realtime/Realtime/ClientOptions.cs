@@ -54,10 +54,10 @@ public class ClientOptions
     public TimeSpan ProbeTimeout { get; set; } = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// When set, the socket disconnects once the last channel has been closed for this long. Call
-    /// <c>ConnectAsync</c> again before creating new channels. Left null, the socket stays open.
+    /// When set, the socket disconnects once the last channel has been closed for this long, and the next
+    /// <c>Subscribe</c> connects again. Left null, the socket stays open.
     /// </summary>
-    [PartialCapability("realtime.configuration.deferred_disconnect", "Opt-in (null by default, socket otherwise stays open); after the deferred disconnect the caller must call ConnectAsync again before creating channels, there is no automatic reconnect.")]
+    [PartialCapability("realtime.configuration.deferred_disconnect", "Opt-in: null by default, so the socket stays open. Closing an idle socket by default is a breaking change planned for 9.0.0.")]
     public TimeSpan? DisconnectOnEmptyChannelsAfter { get; set; }
 
     /// <summary>

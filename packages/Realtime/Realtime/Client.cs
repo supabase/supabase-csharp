@@ -69,8 +69,8 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         {
             this.getHeaders = value;
 
-            if (this.Socket != null)
-                this.Socket.GetHeaders = value;
+            if ((this.Socket ?? this.nextSocket) is { } socket)
+                socket.GetHeaders = value;
         }
     }
 
@@ -111,6 +111,8 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
     private int disconnectGeneration;
     private int disconnects;
+    private RealtimeSocket? nextSocket;
+    private Task connecting = Task.CompletedTask;
 
     /// <summary>
     /// Initializes a Client instance, this method should be called prior to any other method.
@@ -152,8 +154,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             return this;
         }
 
-        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options) { OnHeartbeat = this.NotifyHeartbeat };
-        this.Socket.GetHeaders = this.GetHeaders;
+        (this.Socket, this.nextSocket) = (this.NextSocket(), null);
 
         IRealtimeSocket.StateEventHandler? socketStateHandler = null;
         socketStateHandler = (sender, state) =>
@@ -174,7 +175,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
 
         try
         {
-            await this.Socket.Connect();
+            await this.Socket.Connect().ConfigureAwait(false);
             await tsc.Task;
         }
         catch (WebsocketException ex)
@@ -205,7 +206,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
             return this;
         }
 
-        this.Socket = new RealtimeSocket(this.realtimeUrl, this.Options) { OnHeartbeat = this.NotifyHeartbeat };
+        (this.Socket, this.nextSocket) = (this.NextSocket(), null);
         IRealtimeSocket.StateEventHandler? socketStateHandler = null;
         IRealtimeSocket.ErrorEventHandler? errorEventHandler = null;
 
@@ -432,7 +433,6 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// </param>
     /// <param name="options">Custom channel options for configuring the subscription</param>
     /// <returns>A RealtimeChannel instance representing the subscription</returns>
-    /// <exception cref="Exception">Thrown when Socket is null, indicating Connect() was not called</exception>
     public RealtimeChannel Channel(string channelName, ChannelOptions options)
     {
         var topic = channelName.StartsWith("realtime:", StringComparison.Ordinal)
@@ -442,11 +442,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         if (this.subscriptions.TryGetValue(topic, out var channel))
             return channel;
 
-        if (this.Socket == null)
-            throw new Exception("Socket must exist, was `Connect` called?");
-
-        var subscription = new RealtimeChannel(this.Socket!, topic, options);
-        subscription.AddStateChangedHandler(this.HandleChannelStateChanged);
+        var subscription = this.NewChannel(topic, options);
         this.subscriptions.Add(topic, subscription);
 
         return subscription;
@@ -470,20 +466,35 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
         if (this.subscriptions.TryGetValue(key, out var channel))
             return channel;
 
-        if (this.Socket == null)
-            throw new Exception("Socket must exist, was `Connect` called?");
-
         var changesOptions = new PostgresChangesOptions(schema, table,
             filter: column != null && value != null ? $"{column}=eq.{value}" : null, parameters: parameters);
         var options = ChannelOptions.Public(this.Options, () => this.AccessToken, this.SerializerSettings);
 
-        var subscription = new RealtimeChannel(this.Socket!, key, options);
+        var subscription = this.NewChannel(key, options);
         subscription.RegisterPostgresChangesOptions(changesOptions);
-        subscription.AddStateChangedHandler(this.HandleChannelStateChanged);
 
         this.subscriptions.Add(key, subscription);
 
         return subscription;
+    }
+
+    private RealtimeSocket NextSocket() =>
+        this.nextSocket ??= new(this.realtimeUrl, this.Options) { OnHeartbeat = this.NotifyHeartbeat, GetHeaders = this.GetHeaders };
+
+    private RealtimeChannel NewChannel(string topic, ChannelOptions options)
+    {
+        var channel = new RealtimeChannel(this.Socket ?? this.NextSocket(), topic, options) { ConnectClient = this.ConnectForChannel };
+        channel.ClientSocket = () => this.subscriptions.GetValueOrDefault(topic, channel) == channel ? this.Socket : null;
+        channel.AddStateChangedHandler(this.HandleChannelStateChanged);
+        return channel;
+    }
+
+    private Task? ConnectForChannel()
+    {
+        if (!this.connecting.IsCompleted)
+            return this.connecting;
+
+        return this.Socket == null ? this.connecting = this.ConnectAsync() : null;
     }
 
     // Forget a closed channel so Channel(name) returns a fresh one. If the old one joins again, it comes back.
@@ -516,6 +527,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     [ImplementedCapability("realtime.client.remove_channel")]
     public void Remove(RealtimeChannel channel)
     {
+        channel.CancelSubscribe();
         if (this.subscriptions.ContainsKey(channel.Topic))
         {
             if (!channel.IsClosed)
