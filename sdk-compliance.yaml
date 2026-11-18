@@ -253,6 +253,11 @@ features:
     symbols:
       - AdminClient.UpdateUserById
 
+  auth.oauth_admin.delete_client:
+    status: implemented
+    symbols:
+      - AdminClient.DeleteOAuthClientAsync
+
   auth.passkey_admin.delete_passkey:
     status: implemented
     symbols:
