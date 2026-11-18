@@ -604,6 +604,30 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     Task DeleteOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Generates a new client secret for a confidential OAuth client. The previous secret is replaced, and the server
+    /// shows the new one only in this response. Requires a full-access API key, such as the service_role key: call it
+    /// from a server, never from a client app.
+    /// </summary>
+    /// <param name="clientId">The id of the confidential OAuth client.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The client and its new client secret. Store the secret now: it is not retrievable later.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.OAuthClientNotFound" /> when no OAuth client has this id and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>validation_failed</c> when the client is public, since
+    /// it has no secret, and <c>feature_disabled</c> when the OAuth server is disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var rotated = await admin.RegenerateOAuthClientSecretAsync(clientId);
+    /// var newSecret = rotated.ClientSecret;
+    /// </code>
+    /// </example>
+    Task<OAuthClientCredentials> RegenerateOAuthClientSecretAsync(Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Fetches an OAuth client registered with the project's OAuth 2.1 server. The client secret is never returned:
     /// the server shows it only when the client is created or its secret is regenerated. Requires a full-access API
     /// key, such as the service_role key: call it from a server, never from a client app.
