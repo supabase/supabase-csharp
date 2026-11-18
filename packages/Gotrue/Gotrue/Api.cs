@@ -1208,6 +1208,13 @@ public class Api : IGotrueApi<User, Session>
         this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/oauth/clients/{clientId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
 
     /// <inheritdoc />
+    public async Task<OAuthClientCredentials> RegenerateOAuthClientSecretAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default)
+    {
+        var regenerated = await this.MakeRequestAsync<OAuthClientResponse>(HttpMethod.Post, $"{this.Url}/admin/oauth/clients/{clientId}/regenerate_secret", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientResponse.ReadCredentials(regenerated);
+    }
+
+    /// <inheritdoc />
     public async Task<OAuthClient> UpdateOAuthClientAsync(string jwt, Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default)
     {
         var body = UpdateOAuthClientBody.For(changes);
