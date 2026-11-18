@@ -273,6 +273,10 @@ features:
     status: implemented
     symbols:
       - AdminClient.RegenerateOAuthClientSecretAsync
+  auth.oauth_admin.update_client:
+    status: implemented
+    symbols:
+      - AdminClient.UpdateOAuthClientAsync
 
   auth.passkey_admin.delete_passkey:
     status: implemented
