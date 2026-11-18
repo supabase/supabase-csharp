@@ -227,6 +227,12 @@ rp_display_name = "Supabase C# SDK tests"
 rp_id = "localhost"
 rp_origins = ["http://localhost:3000"]
 
+# OAuth 2.1 server (/auth/v1/admin/oauth/clients), used by the OAuth client admin E2E tests.
+[auth.oauth_server]
+enabled = true
+authorization_url_path = "/oauth/consent"
+allow_dynamic_registration = false
+
 # Multi-factor-authentication is available to Supabase Pro plan.
 [auth.mfa]
 # Control how many MFA factors can be enrolled at once per user.
