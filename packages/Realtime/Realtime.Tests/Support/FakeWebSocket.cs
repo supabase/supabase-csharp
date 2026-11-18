@@ -137,8 +137,8 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     public void Receive(string json) => this.messageReceived.OnNext(ResponseMessage.TextMessage(json));
 
     /// <summary>Reports a connection failure as if the transport had dropped with an error.</summary>
-    public void Fail(Exception exception) =>
-        this.disconnectionHappened.OnNext(DisconnectionInfo.Create(DisconnectionType.Error, null, exception));
+    public void Fail(Exception exception, DisconnectionType type = DisconnectionType.Error) =>
+        this.disconnectionHappened.OnNext(DisconnectionInfo.Create(type, null, exception));
 
     public void Dispose() { }
 

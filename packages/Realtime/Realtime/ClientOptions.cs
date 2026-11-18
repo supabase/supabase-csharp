@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Postgrest.Interfaces;
@@ -14,6 +15,8 @@ namespace Supabase.Realtime;
 /// </summary>
 public class ClientOptions
 {
+    private static readonly ThreadLocal<Random> RandomProvider = new(() => new Random(Guid.NewGuid().GetHashCode()));
+
     /// <summary>
     /// The function to encode outgoing messages. Defaults to JSON
     /// </summary>
@@ -58,14 +61,12 @@ public class ClientOptions
     public TimeSpan? DisconnectOnEmptyChannelsAfter { get; set; }
 
     /// <summary>
-    /// The interval to reconnect
+    /// The delay before the next reconnect attempt after one failed, given the attempt number starting at 1. Defaults
+    /// to a random delay of up to 1, 2, 4, 8 and 16 seconds for the first attempts, then up to 30 seconds.
     /// </summary>
     [ImplementedCapability("realtime.configuration.reconnect_backoff")]
-    public Func<int, TimeSpan> ReconnectAfterInterval { get; set; } = (tries) =>
-    {
-        var intervals = new[] { 30, 45, 60, 120 };
-        return TimeSpan.FromSeconds(tries < intervals.Length ? intervals[tries] : intervals[intervals.Length - 1]);
-    };
+    public Func<int, TimeSpan> ReconnectAfterInterval { get; set; } = attempt =>
+        TimeSpan.FromSeconds(RandomProvider.Value!.NextDouble() * Math.Min(30, Math.Pow(2, attempt - 1)));
 
     /// <summary>
     /// Request headers to be appended to the connection string.
