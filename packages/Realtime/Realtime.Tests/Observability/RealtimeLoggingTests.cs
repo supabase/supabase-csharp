@@ -11,8 +11,9 @@ using Supabase.Realtime;
 namespace Realtime.Tests.Observability;
 
 /// <summary>
-/// What the socket tells a logger: its lifecycle (connected, disconnected, reconnecting, heartbeat timeout) at Debug and the
-/// failure of a background token refresh at Warning, without the endpoint, tokens or payloads (client.observability.diagnostic_logging).
+/// What the client tells a logger: the socket's lifecycle (connected, disconnected, reconnecting, heartbeat timeout) and every
+/// channel's state changes at Debug, and the failure of a background token refresh at Warning, without the endpoint, tokens or
+/// payloads (client.observability.diagnostic_logging, realtime.configuration.custom_logger).
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
@@ -42,6 +43,15 @@ public class RealtimeLoggingTests
     {
         await this.ClientOver(new FakeWebsocketClient { OpenOnStart = true }).ConnectAsync();
         this.Messages().Should().Contain("Supabase.Realtime: connected");
+    }
+
+    [TestMethod]
+    public async Task Channel_ShouldLogItsStateAtDebug_GivenItJoined()
+    {
+        var realtime = this.ClientOver(new FakeWebsocketClient { OpenOnStart = true, AnswerJoins = true });
+        await realtime.ConnectAsync();
+        await realtime.Channel("room").Subscribe();
+        this.Messages().Should().Contain("Supabase.Realtime: channel realtime:room Joined", "a channel's state change is a lifecycle diagnostic");
     }
 
     [TestMethod]

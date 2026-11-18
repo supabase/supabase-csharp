@@ -118,8 +118,10 @@ public class ClientOptions
     public Func<Task<string?>>? RetrieveAccessToken { get; set; }
 
     /// <summary>
-    /// Receives the socket's lifecycle diagnostics (connected, disconnected, reconnecting, heartbeat timeout) at <c>Debug</c>.
-    /// Left null, the client logs nothing. Never carries credentials, tokens, payloads or the endpoint's query string.
+    /// Receives the socket's lifecycle diagnostics (connected, disconnected, reconnecting, heartbeat timeout) and every
+    /// channel's state changes at <c>Debug</c>. Left null, the client logs nothing. Never carries credentials, tokens,
+    /// payloads or the endpoint's query string.
     /// </summary>
+    [ImplementedCapability("realtime.configuration.custom_logger")]
     public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
 }
