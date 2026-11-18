@@ -602,4 +602,27 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task DeleteOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Fetches an OAuth client registered with the project's OAuth 2.1 server. The client secret is never returned:
+    /// the server shows it only when the client is created or its secret is regenerated. Requires a full-access API
+    /// key, such as the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="clientId">The id of the OAuth client.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The OAuth client.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.OAuthClientNotFound" /> when no OAuth client has this id, or it was deleted, and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when the OAuth server is disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var client = await admin.GetOAuthClientAsync(clientId);
+    /// Console.WriteLine(client.Name);
+    /// </code>
+    /// </example>
+    Task<OAuthClient> GetOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default);
 }

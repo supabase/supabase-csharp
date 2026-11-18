@@ -240,4 +240,9 @@ public class AdminClient : IGotrueAdminClient<User>
     [ImplementedCapability("auth.oauth_admin.delete_client")]
     public Task DeleteOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default) =>
         this.api.DeleteOAuthClientAsync(this.serviceKey, clientId, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.get_client")]
+    public Task<OAuthClient> GetOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default) =>
+        this.api.GetOAuthClientAsync(this.serviceKey, clientId, cancellationToken);
 }

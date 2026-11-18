@@ -1205,4 +1205,11 @@ public class Api : IGotrueApi<User, Session>
     /// <inheritdoc />
     public Task DeleteOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default) =>
         this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/oauth/clients/{clientId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<OAuthClient> GetOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default)
+    {
+        var found = await this.MakeRequestAsync<OAuthClientResponse>(HttpMethod.Get, $"{this.Url}/admin/oauth/clients/{clientId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientResponse.Read(found);
+    }
 }
