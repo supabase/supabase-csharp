@@ -56,7 +56,7 @@ internal sealed record OAuthClientResponse
     private OAuthClientCredentials ToCredentials() =>
         new() { Client = this.ToOAuthClient(), ClientSecret = this.ClientSecret };
 
-    private OAuthClient ToOAuthClient() =>
+    internal OAuthClient ToOAuthClient() =>
         new()
         {
             ClientId = this.ClientId,

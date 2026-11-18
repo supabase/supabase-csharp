@@ -649,4 +649,26 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<OAuthClient> GetOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the OAuth clients registered with the project's OAuth 2.1 server, newest first. The server does not
+    /// paginate: it returns every client. Requires a full-access API key, such as the service_role key: call it from
+    /// a server, never from a client app.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered clients, none of which carries its client secret; empty when there are none.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when the OAuth server is disabled
+    /// on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// foreach (var client in await admin.ListOAuthClientsAsync())
+    ///     Console.WriteLine($"{client.ClientId} {client.Name}");
+    /// </code>
+    /// </example>
+    Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(CancellationToken cancellationToken = default);
 }

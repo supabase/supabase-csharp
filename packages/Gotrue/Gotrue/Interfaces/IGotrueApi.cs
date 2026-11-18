@@ -448,4 +448,13 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <returns>The OAuth client.</returns>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task<OAuthClient> GetOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the OAuth clients registered with the project's OAuth 2.1 server.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered clients; empty when there are none.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(string jwt, CancellationToken cancellationToken = default);
 }
