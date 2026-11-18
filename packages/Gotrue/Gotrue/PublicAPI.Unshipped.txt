@@ -22,7 +22,9 @@ static Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.operator !=(Supabase.Got
 static Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.operator ==(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient? left, Supabase.Gotrue.CreateOAuthClient.NewOAuthClient? right) -> bool
 static Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Public(string! name, System.Collections.Generic.IReadOnlyList<System.Uri!>! redirectUris) -> Supabase.Gotrue.CreateOAuthClient.NewOAuthClient!
 Supabase.Gotrue.AdminClient.CreateOAuthClientAsync(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
+Supabase.Gotrue.AdminClient.RegenerateOAuthClientSecretAsync(System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
 Supabase.Gotrue.Api.CreateOAuthClientAsync(string! jwt, Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
+Supabase.Gotrue.Api.RegenerateOAuthClientSecretAsync(string! jwt, System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
 Supabase.Gotrue.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
 Supabase.Gotrue.ClientOptions.Logger.set -> void
 static Supabase.Gotrue.SessionPersistence.Disabled.get -> Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<Supabase.Gotrue.Session!>!
@@ -91,12 +93,14 @@ Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.RedirectUris.get -> System.Coll
 Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.TokenEndpointAuthMethod.get -> Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod
 Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Type.get -> Supabase.Gotrue.Common.OAuthClientType
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateOAuthClientAsync(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.RegenerateOAuthClientSecretAsync(System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateOAuthClientAsync(string! jwt, Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
 Supabase.Gotrue.AdminClient.DeleteOAuthClientAsync(System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Api.DeleteOAuthClientAsync(string! jwt, System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Exceptions.FailureHint.Reason.OAuthClientNotFound = 25 -> Supabase.Gotrue.Exceptions.FailureHint.Reason
 Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.DeleteOAuthClientAsync(System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DeleteOAuthClientAsync(string! jwt, System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RegenerateOAuthClientSecretAsync(string! jwt, System.Guid clientId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
 Supabase.Gotrue.SessionPersistence
 Supabase.Gotrue.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Gotrue.ClientOptions.TracePropagation.set -> void
