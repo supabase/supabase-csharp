@@ -1,7 +1,97 @@
 #nullable enable
+override Supabase.Gotrue.Common.OAuthClient.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.OAuthClient.GetHashCode() -> int
+override Supabase.Gotrue.Common.OAuthClient.ToString() -> string!
+override Supabase.Gotrue.Common.OAuthClientCredentials.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.OAuthClientCredentials.GetHashCode() -> int
+override Supabase.Gotrue.Common.OAuthClientCredentials.ToString() -> string!
+override Supabase.Gotrue.Common.OAuthClientOptions.Equals(object? obj) -> bool
+override Supabase.Gotrue.Common.OAuthClientOptions.GetHashCode() -> int
+override Supabase.Gotrue.Common.OAuthClientOptions.ToString() -> string!
+override Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Equals(object? obj) -> bool
+override Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.GetHashCode() -> int
+override Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.ToString() -> string!
+static Supabase.Gotrue.Common.OAuthClient.operator !=(Supabase.Gotrue.Common.OAuthClient? left, Supabase.Gotrue.Common.OAuthClient? right) -> bool
+static Supabase.Gotrue.Common.OAuthClient.operator ==(Supabase.Gotrue.Common.OAuthClient? left, Supabase.Gotrue.Common.OAuthClient? right) -> bool
+static Supabase.Gotrue.Common.OAuthClientCredentials.operator !=(Supabase.Gotrue.Common.OAuthClientCredentials? left, Supabase.Gotrue.Common.OAuthClientCredentials? right) -> bool
+static Supabase.Gotrue.Common.OAuthClientCredentials.operator ==(Supabase.Gotrue.Common.OAuthClientCredentials? left, Supabase.Gotrue.Common.OAuthClientCredentials? right) -> bool
+static Supabase.Gotrue.Common.OAuthClientOptions.operator !=(Supabase.Gotrue.Common.OAuthClientOptions? left, Supabase.Gotrue.Common.OAuthClientOptions? right) -> bool
+static Supabase.Gotrue.Common.OAuthClientOptions.operator ==(Supabase.Gotrue.Common.OAuthClientOptions? left, Supabase.Gotrue.Common.OAuthClientOptions? right) -> bool
+static Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Confidential(string! name, System.Collections.Generic.IReadOnlyList<System.Uri!>! redirectUris, Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod authMethod = Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod.ClientSecretBasic) -> Supabase.Gotrue.CreateOAuthClient.NewOAuthClient!
+static Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.operator !=(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient? left, Supabase.Gotrue.CreateOAuthClient.NewOAuthClient? right) -> bool
+static Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.operator ==(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient? left, Supabase.Gotrue.CreateOAuthClient.NewOAuthClient? right) -> bool
+static Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Public(string! name, System.Collections.Generic.IReadOnlyList<System.Uri!>! redirectUris) -> Supabase.Gotrue.CreateOAuthClient.NewOAuthClient!
+Supabase.Gotrue.AdminClient.CreateOAuthClientAsync(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
+Supabase.Gotrue.Api.CreateOAuthClientAsync(string! jwt, Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
 Supabase.Gotrue.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
 Supabase.Gotrue.ClientOptions.Logger.set -> void
 static Supabase.Gotrue.SessionPersistence.Disabled.get -> Supabase.Gotrue.Interfaces.IGotrueSessionPersistence<Supabase.Gotrue.Session!>!
+Supabase.Gotrue.Common.OAuthClient
+Supabase.Gotrue.Common.OAuthClient.<Clone>$() -> Supabase.Gotrue.Common.OAuthClient!
+Supabase.Gotrue.Common.OAuthClient.ClientId.get -> System.Guid
+Supabase.Gotrue.Common.OAuthClient.ClientId.init -> void
+Supabase.Gotrue.Common.OAuthClient.ClientUri.get -> System.Uri?
+Supabase.Gotrue.Common.OAuthClient.ClientUri.init -> void
+Supabase.Gotrue.Common.OAuthClient.CreatedAt.get -> System.DateTimeOffset
+Supabase.Gotrue.Common.OAuthClient.CreatedAt.init -> void
+Supabase.Gotrue.Common.OAuthClient.Equals(Supabase.Gotrue.Common.OAuthClient? other) -> bool
+Supabase.Gotrue.Common.OAuthClient.GrantTypes.get -> System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.OAuthClientGrantType>!
+Supabase.Gotrue.Common.OAuthClient.GrantTypes.init -> void
+Supabase.Gotrue.Common.OAuthClient.LogoUri.get -> System.Uri?
+Supabase.Gotrue.Common.OAuthClient.LogoUri.init -> void
+Supabase.Gotrue.Common.OAuthClient.Name.get -> string?
+Supabase.Gotrue.Common.OAuthClient.Name.init -> void
+Supabase.Gotrue.Common.OAuthClient.OAuthClient() -> void
+Supabase.Gotrue.Common.OAuthClient.RedirectUris.get -> System.Collections.Generic.IReadOnlyList<System.Uri!>!
+Supabase.Gotrue.Common.OAuthClient.RedirectUris.init -> void
+Supabase.Gotrue.Common.OAuthClient.RegistrationType.get -> Supabase.Gotrue.Common.OAuthClientRegistrationType
+Supabase.Gotrue.Common.OAuthClient.RegistrationType.init -> void
+Supabase.Gotrue.Common.OAuthClient.TokenEndpointAuthMethod.get -> Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod
+Supabase.Gotrue.Common.OAuthClient.TokenEndpointAuthMethod.init -> void
+Supabase.Gotrue.Common.OAuthClient.Type.get -> Supabase.Gotrue.Common.OAuthClientType
+Supabase.Gotrue.Common.OAuthClient.Type.init -> void
+Supabase.Gotrue.Common.OAuthClient.UpdatedAt.get -> System.DateTimeOffset
+Supabase.Gotrue.Common.OAuthClient.UpdatedAt.init -> void
+Supabase.Gotrue.Common.OAuthClientCredentials
+Supabase.Gotrue.Common.OAuthClientCredentials.<Clone>$() -> Supabase.Gotrue.Common.OAuthClientCredentials!
+Supabase.Gotrue.Common.OAuthClientCredentials.Client.get -> Supabase.Gotrue.Common.OAuthClient!
+Supabase.Gotrue.Common.OAuthClientCredentials.Client.init -> void
+Supabase.Gotrue.Common.OAuthClientCredentials.ClientSecret.get -> string?
+Supabase.Gotrue.Common.OAuthClientCredentials.ClientSecret.init -> void
+Supabase.Gotrue.Common.OAuthClientCredentials.Equals(Supabase.Gotrue.Common.OAuthClientCredentials? other) -> bool
+Supabase.Gotrue.Common.OAuthClientCredentials.OAuthClientCredentials() -> void
+Supabase.Gotrue.Common.OAuthClientGrantType
+Supabase.Gotrue.Common.OAuthClientGrantType.AuthorizationCode = 0 -> Supabase.Gotrue.Common.OAuthClientGrantType
+Supabase.Gotrue.Common.OAuthClientGrantType.RefreshToken = 1 -> Supabase.Gotrue.Common.OAuthClientGrantType
+Supabase.Gotrue.Common.OAuthClientOptions
+Supabase.Gotrue.Common.OAuthClientOptions.<Clone>$() -> Supabase.Gotrue.Common.OAuthClientOptions!
+Supabase.Gotrue.Common.OAuthClientOptions.ClientUri.get -> System.Uri?
+Supabase.Gotrue.Common.OAuthClientOptions.ClientUri.init -> void
+Supabase.Gotrue.Common.OAuthClientOptions.Equals(Supabase.Gotrue.Common.OAuthClientOptions? other) -> bool
+Supabase.Gotrue.Common.OAuthClientOptions.GrantTypes.get -> System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.Common.OAuthClientGrantType>?
+Supabase.Gotrue.Common.OAuthClientOptions.GrantTypes.init -> void
+Supabase.Gotrue.Common.OAuthClientOptions.LogoUri.get -> System.Uri?
+Supabase.Gotrue.Common.OAuthClientOptions.LogoUri.init -> void
+Supabase.Gotrue.Common.OAuthClientOptions.OAuthClientOptions() -> void
+Supabase.Gotrue.Common.OAuthClientRegistrationType
+Supabase.Gotrue.Common.OAuthClientRegistrationType.Dynamic = 0 -> Supabase.Gotrue.Common.OAuthClientRegistrationType
+Supabase.Gotrue.Common.OAuthClientRegistrationType.Manual = 1 -> Supabase.Gotrue.Common.OAuthClientRegistrationType
+Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod
+Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod.ClientSecretBasic = 1 -> Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod
+Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod.ClientSecretPost = 2 -> Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod
+Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod.None = 0 -> Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod
+Supabase.Gotrue.Common.OAuthClientType
+Supabase.Gotrue.Common.OAuthClientType.Confidential = 1 -> Supabase.Gotrue.Common.OAuthClientType
+Supabase.Gotrue.Common.OAuthClientType.Public = 0 -> Supabase.Gotrue.Common.OAuthClientType
+Supabase.Gotrue.CreateOAuthClient.NewOAuthClient
+Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.<Clone>$() -> Supabase.Gotrue.CreateOAuthClient.NewOAuthClient!
+Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Equals(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient? other) -> bool
+Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Name.get -> string!
+Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.RedirectUris.get -> System.Collections.Generic.IReadOnlyList<System.Uri!>!
+Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.TokenEndpointAuthMethod.get -> Supabase.Gotrue.Common.OAuthClientTokenEndpointAuthMethod
+Supabase.Gotrue.CreateOAuthClient.NewOAuthClient.Type.get -> Supabase.Gotrue.Common.OAuthClientType
+Supabase.Gotrue.Interfaces.IGotrueAdminClient<TUser>.CreateOAuthClientAsync(Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.CreateOAuthClientAsync(string! jwt, Supabase.Gotrue.CreateOAuthClient.NewOAuthClient! client, Supabase.Gotrue.Common.OAuthClientOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.Common.OAuthClientCredentials!>!
 Supabase.Gotrue.SessionPersistence
 Supabase.Gotrue.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Gotrue.ClientOptions.TracePropagation.set -> void

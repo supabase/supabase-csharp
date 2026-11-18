@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateOAuthClient;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
@@ -547,4 +548,36 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<SsoProvider> UpdateSsoProviderAsync(SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers an OAuth client with the project's OAuth 2.1 server. The server generates the client id and, for a
+    /// confidential client, a client secret that it shows only in this response. Requires a full-access API key, such as
+    /// the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="client">The client to register, built with <see cref="NewOAuthClient.Confidential" /> or <see cref="NewOAuthClient.Public" />.</param>
+    /// <param name="options">Optional settings, such as the grant types. The server applies its defaults to those left null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered client and its client secret, which is null for a public client. Store the secret now: it is not retrievable later.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="client" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>validation_failed</c>
+    /// when a setting is invalid (for example more than ten redirect URIs, a redirect URI that is not HTTPS or localhost
+    /// HTTP, a grant type the server does not know, or a name longer than 1024 characters) and <c>feature_disabled</c>
+    /// when the OAuth server is disabled on the project. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    /// using Supabase.Gotrue.CreateOAuthClient;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var created = await admin.CreateOAuthClientAsync(
+    ///     NewOAuthClient.Confidential("My App", new[] { new Uri("https://app.example.com/callback") }),
+    ///     new OAuthClientOptions { ClientUri = new Uri("https://app.example.com") });
+    /// var clientId = created.Client.ClientId;
+    /// var clientSecret = created.ClientSecret;
+    /// </code>
+    /// </example>
+    Task<OAuthClientCredentials> CreateOAuthClientAsync(NewOAuthClient client, OAuthClientOptions? options = null, CancellationToken cancellationToken = default);
 }

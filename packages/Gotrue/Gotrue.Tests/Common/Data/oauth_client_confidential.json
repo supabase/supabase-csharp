@@ -1,0 +1,15 @@
+{
+  "client_id": "6ea7e0b6-ee41-4791-802c-ea0625ee8d6b",
+  "client_secret": "s3cr3t-value",
+  "client_type": "confidential",
+  "client_name": "My App",
+  "token_endpoint_auth_method": "client_secret_basic",
+  "registration_type": "manual",
+  "redirect_uris": ["https://app.example.com/callback", "myapp://callback"],
+  "grant_types": ["authorization_code", "refresh_token"],
+  "response_types": ["code"],
+  "client_uri": "https://app.example.com",
+  "logo_uri": "https://app.example.com/logo.png",
+  "created_at": "2026-11-18T10:20:30.5Z",
+  "updated_at": "2026-11-18T10:20:31Z"
+}
