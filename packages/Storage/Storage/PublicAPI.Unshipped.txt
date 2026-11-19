@@ -1,4 +1,6 @@
 #nullable enable
+Supabase.Storage.Bucket.FileSizeLimitInBytes.get -> long?
+Supabase.Storage.Bucket.FileSizeLimitInBytes.set -> void
 Supabase.Storage.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
 Supabase.Storage.ClientOptions.Logger.set -> void
 Supabase.Storage.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
