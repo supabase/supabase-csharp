@@ -45,8 +45,8 @@ public class Bucket
     [Obsolete("Use FileSizeLimitInBytes instead. FileSizeLimit will be removed in the next major version.")]
     public string? FileSizeLimit
     {
-        get => FileSizeLimitInBytes?.ToString(CultureInfo.InvariantCulture);
-        set => FileSizeLimitInBytes = long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
+        get => this.FileSizeLimitInBytes?.ToString(CultureInfo.InvariantCulture);
+        set => this.FileSizeLimitInBytes = long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
     }
 
     /// <summary>
