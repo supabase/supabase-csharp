@@ -58,8 +58,7 @@ await channel.Subscribe();
 `Todo` derives from `Supabase.Postgrest.Models.BaseModel`, letting the client coerce change payloads
 into your model via `change.Model<T>()`.
 
-Full generated API reference:
-[Supabase.Realtime](https://supabase-community.github.io/supabase-csharp/api/Supabase.Realtime.Client.html).
+Full API reference: [Supabase C# reference](https://supabase.com/docs/reference/csharp/introduction).
 
 ## Postgres changes
 

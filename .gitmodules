@@ -1,3 +1,0 @@
-[submodule "Documentation"]
-	path = Documentation
-	url = git@github.com:supabase-community/supabase-csharp.wiki.git
