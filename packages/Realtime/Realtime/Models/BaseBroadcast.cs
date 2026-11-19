@@ -46,7 +46,7 @@ public class BaseBroadcast
     /// <see cref="ProtocolVersion.V2"/>. Null for a broadcast with a JSON payload.
     /// </summary>
     [JsonIgnore]
-    public byte[]? BinaryPayload { get; set; }
+    public byte[]? BinaryPayload { get; internal set; }
 }
 
 /// <summary>

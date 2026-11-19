@@ -160,7 +160,9 @@ public class ProtocolVersionTests
 
     private async Task<RealtimeBroadcast<BaseBroadcast>> JoinedBroadcast(string channelName = "room")
     {
+        var firstHeartbeat = this.socket.SentText("heartbeat", 1);
         await this.client.ConnectAsync();
+        await firstHeartbeat.WaitAsync(Patience);
         var channel = this.client.Channel(channelName);
         var broadcast = channel.Register<BaseBroadcast>();
         await channel.Subscribe().WaitAsync(Patience);
