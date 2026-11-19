@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 namespace Supabase.Storage;
@@ -29,12 +30,24 @@ public class Bucket
     public bool Public { get; set; }
 
     /// <summary>
-    /// Specifies the file size limit that this bucket can accept during upload.
-    ///
-    /// Expects a string value following a format like: '1kb', '50mb', '150kb', etc.
+    /// Maximum allowed object size in bytes, or null when the bucket has no limit.
     /// </summary>
     [JsonPropertyName("file_size_limit")]
-    public string? FileSizeLimit { get; set; }
+    public long? FileSizeLimitInBytes { get; set; }
+
+    /// <summary>
+    /// Maximum allowed object size in bytes as a string, or null when the bucket has no limit.
+    /// </summary>
+    /// <remarks>
+    /// Non-numeric strings assigned to this property are mapped to null.
+    /// </remarks>
+    [JsonIgnore]
+    [Obsolete("Use FileSizeLimitInBytes instead. FileSizeLimit will be removed in the next major version.")]
+    public string? FileSizeLimit
+    {
+        get => FileSizeLimitInBytes?.ToString(CultureInfo.InvariantCulture);
+        set => FileSizeLimitInBytes = long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
+    }
 
     /// <summary>
     /// Specifies the allowed mime types that this bucket can accept during upload.
