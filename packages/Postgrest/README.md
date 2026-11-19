@@ -106,8 +106,7 @@ await client.Table<Movie>()
             .Update();
 ```
 
-Full generated API reference:
-[Supabase.Postgrest](https://supabase-community.github.io/supabase-csharp/api/Supabase.Postgrest.html).
+Full API reference: [Supabase C# reference](https://supabase.com/docs/reference/csharp/introduction).
 
 ## Foreign keys, join tables, and relationships
 

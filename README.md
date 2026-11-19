@@ -23,8 +23,6 @@ Use the `Supabase` meta-package for the full client, or reference an individual 
 | **Supabase.Core** | [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Core)](https://www.nuget.org/packages/Supabase.Core/) | [`packages/Core`](./packages/Core) | Shared primitives used by the packages above. Rarely referenced directly. |
 
 Every package targets .NET Standard 2.1, so it runs on .NET Core 3.0+ / .NET 5+, recent MAUI, Xamarin, and Unity.
-See the [wiki](https://github.com/supabase/supabase-csharp/wiki) for platform-specific guides
-(Unity, desktop/mobile, server-side).
 
 ## Installation
 
@@ -116,11 +114,8 @@ tag. Each package's README documents the specific spans and metrics it produces.
 
 ## Documentation
 
-- [Getting Started](https://github.com/supabase/supabase-csharp/wiki#getting-started)
 - [Supabase C# reference](https://supabase.com/docs/reference/csharp/introduction)
-- [Generated API docs](https://supabase-community.github.io/supabase-csharp/api/Supabase.Client.html)
-- [Examples](https://github.com/supabase/supabase-csharp/wiki/Examples)
-- [Troubleshooting](https://github.com/supabase/supabase-csharp/wiki/Troubleshooting) · [Discussions](https://github.com/supabase/supabase-csharp/discussions)
+- [Discussions](https://github.com/supabase/supabase-csharp/discussions)
 
 ## Repository layout
 
@@ -164,7 +159,7 @@ versions, see [the migration guides](./docs/migrations).
 Contributions are welcome — please open an issue to discuss substantial changes, then submit a PR.
 
 <a href="https://github.com/supabase/supabase-csharp/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=supabase-community/supabase-csharp" alt="Contributors" />
+  <img src="https://contrib.rocks/image?repo=supabase/supabase-csharp" alt="Contributors" />
 </a>
 
 ## License
