@@ -7,8 +7,8 @@ using System.Text.Json;
 namespace Supabase.Realtime.Socket;
 
 /// <summary>
-/// Converts between the message the client works with, the JSON object of protocol 1.0.0, and the frames of
-/// protocol 2.0.0: a JSON array in a text frame, and the user broadcast layouts in a binary frame.
+/// Converts between the message the rest of the client works with (the JSON object of protocol 1.0.0) and the
+/// frames of protocol 2.0.0: a JSON array in a text frame, and the user broadcast layouts in a binary frame.
 /// </summary>
 internal static class WireFrame
 {
@@ -28,7 +28,7 @@ internal static class WireFrame
     /// <summary>
     /// Turns a 1.0.0 message into the 2.0.0 text frame.
     /// </summary>
-    internal static string ToArray(string message)
+    internal static string ToTextFrame(string message)
     {
         using var document = JsonDocument.Parse(message);
         var root = document.RootElement;
@@ -38,7 +38,7 @@ internal static class WireFrame
     /// <summary>
     /// Turns a 2.0.0 text frame into the 1.0.0 message.
     /// </summary>
-    internal static string ToObject(string frame)
+    internal static string ToMessage(string frame)
     {
         using var document = JsonDocument.Parse(frame);
         return $"{{{string.Join(",", document.RootElement.EnumerateArray().Zip(Fields, (value, field) => $"\"{field}\":{value.GetRawText()}"))}}}";
@@ -48,7 +48,7 @@ internal static class WireFrame
     /// Turns a binary user broadcast frame into the 1.0.0 broadcast message. A payload that is not JSON is left out
     /// of the message and returned in <paramref name="binaryPayload"/>.
     /// </summary>
-    internal static string ToObject(byte[] frame, out byte[]? binaryPayload)
+    internal static string ToMessage(byte[] frame, out byte[]? binaryPayload)
     {
         if (frame[0] != UserBroadcastType)
             throw new NotSupportedException($"Binary frame type {frame[0]} is not a user broadcast.");

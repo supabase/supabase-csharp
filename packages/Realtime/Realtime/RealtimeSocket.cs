@@ -318,7 +318,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         if (data.Payload is BinaryBroadcast broadcast)
             this.connection.Send(WireFrame.UserBroadcastPush(data.JoinRef!, data.Ref!, data.Topic!, broadcast.Event, broadcast.Payload));
         else
-            this.options.Encode!(data, encoded => this.connection.Send(this.options.ProtocolVersion == ProtocolVersion.V2 ? WireFrame.ToArray(encoded) : encoded));
+            this.options.Encode!(data, encoded => this.connection.Send(this.options.ProtocolVersion == ProtocolVersion.V2 ? WireFrame.ToTextFrame(encoded) : encoded));
     }
 
     /// <summary>
@@ -502,8 +502,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     {
         byte[]? binaryPayload = null;
         var message = args.MessageType == WebSocketMessageType.Binary
-            ? WireFrame.ToObject(args.Binary!, out binaryPayload)
-            : this.options.ProtocolVersion == ProtocolVersion.V2 ? WireFrame.ToObject(args.Text!) : args.Text!;
+            ? WireFrame.ToMessage(args.Binary!, out binaryPayload)
+            : this.options.ProtocolVersion == ProtocolVersion.V2 ? WireFrame.ToMessage(args.Text!) : args.Text!;
         this.options.Decode!(message, decoded =>
         {
             Debugger.Instance.Log(this, $"Socket Message Received:\n\t{args.Text}");

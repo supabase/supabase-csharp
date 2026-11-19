@@ -117,8 +117,7 @@ public class ProtocolVersionTests
     {
         await this.client.ConnectAsync();
         this.client.Socket!.Push(new SocketRequest { Topic = Topic, Event = "broadcast", Payload = new BinaryBroadcast(Event, Bytes), Ref = Ref, JoinRef = JoinRef });
-        var frame = await this.socket.SentBinary.Task.WaitAsync(Patience);
-        frame.Should().Equal([UserBroadcastPush, (byte) JoinRef.Length, (byte) Ref.Length, (byte) Topic.Length, (byte) Event.Length, NoMetadata, BinaryEncoding, .. Utf8(JoinRef + Ref + Topic + Event), .. Bytes], "the push frame must hold its type, the sizes of join_ref, ref, topic and event, no metadata, the binary encoding, then those fields and the payload");
+        (await this.socket.SentBinary.Task.WaitAsync(Patience)).Should().Equal([UserBroadcastPush, (byte) JoinRef.Length, (byte) Ref.Length, (byte) Topic.Length, (byte) Event.Length, NoMetadata, BinaryEncoding, .. Utf8(JoinRef + Ref + Topic + Event), .. Bytes], "the push frame must hold its type, the sizes of join_ref, ref, topic and event, no metadata, the binary encoding, then those fields and the payload");
     }
 
     [TestMethod]
@@ -127,8 +126,7 @@ public class ProtocolVersionTests
         var longestEvent = new string('e', LongestFieldInBytes);
         var broadcast = await this.JoinedBroadcast();
         await broadcast.SendBinary(longestEvent, Bytes);
-        var frame = await this.socket.SentBinary.Task.WaitAsync(Patience);
-        frame.Should().EndWith([.. Utf8(Topic + longestEvent), .. Bytes], "the bytes must go out in a binary frame after the topic and an event name of up to 255 bytes");
+        (await this.socket.SentBinary.Task.WaitAsync(Patience)).Should().EndWith([.. Utf8(Topic + longestEvent), .. Bytes], "the bytes must go out in a binary frame after the topic and an event name of up to 255 bytes");
     }
 
     [TestMethod]
@@ -138,8 +136,7 @@ public class ProtocolVersionTests
         var broadcast = await this.JoinedBroadcast();
         await broadcast.SendBinary(Event, reused);
         Array.Clear(reused);
-        var frame = await this.socket.SentBinary.Task.WaitAsync(Patience);
-        frame.Should().EndWith(Bytes, "the frame is written after SendBinary returns, so it must carry the bytes as they were at the call");
+        (await this.socket.SentBinary.Task.WaitAsync(Patience)).Should().EndWith(Bytes, "the frame is written after SendBinary returns, so it must carry the bytes as they were at the call");
     }
 
     [TestMethod]
