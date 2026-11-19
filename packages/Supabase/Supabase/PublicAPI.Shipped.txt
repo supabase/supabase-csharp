@@ -66,6 +66,8 @@ Supabase.SupabaseOptions.GotrueRetry.set -> void
 Supabase.SupabaseOptions.Headers -> System.Collections.Generic.Dictionary<string!, string!>!
 Supabase.SupabaseOptions.HttpClient.get -> System.Net.Http.HttpClient?
 Supabase.SupabaseOptions.HttpClient.set -> void
+Supabase.SupabaseOptions.LoggerFactory.get -> Microsoft.Extensions.Logging.ILoggerFactory?
+Supabase.SupabaseOptions.LoggerFactory.set -> void
 Supabase.SupabaseOptions.PostgrestRetry.get -> Supabase.Core.Http.RetryOptions!
 Supabase.SupabaseOptions.PostgrestRetry.set -> void
 Supabase.SupabaseOptions.PostgrestTimeout.get -> System.TimeSpan?
@@ -86,6 +88,8 @@ Supabase.SupabaseOptions.StorageUrlFormat.set -> void
 Supabase.SupabaseOptions.SupabaseOptions() -> void
 Supabase.SupabaseOptions.ThirdPartyAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
 Supabase.SupabaseOptions.ThirdPartyAccessToken.set -> void
+Supabase.SupabaseOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.SupabaseOptions.TracePropagation.set -> void
 Supabase.SupabaseOptions.WebSocketFactory.get -> Supabase.Realtime.Sockets.IWebSocketFactory?
 Supabase.SupabaseOptions.WebSocketFactory.set -> void
 Supabase.SupabaseTable<TModel>

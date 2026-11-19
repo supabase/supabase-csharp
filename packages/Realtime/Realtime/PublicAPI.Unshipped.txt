@@ -1,17 +1,1 @@
 #nullable enable
-Supabase.Realtime.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
-Supabase.Realtime.ClientOptions.Logger.set -> void
-Supabase.Realtime.ClientOptions.MonitorsNetworkPath.get -> bool
-Supabase.Realtime.ClientOptions.MonitorsNetworkPath.set -> void
-Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>
-Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>.CurrentPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
-Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>.Key.get -> string!
-Supabase.Realtime.Presence.PresenceJoin<TPresenceModel>.NewPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
-Supabase.Realtime.Presence.PresenceLeave<TPresenceModel>
-Supabase.Realtime.Presence.PresenceLeave<TPresenceModel>.CurrentPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
-Supabase.Realtime.Presence.PresenceLeave<TPresenceModel>.Key.get -> string!
-Supabase.Realtime.Presence.PresenceLeave<TPresenceModel>.LeftPresences.get -> System.Collections.Generic.IReadOnlyList<TPresenceModel!>!
-Supabase.Realtime.RealtimePresence<TPresenceModel>.AddJoinHandler(System.Action<Supabase.Realtime.Presence.PresenceJoin<TPresenceModel!>!>! handler) -> void
-Supabase.Realtime.RealtimePresence<TPresenceModel>.AddLeaveHandler(System.Action<Supabase.Realtime.Presence.PresenceLeave<TPresenceModel!>!>! handler) -> void
-Supabase.Realtime.RealtimePresence<TPresenceModel>.RemoveJoinHandler(System.Action<Supabase.Realtime.Presence.PresenceJoin<TPresenceModel!>!>! handler) -> void
-Supabase.Realtime.RealtimePresence<TPresenceModel>.RemoveLeaveHandler(System.Action<Supabase.Realtime.Presence.PresenceLeave<TPresenceModel!>!>! handler) -> void
