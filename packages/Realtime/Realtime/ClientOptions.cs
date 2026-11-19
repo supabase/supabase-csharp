@@ -69,6 +69,13 @@ public class ClientOptions
         TimeSpan.FromSeconds(RandomProvider.Value!.NextDouble() * Math.Min(30, Math.Pow(2, attempt - 1)));
 
     /// <summary>
+    /// Whether the client watches the platform's network monitor and, when the network comes back, reconnects without
+    /// waiting out the rest of the reconnect delay. Has no effect on a runtime without that monitor. Defaults to true.
+    /// </summary>
+    [ImplementedCapability("realtime.configuration.network_path_wake", "NetworkChange.NetworkAddressChanged is the monitor; the option has no effect on a runtime that does not support it.")]
+    public bool MonitorsNetworkPath { get; set; } = true;
+
+    /// <summary>
     /// Request headers to be appended to the connection string.
     /// </summary>
     public readonly Dictionary<string, string> Headers = new();
