@@ -1,5 +1,1 @@
 #nullable enable
-Supabase.Functions.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
-Supabase.Functions.ClientOptions.Logger.init -> void
-Supabase.Functions.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
-Supabase.Functions.ClientOptions.TracePropagation.init -> void

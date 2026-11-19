@@ -34,12 +34,16 @@ Supabase.Functions.ClientOptions.ClientOptions() -> void
 Supabase.Functions.ClientOptions.Equals(Supabase.Functions.ClientOptions? other) -> bool
 Supabase.Functions.ClientOptions.HttpClient.get -> System.Net.Http.HttpClient?
 Supabase.Functions.ClientOptions.HttpClient.init -> void
+Supabase.Functions.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
+Supabase.Functions.ClientOptions.Logger.init -> void
 Supabase.Functions.ClientOptions.Proxy.get -> System.Net.IWebProxy?
 Supabase.Functions.ClientOptions.Proxy.init -> void
 Supabase.Functions.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
 Supabase.Functions.ClientOptions.RetrieveAccessToken.init -> void
 Supabase.Functions.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
 Supabase.Functions.ClientOptions.Retry.init -> void
+Supabase.Functions.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Functions.ClientOptions.TracePropagation.init -> void
 Supabase.Functions.Exceptions.FailureHint
 Supabase.Functions.Exceptions.FailureHint.Reason
 Supabase.Functions.Exceptions.FailureHint.Reason.Internal = 2 -> Supabase.Functions.Exceptions.FailureHint.Reason

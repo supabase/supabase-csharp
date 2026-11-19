@@ -1,4 +1,1 @@
 #nullable enable
-Supabase.Core.Http.TracePropagation
-Supabase.Core.Http.TracePropagation.Disabled = 1 -> Supabase.Core.Http.TracePropagation
-Supabase.Core.Http.TracePropagation.Enabled = 0 -> Supabase.Core.Http.TracePropagation

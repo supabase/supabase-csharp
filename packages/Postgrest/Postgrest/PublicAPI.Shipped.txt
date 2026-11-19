@@ -52,6 +52,8 @@ Supabase.Postgrest.ClientOptions.Headers.get -> System.Collections.Generic.Dicti
 Supabase.Postgrest.ClientOptions.Headers.set -> void
 Supabase.Postgrest.ClientOptions.HttpClient.get -> System.Net.Http.HttpClient?
 Supabase.Postgrest.ClientOptions.HttpClient.set -> void
+Supabase.Postgrest.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
+Supabase.Postgrest.ClientOptions.Logger.set -> void
 Supabase.Postgrest.ClientOptions.Proxy.get -> System.Net.IWebProxy?
 Supabase.Postgrest.ClientOptions.Proxy.set -> void
 Supabase.Postgrest.ClientOptions.QueryParams.get -> System.Collections.Generic.Dictionary<string!, string!>!
@@ -66,6 +68,8 @@ Supabase.Postgrest.ClientOptions.SerializeEnumsAsStrings.get -> bool
 Supabase.Postgrest.ClientOptions.SerializeEnumsAsStrings.set -> void
 Supabase.Postgrest.ClientOptions.Timeout.get -> System.TimeSpan?
 Supabase.Postgrest.ClientOptions.Timeout.set -> void
+Supabase.Postgrest.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Postgrest.ClientOptions.TracePropagation.set -> void
 Supabase.Postgrest.Constants
 Supabase.Postgrest.Constants.CountType
 Supabase.Postgrest.Constants.CountType.Estimated = 2 -> Supabase.Postgrest.Constants.CountType
@@ -115,10 +119,12 @@ Supabase.Postgrest.Exceptions.FailureHint
 Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.ForeignKeyViolation = 2 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.InvalidArgument = 7 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
+Supabase.Postgrest.Exceptions.FailureHint.Reason.MaxAffectedExceeded = 9 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.NotAuthorized = 1 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.ServerError = 4 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.UndefinedFunction = 6 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.UndefinedTable = 5 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
+Supabase.Postgrest.Exceptions.FailureHint.Reason.UnexpectedRowCount = 10 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.UniquenessViolation = 3 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.Unknown = 0 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Exceptions.FailureHint.Reason.UriTooLong = 8 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
@@ -196,6 +202,7 @@ Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Insert(TModel! model, Supa
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Limit(int limit, string? foreignTableName = null) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Match(System.Collections.Generic.Dictionary<string!, string!>! query) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Match(TModel! model) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.MaxAffected(int rows) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Not(Supabase.Postgrest.Interfaces.IPostgrestQueryFilter! filter) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Not(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! predicate, Supabase.Postgrest.Constants.Operator op, System.Collections.Generic.Dictionary<string!, object!>! criteria) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Not(string! columnName, Supabase.Postgrest.Constants.Operator op, System.Collections.Generic.Dictionary<string!, object!>! criteria) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
@@ -217,6 +224,7 @@ Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Select(string! columnQuery
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, System.Collections.Generic.KeyValuePair<object!, object?>>!>! keyValuePairExpression) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! keySelector, object? value) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Single(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel?>!
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.SingleOrThrowAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.StripNulls() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.TableName.get -> string!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.Update(Supabase.Postgrest.QueryOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.Responses.ModeledResponse<TModel!>!>!
@@ -270,6 +278,11 @@ Supabase.Postgrest.QueryOptions.DuplicateResolution.set -> void
 Supabase.Postgrest.QueryOptions.DuplicateResolutionType
 Supabase.Postgrest.QueryOptions.DuplicateResolutionType.IgnoreDuplicates = 1 -> Supabase.Postgrest.QueryOptions.DuplicateResolutionType
 Supabase.Postgrest.QueryOptions.DuplicateResolutionType.MergeDuplicates = 0 -> Supabase.Postgrest.QueryOptions.DuplicateResolutionType
+Supabase.Postgrest.QueryOptions.MissingFieldType
+Supabase.Postgrest.QueryOptions.MissingFieldType.ColumnDefault = 1 -> Supabase.Postgrest.QueryOptions.MissingFieldType
+Supabase.Postgrest.QueryOptions.MissingFieldType.Null = 0 -> Supabase.Postgrest.QueryOptions.MissingFieldType
+Supabase.Postgrest.QueryOptions.MissingFields.get -> Supabase.Postgrest.QueryOptions.MissingFieldType
+Supabase.Postgrest.QueryOptions.MissingFields.set -> void
 Supabase.Postgrest.QueryOptions.OnConflict.get -> string?
 Supabase.Postgrest.QueryOptions.OnConflict.set -> void
 Supabase.Postgrest.QueryOptions.QueryOptions() -> void
@@ -335,6 +348,7 @@ Supabase.Postgrest.Table<TModel>.Insert(TModel! model, Supabase.Postgrest.QueryO
 Supabase.Postgrest.Table<TModel>.Limit(int limit, string? foreignTableName = null) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Match(System.Collections.Generic.Dictionary<string!, string!>! query) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Match(TModel! model) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Table<TModel>.MaxAffected(int rows) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Not(Supabase.Postgrest.Interfaces.IPostgrestQueryFilter! filter) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Not(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! predicate, Supabase.Postgrest.Constants.Operator op, System.Collections.Generic.Dictionary<string!, object!>! criteria) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Not(string! columnName, Supabase.Postgrest.Constants.Operator op, System.Collections.Generic.Dictionary<string!, object!>! criteria) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
@@ -356,6 +370,7 @@ Supabase.Postgrest.Table<TModel>.Select(string! columnQuery) -> Supabase.Postgre
 Supabase.Postgrest.Table<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, System.Collections.Generic.KeyValuePair<object!, object?>>!>! keyValuePairExpression) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Set(System.Linq.Expressions.Expression<System.Func<TModel!, object!>!>! keySelector, object? value) -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Single(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel?>!
+Supabase.Postgrest.Table<TModel>.SingleOrThrowAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TModel!>!
 Supabase.Postgrest.Table<TModel>.StripNulls() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Table<TModel>.Table(string! baseUrl, System.Text.Json.JsonSerializerOptions! serializerSettings, Supabase.Postgrest.ClientOptions? options = null) -> void
 Supabase.Postgrest.Table<TModel>.TableName.get -> string!
