@@ -96,6 +96,14 @@ public class StorageFileApiContractTests
     }
 
     [TestMethod]
+    public async Task Info_ShouldReadSizeAboveInt32Range()
+    {
+        this.Respond($"/storage/v1/object/info/{Bucket}/big.bin", "GET", 200, "{\"name\":\"big.bin\",\"size\":3000000000}");
+        var info = await this.client.From(Bucket).Info("big.bin");
+        ((long?)info!.Size).Should().Be(3000000000L);
+    }
+
+    [TestMethod]
     public async Task CreateSignedUrl_ShouldPostToSignPathAndReturnAbsoluteUrl()
     {
         this.Respond($"/storage/v1/object/sign/{Bucket}/a.png", "POST", 200,

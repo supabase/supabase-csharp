@@ -29,7 +29,7 @@ public class FileObjectV2
     public DateTime? LastAccessedAt { get; set; }
 
     [JsonPropertyName("size")]
-    public int? Size { get; set; }
+    public long? Size { get; set; }
 
     [JsonPropertyName("cache_control")]
     public string? CacheControl { get; set; }
