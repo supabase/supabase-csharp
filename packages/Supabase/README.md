@@ -4,11 +4,11 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase)](https://www.nuget.org/packages/Supabase/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
-The unified C# client for [Supabase](https://supabase.com). One client composes Auth, Database,
+The official, unified C# client for [Supabase](https://supabase.com). One client composes Auth, Database,
 Storage, Realtime, and Edge Functions, so you configure your project once and reach every service
 from a single object.
 
-Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). To use a single
+Part of the official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase. To use a single
 service on its own, reference its package instead — see [Individual services](#individual-services).
 
 ## Installation

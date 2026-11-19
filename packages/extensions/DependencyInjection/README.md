@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../../LICENSE)
 
 ASP.NET Core / `Microsoft.Extensions.DependencyInjection` integration for the
-[Supabase C# SDK](https://github.com/supabase/supabase-csharp).
+official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase.
 
 Registers a `Supabase.Client` — and each of its sub-clients individually — against
 `IHttpClientFactory`-managed, pooled `HttpClient`s. Without this, an app that resolves a

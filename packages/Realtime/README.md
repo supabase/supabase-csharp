@@ -4,11 +4,11 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Realtime)](https://www.nuget.org/packages/Supabase.Realtime/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
-A C# client for [Supabase Realtime](https://supabase.com/docs/guides/realtime) — listen to Postgres
+The official C# client for [Supabase Realtime](https://supabase.com/docs/guides/realtime) — listen to Postgres
 changes, and use Broadcast and Presence over a single websocket connection. It is a C#-ification of
 [realtime-js](https://github.com/supabase/realtime-js).
 
-Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
+Part of the official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase. Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.Realtime`); reference
 this package directly to use Realtime on its own.
 

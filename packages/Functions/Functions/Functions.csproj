@@ -7,8 +7,8 @@
 		<RootNamespace>Supabase.Functions</RootNamespace>
 		<AssemblyName>Supabase.Functions</AssemblyName>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Description>Supabase Edge Functions client for .NET that invokes functions with typed and streamed responses.</Description>
-		<PackageTags>supabase;edge-functions;functions;serverless;streaming</PackageTags>
+		<Description>Official Supabase Edge Functions client for .NET that invokes functions with typed and streamed responses.</Description>
+		<PackageTags>supabase;official;edge-functions;functions;serverless;streaming</PackageTags>
     <!-- x-release-please-start-version -->
 		<PackageVersion>8.12.0</PackageVersion>
 		<ReleaseVersion>8.12.0</ReleaseVersion>

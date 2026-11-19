@@ -7,8 +7,8 @@
 		<RootNamespace>Supabase.Extensions.DependencyInjection</RootNamespace>
 		<AssemblyName>Supabase.Extensions.DependencyInjection</AssemblyName>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Description>Supabase client registration for Microsoft.Extensions.DependencyInjection with pooled HttpClients for ASP.NET Core.</Description>
-		<PackageTags>supabase;dependency-injection;aspnetcore;httpclientfactory</PackageTags>
+		<Description>Official Supabase client registration for Microsoft.Extensions.DependencyInjection with pooled HttpClients for ASP.NET Core.</Description>
+		<PackageTags>supabase;official;dependency-injection;aspnetcore;httpclientfactory</PackageTags>
 		<!-- x-release-please-start-version -->
 		<PackageVersion>8.12.0</PackageVersion>
 		<ReleaseVersion>8.12.0</ReleaseVersion>
