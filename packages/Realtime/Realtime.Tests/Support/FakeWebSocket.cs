@@ -87,6 +87,9 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     /// <summary>When set, every channel join gets an <c>ok</c> reply, as from a server that authorizes it.</summary>
     public bool AnswerJoins { get; init; }
 
+    /// <summary>When set, every broadcast gets an <c>ok</c> reply, as from a server that acknowledges it.</summary>
+    public bool AnswerBroadcasts { get; init; }
+
     private readonly List<SentFrameWaiter> sentFrameWaiters = new();
     private readonly Dictionary<string, int> sentFrameCounts = new();
 
@@ -98,6 +101,8 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
         if (this.AnswerHeartbeats && eventName == "heartbeat")
             this.Reply("phoenix", (string?) frame["ref"], this.HeartbeatReplyStatus);
         if (this.AnswerJoins && eventName == "phx_join")
+            this.Reply((string) frame["topic"]!, (string?) frame["ref"]);
+        if (this.AnswerBroadcasts && eventName == "broadcast")
             this.Reply((string) frame["topic"]!, (string?) frame["ref"]);
         this.Record(eventName ?? string.Empty, frame);
         return true;

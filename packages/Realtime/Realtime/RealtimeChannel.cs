@@ -651,6 +651,8 @@ public class RealtimeChannel : IRealtimeChannel
             this.push = push;
             this.push.AddMessageReceivedHandler(this.HandleMessageReceived);
             this.push.OnTimeout += this.HandleTimeout;
+            if (push.Response is SocketResponse reply)
+                this.HandleMessageReceived(push, reply);
         }
 
         public static Task<bool> Await(Push push) => new PushAwaiter(push).taskCompletion.Task;
