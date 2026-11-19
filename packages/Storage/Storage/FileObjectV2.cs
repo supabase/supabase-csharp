@@ -41,8 +41,8 @@ public class FileObjectV2
     [Obsolete("Use SizeInBytes instead; Size cannot represent objects larger than 2 GiB.")]
     public int? Size
     {
-        get => SizeInBytes is > int.MaxValue ? null : (int?)SizeInBytes;
-        set => SizeInBytes = value;
+        get => this.SizeInBytes is > int.MaxValue ? null : (int?) this.SizeInBytes;
+        set => this.SizeInBytes = value;
     }
 
     [JsonPropertyName("cache_control")]
