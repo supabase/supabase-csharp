@@ -772,6 +772,11 @@ features:
     note: "The app calls ProbeConnection when it returns to the foreground."
     symbols:
       - Client.ProbeConnection
+  realtime.configuration.network_path_wake:
+    status: implemented
+    note: "NetworkChange.NetworkAddressChanged is the monitor; the option has no effect on a runtime that does not support it."
+    symbols:
+      - ClientOptions.MonitorsNetworkPath
 
   # ── Storage ────────────────────────────────────────────────────────────────
 
