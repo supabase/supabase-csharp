@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Extensions;
 using Supabase.Core.Logging;
+using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.HttpSend;
 using Supabase.Realtime.Interfaces;
@@ -44,7 +45,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
             {
                 { "token", this.options.Parameters.Token },
                 { "apikey", this.options.Parameters.ApiKey },
-                { "vsn", "1.0.0" }
+                { "vsn", Core.Helpers.GetMappedToAttr(this.options.ProtocolVersion).Mapping }
             };
 
             return string.Format($"{this.endpoint}?{Utils.QueryString(parameters)}");
@@ -304,12 +305,20 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         Debugger.Instance.Log(this,
             $"Socket Push [topic: {data.Topic}, event: {data.Event}, ref: {data.Ref}]:\n\t{JsonSerializer.Serialize(data.Payload, new JsonSerializerOptions { WriteIndented = true })}");
 
-        var task = new Task(() => this.options.Encode!(data, encoded => this.connection.Send(encoded)));
+        var task = new Task(() => this.Write(data));
 
         if (this.connection.IsRunning)
             task.Start();
         else
             this.buffer.Add(task);
+    }
+
+    private void Write(SocketRequest data)
+    {
+        if (data.Payload is BinaryBroadcast broadcast)
+            this.connection.Send(WireFrame.UserBroadcastPush(data.JoinRef!, data.Ref!, data.Topic!, broadcast.Event, broadcast.Payload));
+        else
+            this.options.Encode!(data, encoded => this.connection.Send(this.options.ProtocolVersion == ProtocolVersion.V2 ? WireFrame.ToArray(encoded) : encoded));
     }
 
     /// <summary>
@@ -489,9 +498,13 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// Parses a received socket message into a non-generic type.
     /// </summary>
     /// <param name="args"></param>
-    private void HandleSocketMessage(ResponseMessage args)
+    private void HandleSocketMessage(ResponseMessage args) => Debugger.Instance.Guard(this, () =>
     {
-        Debugger.Instance.Guard(this, () => this.options.Decode!(args.Text, decoded =>
+        byte[]? binaryPayload = null;
+        var message = args.MessageType == WebSocketMessageType.Binary
+            ? WireFrame.ToObject(args.Binary!, out binaryPayload)
+            : this.options.ProtocolVersion == ProtocolVersion.V2 ? WireFrame.ToObject(args.Text!) : args.Text!;
+        this.options.Decode!(message, decoded =>
         {
             Debugger.Instance.Log(this, $"Socket Message Received:\n\t{args.Text}");
 
@@ -505,10 +518,11 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
                 return;
             }
 
-            decoded.Json = args.Text;
+            decoded.Json = message;
+            decoded.BinaryPayload = binaryPayload;
             this.NotifyMessageReceived(decoded);
-        }));
-    }
+        });
+    });
 
     /// <summary>
     /// Handles socket errors, increments reconnection count if a connection has been established at least once.

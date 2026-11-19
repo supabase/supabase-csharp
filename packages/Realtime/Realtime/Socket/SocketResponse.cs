@@ -96,4 +96,7 @@ public class SocketResponse : IRealtimeSocketResponse
     /// </summary>
     [JsonIgnore]
     internal string? Json { get; set; }
+
+    [JsonIgnore]
+    internal byte[]? BinaryPayload { get; set; }
 }

@@ -89,44 +89,64 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
 
     private readonly List<SentFrameWaiter> sentFrameWaiters = new();
     private readonly Dictionary<string, int> sentFrameCounts = new();
+    private bool speaksArrays;
 
     public bool Send(string message)
     {
         this.FirstSend.TrySetResult();
-        var frame = JsonNode.Parse(message)!;
+        this.speaksArrays = JsonNode.Parse(message) is JsonArray;
+        var frame = AsObject(message);
         var eventName = (string?) frame["event"];
         if (this.AnswerHeartbeats && eventName == "heartbeat")
             this.Reply("phoenix", (string?) frame["ref"], this.HeartbeatReplyStatus);
         if (this.AnswerJoins && eventName == "phx_join")
             this.Reply((string) frame["topic"]!, (string?) frame["ref"]);
-        this.Record(eventName ?? string.Empty, frame);
+        this.Record(eventName ?? string.Empty, message);
         return true;
     }
 
-    /// <summary>Completes with the <paramref name="occurrence" />-th frame (1-based) the socket sends with <paramref name="eventName" />.</summary>
-    public Task<JsonNode> SentFrame(string eventName, int occurrence)
+    /// <summary>Completes with the first binary frame the socket sends.</summary>
+    public TaskCompletionSource<byte[]> SentBinary { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    public bool Send(byte[] message) => this.SentBinary.TrySetResult(message);
+
+    /// <summary>Completes with the <paramref name="occurrence" />-th frame (1-based) the socket sends with <paramref name="eventName" />, read as a protocol 1.0.0 message.</summary>
+    public async Task<JsonNode> SentFrame(string eventName, int occurrence) => AsObject(await this.SentText(eventName, occurrence));
+
+    /// <summary>Completes with the text of the <paramref name="occurrence" />-th frame (1-based) the socket sends with <paramref name="eventName" />, as written to the wire.</summary>
+    public Task<string> SentText(string eventName, int occurrence)
     {
-        var waiter = new SentFrameWaiter(eventName, occurrence, new TaskCompletionSource<JsonNode>(TaskCreationOptions.RunContinuationsAsynchronously));
+        var waiter = new SentFrameWaiter(eventName, occurrence, new TaskCompletionSource<string>(TaskCreationOptions.RunContinuationsAsynchronously));
         lock (this.sentFrameWaiters)
             this.sentFrameWaiters.Add(waiter);
-        return waiter.Frame.Task;
+        return waiter.Text.Task;
     }
 
-    private void Record(string eventName, JsonNode frame)
+    private void Record(string eventName, string text)
     {
         lock (this.sentFrameWaiters)
         {
             var occurrence = this.sentFrameCounts[eventName] = this.sentFrameCounts.GetValueOrDefault(eventName) + 1;
             foreach (var waiter in this.sentFrameWaiters.FindAll(waiter => waiter.EventName == eventName && waiter.Occurrence == occurrence))
-                waiter.Frame.TrySetResult(frame);
+                waiter.Text.TrySetResult(text);
         }
     }
 
-    private sealed record SentFrameWaiter(string EventName, int Occurrence, TaskCompletionSource<JsonNode> Frame);
+    private sealed record SentFrameWaiter(string EventName, int Occurrence, TaskCompletionSource<string> Text);
 
-    /// <summary>Delivers the server's reply to the frame sent with <paramref name="reference" />.</summary>
+    private static JsonNode AsObject(string text)
+    {
+        var frame = JsonNode.Parse(text)!;
+        return frame is JsonArray array
+            ? new JsonObject { ["join_ref"] = array[0]?.DeepClone(), ["ref"] = array[1]?.DeepClone(), ["topic"] = array[2]?.DeepClone(), ["event"] = array[3]?.DeepClone(), ["payload"] = array[4]?.DeepClone() }
+            : frame;
+    }
+
+    /// <summary>Delivers the server's reply to the frame sent with <paramref name="reference" />, in the protocol version the socket last wrote.</summary>
     public void Reply(string topic, string? reference, string status = "ok") =>
-        this.Receive("""{"topic":"TOPIC","event":"phx_reply","ref":"REF","payload":{"status":"STATUS","response":{}}}"""
+        this.Receive((this.speaksArrays
+                ? """[null,"REF","TOPIC","phx_reply",{"status":"STATUS","response":{}}]"""
+                : """{"topic":"TOPIC","event":"phx_reply","ref":"REF","payload":{"status":"STATUS","response":{}}}""")
             .Replace("TOPIC", topic).Replace("REF", reference).Replace("STATUS", status));
 
     public Task Reconnect()
@@ -141,6 +161,9 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
 
     /// <summary>Delivers a frame as if the server had sent it.</summary>
     public void Receive(string json) => this.messageReceived.OnNext(ResponseMessage.TextMessage(json));
+
+    /// <summary>Delivers a binary frame as if the server had sent it.</summary>
+    public void ReceiveBinary(byte[] frame) => this.messageReceived.OnNext(ResponseMessage.BinaryMessage(frame));
 
     /// <summary>Reports a connection failure as if the transport had dropped with an error.</summary>
     public void Fail(Exception exception, DisconnectionType type = DisconnectionType.Error) =>
@@ -164,7 +187,6 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     public Task Start() => throw new NotImplementedException();
     public Task<bool> StopOrFail(WebSocketCloseStatus status, string reason) => throw new NotImplementedException();
     public Task ReconnectOrFail() => throw new NotImplementedException();
-    public bool Send(byte[] message) => throw new NotImplementedException();
     public bool Send(ArraySegment<byte> message) => throw new NotImplementedException();
     public bool Send(ReadOnlySequence<byte> message) => throw new NotImplementedException();
     public Task SendInstant(string message) => throw new NotImplementedException();

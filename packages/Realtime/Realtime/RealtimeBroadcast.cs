@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Realtime.Broadcast;
+using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Models;
 using Supabase.Realtime.Socket;
@@ -43,6 +44,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
 
         if (obj == null || obj.Payload == null) return null;
 
+        obj.Payload.BinaryPayload = this.lastSocketResponse.BinaryPayload;
         return obj.Payload;
     }
 
@@ -116,5 +118,20 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
             baseBroadcast.Event = broadcastEventName;
 
         return this.channel.Send(ChannelEventName.Broadcast, broadcastEventName, payload, timeoutMs);
+    }
+
+    /// <inheritdoc />
+    public Task<bool> SendBinary(string broadcastEventName, byte[] payload, int timeoutMs = DefaultTimeout)
+    {
+        if (this.channel.Options.ClientOptions.ProtocolVersion != ProtocolVersion.V2)
+            throw new RealtimeException("A broadcast of bytes needs ClientOptions.ProtocolVersion set to V2.");
+        if (payload == null)
+            throw new ArgumentNullException(nameof(payload));
+        if (!WireFrame.Fits(broadcastEventName))
+            throw new ArgumentException("The event name of a broadcast of bytes must fit in 255 bytes.", nameof(broadcastEventName));
+        if (!WireFrame.Fits(this.channel.Topic))
+            throw new RealtimeException("The topic of a broadcast of bytes must fit in 255 bytes.");
+
+        return this.channel.Send(ChannelEventName.Broadcast, null, new BinaryBroadcast(broadcastEventName, payload), timeoutMs);
     }
 }

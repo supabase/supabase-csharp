@@ -40,6 +40,13 @@ public class BaseBroadcast
     [JsonPropertyName("meta")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public BroadcastMeta? Meta { get; set; }
+
+    /// <summary>
+    /// The payload of a broadcast that was sent as bytes, received on a client that speaks
+    /// <see cref="ProtocolVersion.V2"/>. Null for a broadcast with a JSON payload.
+    /// </summary>
+    [JsonIgnore]
+    public byte[]? BinaryPayload { get; set; }
 }
 
 /// <summary>
