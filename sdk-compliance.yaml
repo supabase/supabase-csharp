@@ -764,10 +764,9 @@ features:
     symbols:
       - ClientOptions.DisconnectOnEmptyChannelsAfter
   realtime.configuration.custom_logger:
-    status: partially_implemented
-    note: "Diagnostics routed through a debug handler hook; no custom logging function with a log-level filter."
+    status: implemented
     symbols:
-      - Client.AddDebugHandler
+      - ClientOptions.Logger
   realtime.configuration.foreground_liveness_probe:
     status: implemented
     note: "The app calls ProbeConnection when it returns to the foreground."
