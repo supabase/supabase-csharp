@@ -100,7 +100,10 @@ public class StorageFileApiContractTests
     {
         this.Respond($"/storage/v1/object/info/{Bucket}/big.bin", "GET", 200, "{\"name\":\"big.bin\",\"size\":3000000000}");
         var info = await this.client.From(Bucket).Info("big.bin");
-        ((long?)info!.Size).Should().Be(3000000000L);
+        info!.SizeInBytes.Should().Be(3000000000L);
+#pragma warning disable CS0618
+        info.Size.Should().BeNull();
+#pragma warning restore CS0618
     }
 
     [TestMethod]

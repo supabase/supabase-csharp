@@ -3,3 +3,5 @@ Supabase.Storage.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogge
 Supabase.Storage.ClientOptions.Logger.set -> void
 Supabase.Storage.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
 Supabase.Storage.ClientOptions.TracePropagation.set -> void
+Supabase.Storage.FileObjectV2.SizeInBytes.get -> long?
+Supabase.Storage.FileObjectV2.SizeInBytes.set -> void
