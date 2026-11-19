@@ -318,7 +318,6 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     /// Adds a debug handler, likely used within a logging solution of some kind.
     /// </summary>
     /// <param name="handler"></param>
-    [PartialCapability("realtime.configuration.custom_logger", "Diagnostics routed through a debug handler hook; no custom logging function with a log-level filter.")]
     public void AddDebugHandler(IRealtimeDebugger.DebugEventHandler handler) =>
         Debugger.Instance.AddDebugHandler(handler);
 

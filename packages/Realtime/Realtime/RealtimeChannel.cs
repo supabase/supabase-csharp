@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Supabase.Core.Attributes;
+using Supabase.Core.Logging;
 using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Channel;
 using Supabase.Realtime.Exceptions;
@@ -306,6 +307,7 @@ public class RealtimeChannel : IRealtimeChannel
     private void NotifyStateChanged(ChannelState state, bool shouldRejoin = true)
     {
         this.State = state;
+        this.Options.ClientOptions.Logger.BackgroundWorkEvent("Supabase.Realtime", $"channel {this.Topic} {state}");
 
         this.isRejoining = shouldRejoin;
         if (shouldRejoin)
