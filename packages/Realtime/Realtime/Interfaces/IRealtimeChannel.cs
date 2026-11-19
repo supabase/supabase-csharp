@@ -231,7 +231,7 @@ public interface IRealtimeChannel
     /// <param name="type"></param>
     /// <param name="payload"></param>
     /// <param name="timeoutMs"></param>
-    /// <returns></returns>
+    /// <returns><c>false</c> when the server replied with an error, <c>true</c> otherwise.</returns>
     Task<bool> Send(ChannelEventName eventType, string? type, object payload, int timeoutMs = DefaultTimeout);
 
     /// <summary>
