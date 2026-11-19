@@ -343,6 +343,7 @@ internal static class HttpClientProgress
         // BirdMessenger, so this is one operation span for the whole transfer rather than a span
         // per underlying request.
         var bytes = fileStream.CanSeek ? fileStream.Length : (long?) null;
+        var traceId = ActivityTraceId.CreateRandom();
         using var activity = StorageInstrumentation.StartHttpActivity(HttpMethod.Post, uri, StorageInstrumentation.DirectionUpload);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
@@ -454,7 +455,7 @@ internal static class HttpClientProgress
         {
             foreach (var header in uploadHeaders)
                 preSend.HttpRequestMsg.Headers.Add(header.Key, header.Value);
-            TraceContext.Inject(preSend.HttpRequestMsg.Headers, tracePropagation);
+            TraceContext.Inject(preSend.HttpRequestMsg.Headers, tracePropagation, traceId);
 
             return Task.CompletedTask;
         }

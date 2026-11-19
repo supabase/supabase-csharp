@@ -157,8 +157,8 @@ public class SupabaseOptions
     public IWebSocketFactory? WebSocketFactory { get; set; }
 
     /// <summary>
-    /// Whether the SDK adds the current trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each request it
-    /// sends. Defaults to <see cref="Supabase.Core.Http.TracePropagation.Enabled"/>; <see cref="Supabase.Core.Http.TracePropagation.Disabled"/> stops the SDK from
+    /// Whether the SDK adds trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each request it
+    /// sends: the current activity's, or a new unsampled <c>traceparent</c> when there is none. Defaults to <see cref="Supabase.Core.Http.TracePropagation.Enabled"/>; <see cref="Supabase.Core.Http.TracePropagation.Disabled"/> stops the SDK from
     /// injecting it, and the .NET runtime's own injection is controlled through
     /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>. Passed to the Auth, Database, Storage and Edge
     /// Functions clients; Realtime does not propagate trace context.

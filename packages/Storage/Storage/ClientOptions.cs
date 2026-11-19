@@ -58,9 +58,9 @@ public class ClientOptions
     public RetryOptions Retry { get; set; } = new RetryOptions();
 
     /// <summary>
-    /// Whether the SDK adds the current trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each
-    /// request. Defaults to <see cref="TracePropagation.Enabled"/>. <see cref="TracePropagation.Disabled"/> stops the SDK
-    /// from injecting it; the .NET runtime's own injection is controlled through
+    /// Whether the SDK adds trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each
+    /// request: the current activity's, or a new unsampled <c>traceparent</c> when there is none. Defaults to
+    /// <see cref="TracePropagation.Enabled"/>. <see cref="TracePropagation.Disabled"/> stops the SDK from injecting it; the .NET runtime's own injection is controlled through
     /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>.
     /// </summary>
     public TracePropagation TracePropagation { get; set; } = TracePropagation.Enabled;

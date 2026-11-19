@@ -33,9 +33,10 @@ public static class RetryExecutor
         RetryOptions options, TracePropagation tracePropagation, ILogger? logger, HttpCompletionOption completionOption, CancellationToken cancellationToken)
     {
         var attempt = 0;
+        var traceId = ActivityTraceId.CreateRandom();
         while (true)
         {
-            var (response, exception, sent) = await Attempt(client, requestFactory, tracePropagation, logger, completionOption, cancellationToken).ConfigureAwait(false);
+            var (response, exception, sent) = await Attempt(client, requestFactory, tracePropagation, traceId, logger, completionOption, cancellationToken).ConfigureAwait(false);
             if (!ShouldRetry(response, exception, attempt, options))
                 return response ?? throw exception!;
 
@@ -48,11 +49,11 @@ public static class RetryExecutor
     }
 
     private static async Task<(HttpResponseMessage? Response, HttpRequestException? Exception, SentRequest Sent)> Attempt(
-        HttpClient client, Func<HttpRequestMessage> requestFactory, TracePropagation tracePropagation, ILogger? logger,
-        HttpCompletionOption completionOption, CancellationToken cancellationToken)
+        HttpClient client, Func<HttpRequestMessage> requestFactory, TracePropagation tracePropagation, ActivityTraceId traceId,
+        ILogger? logger, HttpCompletionOption completionOption, CancellationToken cancellationToken)
     {
         using var request = requestFactory();
-        TraceContext.Inject(request.Headers, tracePropagation);
+        TraceContext.Inject(request.Headers, tracePropagation, traceId);
         var sent = new SentRequest(request.Method, request.RequestUri!);
         var startTimestamp = Stopwatch.GetTimestamp();
         try

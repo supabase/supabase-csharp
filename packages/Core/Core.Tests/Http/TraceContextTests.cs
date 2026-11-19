@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,8 +15,8 @@ using Supabase.Core.Http;
 namespace Core.Tests.Http;
 
 /// <summary>
-/// The current <see cref="Activity"/> travels with every request the SDK sends as W3C trace context, unless the caller turned
-/// propagation off or already set the header (client.observability.trace_propagation).
+/// The current <see cref="Activity"/> travels with every request the SDK sends as W3C trace context, and without one the SDK
+/// originates an unsampled trace, unless the caller turned propagation off or already set the header (client.observability.trace_propagation).
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
@@ -81,12 +84,68 @@ public class TraceContextTests
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldSendNoTraceContext_GivenNoActivity()
+    public async Task SendAsync_ShouldOriginateAnUnsampledTraceParent_GivenNoActivity()
     {
         Activity.Current = null;
-        (await SentThrough(TracePropagation.Enabled)).Headers.Contains("traceparent").Should().BeFalse(
-            "without an active operation there is no context to propagate");
+        var sent = await SentThrough(TracePropagation.Enabled);
+        sent.Headers.GetValues("traceparent").Should().ContainSingle().Which.Should().MatchRegex("^00-[0-9a-f]{32}-[0-9a-f]{16}-00$",
+            "without an active operation the SDK starts a trace that nothing downstream records");
     }
+
+    [TestMethod]
+    public async Task SendAsync_ShouldOriginateANewTracePerCall_GivenNoActivity()
+    {
+        Activity.Current = null;
+        var first = (await SentThrough(TracePropagation.Enabled)).Headers.GetValues("traceparent").Single();
+        var second = (await SentThrough(TracePropagation.Enabled)).Headers.GetValues("traceparent").Single();
+        TraceIdOf(first).Should().NotBe(TraceIdOf(second), "each call is its own trace");
+    }
+
+    [TestMethod]
+    public async Task SendAsync_ShouldShareTheTraceAcrossRetries_GivenNoActivity()
+    {
+        Activity.Current = null;
+        var handler = new CapturingHandler(HttpStatusCode.ServiceUnavailable, HttpStatusCode.OK);
+        using var client = new HttpClient(handler);
+        var options = new RetryOptions { MaxRetries = 1, BaseDelay = TimeSpan.Zero, MaxDelay = TimeSpan.Zero };
+        (await RetryExecutor.SendAsync(client, () => new HttpRequestMessage(HttpMethod.Get, "http://localhost/"),
+            options, TracePropagation.Enabled, null, CancellationToken.None)).Dispose();
+
+        var attempts = handler.Received.Select(request => request.Headers.GetValues("traceparent").Single()).ToList();
+        using (new AssertionScope())
+        {
+            attempts.Should().HaveCount(2);
+            TraceIdOf(attempts[0]).Should().Be(TraceIdOf(attempts[1]), "the attempts belong to one call");
+            SpanIdOf(attempts[0]).Should().NotBe(SpanIdOf(attempts[1]), "each attempt is its own request");
+        }
+    }
+
+    [TestMethod]
+    public async Task SendAsync_ShouldKeepTheCallersTraceParentUnchanged_GivenNoActivity()
+    {
+        const string callerTraceParent = "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01";
+        Activity.Current = null;
+        var sent = await SentThrough(TracePropagation.Enabled, () =>
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost/");
+            request.Headers.Add("traceparent", callerTraceParent);
+            return request;
+        });
+        sent.Headers.GetValues("traceparent").Should().ContainSingle().Which.Should().Be(callerTraceParent,
+            "an existing trace is forwarded as is, flags included");
+    }
+
+    [TestMethod]
+    public async Task SendAsync_ShouldKeepTheActivitysFlags_GivenASampledActivity()
+    {
+        using var activity = Source.StartActivity("operation")!;
+        var sent = await SentThrough(TracePropagation.Enabled);
+        sent.Headers.GetValues("traceparent").Single().Should().EndWith("-01", "a trace that already exists keeps its sampling decision");
+    }
+
+    private static string TraceIdOf(string traceParent) => traceParent.Split('-')[1];
+
+    private static string SpanIdOf(string traceParent) => traceParent.Split('-')[2];
 
     [TestMethod]
     public async Task SendAsync_ShouldKeepTheCallersTraceParent_GivenTheRequestAlreadyHasOne()
@@ -145,12 +204,18 @@ public class TraceContextTests
 
     private sealed class CapturingHandler : HttpMessageHandler
     {
-        public HttpRequestMessage? Sent { get; private set; }
+        private readonly Queue<HttpStatusCode> statuses;
+
+        public CapturingHandler(params HttpStatusCode[] statuses) => this.statuses = new Queue<HttpStatusCode>(statuses);
+
+        public HttpRequestMessage? Sent => this.Received.LastOrDefault();
+
+        public List<HttpRequestMessage> Received { get; } = new();
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            this.Sent = request;
-            return Task.FromResult(new HttpResponseMessage());
+            this.Received.Add(request);
+            return Task.FromResult(new HttpResponseMessage(this.statuses.Count > 0 ? this.statuses.Dequeue() : HttpStatusCode.OK));
         }
     }
 }
