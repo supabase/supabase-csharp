@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -39,7 +38,7 @@ public class BroadcastEarlyReplyTests
     [TestMethod]
     public async Task Send_ShouldResolve_GivenTheReplyArrivesBeforeItReturns()
     {
-        var send = await Task.Factory.StartNew(() => this.channel.Send(ChannelEventName.Broadcast, "hello", new { }), CancellationToken.None, TaskCreationOptions.None, new InlineTaskScheduler());
-        await send.Awaiting(sending => sending).Should().CompleteWithinAsync(Patience, "a reply that arrives before Send listens for it must still complete the send");
+        var send = await new TaskFactory(new InlineTaskScheduler()).StartNew(() => this.channel.Send(ChannelEventName.Broadcast, "hello", new { }));
+        send.IsCompleted.Should().BeTrue("a reply that arrives before Send listens for it must still complete the send");
     }
 }
