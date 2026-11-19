@@ -16,6 +16,7 @@ internal static class WireFrame
     private const byte UserBroadcastType = 4;
     private const byte NoMetadata = 0;
     private const byte BinaryEncoding = 0;
+    private const byte JsonEncoding = 1;
     private const int UserBroadcastHeaderSize = 5;
     private static readonly string[] Fields = { "join_ref", "ref", "topic", "event", "payload" };
 
@@ -64,7 +65,7 @@ internal static class WireFrame
         var userEvent = JsonSerializer.Serialize(Next(frame[2]));
         var metadata = Next(frame[3]);
         var meta = metadata.Length > 0 ? $",\"meta\":{metadata}" : string.Empty;
-        binaryPayload = frame[4] == BinaryEncoding ? frame.AsSpan(offset).ToArray() : null;
+        binaryPayload = frame[4] == JsonEncoding ? null : frame.AsSpan(offset).ToArray();
         var payload = binaryPayload == null ? $",\"payload\":{Next(frame.Length - offset)}" : string.Empty;
         return $"{{\"topic\":{topic},\"event\":\"broadcast\",\"payload\":{{\"type\":\"broadcast\",\"event\":{userEvent}{meta}{payload}}}}}";
     }

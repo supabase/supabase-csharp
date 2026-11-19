@@ -32,6 +32,7 @@ public class ProtocolVersionTests
     private const byte NoMetadata = 0;
     private const byte BinaryEncoding = 0;
     private const byte JsonEncoding = 1;
+    private const byte UnknownEncoding = 2;
     private const int LongestFieldInBytes = 255;
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
     private static readonly byte[] Bytes = [0, 159, 146, 150, 255];
@@ -92,10 +93,12 @@ public class ProtocolVersionTests
     }
 
     [TestMethod]
-    public async Task Broadcast_ShouldCarryTheBytes_GivenABinaryFrameWithABinaryPayload()
+    [DataRow(BinaryEncoding)]
+    [DataRow(UnknownEncoding)]
+    public async Task Broadcast_ShouldCarryTheBytes_GivenABinaryFrameWhosePayloadIsNotJson(byte encoding)
     {
         var broadcast = await this.JoinedBroadcast();
-        this.socket.ReceiveBinary(BinaryFrame(UserBroadcast, string.Empty, BinaryEncoding, Bytes));
+        this.socket.ReceiveBinary(BinaryFrame(UserBroadcast, string.Empty, encoding, Bytes));
         broadcast.Current()!.BinaryPayload.Should().Equal(Bytes, "a payload that is not JSON must reach the app as the bytes the server sent");
     }
 
@@ -126,6 +129,17 @@ public class ProtocolVersionTests
         await broadcast.SendBinary(longestEvent, Bytes);
         var frame = await this.socket.SentBinary.Task.WaitAsync(Patience);
         frame.Should().EndWith([.. Utf8(Topic + longestEvent), .. Bytes], "the bytes must go out in a binary frame after the topic and an event name of up to 255 bytes");
+    }
+
+    [TestMethod]
+    public async Task SendBinary_ShouldPushTheBytesItWasGiven_GivenTheArrayChangesAfterTheCall()
+    {
+        byte[] reused = [.. Bytes];
+        var broadcast = await this.JoinedBroadcast();
+        await broadcast.SendBinary(Event, reused);
+        Array.Clear(reused);
+        var frame = await this.socket.SentBinary.Task.WaitAsync(Patience);
+        frame.Should().EndWith(Bytes, "the frame is written after SendBinary returns, so it must carry the bytes as they were at the call");
     }
 
     [TestMethod]

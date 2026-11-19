@@ -37,14 +37,14 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
     /// </summary>
     public TBroadcastModel? Current()
     {
-        if (this.lastSocketResponse == null) return null;
+        if (this.lastSocketResponse is not { } response) return null;
 
-        var obj = JsonSerializer.Deserialize<SocketResponse<TBroadcastModel>>(this.lastSocketResponse.Json!,
+        var obj = JsonSerializer.Deserialize<SocketResponse<TBroadcastModel>>(response.Json!,
             this.serializerSettings);
 
         if (obj == null || obj.Payload == null) return null;
 
-        obj.Payload.BinaryPayload = this.lastSocketResponse.BinaryPayload;
+        obj.Payload.BinaryPayload = response.BinaryPayload;
         return obj.Payload;
     }
 
@@ -132,6 +132,6 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
         if (!WireFrame.Fits(this.channel.Topic))
             throw new RealtimeException("The topic of a broadcast of bytes must fit in 255 bytes.");
 
-        return this.channel.Send(ChannelEventName.Broadcast, null, new BinaryBroadcast(broadcastEventName, payload), timeoutMs);
+        return this.channel.Send(ChannelEventName.Broadcast, null, new BinaryBroadcast(broadcastEventName, (byte[]) payload.Clone()), timeoutMs);
     }
 }
