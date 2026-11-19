@@ -1,5 +1,42 @@
 # Changelog
 
+## [8.13.0](https://github.com/supabase/supabase-csharp/compare/v8.12.0...v8.13.0) (2026-11-19)
+
+
+### Features
+
+* **auth:** delete an OAuth client as an admin ([#784](https://github.com/supabase/supabase-csharp/issues/784)) ([7149a48](https://github.com/supabase/supabase-csharp/commit/7149a48c65c7519ea26764fc8a770c86fb50daf8))
+* **auth:** disable session persistence with SessionPersistence.Disabled ([#761](https://github.com/supabase/supabase-csharp/issues/761)) ([cf8b6d3](https://github.com/supabase/supabase-csharp/commit/cf8b6d3394f2c5013a6038bb825cb4cfc1464281))
+* **auth:** list OAuth clients as an admin ([#789](https://github.com/supabase/supabase-csharp/issues/789)) ([abff936](https://github.com/supabase/supabase-csharp/commit/abff936fe84b91624ee47992ae285f3a9fd4bd30))
+* **auth:** read an OAuth client as an admin ([#791](https://github.com/supabase/supabase-csharp/issues/791)) ([da79909](https://github.com/supabase/supabase-csharp/commit/da799094343edc90115ee81777a536717041df76))
+* **auth:** regenerate an OAuth client secret as an admin ([#788](https://github.com/supabase/supabase-csharp/issues/788)) ([e906745](https://github.com/supabase/supabase-csharp/commit/e906745f76f25e399514e47f445b555d27dc2db2))
+* **auth:** register an OAuth client as an admin ([#786](https://github.com/supabase/supabase-csharp/issues/786)) ([6886804](https://github.com/supabase/supabase-csharp/commit/68868048eb44d3f69c78a3d966199fb359430926))
+* **auth:** update an OAuth client as an admin ([#792](https://github.com/supabase/supabase-csharp/issues/792)) ([8fdcc0a](https://github.com/supabase/supabase-csharp/commit/8fdcc0a313af0f5d8d602c92b43281722ee83d38))
+* **postgrest:** bulk insert and upsert rows that carry different fields ([#770](https://github.com/supabase/supabase-csharp/issues/770)) ([067dbec](https://github.com/supabase/supabase-csharp/commit/067dbec7057cf7daa76de80d63c88fd7fb39f2f0))
+* **postgrest:** cap how many rows an update or delete may affect with MaxAffected ([#771](https://github.com/supabase/supabase-csharp/issues/771)) ([774a112](https://github.com/supabase/supabase-csharp/commit/774a1122808a372d8d54b791626bd7cc6bd1363c))
+* **postgrest:** read exactly one row with SingleOrThrowAsync ([#776](https://github.com/supabase/supabase-csharp/issues/776)) ([04db9b8](https://github.com/supabase/supabase-csharp/commit/04db9b8382ffc6443fed6e69e9fbc1e0287d7333))
+* **postgrest:** use column defaults for fields omitted from bulk insert or upsert rows ([#774](https://github.com/supabase/supabase-csharp/issues/774)) ([0570438](https://github.com/supabase/supabase-csharp/commit/0570438b717cf19f907c1abf3f24fe1a1245eb81))
+* **realtime:** add presence join and leave handlers with the key and presences ([#756](https://github.com/supabase/supabase-csharp/issues/756)) ([9537a08](https://github.com/supabase/supabase-csharp/commit/9537a08247cb1177076f1bee3252742506932e96))
+* **realtime:** connect on subscribe when the client has no socket ([#780](https://github.com/supabase/supabase-csharp/issues/780)) ([f8037d3](https://github.com/supabase/supabase-csharp/commit/f8037d37ac42bccda5009e86caa3ce3e6f1a4d09))
+* **realtime:** log channel state changes to the supplied logger ([#797](https://github.com/supabase/supabase-csharp/issues/797)) ([e8f3c2b](https://github.com/supabase/supabase-csharp/commit/e8f3c2b1339496358b9a77306c0f22045b58d19e))
+* **realtime:** reconnect when the network comes back ([#799](https://github.com/supabase/supabase-csharp/issues/799)) ([fdef791](https://github.com/supabase/supabase-csharp/commit/fdef7916e1ba8f8985ddc01bf09cb68730696881))
+* **supabase:** log request outcomes, retries and background work to a supplied logger ([#766](https://github.com/supabase/supabase-csharp/issues/766)) ([7cef7f5](https://github.com/supabase/supabase-csharp/commit/7cef7f5456a3fb3ed50ee349b46917164c2930f4))
+* **supabase:** send Storage requests, uploads and downloads through the client supplied in SupabaseOptions.HttpClient ([#758](https://github.com/supabase/supabase-csharp/issues/758)) ([687b978](https://github.com/supabase/supabase-csharp/commit/687b978d2f376218b1f3bbc524b8cbdd501048a1))
+* **supabase:** send the current trace context with every request, with an opt-out ([#762](https://github.com/supabase/supabase-csharp/issues/762)) ([fab89ee](https://github.com/supabase/supabase-csharp/commit/fab89ee66e2c1f5ff0c3022e1fff4e05610d4970))
+
+
+### Bug Fixes
+
+* **realtime:** close a channel removed while it is still joining ([#754](https://github.com/supabase/supabase-csharp/issues/754)) ([cef965d](https://github.com/supabase/supabase-csharp/commit/cef965d90b2510fb6e2462dbf6ec82efbb97679c))
+* **realtime:** complete a push only on its own reply ([#781](https://github.com/supabase/supabase-csharp/issues/781)) ([9f398e1](https://github.com/supabase/supabase-csharp/commit/9f398e15395aaa15d7143b364929022c3f8859ef))
+* **realtime:** do not open the socket when Disconnect is called during the token lookup ([#782](https://github.com/supabase/supabase-csharp/issues/782)) ([d7a9376](https://github.com/supabase/supabase-csharp/commit/d7a9376bcf1ec69748e0d818732f91b39339934e))
+* **realtime:** ignore exceptions thrown by debug handlers ([#731](https://github.com/supabase/supabase-csharp/issues/731)) ([c250f4b](https://github.com/supabase/supabase-csharp/commit/c250f4b109a407c9fc6cd658dbab4283c87a31f1))
+* **realtime:** keep presence on a track that replaces phx_ref ([#680](https://github.com/supabase/supabase-csharp/issues/680)) ([55877f2](https://github.com/supabase/supabase-csharp/commit/55877f27ae3c4f71e3c0505c8378512ef10552c1))
+* **realtime:** send queued messages after a rejoin ([#755](https://github.com/supabase/supabase-csharp/issues/755)) ([1b5554d](https://github.com/supabase/supabase-csharp/commit/1b5554dbbdecc60b87c185349403c265350bba8d))
+* **realtime:** wait ReconnectAfterInterval between reconnect attempts ([#783](https://github.com/supabase/supabase-csharp/issues/783)) ([12b5160](https://github.com/supabase/supabase-csharp/commit/12b5160bdbc1def8862b6e65d504f4a414bf8c85))
+* **storage:** add Bucket.FileSizeLimitInBytes to read numeric file_size_limit ([#801](https://github.com/supabase/supabase-csharp/issues/801)) ([58c7832](https://github.com/supabase/supabase-csharp/commit/58c7832b2131f109c6c91367930bd2e431002e9c))
+* **storage:** read FileObjectV2.Size as long so objects over 2 GiB deserialize ([#804](https://github.com/supabase/supabase-csharp/issues/804)) ([39b1136](https://github.com/supabase/supabase-csharp/commit/39b1136054a148f4d3a53da861d33136145f3219))
+
 ## [8.12.0](https://github.com/supabase/supabase-csharp/compare/v8.11.0...v8.12.0) (2026-11-16)
 
 
