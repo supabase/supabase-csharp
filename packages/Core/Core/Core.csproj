@@ -5,12 +5,12 @@
 		<PackageId>Supabase.Core</PackageId>
 		<PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Core</PackageProjectUrl>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Description>Supabase .NET shared HTTP, retry and telemetry pieces used by the Supabase packages.</Description>
+		<Description>Official Supabase .NET shared HTTP, retry and telemetry pieces used by the Supabase packages.</Description>
 		<AssemblyName>Supabase.Core</AssemblyName>
 		<RootNamespace>Supabase.Core</RootNamespace>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageTags>supabase;core</PackageTags>
+		<PackageTags>supabase;official;core</PackageTags>
 		<!-- x-release-please-start-version -->
 		<PackageVersion>8.12.0</PackageVersion>
 		<ReleaseVersion>8.12.0</ReleaseVersion>

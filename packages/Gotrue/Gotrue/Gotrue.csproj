@@ -8,8 +8,8 @@
         <RootNamespace>Supabase.Gotrue</RootNamespace>
         <AssemblyName>Supabase.Gotrue</AssemblyName>
         <NeutralLanguage>en</NeutralLanguage>
-        <Description>Supabase Auth client for .NET covering email, phone and OAuth sign-in, magic links, MFA and session refresh.</Description>
-        <PackageTags>supabase;auth;authentication;gotrue;jwt;oauth;mfa;pkce;sso</PackageTags>
+        <Description>Official Supabase Auth client for .NET covering email, phone and OAuth sign-in, magic links, MFA and session refresh.</Description>
+        <PackageTags>supabase;official;auth;authentication;gotrue;jwt;oauth;mfa;pkce;sso</PackageTags>
         <!-- x-release-please-start-version -->
         <PackageVersion>8.12.0</PackageVersion>
         <ReleaseVersion>8.12.0</ReleaseVersion>

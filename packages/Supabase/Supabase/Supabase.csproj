@@ -9,10 +9,10 @@
         <PackageProjectUrl>https://github.com/supabase/supabase-csharp/tree/master/packages/Supabase</PackageProjectUrl>
         <RootNamespace>Supabase</RootNamespace>
         <AssemblyName>Supabase</AssemblyName>
-        <Description>Supabase client for .NET that composes Auth, Database, Storage, Realtime and Edge Functions behind one client.</Description>
+        <Description>Official Supabase client for .NET that composes Auth, Database, Storage, Realtime and Edge Functions behind one client.</Description>
         <NeutralLanguage>en</NeutralLanguage>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <PackageTags>supabase;postgres;baas;auth;storage;realtime;edge-functions;blazor;maui</PackageTags>
+        <PackageTags>supabase;official;postgres;baas;auth;storage;realtime;edge-functions;blazor;maui</PackageTags>
         <!-- x-release-please-start-version -->
         <ReleaseVersion>8.12.0</ReleaseVersion>
         <PackageVersion>8.12.0</PackageVersion>

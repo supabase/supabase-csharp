@@ -4,9 +4,9 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Functions)](https://www.nuget.org/packages/Supabase.Functions/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
-A C# client for invoking [Supabase Edge Functions](https://supabase.com/docs/guides/functions).
+The official C# client for invoking [Supabase Edge Functions](https://supabase.com/docs/guides/functions).
 
-Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
+Part of the official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase. Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.Functions`); reference
 this package directly when you only need to invoke functions.
 

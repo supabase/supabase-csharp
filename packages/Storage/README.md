@@ -4,10 +4,10 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Storage)](https://www.nuget.org/packages/Supabase.Storage/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
-A C# client for [Supabase Storage](https://supabase.com/docs/guides/storage) — upload, download, and
+The official C# client for [Supabase Storage](https://supabase.com/docs/guides/storage) — upload, download, and
 serve files from buckets, with signed and public URLs.
 
-Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
+Part of the official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase. Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.Storage`); reference
 this package directly when you only need storage.
 

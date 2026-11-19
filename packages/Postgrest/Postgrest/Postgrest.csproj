@@ -10,8 +10,8 @@
         <PackOnBuild>true</PackOnBuild>
         <NeutralLanguage>en-US</NeutralLanguage>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <Description>Supabase Database client for .NET that queries Postgres through PostgREST with typed models, filters and RPC.</Description>
-        <PackageTags>supabase;postgrest;postgres;postgresql;database;rest;rpc;linq</PackageTags>
+        <Description>Official Supabase Database client for .NET that queries Postgres through PostgREST with typed models, filters and RPC.</Description>
+        <PackageTags>supabase;official;postgrest;postgres;postgresql;database;rest;rpc;linq</PackageTags>
         <!-- x-release-please-start-version -->
         <ReleaseVersion>8.12.0</ReleaseVersion>
         <PackageVersion>8.12.0</PackageVersion>

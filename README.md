@@ -4,7 +4,7 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase?label=Supabase)](https://www.nuget.org/packages/Supabase/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 
-The official C# client for [Supabase](https://supabase.com). This is a monorepo: the top-level
+The official C# client for [Supabase](https://supabase.com), maintained by Supabase. This is a monorepo: the top-level
 `Supabase` client and every service package it builds on live here, under [`packages/`](./packages).
 
 Use the `Supabase` meta-package for the full client, or reference an individual service package
