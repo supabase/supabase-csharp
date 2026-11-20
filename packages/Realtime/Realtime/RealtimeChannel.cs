@@ -635,8 +635,8 @@ public class RealtimeChannel : IRealtimeChannel
         this.Socket.HttpSendAsync(this, eventName, payload, cancellationToken);
 
     /// <summary>
-    /// Awaits a reply for a given <see cref="Channel.Push"/>, resolving with whether a known reply was
-    /// received, or faulting with a <see cref="RealtimeException"/> if the push times out first.
+    /// Awaits a reply for a given <see cref="Channel.Push"/>, resolving with whether the server replied
+    /// <c>ok</c>, or faulting with a <see cref="RealtimeException"/> if the push times out first.
     ///
     /// Kept as instance methods (rather than local lambdas referencing each other) so there's no
     /// self/mutually-referencing closure over locals that get assigned after the closure is created.
@@ -651,6 +651,8 @@ public class RealtimeChannel : IRealtimeChannel
             this.push = push;
             this.push.AddMessageReceivedHandler(this.HandleMessageReceived);
             this.push.OnTimeout += this.HandleTimeout;
+            if (this.push.Response is SocketResponse reply)
+                this.HandleMessageReceived(this.push, reply);
         }
 
         public static Task<bool> Await(Push push) => new PushAwaiter(push).taskCompletion.Task;
@@ -658,7 +660,7 @@ public class RealtimeChannel : IRealtimeChannel
         private void HandleMessageReceived(IRealtimePush<RealtimeChannel, SocketResponse> sender, SocketResponse message)
         {
             this.Detach();
-            this.taskCompletion.TrySetResult(message.Event != EventType.Unknown);
+            this.taskCompletion.TrySetResult(message.Payload?.Status == PhoenixStatusOk);
         }
 
         private void HandleTimeout(object sender, EventArgs e)
