@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
+using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
@@ -17,7 +18,6 @@ using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.SignInWithPasskey;
 using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
-using Supabase.Gotrue.AuthorizationOAuth;
 using static Supabase.Gotrue.Constants;
 
 #endregion

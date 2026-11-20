@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Supabase.Gotrue;
 using Supabase.Gotrue.AuthorizationOAuth;
 
 #endregion

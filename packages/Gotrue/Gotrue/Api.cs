@@ -6,9 +6,11 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Supabase.Core;
 using Supabase.Core.Extensions;
 using Supabase.Core.Http;
+using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
@@ -34,7 +36,6 @@ using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
 using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
-using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.VerifyRecoveryCode;
 using static Supabase.Gotrue.Constants;
 
@@ -74,7 +75,7 @@ public class Api : IGotrueApi<User, Session>
 
     internal TracePropagation TracePropagation { get; init; } = TracePropagation.Enabled;
 
-    internal Microsoft.Extensions.Logging.ILogger? Logger { get; init; }
+    internal ILogger? Logger { get; init; }
 
     /// <summary>
     /// Creates a new API client

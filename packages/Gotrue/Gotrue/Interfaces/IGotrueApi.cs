@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
+using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
@@ -22,7 +23,6 @@ using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
 using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
-using Supabase.Gotrue.AuthorizationOAuth;
 using static Supabase.Gotrue.Constants;
 
 #pragma warning disable CS1591

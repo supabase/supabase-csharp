@@ -1,4 +1,6 @@
 #nullable enable
+override Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.GetHashCode() -> int
+static Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.operator !=(Supabase.Gotrue.AuthorizationOAuth.OAuthGrant? left, Supabase.Gotrue.AuthorizationOAuth.OAuthGrant? right) -> bool
 Supabase.Gotrue.Api.ApproveAuthorization(string! jwt, string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
 Supabase.Gotrue.Api.DenyAuthorization(string! jwt, string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
 Supabase.Gotrue.Api.GetAuthorizationDetails(string! jwt, string! authorizationId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse!>!
@@ -6,9 +8,23 @@ Supabase.Gotrue.Api.ListGrants(string! jwt, System.Threading.CancellationToken c
 Supabase.Gotrue.Api.RevokeGrant(string! jwt, Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions
 Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.AuthorizationOptions() -> void
+Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.<Clone>$() -> Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions!
+Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.Equals(Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? other) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.Equals(object? obj) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.ToString() -> string!
+static Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.operator !=(Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? left, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? right) -> bool
+static Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.operator ==(Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? left, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? right) -> bool
 Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.SkipBrowserRedirect.get -> bool
 Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.SkipBrowserRedirect.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.<Clone>$() -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Equals(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient? other) -> bool
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.OAuthAuthorizationClient() -> void
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Equals(object? obj) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.GetHashCode() -> int
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.ToString() -> string!
+static Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.operator !=(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient? left, Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient? right) -> bool
+static Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.operator ==(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient? left, Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient? right) -> bool
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Id.get -> string!
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Id.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.LogoUri.get -> string!
@@ -18,6 +34,14 @@ Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Name.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Uri.get -> string!
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Uri.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.<Clone>$() -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.Equals(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails? other) -> bool
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.OAuthAuthorizationDetails() -> void
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.Equals(object? obj) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.GetHashCode() -> int
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.ToString() -> string!
+static Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.operator !=(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails? left, Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails? right) -> bool
+static Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.operator ==(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails? left, Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails? right) -> bool
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.AuthorizationId.get -> string!
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.AuthorizationId.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.Client.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient!
@@ -29,26 +53,65 @@ Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.Scope.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.User.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser!
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.User.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.<Clone>$() -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Equals(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse? other) -> bool
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.OAuthAuthorizationResponse() -> void
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Equals(object? obj) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.GetHashCode() -> int
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.ToString() -> string!
+static Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.operator !=(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse? left, Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse? right) -> bool
+static Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.operator ==(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse? left, Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse? right) -> bool
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Details.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails?
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Details.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Redirect.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect?
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Redirect.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.<Clone>$() -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Equals(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser? other) -> bool
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.OAuthAuthorizationUser() -> void
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Equals(object? obj) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.GetHashCode() -> int
+override Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.ToString() -> string!
+static Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.operator !=(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser? left, Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser? right) -> bool
+static Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.operator ==(Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser? left, Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser? right) -> bool
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Email.get -> string!
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Email.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Id.get -> string!
 Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Id.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthGrant
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.<Clone>$() -> Supabase.Gotrue.AuthorizationOAuth.OAuthGrant!
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Equals(Supabase.Gotrue.AuthorizationOAuth.OAuthGrant? other) -> bool
+static Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.operator ==(Supabase.Gotrue.AuthorizationOAuth.OAuthGrant? left, Supabase.Gotrue.AuthorizationOAuth.OAuthGrant? right) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Equals(object? obj) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.GetHashCode() -> int
+override Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.ToString() -> string!
 Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Client.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient!
 Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Client.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.GrantedAt.get -> System.DateTimeOffset
 Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.GrantedAt.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.OAuthGrant() -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Scopes.get -> System.Collections.Generic.List<string!>!
 Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Scopes.init -> void
 Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect
+Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.<Clone>$() -> Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!
+Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.Equals(Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect? other) -> bool
+Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.OAuthRedirect() -> void
+override Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.Equals(object? obj) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.GetHashCode() -> int
+override Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.ToString() -> string!
+static Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.operator !=(Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect? left, Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect? right) -> bool
+static Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.operator ==(Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect? left, Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect? right) -> bool
 Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.RedirectUrl.get -> string!
 Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.RedirectUrl.init -> void
 Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions
+Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.<Clone>$() -> Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions!
+Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.Equals(Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions? other) -> bool
+Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.RevokeGrantOptions() -> void
+override Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.Equals(object? obj) -> bool
+override Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.GetHashCode() -> int
+override Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.ToString() -> string!
+static Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.operator !=(Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions? left, Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions? right) -> bool
+static Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.operator ==(Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions? left, Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions? right) -> bool
 Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.ClientId.get -> string!
 Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.ClientId.init -> void
 Supabase.Gotrue.Client.ApproveAuthorization(string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
