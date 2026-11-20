@@ -357,6 +357,21 @@ public class StorageFileTests : StorageE2EFixture
         list!.Select(item => item.Name).Should().Equal(names[2], names[1], names[0]);
     }
 
+    [TestMethod]
+    public async Task Exists_ShouldReturnTrueForExistingFile()
+    {
+        var names = await this.UploadThreeNumbered();
+        var exists = await this.bucket.Exists(names[0]);
+        exists.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task Exists_ShouldReturnFalseForNonExistingFile()
+    {
+        var exists = await this.bucket.Exists("supabase.png");
+        exists.Should().BeFalse();
+    }
+
     private async Task<string[]> UploadThreeNumbered()
     {
         var names = new[]
