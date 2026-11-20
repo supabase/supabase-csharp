@@ -169,13 +169,34 @@ public class ProtocolVersionTests
         (await broadcast.Awaiting(b => b.SendBinary(Event, Bytes)).Should().ThrowAsync<RealtimeException>()).WithMessage("The topic of a broadcast of bytes must fit in 255 bytes.", "a binary frame has one byte for the size of the topic, so a longer one must be refused");
     }
 
-    private async Task<RealtimeBroadcast<BaseBroadcast>> JoinedBroadcast(string channelName = "room")
+    [TestMethod]
+    public async Task SendBinary_ShouldThrow_GivenTheServerRejectsTheBroadcast()
+    {
+        var broadcast = await this.JoinedBroadcast(acknowledged: true);
+        var send = broadcast.SendBinary(Event, Bytes);
+        this.socket.Reply(Topic, this.client.Channel(Topic).LastPush!.Ref, "error");
+        (await send.Awaiting(s => s).Should().ThrowWithinAsync<RealtimeException>(Patience)).WithMessage("The server rejected the broadcast of bytes.", "with ack on, an error reply means the server did not accept the broadcast, so the caller must be told");
+    }
+
+    [TestMethod]
+    public async Task SendBinary_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
+    {
+        var broadcast = await this.JoinedBroadcast(acknowledged: true);
+        BlockingCaller.Completes(() =>
+        {
+            var sending = broadcast.SendBinary(Event, Bytes);
+            Task.Run(() => this.socket.Reply(Topic, this.client.Channel(Topic).LastPush!.Ref));
+            return sending;
+        }).Should().BeTrue("the SDK must not resume on the caller's synchronization context");
+    }
+
+    private async Task<RealtimeBroadcast<BaseBroadcast>> JoinedBroadcast(string channelName = "room", bool acknowledged = false)
     {
         var firstHeartbeat = this.socket.SentText("heartbeat", 1);
         await this.client.ConnectAsync();
         await firstHeartbeat.WaitAsync(Patience);
         var channel = this.client.Channel(channelName);
-        var broadcast = channel.Register<BaseBroadcast>();
+        var broadcast = channel.Register<BaseBroadcast>(broadcastAck: acknowledged);
         await channel.Subscribe().WaitAsync(Patience);
         return broadcast;
     }

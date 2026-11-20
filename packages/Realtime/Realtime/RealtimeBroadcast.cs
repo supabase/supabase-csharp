@@ -121,7 +121,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
     }
 
     /// <inheritdoc />
-    public Task<bool> SendBinary(string broadcastEventName, byte[] payload, int timeoutMs = DefaultTimeout)
+    public async Task SendBinary(string broadcastEventName, byte[] payload, int timeoutMs = DefaultTimeout)
     {
         if (this.channel.Options.ClientOptions.ProtocolVersion != ProtocolVersion.V2)
             throw new RealtimeException("A broadcast of bytes needs ClientOptions.ProtocolVersion set to V2.");
@@ -132,6 +132,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
         if (!WireFrame.Fits(this.channel.Topic))
             throw new RealtimeException("The topic of a broadcast of bytes must fit in 255 bytes.");
 
-        return this.channel.Send(ChannelEventName.Broadcast, null, new BinaryBroadcast(broadcastEventName, (byte[]) payload.Clone()), timeoutMs);
+        if (!await this.channel.Send(ChannelEventName.Broadcast, null, new BinaryBroadcast(broadcastEventName, (byte[]) payload.Clone()), timeoutMs).ConfigureAwait(false))
+            throw new RealtimeException("The server rejected the broadcast of bytes.");
     }
 }
