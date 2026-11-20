@@ -1200,7 +1200,7 @@ public class Api : IGotrueApi<User, Session>
         var response = await this
             .MakeRequestAsync<OAuthAuthorizationResponse>(
                 HttpMethod.Get,
-                $"{this.Url}/oauth/authorizations/{PathSegment.Escape(authorizationId)}",
+                $"{this.Url}/oauth/authorizations/{authorizationId}",
                 null,
                 this.CreateAuthedRequestHeaders(jwt),
                 cancellationToken

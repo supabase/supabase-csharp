@@ -1344,6 +1344,7 @@ public class Client : IGotrueClient<User, Session>
     }
 
     /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.get_authorization_details"))]
     public Task<OAuthAuthorizationResponse> GetAuthorizationDetails(
         string authorizationId,
         CancellationToken cancellationToken = default
@@ -1354,6 +1355,7 @@ public class Client : IGotrueClient<User, Session>
         );
 
     /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.approve_authorization"))]
     public Task<OAuthRedirect> ApproveAuthorization(
         string authorizationId,
         AuthorizationOptions? options = null,
@@ -1365,6 +1367,7 @@ public class Client : IGotrueClient<User, Session>
         );
 
     /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.deny_authorization"))]
     public Task<OAuthRedirect> DenyAuthorization(
         string authorizationId,
         AuthorizationOptions? options = null,
@@ -1376,6 +1379,7 @@ public class Client : IGotrueClient<User, Session>
         );
 
     /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.list_grants"))]
     public Task<IReadOnlyList<OAuthGrant>> ListGrants(CancellationToken cancellationToken = default) =>
         this.AsSignedInUserAsync(
             "auth.oauth.list_grants",
@@ -1383,6 +1387,7 @@ public class Client : IGotrueClient<User, Session>
         );
 
     /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.revoke_grant"))]
     public Task RevokeGrant(RevokeGrantOptions options, CancellationToken cancellationToken = default) =>
         this.AsSignedInUserAsync(
             "auth.oauth.revoke_grant",

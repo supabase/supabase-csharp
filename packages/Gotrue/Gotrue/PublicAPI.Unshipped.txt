@@ -1,1 +1,68 @@
 #nullable enable
+Supabase.Gotrue.Api.ApproveAuthorization(string! jwt, string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
+Supabase.Gotrue.Api.DenyAuthorization(string! jwt, string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
+Supabase.Gotrue.Api.GetAuthorizationDetails(string! jwt, string! authorizationId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse!>!
+Supabase.Gotrue.Api.ListGrants(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.AuthorizationOAuth.OAuthGrant!>!>!
+Supabase.Gotrue.Api.RevokeGrant(string! jwt, Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions
+Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.AuthorizationOptions() -> void
+Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.SkipBrowserRedirect.get -> bool
+Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions.SkipBrowserRedirect.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Id.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Id.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.LogoUri.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.LogoUri.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Name.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Name.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Uri.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient.Uri.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.AuthorizationId.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.AuthorizationId.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.Client.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.Client.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.RedirectUri.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.RedirectUri.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.Scope.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.Scope.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.User.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails.User.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Details.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationDetails?
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Details.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Redirect.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect?
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse.Redirect.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Email.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Email.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Id.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationUser.Id.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Client.get -> Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationClient!
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Client.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.GrantedAt.get -> System.DateTimeOffset
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.GrantedAt.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Scopes.get -> System.Collections.Generic.List<string!>!
+Supabase.Gotrue.AuthorizationOAuth.OAuthGrant.Scopes.init -> void
+Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect
+Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.RedirectUrl.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect.RedirectUrl.init -> void
+Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions
+Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.ClientId.get -> string!
+Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions.ClientId.init -> void
+Supabase.Gotrue.Client.ApproveAuthorization(string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
+Supabase.Gotrue.Client.DenyAuthorization(string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
+Supabase.Gotrue.Client.GetAuthorizationDetails(string! authorizationId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse!>!
+Supabase.Gotrue.Client.ListGrants(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.AuthorizationOAuth.OAuthGrant!>!>!
+Supabase.Gotrue.Client.RevokeGrant(Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ApproveAuthorization(string! jwt, string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.DenyAuthorization(string! jwt, string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.GetAuthorizationDetails(string! jwt, string! authorizationId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.ListGrants(string! jwt, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.AuthorizationOAuth.OAuthGrant!>!>!
+Supabase.Gotrue.Interfaces.IGotrueApi<TUser, TSession>.RevokeGrant(string! jwt, Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ApproveAuthorization(string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.DenyAuthorization(string! authorizationId, Supabase.Gotrue.AuthorizationOAuth.AuthorizationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthRedirect!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.GetAuthorizationDetails(string! authorizationId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Gotrue.AuthorizationOAuth.OAuthAuthorizationResponse!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.ListGrants(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Gotrue.AuthorizationOAuth.OAuthGrant!>!>!
+Supabase.Gotrue.Interfaces.IGotrueClient<TUser, TSession>.RevokeGrant(Supabase.Gotrue.AuthorizationOAuth.RevokeGrantOptions! options, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!

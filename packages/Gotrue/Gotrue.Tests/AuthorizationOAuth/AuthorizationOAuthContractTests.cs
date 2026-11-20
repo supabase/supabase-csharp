@@ -2,11 +2,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Gotrue.Tests.Support;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Supabase.Gotrue;
 using Supabase.Gotrue.AuthorizationOAuth;
 
 #endregion
@@ -41,7 +42,7 @@ public class AuthorizationOAuthContractTests : RequestApprovalFixture
     [TestMethod]
     public async Task GetAuthorizationDetails_ShouldReturnRedirect_GivenConsentWasAlreadyGranted()
     {
-        this.RespondTo("/oauth/authorizations/authorization-id", Fixture("authorization_redirect.json"));
+        this.RespondTo("/oauth/authorizations/authorization-id", AuthorizationOAuthResponses.Redirect);
 
         var response = await this.Api.GetAuthorizationDetails(AccessToken, "authorization-id");
 
@@ -55,7 +56,7 @@ public class AuthorizationOAuthContractTests : RequestApprovalFixture
     [TestMethod]
     public async Task GetAuthorizationDetails_ShouldReturnDetails_GivenConsentIsRequired()
     {
-        this.RespondTo("/oauth/authorizations/authorization-id", Fixture("authorization_details.json"));
+        this.RespondTo("/oauth/authorizations/authorization-id", AuthorizationOAuthResponses.Details);
 
         var response = await this.Api.GetAuthorizationDetails(AccessToken, "authorization-id");
 
@@ -79,7 +80,7 @@ public class AuthorizationOAuthContractTests : RequestApprovalFixture
     [TestMethod]
     public async Task ListGrants_ShouldReturnGrantsWithoutClientIdQueryParameter()
     {
-        this.RespondTo("/user/oauth/grants", Fixture("oauth_grants.json"));
+        this.RespondTo("/user/oauth/grants", AuthorizationOAuthResponses.Grants);
 
         var grants = await this.Api.ListGrants(AccessToken);
 
@@ -109,6 +110,13 @@ public class AuthorizationOAuthContractTests : RequestApprovalFixture
         this.ValidateQueryParameters("client_id", "client-id");
     }
 
-    private static string Fixture(string name) =>
-        File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AuthorizationOAuth", "Data", name));
+    [TestMethod]
+    public async Task OAuthAuthorization_ShouldNotSendRequest_GivenCancelledToken()
+    {
+        using var cancelled = new CancellationTokenSource();
+        cancelled.Cancel();
+        var list = () => this.Api.GetAuthorizationDetails(AccessToken, "", cancellationToken: cancelled.Token);
+        await list.Should().ThrowAsync<OperationCanceledException>();
+    }
+
 }

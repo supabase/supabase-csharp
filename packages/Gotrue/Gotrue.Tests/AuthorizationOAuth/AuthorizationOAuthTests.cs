@@ -1,7 +1,5 @@
 #region
 
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,96 +17,96 @@ public class AuthorizationOAuthTests : AuthorizationOAuthFixture
     [TestMethod]
     public async Task GetAuthorizationDetails_ShouldReturnConsentDetails_GivenNewAuthorization()
     {
-        await this.CreateOAuthClient();
-        var session = await this.SignUpNewUser();
-        var authorizationId = await this.StartAuthorizationRequest();
+        var authorizationId = DetailsAuthorizationId;
+        var session = await this.SignInSeededUser();
 
         var result = await this.Client.GetAuthorizationDetails(authorizationId);
 
         result.Details.Should().NotBeNull();
         result.Details!.AuthorizationId.Should().Be(authorizationId);
-        result.Details.RedirectUri.Should().Be(this.RedirectUri);
-        result.Details.Client.Id.Should().Be(this.ClientId);
-        result.Details.User.Id.Should().Be(session.User!.Id);
+        result.Details.RedirectUri.Should().Be("http://localhost:3000/callback");
+        result.Details.Client.Id.Should().Be(DetailsClientId);
+        result.Details.Client.Name.Should().Be("Mock OAuth Client 009");
+        result.Details.User.Id.Should().Be(session!.User!.Id);
         result.Details.User.Email.Should().Be(session.User.Email);
-        result.Details.Scope.Should().Be("openid profile email");
+        result.Details.Scope.Should().Be("openid email profile");
         result.Redirect.Should().BeNull();
     }
 
     [TestMethod]
-    public async Task ApproveAuthorization_ShouldReturnCodeRedirectAndCreateGrant_GivenConsentDetails()
+    public async Task GetAuthorizationDetails_ShouldReturnRedirect_GivenConsentWasAlreadyGranted()
     {
-        await this.CreateOAuthClient();
-        await this.SignUpNewUser();
-        var authorizationId = await this.StartAuthorizationRequest();
-        var details = await this.Client.GetAuthorizationDetails(authorizationId);
-        details.Details.Should().NotBeNull();
+        await this.SignInSeededUser();
 
-        var redirect = await this.Client.ApproveAuthorization(authorizationId, new AuthorizationOptions { SkipBrowserRedirect = true });
-        var parameters = ParseQuery(new Uri(redirect.RedirectUrl).Query);
-
-        parameters.Should().ContainKey("code");
-        parameters.Should().ContainKey("state");
-        parameters["state"].Should().NotBeNullOrEmpty();
-        var grants = await this.Client.ListGrants();
-        grants.Should().ContainSingle(grant => grant.Client.Id == this.ClientId && grant.Scopes.Contains("openid"));
-    }
-
-    [TestMethod]
-    public async Task GetAuthorizationDetails_ShouldReturnRedirect_GivenConsentWasPreviouslyGranted()
-    {
-        await this.CreateOAuthClient();
-        await this.SignUpNewUser();
-
-        var firstAuthorizationId = await this.StartAuthorizationRequest();
-        await this.Client.GetAuthorizationDetails(firstAuthorizationId);
-        await this.Client.ApproveAuthorization(firstAuthorizationId, new AuthorizationOptions { SkipBrowserRedirect = true });
-
-        var nextAuthorizationId = await this.StartAuthorizationRequest();
-        var result = await this.Client.GetAuthorizationDetails(nextAuthorizationId);
+        var result = await this.Client.GetAuthorizationDetails(AutoApprovedAuthorizationId);
 
         result.Details.Should().BeNull();
         result.Redirect.Should().NotBeNull();
-        var parameters = ParseQuery(new Uri(result.Redirect!.RedirectUrl).Query);
-        parameters.Should().ContainKey("code");
-        parameters.Should().ContainKey("state");
+        result.Redirect!.RedirectUrl.Should().StartWith("http://localhost:3000/callback?")
+            .And.Contain("code=")
+            .And.Contain("state=test-state-004");
+    }
+
+    [TestMethod]
+    public async Task ApproveAuthorization_ShouldReturnCodeRedirect_GivenConsentDetails()
+    {
+        await this.SignInSeededUser();
+        var details = await this.Client.GetAuthorizationDetails(ApprovalAuthorizationId);
+        details.Details.Should().NotBeNull();
+
+        var redirect = await this.Client.ApproveAuthorization(ApprovalAuthorizationId);
+
+        redirect.RedirectUrl.Should().StartWith("http://localhost:3000/callback?")
+            .And.Contain("code=")
+            .And.Contain("state=test-state-002");
     }
 
     [TestMethod]
     public async Task DenyAuthorization_ShouldReturnAccessDeniedRedirect_GivenConsentDetails()
     {
-        await this.CreateOAuthClient();
-        await this.SignUpNewUser();
-        var authorizationId = await this.StartAuthorizationRequest();
-        var details = await this.Client.GetAuthorizationDetails(authorizationId);
+        await this.SignInSeededUser();
+        var details = await this.Client.GetAuthorizationDetails(DenialAuthorizationId);
         details.Details.Should().NotBeNull();
 
-        var redirect = await this.Client.DenyAuthorization(authorizationId, new AuthorizationOptions { SkipBrowserRedirect = true });
-        var parameters = ParseQuery(new Uri(redirect.RedirectUrl).Query);
+        var redirect = await this.Client.DenyAuthorization(DenialAuthorizationId);
 
-        parameters.Should().ContainKey("error").WhoseValue.Should().Be("access_denied");
-        parameters.Should().ContainKey("state");
-        (await this.Client.ListGrants()).Should().BeEmpty();
+        redirect.RedirectUrl.Should().StartWith("http://localhost:3000/callback?")
+            .And.Contain("error=access_denied")
+            .And.Contain("state=test-state-003");
     }
 
     [TestMethod]
-    public async Task RevokeGrant_ShouldRemoveGrant_GivenUserHasApprovedClient()
+    public async Task ListGrants_ShouldReturnSeededGrant_GivenUserHasAuthorizedClient()
     {
-        await this.CreateOAuthClient();
-        await this.SignUpNewUser();
-        var authorizationId = await this.StartAuthorizationRequest();
-        await this.Client.GetAuthorizationDetails(authorizationId);
-        await this.Client.ApproveAuthorization(authorizationId, new AuthorizationOptions { SkipBrowserRedirect = true });
-        (await this.Client.ListGrants()).Should().ContainSingle(grant => grant.Client.Id == this.ClientId);
+        await this.SignInSeededUser();
 
-        await this.Client.RevokeGrant(new RevokeGrantOptions { ClientId = this.ClientId });
+        var grants = await this.Client.ListGrants();
 
-        (await this.Client.ListGrants()).Should().NotContain(grant => grant.Client.Id == this.ClientId);
+        var grant = grants.Should().ContainSingle(item => item.Client.Id == ListGrantsClientId).Which;
+        grant.Client.Name.Should().Be("Mock OAuth Client For Listing");
+        grant.Client.Uri.Should().Be("http://localhost:3000");
+        grant.Client.LogoUri.Should().Be("http://localhost:3000/logo.png");
+        grant.Scopes.Should().BeEquivalentTo("openid", "email", "profile");
     }
 
-    private static System.Collections.Generic.Dictionary<string, string> ParseQuery(string query) =>
-        query.TrimStart('?')
-            .Split('&', StringSplitOptions.RemoveEmptyEntries)
-            .Select(part => part.Split('=', 2))
-            .ToDictionary(pair => Uri.UnescapeDataString(pair[0]), pair => pair.Length > 1 ? Uri.UnescapeDataString(pair[1].Replace('+', ' ')) : string.Empty);
+    [TestMethod]
+    public async Task ListGrants_ShouldReturnNoGrants_GivenNewUserHasNotAuthorizedClients()
+    {
+        await this.SignUpNewUser();
+
+        var grants = await this.Client.ListGrants();
+
+        grants.Should().BeEmpty();
+    }
+
+    [TestMethod]
+    public async Task RevokeGrant_ShouldRemoveSeededGrant_GivenUserHasAuthorizedClient()
+    {
+        await this.SignInSeededUser();
+        (await this.Client.ListGrants()).Should().ContainSingle(grant => grant.Client.Id == RevokeGrantClientId);
+
+        await this.Client.RevokeGrant(new RevokeGrantOptions { ClientId = RevokeGrantClientId });
+
+        (await this.Client.ListGrants()).Should().NotContain(grant => grant.Client.Id == RevokeGrantClientId);
+    }
 }
