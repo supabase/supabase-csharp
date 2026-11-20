@@ -310,7 +310,7 @@ enabled = false
 # domain = "example.clerk.accounts.dev"
 
 [edge_runtime]
-enabled = false
+enabled = true
 # Configure one of the supported request policies: `oneshot`, `per_worker`.
 # Use `oneshot` for hot reload, or `per_worker` for load testing.
 policy = "oneshot"
