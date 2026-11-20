@@ -885,6 +885,24 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
     }
 
+    /// <inheritdoc />
+    [ImplementedCapability("storage.file_buckets.exists")]
+    public async Task<bool> Exists(string path, CancellationToken cancellationToken = default)
+    {
+        bool exists;
+        try
+        {
+            var result = await this.Info(path);
+            exists = result != null;
+        }
+        catch (SupabaseStorageException)
+        {
+            exists = false;
+        }
+
+        return exists;
+    }
+
     private async Task<string> UploadOrUpdate(
         string localPath,
         string supabasePath,

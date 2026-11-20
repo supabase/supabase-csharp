@@ -564,6 +564,25 @@ public class StorageFileApiContractTests
         }
     }
 
+    [TestMethod]
+    public async Task Exists_ShouldReturnTrueForExisingFile()
+    {
+        this.Respond($"/storage/v1/object/info/{Bucket}/a.png", "GET", 200, "{\"name\":\"a.png\"}");
+        var exists = await this.client.From(Bucket).Exists("a.png");
+
+        exists.Should().BeTrue();
+    }
+
+    [TestMethod]
+    public async Task Exists_ShouldReturnFalseForNonExisingFile()
+    {
+        this.Respond($"/storage/v1/object/info/{Bucket}/a.png", "GET", 404, "{\"name\":\"a.png\"}");
+        var exists = await this.client.From(Bucket).Exists("a.png");
+
+        exists.Should().BeFalse();
+    }
+
+
     private static async Task AnswerGetRequests(TcpClient connection)
     {
         var stream = connection.GetStream();
