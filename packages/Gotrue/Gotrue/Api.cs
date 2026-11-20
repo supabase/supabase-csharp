@@ -12,6 +12,7 @@ using Supabase.Core.Http;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateOAuthClient;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.CustomProviders;
 using Supabase.Gotrue.Exceptions;
@@ -19,6 +20,7 @@ using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListCustomProviders;
+using Supabase.Gotrue.ListOAuthClients;
 using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.RegisterPasskey;
@@ -30,6 +32,7 @@ using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
 using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.VerifyRecoveryCode;
@@ -69,6 +72,10 @@ public class Api : IGotrueApi<User, Session>
     private readonly HttpClient? httpClient;
     private readonly RetryOptions retry;
 
+    internal TracePropagation TracePropagation { get; init; } = TracePropagation.Enabled;
+
+    internal Microsoft.Extensions.Logging.ILogger? Logger { get; init; }
+
     /// <summary>
     /// Creates a new API client
     /// </summary>
@@ -88,12 +95,12 @@ public class Api : IGotrueApi<User, Session>
     /// <summary>Routes through the resolved <see cref="httpClient"/> and <see cref="retry"/> policy.</summary>
     private Task<BaseResponse> MakeRequestAsync(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null,
         CancellationToken cancellationToken = default) =>
-        Helpers.MakeRequestAsync(method, url, data, headers, this.httpClient, this.retry, cancellationToken);
+        Helpers.MakeRequestAsync(method, url, data, headers, this.httpClient, this.retry, this.TracePropagation, this.Logger, cancellationToken);
 
     /// <summary>Routes through the resolved <see cref="httpClient"/> and <see cref="retry"/> policy.</summary>
     private Task<T?> MakeRequestAsync<T>(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null,
         CancellationToken cancellationToken = default) where T : class =>
-        Helpers.MakeRequestAsync<T>(method, url, data, headers, this.httpClient, this.retry, cancellationToken);
+        Helpers.MakeRequestAsync<T>(method, url, data, headers, this.httpClient, this.retry, this.TracePropagation, this.Logger, cancellationToken);
 
     /// <summary>
     /// Signs a user up using an email address and password.
@@ -1268,5 +1275,46 @@ public class Api : IGotrueApi<User, Session>
             this.CreateAuthedRequestHeaders(jwt),
             cancellationToken
         ).ConfigureAwait(false);
+    }
+
+    /// <inheritdoc />
+    public async Task<OAuthClientCredentials> CreateOAuthClientAsync(string jwt, NewOAuthClient client, OAuthClientOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var body = CreateOAuthClientBody.For(client, options);
+        var created = await this.MakeRequestAsync<OAuthClientResponse>(HttpMethod.Post, $"{this.Url}/admin/oauth/clients", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientResponse.ReadCredentials(created);
+    }
+
+    /// <inheritdoc />
+    public Task DeleteOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default) =>
+        this.MakeRequestAsync(HttpMethod.Delete, $"{this.Url}/admin/oauth/clients/{clientId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken);
+
+    /// <inheritdoc />
+    public async Task<OAuthClientCredentials> RegenerateOAuthClientSecretAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default)
+    {
+        var regenerated = await this.MakeRequestAsync<OAuthClientResponse>(HttpMethod.Post, $"{this.Url}/admin/oauth/clients/{clientId}/regenerate_secret", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientResponse.ReadCredentials(regenerated);
+    }
+
+    /// <inheritdoc />
+    public async Task<OAuthClient> GetOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default)
+    {
+        var found = await this.MakeRequestAsync<OAuthClientResponse>(HttpMethod.Get, $"{this.Url}/admin/oauth/clients/{clientId}", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientResponse.Read(found);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(string jwt, CancellationToken cancellationToken = default)
+    {
+        var listed = await this.MakeRequestAsync<OAuthClientListResponse>(HttpMethod.Get, $"{this.Url}/admin/oauth/clients", null, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientListResponse.Read(listed);
+    }
+
+    /// <inheritdoc />
+    public async Task<OAuthClient> UpdateOAuthClientAsync(string jwt, Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default)
+    {
+        var body = UpdateOAuthClientBody.For(changes);
+        var updated = await this.MakeRequestAsync<OAuthClientResponse>(HttpMethod.Put, $"{this.Url}/admin/oauth/clients/{clientId}", body, this.CreateAuthedRequestHeaders(jwt), cancellationToken).ConfigureAwait(false);
+        return OAuthClientResponse.Read(updated);
     }
 }

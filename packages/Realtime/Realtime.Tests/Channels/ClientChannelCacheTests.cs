@@ -19,6 +19,8 @@ namespace Realtime.Tests.Channels;
 [TestCategory("Unit")]
 public class ClientChannelCacheTests
 {
+    private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
+
     private readonly FakeWebsocketClient socket = new() { OpenOnStart = true };
     private Client client = null!;
 
@@ -35,6 +37,25 @@ public class ClientChannelCacheTests
         var channel = this.client.Channel("room");
         await this.client.ConnectAsync();
         channel.Socket.Should().BeSameAs(this.client.Socket, "a second ConnectAsync must not replace the open socket");
+    }
+
+    [TestMethod]
+    public async Task Subscribe_ShouldNotTakeTheTopic_GivenANewerChannelHasIt()
+    {
+        var (reconnected, kept, _) = await ReconnectKeepingAChannel();
+        reconnected.Channel("room");
+        _ = kept.Subscribe();
+        kept.Socket.Should().NotBeSameAs(reconnected.Socket, "a kept channel must not take its topic from the channel the client has for it now");
+    }
+
+    [TestMethod]
+    public async Task Channel_ShouldRejoin_GivenALostConnectionAfterAReconnect()
+    {
+        var (_, kept, connection) = await ReconnectKeepingAChannel();
+        await kept.Subscribe().WaitAsync(Patience);
+        var rejoin = connection.SentFrame("phx_join", 2);
+        connection.RecoverFromLostConnection();
+        await rejoin.Awaiting(frame => frame).Should().CompleteWithinAsync(Patience, "a kept channel must rejoin when its new connection drops and comes back");
     }
 
     [TestMethod]
@@ -146,6 +167,15 @@ public class ClientChannelCacheTests
     }
 
     [TestMethod]
+    public void Remove_ShouldCloseTheChannel_GivenAChannelStillJoining()
+    {
+        var channel = this.client.Channel("room");
+        _ = channel.Subscribe();
+        this.client.Remove(channel);
+        channel.IsClosed.Should().BeTrue("a channel removed while joining must not finish the join and come back on the next reconnect");
+    }
+
+    [TestMethod]
     public void Disconnect_ShouldFailSubscribe_GivenAChannelStillJoining()
     {
         var subscribing = this.client.Channel("room").Subscribe();
@@ -153,5 +183,17 @@ public class ClientChannelCacheTests
         var exception = subscribing.Exception!.InnerException.Should().BeOfType<RealtimeException>().Subject;
         exception.Reason.Should().Be(FailureHint.Reason.ChannelJoinFailure);
         exception.Message.Should().Be("Channel closed before it joined");
+    }
+
+    private static async Task<(Client, RealtimeChannel, FakeWebsocketClient)> ReconnectKeepingAChannel()
+    {
+        var second = new FakeWebsocketClient { OpenOnStart = true, AnswerJoins = true };
+        var reconnected = new Client("ws://localhost/socket", new ClientOptions { WebSocketFactory = new FakeWebSocketFactory(new FakeWebsocketClient { OpenOnStart = true, AnswerJoins = true }, second) });
+        await reconnected.ConnectAsync();
+        var kept = reconnected.Channel("room");
+        await kept.Subscribe().WaitAsync(Patience);
+        reconnected.Disconnect();
+        await reconnected.ConnectAsync();
+        return (reconnected, kept, second);
     }
 }

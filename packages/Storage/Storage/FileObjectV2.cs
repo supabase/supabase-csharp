@@ -28,8 +28,22 @@ public class FileObjectV2
     [JsonPropertyName("last_accessed_at")]
     public DateTime? LastAccessedAt { get; set; }
 
+    /// <summary>
+    /// Object size in bytes. Unlike <see cref="Size"/>, this can represent objects larger than 2 GiB.
+    /// </summary>
     [JsonPropertyName("size")]
-    public int? Size { get; set; }
+    public long? SizeInBytes { get; set; }
+
+    /// <summary>
+    /// Object size in bytes, or null when it exceeds <see cref="int.MaxValue"/>.
+    /// </summary>
+    [JsonIgnore]
+    [Obsolete("Use SizeInBytes instead; Size cannot represent objects larger than 2 GiB.")]
+    public int? Size
+    {
+        get => this.SizeInBytes is > int.MaxValue ? null : (int?) this.SizeInBytes;
+        set => this.SizeInBytes = value;
+    }
 
     [JsonPropertyName("cache_control")]
     public string? CacheControl { get; set; }

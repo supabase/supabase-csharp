@@ -43,5 +43,43 @@ public class DebuggerHandlerTests
         calls.Should().Be(0, "a removed listener must not be called");
     }
 
+    [TestMethod]
+    public void Log_ShouldCallTheNextListener_GivenOneThatThrows()
+    {
+        var calls = 0;
+        Debugger.Instance.AddDebugHandler((_, _, _) => throw new InvalidOperationException("boom"));
+        Debugger.Instance.AddDebugHandler((_, _, _) => calls++);
+
+        Debugger.Instance.Log(new object(), "hello");
+
+        calls.Should().Be(1, "a throwing listener must not stop the next one");
+    }
+
+    [TestMethod]
+    public void Log_ShouldTraceAWarning_GivenAListenerThatThrows()
+    {
+        var listener = new CapturingTraceListener();
+        System.Diagnostics.Trace.Listeners.Add(listener);
+        try
+        {
+            Debugger.Instance.AddDebugHandler((_, _, _) => throw new InvalidOperationException("boom"));
+
+            Debugger.Instance.Log(new object(), "hello");
+
+            listener.Messages.Should().Contain(m => m.Contains("boom"), "a throwing listener must not fail silently");
+        }
+        finally
+        {
+            System.Diagnostics.Trace.Listeners.Remove(listener);
+        }
+    }
+
     private sealed record LogLine(object Sender, string Message, Exception? Error);
+
+    private sealed class CapturingTraceListener : System.Diagnostics.TraceListener
+    {
+        public List<string> Messages { get; } = new();
+        public override void Write(string? message) => this.Messages.Add(message ?? string.Empty);
+        public override void WriteLine(string? message) => this.Messages.Add(message ?? string.Empty);
+    }
 }

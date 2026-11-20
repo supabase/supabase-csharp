@@ -11,6 +11,7 @@ using BirdMessenger.Collections;
 using BirdMessenger.Events;
 using BirdMessenger.Infrastructure;
 using Supabase.Core.Diagnostics;
+using Supabase.Core.Http;
 using Supabase.Storage.Exceptions;
 
 namespace Supabase.Storage.Extensions;
@@ -32,7 +33,8 @@ internal static class HttpClientProgress
         Uri uri,
         Dictionary<string, string>? headers = null,
         IProgress<float>? progress = null,
-        CancellationToken cancellationToken = default(CancellationToken)
+        CancellationToken cancellationToken = default(CancellationToken),
+        TracePropagation tracePropagation = TracePropagation.Enabled
     )
     {
         var destination = new MemoryStream();
@@ -47,6 +49,7 @@ internal static class HttpClientProgress
         }
 
         using var activity = StorageInstrumentation.StartHttpActivity(HttpMethod.Get, uri, StorageInstrumentation.DirectionDownload);
+        TraceContext.Inject(message.Headers, tracePropagation);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
         string? errorType = null;
@@ -126,7 +129,8 @@ internal static class HttpClientProgress
         Stream destination,
         int bufferSize,
         IProgress<long>? progress = null,
-        CancellationToken cancellationToken = default(CancellationToken)
+        CancellationToken cancellationToken = default(CancellationToken),
+        TracePropagation tracePropagation = TracePropagation.Enabled
     )
     {
         if (bufferSize < 0)
@@ -166,11 +170,12 @@ internal static class HttpClientProgress
         string filePath,
         Dictionary<string, string>? headers = null,
         Progress<float>? progress = null,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        TracePropagation tracePropagation = TracePropagation.Enabled
     )
     {
         var fileStream = new FileStream(filePath, mode: FileMode.Open, FileAccess.Read);
-        return UploadAsync(client, uri, fileStream, headers, progress, cancellationToken);
+        return UploadAsync(client, uri, fileStream, headers, progress, cancellationToken, tracePropagation);
     }
 
     public static Task<HttpResponseMessage> UploadBytesAsync(
@@ -179,11 +184,12 @@ internal static class HttpClientProgress
         byte[] data,
         Dictionary<string, string>? headers = null,
         Progress<float>? progress = null,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        TracePropagation tracePropagation = TracePropagation.Enabled
     )
     {
         var stream = new MemoryStream(data);
-        return UploadAsync(client, uri, stream, headers, progress, cancellationToken);
+        return UploadAsync(client, uri, stream, headers, progress, cancellationToken, tracePropagation);
     }
 
     public static async Task<HttpResponseMessage> UploadAsync(
@@ -192,7 +198,8 @@ internal static class HttpClientProgress
         Stream stream,
         Dictionary<string, string>? headers = null,
         Progress<float>? progress = null,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        TracePropagation tracePropagation = TracePropagation.Enabled
     )
     {
         var content = new ProgressableStreamContent(stream, 4096, progress);
@@ -211,6 +218,7 @@ internal static class HttpClientProgress
 
         var bytes = stream.CanSeek ? stream.Length : (long?) null;
         using var activity = StorageInstrumentation.StartHttpActivity(HttpMethod.Post, uri, StorageInstrumentation.DirectionUpload);
+        TraceContext.Inject(request.Headers, tracePropagation);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
         string? errorType = null;
@@ -260,7 +268,8 @@ internal static class HttpClientProgress
         MetadataCollection metadata,
         Dictionary<string, string>? headers = null,
         Progress<float>? progress = null,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        TracePropagation tracePropagation = TracePropagation.Enabled
     )
     {
         using var fileStream = new FileStream(filePath, mode: FileMode.Open, FileAccess.Read);
@@ -271,7 +280,8 @@ internal static class HttpClientProgress
             metadata,
             headers,
             progress,
-            cancellationToken
+            cancellationToken,
+            tracePropagation
         ).ConfigureAwait(false);
     }
 
@@ -282,7 +292,8 @@ internal static class HttpClientProgress
         MetadataCollection metadata,
         Dictionary<string, string>? headers = null,
         Progress<float>? progress = null,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        TracePropagation tracePropagation = TracePropagation.Enabled
     )
     {
         var stream = new MemoryStream(data);
@@ -293,7 +304,8 @@ internal static class HttpClientProgress
             metadata,
             headers,
             progress,
-            cancellationToken
+            cancellationToken,
+            tracePropagation
         );
     }
 
@@ -304,7 +316,8 @@ internal static class HttpClientProgress
         MetadataCollection metadata,
         Dictionary<string, string>? headers = null,
         IProgress<float>? progress = null,
-        CancellationToken cancellationToken = default
+        CancellationToken cancellationToken = default,
+        TracePropagation tracePropagation = TracePropagation.Enabled
     )
     {
         if (fileStream == null)
@@ -441,6 +454,7 @@ internal static class HttpClientProgress
         {
             foreach (var header in uploadHeaders)
                 preSend.HttpRequestMsg.Headers.Add(header.Key, header.Value);
+            TraceContext.Inject(preSend.HttpRequestMsg.Headers, tracePropagation);
 
             return Task.CompletedTask;
         }

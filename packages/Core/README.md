@@ -4,7 +4,7 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Core)](https://www.nuget.org/packages/Supabase.Core/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
-Shared primitives for the [Supabase C# SDK](https://github.com/supabase/supabase-csharp) —
+Shared primitives for the official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase:
 common helpers, extensions, attributes, and diagnostics used across the `Supabase.*` packages.
 
 This package is an internal building block. You normally get it transitively by installing

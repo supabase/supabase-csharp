@@ -4,11 +4,11 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Postgrest)](https://www.nuget.org/packages/Supabase.Postgrest/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
-A C# client for [PostgREST](https://postgrest.org) — query your Supabase database through the
+The official C# client for [PostgREST](https://postgrest.org) — query your Supabase database through the
 auto-generated REST API, with strongly-typed models and LINQ. It is a C#-ification of
 [postgrest-js](https://github.com/supabase/postgrest-js).
 
-Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
+Part of the official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase. Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.From<T>()`); reference
 this package directly to use PostgREST on its own. It also works outside the Supabase ecosystem
 against any PostgREST server.
@@ -106,8 +106,7 @@ await client.Table<Movie>()
             .Update();
 ```
 
-Full generated API reference:
-[Supabase.Postgrest](https://supabase-community.github.io/supabase-csharp/api/Supabase.Postgrest.html).
+Full API reference: [Supabase C# reference](https://supabase.com/docs/reference/csharp/introduction).
 
 ## Foreign keys, join tables, and relationships
 

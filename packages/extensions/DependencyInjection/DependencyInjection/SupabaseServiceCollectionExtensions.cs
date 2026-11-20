@@ -1,6 +1,7 @@
 using System;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Supabase.Core.Http;
 
 namespace Supabase.Extensions.DependencyInjection;
@@ -72,6 +73,7 @@ public static class SupabaseServiceCollectionExtensions
             var options = new SupabaseOptions();
             configureOptions?.Invoke(options);
 
+            options.LoggerFactory ??= sp.GetService<ILoggerFactory>();
             options.HttpClient = factory.CreateClient(HttpClientName);
             options.StorageClientOptions.HttpRequestClient = factory.CreateClient(StorageRequestHttpClientName);
             options.StorageClientOptions.HttpUploadClient = factory.CreateClient(StorageUploadHttpClientName);

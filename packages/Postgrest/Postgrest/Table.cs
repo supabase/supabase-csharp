@@ -14,12 +14,15 @@ using System.Web;
 using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
 using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.BulkWrite;
 using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Extensions;
 using Supabase.Postgrest.Interfaces;
+using Supabase.Postgrest.LimitAffectedRows;
 using Supabase.Postgrest.Linq;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
+using Supabase.Postgrest.SingleOrThrow;
 using static Supabase.Postgrest.Constants;
 
 namespace Supabase.Postgrest;
@@ -70,7 +73,9 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
     private string? onConflict;
 
-    private bool stripNulls;
+    private RowRepresentation representation = RowRepresentation.Default;
+
+    private AffectedRowsLimit? affectedRowsLimit;
 
     #endregion
 
@@ -449,10 +454,19 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.max_affected_rows")]
+    public IPostgrestTable<TModel> MaxAffected(int rows)
+    {
+        this.affectedRowsLimit = AffectedRowsLimit.Of(rows);
+        return this;
+    }
+
+
+    /// <inheritdoc />
     [ImplementedCapability("database.using_modifiers.strip_nulls")]
     public IPostgrestTable<TModel> StripNulls()
     {
-        this.stripNulls = true;
+        this.representation = this.representation.WithNullsStripped();
         return this;
     }
 
@@ -465,6 +479,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.bulk_rows_with_differing_fields")]
     public Task<ModeledResponse<TModel>> Insert(ICollection<TModel> models, QueryOptions? options = null,
         CancellationToken cancellationToken = default) =>
         this.PerformInsert(models, options, cancellationToken);
@@ -485,6 +500,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
 
     /// <inheritdoc />
+    [ImplementedCapability("database.mutate.bulk_rows_with_differing_fields")]
     public Task<ModeledResponse<TModel>> Upsert(ICollection<TModel> model, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
@@ -640,6 +656,27 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
         return result.Models.FirstOrDefault();
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.single_row")]
+    public async Task<TModel> SingleOrThrowAsync(CancellationToken cancellationToken = default)
+    {
+        this.method = HttpMethod.Get;
+        this.representation = this.representation.AsSingleObject();
+        var request = this.Send<TModel>(this.method, null, null, cancellationToken);
+        this.Clear();
+        return OnlyRowOf(await request.ConfigureAwait(false));
+    }
+
+    private static TModel OnlyRowOf(ModeledResponse<TModel> response) =>
+        response.Models.Count == 1
+            ? response.Models[0]
+            : throw new PostgrestException($"The query matched {response.Models.Count} rows when exactly one was expected.")
+            {
+                Response = response.ResponseMessage,
+                StatusCode = (int) HttpStatusCode.NotAcceptable,
+                Reason = FailureHint.Reason.UnexpectedRowCount
+            };
 
     /// <inheritdoc />
     [ImplementedCapability("database.using_modifiers.request_cancellation", "Every terminal (Get/Insert/Update/Delete/Single/Count) accepts a CancellationToken.")]
@@ -939,7 +976,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         this.offset = int.MinValue;
         this.offsetForeignKey = null;
         this.onConflict = null;
-        this.stripNulls = false;
+        this.representation = RowRepresentation.Default;
+        this.affectedRowsLimit = null;
     }
 
 
@@ -976,6 +1014,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             requestHeaders = this.GetHeaders().MergeLeft(requestHeaders);
         }
 
+        this.affectedRowsLimit?.ApplyTo(method, requestHeaders);
+
         var url = this.GenerateUrl();
         var preparedData = this.PrepareRequestData(data, isInsert, isUpdate, isUpsert);
 
@@ -1002,11 +1042,13 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         if (this.GetHeaders != null)
             requestHeaders = this.GetHeaders().MergeLeft(requestHeaders);
 
-        if (this.stripNulls)
-            requestHeaders.TryAdd("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
+        this.affectedRowsLimit?.ApplyTo(method, requestHeaders);
 
-        var url = this.GenerateUrl();
+        this.representation.ApplyTo(requestHeaders);
+
         var preparedData = this.PrepareRequestData(data, isInsert, isUpdate, isUpsert);
+        this.SpecifyColumnsOfBulkRows(preparedData);
+        var url = this.GenerateUrl();
 
         Hooks.Instance.NotifyOnRequestPreparedHandlers(this, this.options, method, url, this.serializerSettings,
             preparedData, requestHeaders);
@@ -1018,6 +1060,12 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
         var operation = PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert);
         return Helpers.MakeRequestAsync<TU>(this.options, this.httpClient, method, url, this.serializerSettings, preparedData, requestHeaders, this.GetHeaders, cancellationToken, operation);
+    }
+
+    private void SpecifyColumnsOfBulkRows(object? preparedData)
+    {
+        if (this.columns.Count == 0)
+            this.columns.AddRange(BulkColumns.UnionOf(preparedData));
     }
 
     private static string FindTableName(object? obj = null)

@@ -12,8 +12,10 @@ using Websocket.Client;
 
 namespace Realtime.Tests.Support;
 
-internal sealed class FakeWebSocketFactory(IWebsocketClient client) : IWebSocketFactory
+internal sealed class FakeWebSocketFactory(params IWebsocketClient[] clients) : IWebSocketFactory
 {
+    private int created;
+
     public Uri? CreatedUri { get; private set; }
     public Func<Dictionary<string, string>>? HeadersProvider { get; private set; }
 
@@ -21,7 +23,7 @@ internal sealed class FakeWebSocketFactory(IWebsocketClient client) : IWebSocket
     {
         this.CreatedUri = uri;
         this.HeadersProvider = headers;
-        return client;
+        return clients[Math.Min(this.created++, clients.Length - 1)];
     }
 }
 
@@ -53,7 +55,7 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     {
         this.StartOrFailCallCount++;
         if (this.Handshake != null)
-            await this.Handshake.Task;
+            await this.Handshake.Task.ConfigureAwait(false);
         if (this.OpenOnStart || this.Handshake != null)
         {
             this.IsRunning = true;
@@ -78,6 +80,9 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
 
     /// <summary>Completes when the socket forces a reconnect.</summary>
     public TaskCompletionSource Reconnected { get; } = new();
+
+    /// <summary>How many times the socket forced a reconnect.</summary>
+    public int ReconnectCallCount { get; private set; }
 
     /// <summary>When set, every channel join gets an <c>ok</c> reply, as from a server that authorizes it.</summary>
     public bool AnswerJoins { get; init; }
@@ -126,6 +131,7 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
 
     public Task Reconnect()
     {
+        this.ReconnectCallCount++;
         this.Reconnected.TrySetResult();
         return Task.CompletedTask;
     }
@@ -137,8 +143,8 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     public void Receive(string json) => this.messageReceived.OnNext(ResponseMessage.TextMessage(json));
 
     /// <summary>Reports a connection failure as if the transport had dropped with an error.</summary>
-    public void Fail(Exception exception) =>
-        this.disconnectionHappened.OnNext(DisconnectionInfo.Create(DisconnectionType.Error, null, exception));
+    public void Fail(Exception exception, DisconnectionType type = DisconnectionType.Error) =>
+        this.disconnectionHappened.OnNext(DisconnectionInfo.Create(type, null, exception));
 
     public void Dispose() { }
 

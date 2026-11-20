@@ -1,0 +1,1 @@
+﻿{"client_name":"My App","redirect_uris":["https://app.example.com/callback","myapp://callback"],"token_endpoint_auth_method":"client_secret_post","grant_types":["authorization_code"],"client_uri":"https://app.example.com","logo_uri":"https://app.example.com/logo.png"}

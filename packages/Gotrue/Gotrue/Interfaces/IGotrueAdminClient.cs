@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateOAuthClient;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.ListSsoProviders;
 using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
 
 namespace Supabase.Gotrue.Interfaces;
@@ -547,4 +549,160 @@ public interface IGotrueAdminClient<TUser> : IGettableHeaders
     /// </code>
     /// </example>
     Task<SsoProvider> UpdateSsoProviderAsync(SsoProviderReference provider, SsoProviderChanges changes, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Registers an OAuth client with the project's OAuth 2.1 server. The server generates the client id and, for a
+    /// confidential client, a client secret that it shows only in this response. Requires a full-access API key, such as
+    /// the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="client">The client to register, built with <see cref="NewOAuthClient.Confidential" /> or <see cref="NewOAuthClient.Public" />.</param>
+    /// <param name="options">Optional settings, such as the grant types. The server applies its defaults to those left null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered client and its client secret, which is null for a public client. Store the secret now: it is not retrievable later.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="client" /> is null. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>validation_failed</c>
+    /// when a setting is invalid (for example more than ten redirect URIs, a redirect URI that is not HTTPS or localhost
+    /// HTTP, a grant type the server does not know, or a name longer than 1024 characters) and <c>feature_disabled</c>
+    /// when the OAuth server is disabled on the project. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.Common;
+    /// using Supabase.Gotrue.CreateOAuthClient;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var created = await admin.CreateOAuthClientAsync(
+    ///     NewOAuthClient.Confidential("My App", new[] { new Uri("https://app.example.com/callback") }),
+    ///     new OAuthClientOptions { ClientUri = new Uri("https://app.example.com") });
+    /// var clientId = created.Client.ClientId;
+    /// var clientSecret = created.ClientSecret;
+    /// </code>
+    /// </example>
+    Task<OAuthClientCredentials> CreateOAuthClientAsync(NewOAuthClient client, OAuthClientOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes an OAuth client registered with the project's OAuth 2.1 server. The client can no longer be retrieved,
+    /// and its credentials stop being accepted. Requires a full-access API key, such as the service_role key: call
+    /// it from a server, never from a client app.
+    /// </summary>
+    /// <param name="clientId">The id of the OAuth client to delete.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.OAuthClientNotFound" /> when no OAuth client has this id, including
+    /// one that was already deleted, and <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key
+    /// is not a full-access key; <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when
+    /// the OAuth server is disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// await admin.DeleteOAuthClientAsync(clientId);
+    /// </code>
+    /// </example>
+    Task DeleteOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Generates a new client secret for a confidential OAuth client. The previous secret is replaced, and the server
+    /// shows the new one only in this response. Requires a full-access API key, such as the service_role key: call it
+    /// from a server, never from a client app.
+    /// </summary>
+    /// <param name="clientId">The id of the confidential OAuth client.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The client and its new client secret. Store the secret now: it is not retrievable later.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.OAuthClientNotFound" /> when no OAuth client has this id and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>validation_failed</c> when the client is public, since
+    /// it has no secret, and <c>feature_disabled</c> when the OAuth server is disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var rotated = await admin.RegenerateOAuthClientSecretAsync(clientId);
+    /// var newSecret = rotated.ClientSecret;
+    /// </code>
+    /// </example>
+    Task<OAuthClientCredentials> RegenerateOAuthClientSecretAsync(Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Fetches an OAuth client registered with the project's OAuth 2.1 server. The client secret is never returned:
+    /// the server shows it only when the client is created or its secret is regenerated. Requires a full-access API
+    /// key, such as the service_role key: call it from a server, never from a client app.
+    /// </summary>
+    /// <param name="clientId">The id of the OAuth client.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The OAuth client.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.OAuthClientNotFound" /> when no OAuth client has this id, or it was deleted, and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when the OAuth server is disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var client = await admin.GetOAuthClientAsync(clientId);
+    /// Console.WriteLine(client.Name);
+    /// </code>
+    /// </example>
+    Task<OAuthClient> GetOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the OAuth clients registered with the project's OAuth 2.1 server, newest first. The server does not
+    /// paginate: it returns every client. Requires a full-access API key, such as the service_role key: call it from
+    /// a server, never from a client app.
+    /// </summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered clients, none of which carries its client secret; empty when there are none.</returns>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>feature_disabled</c> when the OAuth server is disabled
+    /// on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// foreach (var client in await admin.ListOAuthClientsAsync())
+    ///     Console.WriteLine($"{client.ClientId} {client.Name}");
+    /// </code>
+    /// </example>
+    Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates an OAuth client. Only the members set on <paramref name="changes" /> are sent; the others keep their
+    /// current value. Requires a full-access API key, such as the service_role key: call it from a server, never from
+    /// a client app.
+    /// </summary>
+    /// <param name="clientId">The id of the OAuth client to update.</param>
+    /// <param name="changes">The changes. A member left null cannot be cleared: the server reads it as unchanged.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The updated client, without its client secret.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="changes" /> is null. Nothing is sent.</exception>
+    /// <exception cref="ArgumentException">No member of <paramref name="changes" /> is set. Nothing is sent.</exception>
+    /// <exception cref="Exceptions.GotrueException">
+    /// The server rejected the request. <see cref="Exceptions.GotrueException.Reason" /> is
+    /// <see cref="Exceptions.FailureHint.Reason.OAuthClientNotFound" /> when no OAuth client has this id and
+    /// <see cref="Exceptions.FailureHint.Reason.AdminTokenRequired" /> when the key is not a full-access key;
+    /// <see cref="Exceptions.GotrueException.ErrorCode" /> is <c>validation_failed</c> when a setting is invalid (for
+    /// example a token endpoint authentication method that does not suit the client's type, more than ten redirect
+    /// URIs, or an unknown grant type) and <c>feature_disabled</c> when the OAuth server is disabled on the project.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// using Supabase.Gotrue.UpdateOAuthClient;
+    ///
+    /// var admin = new AdminClient(serviceRoleKey, new ClientOptions { Url = authUrl });
+    /// var updated = await admin.UpdateOAuthClientAsync(clientId, new OAuthClientChanges
+    /// {
+    ///     Name = "My App (production)",
+    ///     RedirectUris = new[] { new Uri("https://app.example.com/callback") },
+    /// });
+    /// </code>
+    /// </example>
+    Task<OAuthClient> UpdateOAuthClientAsync(Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default);
 }

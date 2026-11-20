@@ -7,6 +7,7 @@ using Realtime.Tests.Models;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Realtime;
 using Supabase.Realtime.Interfaces;
+using Supabase.Realtime.Presence;
 
 namespace Realtime.Tests.Presence;
 
@@ -86,5 +87,16 @@ public class PresenceTrackingTests
         await channel2.Subscribe();
         await seen.Awaiting(source => source.Task).Should().CompleteWithinAsync(TimeSpan.FromSeconds(10), "the snapshot sent on join lists who was already there");
         client2.Disconnect();
+    }
+
+    [TestMethod]
+    public async Task Subscribe_ShouldReceivePresence_GivenAHandlerOnAChannelRegisteredWithoutPresence()
+    {
+        var synced = new TaskCompletionSource();
+        var channel = this.socketClient.Channel("handler-turns-presence-on");
+        var presence = channel.Register<PresenceExample>(PresenceOptions.WithoutPresence(Guid.NewGuid().ToString()));
+        presence.AddPresenceEventHandler(IRealtimePresence.EventType.Sync, (_, _) => synced.TrySetResult());
+        await channel.Subscribe();
+        await synced.Awaiting(source => source.Task).Should().CompleteWithinAsync(TimeSpan.FromSeconds(10), "a presence handler added before subscribe must turn presence on for the channel");
     }
 }

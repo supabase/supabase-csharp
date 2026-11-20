@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
 using Supabase.Core.Attributes;
+using Supabase.Core.Logging;
 using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Channel;
 using Supabase.Realtime.Exceptions;
@@ -78,7 +79,7 @@ public class RealtimeChannel : IRealtimeChannel
     public BroadcastOptions? BroadcastOptions { get; private set; } = new();
 
     /// <summary>
-    /// The saved Presence Options, set in <see cref="Register{TPresenceResponse}(string)"/> or <see cref="Register{TPresenceResponse}(PresenceOptions)"/>
+    /// The Presence Options sent with the join, set in <see cref="Register{TPresenceResponse}(string)"/> or <see cref="Register{TPresenceResponse}(PresenceOptions)"/> and turned on by a presence handler added before <see cref="Subscribe"/>.
     /// </summary>
     public PresenceOptions? PresenceOptions { get; private set; }
 
@@ -143,13 +144,17 @@ public class RealtimeChannel : IRealtimeChannel
     internal BroadcastEventHandler? BroadcastHandler;
     internal PresenceDiffHandler? PresenceDiff;
     internal PresenceSyncHandler? PresenceSync;
+    private Func<PresenceOptions>? presenceJoinOptions;
+    private Action? endPresence;
 
     /// <summary>
     /// Buffer of Pushes held because of Socket availability
     /// </summary>
     private readonly List<Push> buffer = new();
 
-    internal readonly IRealtimeSocket Socket;
+    internal IRealtimeSocket Socket { get; private set; }
+    internal Func<IRealtimeSocket?>? ClientSocket;
+    internal Func<Task?>? ConnectClient;
     private IRealtimePresence? presence;
     private IRealtimeBroadcast? broadcast;
     private RealtimeException? exception;
@@ -160,6 +165,7 @@ public class RealtimeChannel : IRealtimeChannel
 
     private bool CanPush => this.IsJoined && this.Socket.IsConnected;
     private bool hasJoinedOnce;
+    private int subscribeCancellations;
     private readonly Timer rejoinTimer;
     private bool isRejoining;
 
@@ -269,6 +275,8 @@ public class RealtimeChannel : IRealtimeChannel
 
         this.PresenceSync = (_, response) => this.presence.TriggerSync(response);
         this.PresenceDiff = (_, response) => this.presence.TriggerDiff(response);
+        this.presenceJoinOptions = instance.JoinOptions;
+        this.endPresence = instance.End;
 
         return instance;
     }
@@ -299,6 +307,7 @@ public class RealtimeChannel : IRealtimeChannel
     private void NotifyStateChanged(ChannelState state, bool shouldRejoin = true)
     {
         this.State = state;
+        this.Options.ClientOptions.Logger.BackgroundWorkEvent("Supabase.Realtime", $"channel {this.Topic} {state}");
 
         this.isRejoining = shouldRejoin;
         if (shouldRejoin)
@@ -469,7 +478,7 @@ public class RealtimeChannel : IRealtimeChannel
     }
 
     /// <summary>
-    /// Subscribes to the channel given supplied Options/params.
+    /// Subscribes to the channel given supplied Options/params. Connects the client first when it has no socket.
     /// </summary>
     /// <param name="timeoutMs"></param>
     [ImplementedCapability("realtime.channel.subscribe")]
@@ -480,6 +489,16 @@ public class RealtimeChannel : IRealtimeChannel
         if (this.IsSubscribed)
             return Task.FromResult(this as IRealtimeChannel);
 
+        if (this.ConnectClient?.Invoke() is { } connecting)
+            return this.SubscribeOnceConnected(connecting, timeoutMs).Unwrap();
+
+        if (this.ClientSocket?.Invoke() is { } socket)
+        {
+            this.Socket = socket;
+            this.Socket.AddStateChangedHandler(this.HandleSocketStateChanged);
+        }
+
+        this.PresenceOptions = this.presenceJoinOptions?.Invoke();
         this.JoinPush = this.GenerateJoinPush();
         StateChangedHandler? channelCallback = null;
         EventHandler? joinPushTimeoutCallback = null;
@@ -496,11 +515,6 @@ public class RealtimeChannel : IRealtimeChannel
                     sender.RemoveStateChangedHandler(channelCallback!);
                     this.JoinPush.OnTimeout -= joinPushTimeoutCallback;
 
-                    // Clear buffer
-                    foreach (var item in this.buffer)
-                        item.Send();
-                    this.buffer.Clear();
-
                     tsc.TrySetResult(this);
                     break;
                 // Failure
@@ -508,9 +522,7 @@ public class RealtimeChannel : IRealtimeChannel
                 case ChannelState.Errored:
                     sender.RemoveStateChangedHandler(channelCallback!);
                     this.JoinPush.OnTimeout -= joinPushTimeoutCallback;
-                    tsc.TrySetException(state == ChannelState.Errored
-                        ? this.exception
-                        : new RealtimeException("Channel closed before it joined") { Reason = FailureHint.Reason.ChannelJoinFailure });
+                    tsc.TrySetException(state == ChannelState.Errored ? this.exception : ClosedBeforeItJoined());
                     break;
             }
         };
@@ -536,12 +548,28 @@ public class RealtimeChannel : IRealtimeChannel
         return tsc.Task;
     }
 
+    private async Task<Task<IRealtimeChannel>> SubscribeOnceConnected(Task connecting, int timeoutMs)
+    {
+        var cancellations = this.subscribeCancellations;
+        await connecting.ConfigureAwait(false);
+        if (cancellations != this.subscribeCancellations)
+            throw ClosedBeforeItJoined();
+
+        return this.Subscribe(timeoutMs);
+    }
+
+    internal void CancelSubscribe() => this.subscribeCancellations++;
+
+    private static RealtimeException ClosedBeforeItJoined() =>
+        new("Channel closed before it joined") { Reason = FailureHint.Reason.ChannelJoinFailure };
+
     /// <summary>
     /// Unsubscribes from the channel.
     /// </summary>
     [ImplementedCapability("realtime.channel.unsubscribe")]
     public IRealtimeChannel Unsubscribe()
     {
+        this.CancelSubscribe();
         this.IsSubscribed = false;
 
         this.NotifyStateChanged(ChannelState.Leaving);
@@ -550,6 +578,7 @@ public class RealtimeChannel : IRealtimeChannel
         leavePush.Send();
 
         this.NotifyStateChanged(ChannelState.Closed, false);
+        this.endPresence?.Invoke();
 
         return this;
     }
@@ -723,6 +752,15 @@ public class RealtimeChannel : IRealtimeChannel
         this.Rejoin();
     }
 
+    private void NotifyJoined()
+    {
+        this.NotifyStateChanged(ChannelState.Joined);
+
+        foreach (var push in this.buffer)
+            push.Send();
+        this.buffer.Clear();
+    }
+
     /// <summary>
     /// Sends the phoenix server a join message.
     /// </summary>
@@ -769,7 +807,7 @@ public class RealtimeChannel : IRealtimeChannel
                 // If postgres_changes options are specified, we need to wait for a system event
                 // that registers a successful subscription (see HandleSocketMessage.System)
                 if (this.PostgresChangesOptions.Count == 0)
-                    this.NotifyStateChanged(ChannelState.Joined);
+                    this.NotifyJoined();
                 break;
             case PhoenixStatusError:
                 this.rejoinTimer.Stop();
@@ -811,7 +849,7 @@ public class RealtimeChannel : IRealtimeChannel
                 switch (obj.Payload.Status)
                 {
                     case PhoenixStatusOk:
-                        this.NotifyStateChanged(ChannelState.Joined);
+                        this.NotifyJoined();
                         break;
                     case PhoenixStatusError:
                         this.NotifyErrorOccurred(new RealtimeException(message.Json)

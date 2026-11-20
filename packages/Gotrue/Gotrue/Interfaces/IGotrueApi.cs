@@ -7,6 +7,7 @@ using Supabase.Core.Interfaces;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateOAuthClient;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.GenerateRecoveryCodes;
 using Supabase.Gotrue.GetRecoveryCodesStatus;
@@ -19,6 +20,7 @@ using Supabase.Gotrue.SignInWithWeb3;
 using Supabase.Gotrue.SignUp;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
 using Supabase.Gotrue.AuthorizationOAuth;
 using static Supabase.Gotrue.Constants;
@@ -226,7 +228,6 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
     Task UnenrollRecoveryCodesAsync(string jwt, CancellationToken cancellationToken = default);
-
     Task<BaseResponse> ListFactors(string jwt, MfaAdminListFactorsParams listFactorsParams);
     Task<MfaAdminDeleteFactorResponse?> DeleteFactor(string jwt, MfaAdminDeleteFactorParams deleteFactorParams);
     Task<Factor> UpdateFactorAsync(string jwt, string userId, string factorId, FactorChanges changes, CancellationToken cancellationToken = default);
@@ -408,6 +409,69 @@ public interface IGotrueApi<TUser, TSession> : IGettableHeaders
     /// <param name="flowType"></param>
     /// <returns></returns>
     Task<ResendState> Resend(ResendParameters resendParameters, OAuthFlowType flowType);
+
+    /// <summary>
+    /// Registers an OAuth client with the project's OAuth 2.1 server.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="client">The client to register.</param>
+    /// <param name="options">Optional settings, such as the grant types. The server applies its defaults to those left null.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered client and its client secret, which is null for a public client.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="client" /> is null.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<OAuthClientCredentials> CreateOAuthClientAsync(string jwt, NewOAuthClient client, OAuthClientOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes an OAuth client registered with the project's OAuth 2.1 server.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="clientId">The id of the OAuth client to delete.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task DeleteOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Generates a new client secret for a confidential OAuth client.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="clientId">The id of the confidential OAuth client.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The client and its new client secret.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<OAuthClientCredentials> RegenerateOAuthClientSecretAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Fetches an OAuth client registered with the project's OAuth 2.1 server.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="clientId">The id of the OAuth client.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The OAuth client.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<OAuthClient> GetOAuthClientAsync(string jwt, Guid clientId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the OAuth clients registered with the project's OAuth 2.1 server.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The registered clients; empty when there are none.</returns>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(string jwt, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Updates an OAuth client registered with the project's OAuth 2.1 server.
+    /// </summary>
+    /// <param name="jwt">A full-access API key, such as the service_role key.</param>
+    /// <param name="clientId">The id of the OAuth client to update.</param>
+    /// <param name="changes">The changes; members left null keep their current value.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The updated client.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="changes" /> is null.</exception>
+    /// <exception cref="ArgumentException">No member of <paramref name="changes" /> is set.</exception>
+    /// <exception cref="Exceptions.GotrueException">The server rejected the request.</exception>
+    Task<OAuthClient> UpdateOAuthClientAsync(string jwt, Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Retrieves details about an OAuth authorization request for displaying consent information.

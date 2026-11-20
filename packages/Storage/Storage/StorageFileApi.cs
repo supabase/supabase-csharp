@@ -460,7 +460,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             signedUrl.SignedUrl,
             localFilePath,
             headers.Get(),
-            progress
+            progress,
+            tracePropagation: this.Options.TracePropagation
         ).ConfigureAwait(false);
 
         return this.GetFinalPath(signedUrl.Key);
@@ -511,7 +512,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             signedUrl.SignedUrl,
             data,
             headers.Get(),
-            progress
+            progress,
+            tracePropagation: this.Options.TracePropagation
         ).ConfigureAwait(false);
 
         return this.GetFinalPath(signedUrl.Key);
@@ -914,7 +916,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        await this.uploadClient.UploadFileAsync(uri, localPath, headers.Get(), progress, cancellationToken).ConfigureAwait(false);
+        await this.uploadClient.UploadFileAsync(uri, localPath, headers.Get(), progress, cancellationToken, this.Options.TracePropagation).ConfigureAwait(false);
 
         return this.GetFinalPath(supabasePath);
     }
@@ -962,7 +964,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             metadata,
             headers.Get(),
             progress,
-            cancellationToken
+            cancellationToken,
+            this.Options.TracePropagation
         ).ConfigureAwait(false);
     }
 
@@ -1009,7 +1012,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             metadata,
             headers.Get(),
             progress,
-            cancellationToken
+            cancellationToken,
+            this.Options.TracePropagation
         ).ConfigureAwait(false);
     }
 
@@ -1052,7 +1056,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (onProgress != null)
             progress.ProgressChanged += onProgress;
 
-        await this.uploadClient.UploadBytesAsync(uri, data, headers.Get(), progress, cancellationToken).ConfigureAwait(false);
+        await this.uploadClient.UploadBytesAsync(uri, data, headers.Get(), progress, cancellationToken, this.Options.TracePropagation).ConfigureAwait(false);
 
         return this.GetFinalPath(supabasePath);
     }
@@ -1085,7 +1089,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             builder.Uri,
             await Helpers.AuthorizeAsync(this.Options, this.Headers, cancellationToken).ConfigureAwait(false),
             progress,
-            cancellationToken
+            cancellationToken,
+            this.Options.TracePropagation
         ).ConfigureAwait(false);
 
         using var fileStream = new FileStream(
@@ -1126,7 +1131,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             builder.Uri,
             await Helpers.AuthorizeAsync(this.Options, this.Headers, cancellationToken).ConfigureAwait(false),
             progress,
-            cancellationToken
+            cancellationToken,
+            this.Options.TracePropagation
         ).ConfigureAwait(false);
 
         return stream.ToArray();

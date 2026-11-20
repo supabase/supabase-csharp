@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Postgrest.Interfaces;
@@ -14,6 +15,8 @@ namespace Supabase.Realtime;
 /// </summary>
 public class ClientOptions
 {
+    private static readonly ThreadLocal<Random> RandomProvider = new(() => new Random(Guid.NewGuid().GetHashCode()));
+
     /// <summary>
     /// The function to encode outgoing messages. Defaults to JSON
     /// </summary>
@@ -51,21 +54,26 @@ public class ClientOptions
     public TimeSpan ProbeTimeout { get; set; } = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// When set, the socket disconnects once the last channel has been closed for this long. Call
-    /// <c>ConnectAsync</c> again before creating new channels. Left null, the socket stays open.
+    /// When set, the socket disconnects once the last channel has been closed for this long, and the next
+    /// <c>Subscribe</c> connects again. Left null, the socket stays open.
     /// </summary>
-    [PartialCapability("realtime.configuration.deferred_disconnect", "Opt-in (null by default, socket otherwise stays open); after the deferred disconnect the caller must call ConnectAsync again before creating channels, there is no automatic reconnect.")]
+    [PartialCapability("realtime.configuration.deferred_disconnect", "Opt-in: null by default, so the socket stays open. Closing an idle socket by default is a breaking change planned for 9.0.0.")]
     public TimeSpan? DisconnectOnEmptyChannelsAfter { get; set; }
 
     /// <summary>
-    /// The interval to reconnect
+    /// The delay before the next reconnect attempt after one failed, given the attempt number starting at 1. Defaults
+    /// to a random delay of up to 1, 2, 4, 8 and 16 seconds for the first attempts, then up to 30 seconds.
     /// </summary>
     [ImplementedCapability("realtime.configuration.reconnect_backoff")]
-    public Func<int, TimeSpan> ReconnectAfterInterval { get; set; } = (tries) =>
-    {
-        var intervals = new[] { 30, 45, 60, 120 };
-        return TimeSpan.FromSeconds(tries < intervals.Length ? intervals[tries] : intervals[intervals.Length - 1]);
-    };
+    public Func<int, TimeSpan> ReconnectAfterInterval { get; set; } = attempt =>
+        TimeSpan.FromSeconds(RandomProvider.Value!.NextDouble() * Math.Min(30, Math.Pow(2, attempt - 1)));
+
+    /// <summary>
+    /// Whether the client watches the platform's network monitor and, when the network comes back, reconnects without
+    /// waiting out the rest of the reconnect delay. Has no effect on a runtime without that monitor. Defaults to true.
+    /// </summary>
+    [ImplementedCapability("realtime.configuration.network_path_wake", "NetworkChange.NetworkAddressChanged is the monitor; the option has no effect on a runtime that does not support it.")]
+    public bool MonitorsNetworkPath { get; set; } = true;
 
     /// <summary>
     /// Request headers to be appended to the connection string.
@@ -115,4 +123,12 @@ public class ClientOptions
     /// </summary>
     [ImplementedCapability("realtime.configuration.access_token_callback")]
     public Func<Task<string?>>? RetrieveAccessToken { get; set; }
+
+    /// <summary>
+    /// Receives the socket's lifecycle diagnostics (connected, disconnected, reconnecting, heartbeat timeout) and every
+    /// channel's state changes at <c>Debug</c>. Left null, the client logs nothing. Never carries credentials, tokens,
+    /// payloads or the endpoint's query string.
+    /// </summary>
+    [ImplementedCapability("realtime.configuration.custom_logger")]
+    public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
 }

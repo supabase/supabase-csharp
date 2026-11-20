@@ -137,7 +137,15 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
 
     /// <summary>
     /// Executes a BULK INSERT query using the defined query params on the current instance.
+    /// Rows may carry different fields (for example when a column omits its null value): the request names the
+    /// union of the fields in the `columns` query parameter, unless <see cref="Columns(string[])"/> was called.
+    /// An empty collection writes nothing.
     /// </summary>
+    /// <example>
+    /// <code>
+    /// await client.Table&lt;User&gt;().Insert(new[] { new User { Username = "ann" }, new User { Username = "bob", Data = "{}" } });
+    /// </code>
+    /// </example>
     /// <param name="models"></param>
     /// <param name="options"></param>
     /// <param name="cancellationToken"></param>
@@ -412,13 +420,32 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     IPostgrestTable<TModel> Where(Expression<Func<TModel, bool>> predicate);
 
     /// <summary>
-    /// Executes a query that expects to have a single object returned, rather than returning list of models
-    /// it will return a single model. Returns null when the query matches no rows.
+    /// Executes a query that returns at most one row, as a single model rather than a list.
+    /// Returns null when the query matches no rows. To have no match throw instead, use <see cref="SingleOrThrowAsync"/>.
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <exception cref="Exceptions.PostgrestException">The query matches more than one row.</exception>
     /// <returns></returns>
     Task<TModel?> Single(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Executes a read that must match exactly one row, and returns that row. The server enforces the count
+    /// by answering with a single object, so a query that matches no row or several rows throws.
+    /// </summary>
+    /// <remarks>
+    /// This is the strict twin of <see cref="Single"/>, which is the lenient "at most one row" read: it
+    /// returns null for no match. In v9, <c>Single</c> becomes the strict one and <c>MaybeSingle</c> the lenient one.
+    /// Only reads are supported: a write takes its row expectation from <see cref="QueryOptions"/>, and an RPC call is terminal.
+    /// </remarks>
+    /// <param name="cancellationToken"></param>
+    /// <returns>The only row the query matches.</returns>
+    /// <exception cref="Exceptions.PostgrestException">The query matches no row or more than one row (<see cref="Exceptions.FailureHint.Reason.UnexpectedRowCount"/>).</exception>
+    /// <example>
+    /// <code>
+    /// var todo = await client.Table&lt;Todo&gt;().Filter("id", Operator.Equals, "1").SingleOrThrowAsync();
+    /// </code>
+    /// </example>
+    Task<TModel> SingleOrThrowAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Specifies a key and value to be updated. Should be combined with filters/where clauses.
@@ -439,6 +466,23 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     IPostgrestTable<TModel> Set(Expression<Func<TModel, KeyValuePair<object, object?>>> keyValuePairExpression);
+
+    /// <summary>
+    /// Sets the maximum number of rows an <c>Update</c> or <c>Delete</c> may affect. When the mutation would
+    /// affect more rows, PostgREST rolls it back and the call throws. Needs PostgREST 13 or later: an older
+    /// server ignores the limit.
+    /// </summary>
+    /// <param name="rows">The most rows the mutation may affect; zero forbids any affected row.</param>
+    /// <returns>The same table, for chaining.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="rows"/> is negative.</exception>
+    /// <exception cref="InvalidOperationException">The terminal call is not an Update or a Delete.</exception>
+    /// <exception cref="Exceptions.PostgrestException">The mutation would affect more than <paramref name="rows"/> rows (<see cref="Exceptions.FailureHint.Reason.MaxAffectedExceeded"/>).</exception>
+    /// <example>
+    /// <code>
+    /// await client.Table&lt;Todo&gt;().Filter("done", Operator.Equals, "true").MaxAffected(10).Delete();
+    /// </code>
+    /// </example>
+    IPostgrestTable<TModel> MaxAffected(int rows);
 
     /// <summary>
     /// Leaves null values out of the returned rows. Needs PostgREST 11.2 or later.
@@ -471,6 +515,8 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     /// By default the new record is returned. Set QueryOptions.ReturnType to Minimal if you don't need this value.
     /// By specifying the QueryOptions.OnConflict parameter, you can make UPSERT work on a column(s) that has a UNIQUE constraint.
     /// QueryOptions.DuplicateResolution.IgnoreDuplicates Specifies if duplicate rows should be ignored and not inserted.
+    /// Rows may carry different fields: the request names the union of the fields in the `columns` query parameter,
+    /// unless <see cref="Columns(string[])"/> was called.
     /// </summary>
     /// <param name="model"></param>
     /// <param name="options"></param>

@@ -69,7 +69,9 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             AutoRefreshToken = this.options.AutoRefreshToken,
             HttpClient = this.options.HttpClient,
             Proxy = this.options.Proxy,
-            Retry = this.options.GotrueRetry
+            Retry = this.options.GotrueRetry,
+            TracePropagation = this.options.TracePropagation,
+            Logger = this.options.LoggerFor(GotrueDiagnostics.SourceName)
         })
         {
             GetHeaders = () => this.GetAuthHeaders(),
@@ -201,6 +203,8 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
         {
             Schema = schema,
             Retry = this.options.PostgrestRetry,
+            TracePropagation = this.options.TracePropagation,
+            Logger = this.options.LoggerFor(Supabase.Postgrest.PostgrestDiagnostics.SourceName),
             Timeout = this.options.PostgrestTimeout,
             HttpClient = this.options.HttpClient,
             Proxy = this.options.Proxy,
@@ -215,6 +219,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             Parameters = { ApiKey = this.supabaseKey },
             PostgrestClient = this.postgrest,
             WebSocketFactory = this.options.WebSocketFactory,
+            Logger = this.options.LoggerFor(SupabaseOptions.RealtimeLoggerCategory),
             RetrieveAccessToken = ThirdPartyAuthorization.RealtimeAccessToken(thirdPartyAccessToken, this.supabaseKey)
         };
         this.realtime = new Realtime.Client(realtimeUrl, realtimeOptions);
@@ -229,12 +234,14 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             HttpClient = this.options.HttpClient,
             Proxy = this.options.Proxy,
             Retry = this.options.FunctionsRetry,
+            TracePropagation = this.options.TracePropagation,
+            Logger = this.options.LoggerFor(Supabase.Functions.FunctionsDiagnostics.SourceName),
             RetrieveAccessToken = thirdPartyAccessToken
         });
         // Edge Functions must not receive a new-format (opaque) API key on the Authorization
         // header — the gateway would try to parse it as a JWT and reject the request.
         this.functions.GetHeaders = () => this.GetAuthHeaders(omitApiKeyAsBearer: true);
-        this.storage = new Storage.Client(storageUrl, ThirdPartyAuthorization.StorageOptions(this.options.StorageClientOptions, thirdPartyAccessToken));
+        this.storage = new Storage.Client(storageUrl, StorageConfiguration.For(this.options, thirdPartyAccessToken));
         this.storage.GetHeaders = () => this.GetAuthHeaders();
     }
 
@@ -247,6 +254,8 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             HttpClient = this.options.HttpClient,
             Proxy = this.options.Proxy,
             Retry = this.options.GotrueRetry,
+            TracePropagation = this.options.TracePropagation,
+            Logger = this.options.LoggerFor(GotrueDiagnostics.SourceName),
             FlowType = this.options.AuthFlowType
         });
         supabaseAuth.SetPersistence(this.options.SessionHandler);

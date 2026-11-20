@@ -38,6 +38,21 @@ public class ClientOptions
     public RetryOptions Retry { get; set; } = new RetryOptions();
 
     /// <summary>
+    /// Whether the SDK adds the current trace context (<c>traceparent</c>, <c>tracestate</c>, <c>baggage</c>) to each
+    /// request. Defaults to <see cref="TracePropagation.Enabled"/>. <see cref="TracePropagation.Disabled"/> stops the SDK
+    /// from injecting it; the .NET runtime's own injection is controlled through
+    /// <see cref="System.Diagnostics.DistributedContextPropagator.Current"/>.
+    /// </summary>
+    public TracePropagation TracePropagation { get; set; } = TracePropagation.Enabled;
+
+    /// <summary>
+    /// Receives the diagnostics of this client: request outcomes and retry decisions at <c>Debug</c>, and failures of work that
+    /// runs in the background at <c>Warning</c>. Left null, the client logs nothing. Never carries credentials, tokens, bodies,
+    /// query strings or header values.
+    /// </summary>
+    public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
+
+    /// <summary>
     /// Should the Client automatically handle refreshing the User's Token?
     /// </summary>
     [ImplementedCapability("auth.session.auto_refresh")]

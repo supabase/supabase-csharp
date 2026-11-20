@@ -163,7 +163,7 @@ public static class Constants
         Internal,
 
         /// <summary>
-        /// A presently unknown event, if this is seen, please open an issue at https://github.com/supabase-community/realtime-csharp
+        /// A presently unknown event, if this is seen, please open an issue at https://github.com/supabase/supabase-csharp/issues
         /// </summary>
         Unknown
     }

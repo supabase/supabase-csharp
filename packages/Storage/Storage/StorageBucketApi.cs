@@ -111,7 +111,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     {
         options ??= new BucketUpsertOptions();
 
-        var data = new Bucket
+        var data = new BucketRequest
         {
             Id = id,
             Name = id,
@@ -136,7 +136,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     {
         options ??= new BucketUpsertOptions();
 
-        var data = new Bucket
+        var data = new BucketRequest
         {
             Id = id,
             Public = options.Public,

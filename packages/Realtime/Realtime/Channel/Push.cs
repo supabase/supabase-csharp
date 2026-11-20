@@ -60,7 +60,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     private int _timeoutMs;
     private readonly Timer _timer;
 
-    private readonly IRealtimeSocket _socket;
+    private IRealtimeSocket Socket => this.Channel.Socket;
 
     /// <summary>
     /// Handlers for notifications of message events.
@@ -79,7 +79,6 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     public Push(IRealtimeSocket socket, RealtimeChannel channel, string eventName, string? type = null,
         object? payload = null, int timeoutMs = Constants.DefaultTimeout)
     {
-        this._socket = socket;
         this._timeoutMs = timeoutMs;
         this._timer = new Timer(this._timeoutMs) { AutoReset = false };
         this._timer.Elapsed += this.HandleTimeoutElapsed;
@@ -124,7 +123,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
             JoinRef = this.Channel.JoinPush?.Ref,
         };
 
-        this._socket.Push(this.Message);
+        this.Socket.Push(this.Message);
     }
 
     /// <summary>
@@ -134,9 +133,9 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     {
         this._timer.Stop();
         this._timer.Start();
-        this._socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
-        this.Ref = this._socket.MakeMsgRef();
-        this._msgRefEvent = this._socket.ReplyEventName(this.Ref);
+        this.Socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
+        this.Ref = this.Socket.MakeMsgRef();
+        this._msgRefEvent = this.Socket.ReplyEventName(this.Ref);
     }
 
     /// <summary>
@@ -146,12 +145,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="message"></param>
     private void HandleSocketMessageReceived(IRealtimeSocket sender, SocketResponse message)
     {
-        // Needs to verify if realtime server won't send the message below anymore after receive a track presence event
-        // {"ref":"bd07efe5-ca06-4257-b080-79779c6f76c4","event":"phx_reply","payload":{"status":"ok","response":{}},"topic":"realtime:online-users"}
-        // the message was used to stop timeout handler
-        // All tests still work on version before 2.34.21
-        var isPresenceDiff = message is { Event: Constants.EventType.PresenceDiff };
-        if (!isPresenceDiff && message.Ref != this.Ref) return;
+        if (message.Ref is null || message.Ref != this.Ref) return;
 
         this.CancelTimeout();
         this.Response = message;
@@ -196,7 +190,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
 
     private void HandleTimeoutElapsed(object sender, ElapsedEventArgs e)
     {
-        this._socket.RemoveMessageReceivedHandler(this.HandleSocketMessageReceived);
+        this.Socket.RemoveMessageReceivedHandler(this.HandleSocketMessageReceived);
         OnTimeout?.Invoke(this, null);
     }
 

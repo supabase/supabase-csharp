@@ -53,6 +53,16 @@ public class StorageBucketApiContractTests
     }
 
     [TestMethod]
+    public async Task ListBuckets_ShouldReturnBucketsWhenFileSizeLimitIsNumeric()
+    {
+        this.Respond("/storage/v1/bucket", "GET", 200, "[{\"id\":\"a\",\"name\":\"a\",\"file_size_limit\":1048576}]");
+
+        var buckets = await this.client.ListBuckets();
+
+        buckets.Should().ContainSingle().Which.FileSizeLimitInBytes.Should().Be(1048576L);
+    }
+
+    [TestMethod]
     public async Task GetBucket_ShouldReturnTheBucket_GivenFound()
     {
         this.Respond("/storage/v1/bucket/photos", "GET", 200, "{\"id\":\"photos\",\"name\":\"photos\",\"public\":true}");
@@ -63,6 +73,17 @@ public class StorageBucketApiContractTests
             bucket!.Id.Should().Be("photos");
             bucket.Public.Should().BeTrue();
         }
+    }
+
+    [TestMethod]
+    public async Task GetBucket_ShouldReturnBucketWhenFileSizeLimitIsNumeric()
+    {
+        this.Respond("/storage/v1/bucket/photos", "GET", 200, "{\"id\":\"photos\",\"name\":\"photos\",\"file_size_limit\":1048576}");
+
+        var bucket = await this.client.GetBucket("photos");
+
+        bucket.Should().NotBeNull();
+        bucket!.FileSizeLimitInBytes.Should().Be(1048576L);
     }
 
     [TestMethod]
@@ -93,6 +114,51 @@ public class StorageBucketApiContractTests
             request.Path.Should().Be("/storage/v1/bucket");
             request.Body.Should().Contain("\"id\":\"photos\"").And.Contain("\"public\":true");
         }
+    }
+
+    [TestMethod]
+    public async Task CreateBucket_ShouldSendFileSizeLimitAsProvided()
+    {
+        this.Respond("/storage/v1/bucket", "POST", 200, "{\"name\":\"photos\"}");
+        await this.client.CreateBucket("photos", new BucketUpsertOptions { FileSizeLimit = "1mb" });
+
+        this.SingleRequest().Body.Should().Be(
+            "{\"id\":\"photos\",\"name\":\"photos\",\"owner\":null,\"created_at\":null,\"updated_at\":null,\"public\":false,\"file_size_limit\":\"1mb\"}");
+    }
+
+    [TestMethod]
+    public async Task UpdateBucket_ShouldSendFileSizeLimitAsProvided()
+    {
+        this.Respond("/storage/v1/bucket/photos", "PUT", 200, "{\"id\":\"photos\"}");
+        await this.client.UpdateBucket("photos", new BucketUpsertOptions { FileSizeLimit = "1mb" });
+
+        this.SingleRequest().Body.Should().Be(
+            "{\"id\":\"photos\",\"name\":null,\"owner\":null,\"created_at\":null,\"updated_at\":null,\"public\":false,\"file_size_limit\":\"1mb\"}");
+    }
+
+    [TestMethod]
+    public async Task CreateBucket_ShouldOmitOrNullFileSizeLimitWhenNotProvided()
+    {
+        this.Respond("/storage/v1/bucket", "POST", 200, "{\"name\":\"photos\"}");
+        await this.client.CreateBucket("photos");
+
+        this.SingleRequest().Body.Should().Be(
+            "{\"id\":\"photos\",\"name\":\"photos\",\"owner\":null,\"created_at\":null,\"updated_at\":null,\"public\":false,\"file_size_limit\":null}");
+    }
+
+    [TestMethod]
+    public async Task CreateBucket_ShouldSendAllowedMimeTypesAndPublicFlag()
+    {
+        this.Respond("/storage/v1/bucket", "POST", 200, "{\"name\":\"photos\"}");
+        await this.client.CreateBucket("photos", new BucketUpsertOptions
+        {
+            Public = true,
+            AllowedMimes = new List<string> { "image/png", "image/jpeg" }
+        });
+
+        var body = this.SingleRequest().Body;
+        body.Should().Contain("\"public\":true")
+            .And.Contain("\"allowed_mime_types\":[\"image/png\",\"image/jpeg\"]");
     }
 
     [TestMethod]

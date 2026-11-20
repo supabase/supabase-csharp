@@ -4,10 +4,10 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase.Gotrue)](https://www.nuget.org/packages/Supabase.Gotrue/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
-A C# client for [Supabase Auth](https://supabase.com/docs/guides/auth) (GoTrue) — email/password,
+The official C# client for [Supabase Auth](https://supabase.com/docs/guides/auth) (GoTrue) — email/password,
 OAuth providers, SSO, magic links, and user management.
 
-Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). Most projects
+Part of the official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase. Most projects
 use it through the [`Supabase`](../Supabase/README.md) meta-package (`supabase.Auth`); reference this
 package directly to use Auth on its own. The client is written to be platform-agnostic and works on
 .NET, Xamarin, MAUI, and Unity — see the [Unity session-persistence example](https://gist.github.com/wiverson/fbb07498743dff19b72c9c58599931e9).

@@ -36,6 +36,8 @@ public static class StatelessClient
             HttpClient = options.HttpClient,
             Proxy = options.Proxy,
             Retry = options.GotrueRetry,
+            TracePropagation = options.TracePropagation,
+            Logger = options.LoggerFor(Supabase.Gotrue.GotrueDiagnostics.SourceName),
             FlowType = options.AuthFlowType
         };
     }
@@ -57,6 +59,8 @@ public static class StatelessClient
             Schema = options.Schema,
             Headers = headers,
             Retry = options.PostgrestRetry,
+            TracePropagation = options.TracePropagation,
+            Logger = options.LoggerFor(Supabase.Postgrest.PostgrestDiagnostics.SourceName),
             Timeout = options.PostgrestTimeout,
             HttpClient = options.HttpClient,
             Proxy = options.Proxy
@@ -76,7 +80,7 @@ public static class StatelessClient
 
         var headers = GetAuthHeaders(supabaseKey, options).MergeLeft(options.Headers);
 
-        return new Storage.Client(string.Format(options.StorageUrlFormat, supabaseUrl), options.StorageClientOptions, headers);
+        return new Storage.Client(string.Format(options.StorageUrlFormat, supabaseUrl), StorageConfiguration.For(options, null), headers);
     }
 
     /// <summary>
@@ -109,7 +113,9 @@ public static class StatelessClient
         {
             HttpClient = options.HttpClient,
             Proxy = options.Proxy,
-            Retry = options.FunctionsRetry
+            Retry = options.FunctionsRetry,
+            TracePropagation = options.TracePropagation,
+            Logger = options.LoggerFor(Supabase.Functions.FunctionsDiagnostics.SourceName)
         });
         client.GetHeaders = () => headers;
 

@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Web;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Postgrest;
@@ -45,6 +48,11 @@ public abstract class RequestApprovalFixture : VerifyBase
     protected string EmittedRequestBody =>
         this.server.LogEntries.Should().ContainSingle("the SDK should emit exactly one request")
             .Which.RequestMessage!.Body!;
+
+    /// <summary>The query string of the single request the SDK emitted, decoded.</summary>
+    protected NameValueCollection EmittedRequestQuery =>
+        HttpUtility.ParseQueryString(new Uri(this.server.LogEntries.Should().ContainSingle("the SDK should emit exactly one request")
+            .Which.RequestMessage!.Url!).Query);
 
     /// <summary>The <c>Prefer</c> header of each request the SDK emitted, in order.</summary>
     protected IEnumerable<string> EmittedPreferHeaders =>

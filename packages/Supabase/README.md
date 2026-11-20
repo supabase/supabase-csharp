@@ -4,11 +4,11 @@
 [![NuGet](https://img.shields.io/nuget/vpre/Supabase)](https://www.nuget.org/packages/Supabase/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../LICENSE)
 
-The unified C# client for [Supabase](https://supabase.com). One client composes Auth, Database,
+The official, unified C# client for [Supabase](https://supabase.com). One client composes Auth, Database,
 Storage, Realtime, and Edge Functions, so you configure your project once and reach every service
 from a single object.
 
-Part of the [Supabase C# SDK](https://github.com/supabase/supabase-csharp). To use a single
+Part of the official [Supabase C# SDK](https://github.com/supabase/supabase-csharp), maintained by Supabase. To use a single
 service on its own, reference its package instead — see [Individual services](#individual-services).
 
 ## Installation
@@ -17,8 +17,7 @@ service on its own, reference its package instead — see [Individual services](
 dotnet add package Supabase
 ```
 
-Targets .NET Standard 2.1, so it runs on .NET Core / .NET 5+, Xamarin, MAUI, and Unity. See the
-[wiki](https://github.com/supabase/supabase-csharp/wiki) for platform-specific guides.
+Targets .NET Standard 2.1, so it runs on .NET Core / .NET 5+, Xamarin, MAUI, and Unity.
 
 ## Supabase Service Compatibility
 
@@ -102,9 +101,7 @@ Pass a `SupabaseOptions` to the constructor:
 
 By default the client does not persist the auth session, so the user is signed out when the process
 ends. Provide a `SessionHandler` to save, load, and destroy the session — for example to a file or to
-the platform's secure storage. See
-[Authorization with Gotrue](https://github.com/supabase/supabase-csharp/wiki/Authorization-with-Gotrue#offline-support)
-in the wiki for a worked example.
+the platform's secure storage.
 
 > **A note on keys:** some APIs (user administration, bypassing RLS, etc.) require an elevated key
 > rather than the public/publishable one. Never expose an elevated key in client-side code, and use a
@@ -172,11 +169,8 @@ Each service is also published as a standalone package, useful when you only nee
 
 ## Documentation
 
-- [Getting Started](https://github.com/supabase/supabase-csharp/wiki#getting-started)
 - [Supabase C# reference](https://supabase.com/docs/reference/csharp/introduction)
-- [Generated API docs](https://supabase-community.github.io/supabase-csharp/api/Supabase.Client.html)
-- [Examples](https://github.com/supabase/supabase-csharp/wiki/Examples)
-- [Troubleshooting](https://github.com/supabase/supabase-csharp/wiki/Troubleshooting) · [Discussions](https://github.com/supabase/supabase-csharp/discussions)
+- [Discussions](https://github.com/supabase/supabase-csharp/discussions)
 
 ## Contributing
 

@@ -223,7 +223,7 @@ public partial class Client : IFunctionsClient
 
         try
         {
-            var response = await RetryExecutor.SendAsync(this.httpClient, () => BuildRequestMessage(options, headers, uri), this.Options.Retry, completionOption, linkedCts.Token).ConfigureAwait(false);
+            var response = await RetryExecutor.SendAsync(this.httpClient, () => BuildRequestMessage(options, headers, uri), this.Options.Retry, this.Options.TracePropagation, this.Options.Logger, completionOption, linkedCts.Token).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             var isRelayError = response.Headers.Contains("x-relay-error");
             activity.SetHttpResponseTags(statusCode.Value);

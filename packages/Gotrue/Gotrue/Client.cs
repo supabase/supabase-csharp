@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Supabase.Core.Attributes;
 using Supabase.Core.Diagnostics;
+using Supabase.Core.Logging;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.Common;
@@ -116,7 +117,11 @@ public class Client : IGotrueClient<User, Session>
     {
         options ??= new ClientOptions();
         this.Options = options;
-        this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry);
+        this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
+        {
+            TracePropagation = options.TracePropagation,
+            Logger = options.Logger
+        };
         if (options.AutoRefreshToken)
             this.StartAutoRefresh();
     }
@@ -168,6 +173,7 @@ public class Client : IGotrueClient<User, Session>
         catch (Exception e)
         {
             this.debugNotification?.Log("Auth State Change Handler Failure", e);
+            this.Options.Logger.BackgroundWorkFailed(GotrueDiagnostics.SourceName, "Session persistence handler", e);
         }
         finally
         {
@@ -186,6 +192,7 @@ public class Client : IGotrueClient<User, Session>
             catch (Exception e)
             {
                 this.debugNotification?.Log("Auth State Change Handler Failure", e);
+                this.Options.Logger.BackgroundWorkFailed(GotrueDiagnostics.SourceName, "Auth state change handler", e);
             }
         }
     }
@@ -874,6 +881,7 @@ public class Client : IGotrueClient<User, Session>
                 // Anything else is treated as transient - keep the session so the next refresh can retry.
                 // Never log the session itself here - it contains the access and refresh tokens.
                 this.debugNotification?.Log($"Failed to refresh token ({e.Message})", e);
+                this.Options.Logger.BackgroundWorkFailed(GotrueDiagnostics.SourceName, "Token refresh", e);
                 activity.SetFailure(e);
                 return this.CurrentSession;
             }
@@ -1040,6 +1048,7 @@ public class Client : IGotrueClient<User, Session>
         catch (Exception e)
         {
             this.debugNotification?.Log($"Failed to load the persisted session ({e.Message})", e);
+            this.Options.Logger.BackgroundWorkFailed(GotrueDiagnostics.SourceName, "Session load", e);
             return;
         }
         this.ApplyLoadedSession(before, session);
@@ -1061,6 +1070,7 @@ public class Client : IGotrueClient<User, Session>
         catch (Exception e)
         {
             this.debugNotification?.Log($"Failed to load the persisted session ({e.Message})", e);
+            this.Options.Logger.BackgroundWorkFailed(GotrueDiagnostics.SourceName, "Session load", e);
             return;
         }
         this.ApplyLoadedSession(before, session);
@@ -1110,7 +1120,7 @@ public class Client : IGotrueClient<User, Session>
     [ImplementedCapability("auth.session.auto_refresh")]
     public void StartAutoRefresh()
     {
-        this.TokenRefresh ??= new TokenRefresh(this);
+        this.TokenRefresh ??= new TokenRefresh(this) { Logger = this.Options.Logger };
         this.AddStateChangedListener(this.TokenRefresh.ManageAutoRefresh);
         this.TokenRefresh.Start();
     }

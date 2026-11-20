@@ -7,6 +7,8 @@ Supabase.Storage.Bucket.CreatedAt.get -> System.DateTime?
 Supabase.Storage.Bucket.CreatedAt.set -> void
 Supabase.Storage.Bucket.FileSizeLimit.get -> string?
 Supabase.Storage.Bucket.FileSizeLimit.set -> void
+Supabase.Storage.Bucket.FileSizeLimitInBytes.get -> long?
+Supabase.Storage.Bucket.FileSizeLimitInBytes.set -> void
 Supabase.Storage.Bucket.Id.get -> string?
 Supabase.Storage.Bucket.Id.set -> void
 Supabase.Storage.Bucket.Name.get -> string?
@@ -40,12 +42,16 @@ Supabase.Storage.ClientOptions.HttpRequestTimeout -> System.TimeSpan
 Supabase.Storage.ClientOptions.HttpUploadClient.get -> System.Net.Http.HttpClient?
 Supabase.Storage.ClientOptions.HttpUploadClient.set -> void
 Supabase.Storage.ClientOptions.HttpUploadTimeout -> System.TimeSpan
+Supabase.Storage.ClientOptions.Logger.get -> Microsoft.Extensions.Logging.ILogger?
+Supabase.Storage.ClientOptions.Logger.set -> void
 Supabase.Storage.ClientOptions.Proxy.get -> System.Net.IWebProxy?
 Supabase.Storage.ClientOptions.Proxy.set -> void
 Supabase.Storage.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.CancellationToken, System.Threading.Tasks.Task<string?>!>?
 Supabase.Storage.ClientOptions.RetrieveAccessToken.set -> void
 Supabase.Storage.ClientOptions.Retry.get -> Supabase.Core.Http.RetryOptions!
 Supabase.Storage.ClientOptions.Retry.set -> void
+Supabase.Storage.ClientOptions.TracePropagation.get -> Supabase.Core.Http.TracePropagation
+Supabase.Storage.ClientOptions.TracePropagation.set -> void
 Supabase.Storage.CreateSignedUrlResponse
 Supabase.Storage.CreateSignedUrlResponse.CreateSignedUrlResponse() -> void
 Supabase.Storage.CreateSignedUrlResponse.SignedUrl.get -> string?
@@ -139,6 +145,8 @@ Supabase.Storage.FileObjectV2.Name.get -> string?
 Supabase.Storage.FileObjectV2.Name.set -> void
 Supabase.Storage.FileObjectV2.Size.get -> int?
 Supabase.Storage.FileObjectV2.Size.set -> void
+Supabase.Storage.FileObjectV2.SizeInBytes.get -> long?
+Supabase.Storage.FileObjectV2.SizeInBytes.set -> void
 Supabase.Storage.FileObjectV2.UpdatedAt.get -> System.DateTime?
 Supabase.Storage.FileObjectV2.UpdatedAt.set -> void
 Supabase.Storage.FileObjectV2.Version.get -> string!

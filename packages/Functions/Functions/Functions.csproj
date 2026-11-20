@@ -7,11 +7,11 @@
 		<RootNamespace>Supabase.Functions</RootNamespace>
 		<AssemblyName>Supabase.Functions</AssemblyName>
 		<NeutralLanguage>en</NeutralLanguage>
-		<Description>Supabase Edge Functions client for .NET that invokes functions with typed and streamed responses.</Description>
-		<PackageTags>supabase;edge-functions;functions;serverless;streaming</PackageTags>
+		<Description>Official Supabase Edge Functions client for .NET that invokes functions with typed and streamed responses.</Description>
+		<PackageTags>supabase;official;edge-functions;functions;serverless;streaming</PackageTags>
     <!-- x-release-please-start-version -->
-		<PackageVersion>8.12.0</PackageVersion>
-		<ReleaseVersion>8.12.0</ReleaseVersion>
+		<PackageVersion>8.13.0</PackageVersion>
+		<ReleaseVersion>8.13.0</ReleaseVersion>
     <!-- x-release-please-end -->
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -23,7 +23,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Version)' == '' ">
-    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.12.0</VersionPrefix> <!-- x-release-please-version -->
+    <VersionPrefix Condition=" '$(VersionPrefix)' == '' ">8.13.0</VersionPrefix> <!-- x-release-please-version -->
 		<VersionSuffix Condition=" '$(VersionSuffix)' == '' "></VersionSuffix>
 		<Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)-$(VersionSuffix)</Version>
 		<Version Condition=" '$(Version)' == '' ">$(VersionPrefix)</Version>

@@ -1,0 +1,1 @@
+﻿{"client_name":"My SPA","client_type":"public","token_endpoint_auth_method":"none","redirect_uris":["http://localhost:3000/callback","myapp://callback"],"grant_types":["authorization_code","refresh_token"],"client_uri":"https://app.example.com","logo_uri":"https://app.example.com/logo.png"}

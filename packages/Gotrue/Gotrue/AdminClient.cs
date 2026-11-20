@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
+using Supabase.Gotrue.CreateOAuthClient;
 using Supabase.Gotrue.CreateSsoProvider;
 using Supabase.Gotrue.Interfaces;
 using Supabase.Gotrue.ListSsoProviders;
@@ -12,6 +13,7 @@ using Supabase.Gotrue.Mfa;
 using Supabase.Gotrue.Responses;
 using Supabase.Gotrue.UpdateCustomProvider;
 using Supabase.Gotrue.UpdateFactor;
+using Supabase.Gotrue.UpdateOAuthClient;
 using Supabase.Gotrue.UpdateSsoProvider;
 
 namespace Supabase.Gotrue;
@@ -40,7 +42,11 @@ public class AdminClient : IGotrueAdminClient<User>
 
         options ??= new ClientOptions();
         this.Options = options;
-        this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry);
+        this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
+        {
+            TracePropagation = options.TracePropagation,
+            Logger = options.Logger
+        };
     }
 
     /// <summary>
@@ -225,4 +231,34 @@ public class AdminClient : IGotrueAdminClient<User>
         var result = await this.api.UpdateUser(this.serviceKey, attributes);
         return result;
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.create_client")]
+    public Task<OAuthClientCredentials> CreateOAuthClientAsync(NewOAuthClient client, OAuthClientOptions? options = null, CancellationToken cancellationToken = default) =>
+        this.api.CreateOAuthClientAsync(this.serviceKey, client, options, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.delete_client")]
+    public Task DeleteOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default) =>
+        this.api.DeleteOAuthClientAsync(this.serviceKey, clientId, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.regenerate_client_secret")]
+    public Task<OAuthClientCredentials> RegenerateOAuthClientSecretAsync(Guid clientId, CancellationToken cancellationToken = default) =>
+        this.api.RegenerateOAuthClientSecretAsync(this.serviceKey, clientId, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.get_client")]
+    public Task<OAuthClient> GetOAuthClientAsync(Guid clientId, CancellationToken cancellationToken = default) =>
+        this.api.GetOAuthClientAsync(this.serviceKey, clientId, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.list_clients")]
+    public Task<IReadOnlyList<OAuthClient>> ListOAuthClientsAsync(CancellationToken cancellationToken = default) =>
+        this.api.ListOAuthClientsAsync(this.serviceKey, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("auth.oauth_admin.update_client")]
+    public Task<OAuthClient> UpdateOAuthClientAsync(Guid clientId, OAuthClientChanges changes, CancellationToken cancellationToken = default) =>
+        this.api.UpdateOAuthClientAsync(this.serviceKey, clientId, changes, cancellationToken);
 }

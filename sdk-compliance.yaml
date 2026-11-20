@@ -253,6 +253,31 @@ features:
     symbols:
       - AdminClient.UpdateUserById
 
+  auth.oauth_admin.create_client:
+    status: implemented
+    symbols:
+      - AdminClient.CreateOAuthClientAsync
+  auth.oauth_admin.delete_client:
+    status: implemented
+    symbols:
+      - AdminClient.DeleteOAuthClientAsync
+  auth.oauth_admin.get_client:
+    status: implemented
+    symbols:
+      - AdminClient.GetOAuthClientAsync
+  auth.oauth_admin.list_clients:
+    status: implemented
+    symbols:
+      - AdminClient.ListOAuthClientsAsync
+  auth.oauth_admin.regenerate_client_secret:
+    status: implemented
+    symbols:
+      - AdminClient.RegenerateOAuthClientSecretAsync
+  auth.oauth_admin.update_client:
+    status: implemented
+    symbols:
+      - AdminClient.UpdateOAuthClientAsync
+
   auth.passkey_admin.delete_passkey:
     status: implemented
     symbols:
@@ -322,15 +347,27 @@ features:
       - Client.SetPersistence
       - SupabaseOptions.SessionHandler
   client.session_management.persist_session:
-    status: partially_implemented
-    note: "No boolean persist toggle; in-memory-only behavior is achievable only by supplying a no-op IGotrueSessionPersistence handler."
+    status: implemented
     symbols:
       - SupabaseOptions.SessionHandler
 
+  client.request_configuration.custom_http_client:
+    status: implemented
+    symbols:
+      - SupabaseOptions.HttpClient
   client.request_configuration.global_headers:
     status: implemented
     symbols:
       - SupabaseOptions.Headers
+
+  client.observability.trace_propagation:
+    status: implemented
+    symbols:
+      - SupabaseOptions.TracePropagation
+  client.observability.diagnostic_logging:
+    status: implemented
+    symbols:
+      - SupabaseOptions.LoggerFactory
 
   # ── Database (PostgREST) ───────────────────────────────────────────────────
 
@@ -354,6 +391,11 @@ features:
     symbols:
       - Table.Select
 
+  database.mutate.bulk_rows_with_differing_fields:
+    status: implemented
+    symbols:
+      - Table.Insert
+      - Table.Upsert
   database.mutate.count:
     status: implemented
     note: "Applied to Insert/Upsert/Update/Delete; the count is read back from ModeledResponse.Count."
@@ -367,6 +409,11 @@ features:
     status: implemented
     symbols:
       - Table.Insert
+  database.mutate.missing_defaults:
+    status: implemented
+    note: "Applied to bulk Insert/Upsert; sends Prefer: missing=default."
+    symbols:
+      - QueryOptions.MissingFields
   database.mutate.update:
     status: implemented
     symbols:
@@ -490,6 +537,10 @@ features:
     symbols:
       - Table.Limit
       - Table.Offset
+  database.using_modifiers.max_affected_rows:
+    status: implemented
+    symbols:
+      - Table.MaxAffected
   database.using_modifiers.maybe_single_row:
     status: implemented
     symbols:
@@ -503,6 +554,10 @@ features:
     status: implemented
     symbols:
       - Table.Range
+  database.using_modifiers.single_row:
+    status: implemented
+    symbols:
+      - Table.SingleOrThrowAsync
   database.using_modifiers.strip_nulls:
     status: implemented
     symbols:
@@ -638,8 +693,7 @@ features:
       - RealtimeChannel.Register
       - SupabaseTable.On
   realtime.subscriptions.subscribe_presence:
-    status: partially_implemented
-    note: "Join and Leave handlers get no key or presences, and a presence_state snapshot raises Sync only, not Join or Leave."
+    status: implemented
     symbols:
       - RealtimePresence
   realtime.subscriptions.postgres_changes_filter:
@@ -706,19 +760,23 @@ features:
       - ClientOptions.RetrieveAccessToken
   realtime.configuration.deferred_disconnect:
     status: partially_implemented
-    note: "Opt-in (null by default, socket otherwise stays open); after the deferred disconnect the caller must call ConnectAsync again before creating channels, there is no automatic reconnect."
+    note: "Opt-in: null by default, so the socket stays open. Closing an idle socket by default is a breaking change planned for 9.0.0."
     symbols:
       - ClientOptions.DisconnectOnEmptyChannelsAfter
   realtime.configuration.custom_logger:
-    status: partially_implemented
-    note: "Diagnostics routed through a debug handler hook; no custom logging function with a log-level filter."
+    status: implemented
     symbols:
-      - Client.AddDebugHandler
+      - ClientOptions.Logger
   realtime.configuration.foreground_liveness_probe:
     status: implemented
     note: "The app calls ProbeConnection when it returns to the foreground."
     symbols:
       - Client.ProbeConnection
+  realtime.configuration.network_path_wake:
+    status: implemented
+    note: "NetworkChange.NetworkAddressChanged is the monitor; the option has no effect on a runtime that does not support it."
+    symbols:
+      - ClientOptions.MonitorsNetworkPath
 
   # ── Storage ────────────────────────────────────────────────────────────────
 
