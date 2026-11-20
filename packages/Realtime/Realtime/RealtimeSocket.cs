@@ -496,7 +496,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
             Debugger.Instance.Log(this, $"Socket Message Received:\n\t{args.Text}");
 
             // Send Separate heartbeat event
-            if (decoded!.Ref == this.pendingHeartbeatRef)
+            if (decoded!.Ref != null && decoded.Ref == this.pendingHeartbeatRef)
             {
                 this.hasPendingHeartbeat = false;
                 var status = decoded.Payload?.Status == PhoenixStatusOk ? HeartbeatStatus.Ok : HeartbeatStatus.Error;
