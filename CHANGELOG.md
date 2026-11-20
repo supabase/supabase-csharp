@@ -1,5 +1,18 @@
 # Changelog
 
+## [8.14.0](https://github.com/supabase/supabase-csharp/compare/v8.13.0...v8.14.0) (2026-11-20)
+
+
+### Features
+
+* **core:** originate a trace context when no trace is active ([#815](https://github.com/supabase/supabase-csharp/issues/815)) ([9f05773](https://github.com/supabase/supabase-csharp/commit/9f057737a92851897fcc2b1d1ac1aa8cd757f819))
+
+
+### Bug Fixes
+
+* **realtime:** Send completes when the reply is already in ([#817](https://github.com/supabase/supabase-csharp/issues/817)) ([a0d26ea](https://github.com/supabase/supabase-csharp/commit/a0d26ea4d781869d9c0bc703049133dca2258bd9))
+* **realtime:** Send returns false on an error reply ([#816](https://github.com/supabase/supabase-csharp/issues/816)) ([76134e3](https://github.com/supabase/supabase-csharp/commit/76134e3aa589ff687ce8940416e74ade9c1ec7d1))
+
 ## [8.13.0](https://github.com/supabase/supabase-csharp/compare/v8.12.0...v8.13.0) (2026-11-19)
 
 
