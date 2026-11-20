@@ -1,0 +1,15 @@
+{
+  "authorization_id": "authorization-id",
+  "redirect_uri": "https://app.example/callback",
+  "client": {
+    "id": "client-id",
+    "name": "Example app",
+    "uri": "https://app.example",
+    "logo_uri": "https://app.example/logo.png"
+  },
+  "user": {
+    "id": "user-id",
+    "email": "user@example.com"
+  },
+  "scope": "openid profile email"
+}

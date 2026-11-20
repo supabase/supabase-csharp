@@ -34,6 +34,7 @@
   <ItemGroup>
     <None Update="TokenRefresh\Fixtures\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="SignUp\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="AuthorizationOAuth\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Common\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Common\Data\*.xml" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Identities\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
@@ -52,6 +53,10 @@
     <None Update="AdminListPasskeys\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="AdminDeletePasskey\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="Pkce\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AuthorizationOAuth\Data\" />
   </ItemGroup>
 
 </Project>

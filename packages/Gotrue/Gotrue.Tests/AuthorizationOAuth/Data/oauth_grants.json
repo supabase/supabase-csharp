@@ -1,0 +1,12 @@
+[
+  {
+    "client": {
+      "id": "client-id",
+      "name": "Example app",
+      "uri": "https://app.example",
+      "logo_uri": "https://app.example/logo.png"
+    },
+    "scopes": ["openid", "profile"],
+    "granted_at": "2026-11-14T12:00:00Z"
+  }
+]

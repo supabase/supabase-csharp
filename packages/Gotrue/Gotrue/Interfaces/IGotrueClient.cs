@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
+using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
@@ -1111,6 +1112,63 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     </code>
     /// </example>
     Task UnenrollRecoveryCodesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves details about an OAuth authorization request for displaying consent information.
+    /// Returns authorization details when the user must consent, or a redirect when consent is already granted.
+    /// Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+    /// </summary>
+    /// <param name="authorizationId">The authorization ID from the authorization request.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>Authorization details or an immediate redirect, depending on consent status.</returns>
+    Task<OAuthAuthorizationResponse> GetAuthorizationDetails(
+        string authorizationId,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
+    /// Approves an OAuth authorization request. The user's consent is stored and an authorization code is generated.
+    /// Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+    /// </summary>
+    /// <param name="authorizationId">The authorization ID to approve.</param>
+    /// <param name="options">Optional redirect handling settings.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The redirect URL containing the authorization code.</returns>
+    Task<OAuthRedirect> ApproveAuthorization(
+        string authorizationId,
+        AuthorizationOptions? options = null,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
+    /// Denies an OAuth authorization request. The redirect URL contains the <c>access_denied</c> OAuth error.
+    /// Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+    /// </summary>
+    /// <param name="authorizationId">The authorization ID to deny.</param>
+    /// <param name="options">Optional redirect handling settings.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The redirect URL containing the denial error.</returns>
+    Task<OAuthRedirect> DenyAuthorization(
+        string authorizationId,
+        AuthorizationOptions? options = null,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>Lists all OAuth grants authorized by the authenticated user. Only relevant when the OAuth 2.1 server is enabled.</summary>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The user's OAuth grants, including client details and granted scopes.</returns>
+    Task<IReadOnlyList<OAuthGrant>> ListGrants(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Revokes the user's OAuth grant for a client, deleting active sessions and invalidating associated refresh tokens.
+    /// Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+    /// </summary>
+    /// <param name="options">The client identifier to revoke.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    Task RevokeGrant(
+        RevokeGrantOptions options,
+        CancellationToken cancellationToken = default
+    );
 
     #endregion
 

@@ -11,6 +11,7 @@ using System.Web;
 using Supabase.Core.Attributes;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Logging;
+using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.Exceptions;
@@ -1351,6 +1352,57 @@ public class Client : IGotrueClient<User, Session>
         }
         return JwtVerification.BuildResponse(decoded);
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.get_authorization_details"))]
+    public Task<OAuthAuthorizationResponse> GetAuthorizationDetails(
+        string authorizationId,
+        CancellationToken cancellationToken = default
+    ) =>
+        this.AsSignedInUserAsync(
+            "auth.oauth.get_authorization_details",
+            accessToken => this.api.GetAuthorizationDetails(accessToken, authorizationId, cancellationToken)
+        );
+
+    /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.approve_authorization"))]
+    public Task<OAuthRedirect> ApproveAuthorization(
+        string authorizationId,
+        AuthorizationOptions? options = null,
+        CancellationToken cancellationToken = default
+    ) =>
+        this.AsSignedInUserAsync(
+            "auth.oauth.approve_authorization",
+            accessToken => this.api.ApproveAuthorization(accessToken, authorizationId, options, cancellationToken)
+        );
+
+    /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.deny_authorization"))]
+    public Task<OAuthRedirect> DenyAuthorization(
+        string authorizationId,
+        AuthorizationOptions? options = null,
+        CancellationToken cancellationToken = default
+    ) =>
+        this.AsSignedInUserAsync(
+            "auth.oauth.deny_authorization",
+            accessToken => this.api.DenyAuthorization(accessToken, authorizationId, options, cancellationToken)
+        );
+
+    /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.list_grants"))]
+    public Task<IReadOnlyList<OAuthGrant>> ListGrants(CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(
+            "auth.oauth.list_grants",
+            accessToken => this.api.ListGrants(accessToken, cancellationToken)
+        );
+
+    /// <inheritdoc />
+    [ImplementedCapability(("auth.oauth.revoke_grant"))]
+    public Task RevokeGrant(RevokeGrantOptions options, CancellationToken cancellationToken = default) =>
+        this.AsSignedInUserAsync(
+            "auth.oauth.revoke_grant",
+            accessToken => this.api.RevokeGrant(accessToken, options, cancellationToken)
+        );
 
     /// <summary>
     ///     Finds a matching public key, or returns null to use server verification.
