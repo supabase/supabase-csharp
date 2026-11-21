@@ -62,4 +62,11 @@ public class StorageBucketAnonTests : StorageE2EFixture
         var act = () => this.PublicStorage.DeleteBucket(id);
         await act.Should().ThrowAsync<SupabaseStorageException>();
     }
+
+    [TestMethod]
+    public async Task PurgeProjectCacheAsync_ShouldThrow_GivenNoPermission()
+    {
+        var act = () => this.PublicStorage.PurgeProjectCacheAsync();
+        (await act.Should().ThrowAsync<SupabaseStorageException>()).Which.StatusCode.Should().Be(403);
+    }
 }

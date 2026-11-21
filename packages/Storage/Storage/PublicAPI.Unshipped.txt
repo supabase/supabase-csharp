@@ -1,1 +1,3 @@
 #nullable enable
+Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.PurgeProjectCacheAsync(Supabase.Storage.PurgeCacheOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.StorageBucketApi.PurgeProjectCacheAsync(Supabase.Storage.PurgeCacheOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
