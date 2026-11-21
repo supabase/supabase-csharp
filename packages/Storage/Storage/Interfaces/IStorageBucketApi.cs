@@ -34,5 +34,15 @@ namespace Supabase.Storage.Interfaces
 		/// </code>
 		/// </example>
 		Task<GenericResponse?> PurgeBucketCache(string id, PurgeCacheOptions? options = null, CancellationToken cancellationToken = default);
+
+		/// <summary>
+		/// Purges the CDN cache for every object in every bucket of the project. Requires a service-role key.
+		/// </summary>
+		/// <example>
+		/// <code>
+		/// await storage.PurgeProjectCacheAsync();
+		/// </code>
+		/// </example>
+		Task PurgeProjectCacheAsync(PurgeCacheOptions? options = null, CancellationToken cancellationToken = default);
 	}
 }
