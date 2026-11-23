@@ -46,6 +46,15 @@ public class PurgeCacheCancellationTests
             "the bucket purge must carry the caller's token so an in-flight request can be cancelled");
     }
 
+    [TestMethod]
+    public async Task PurgeProjectCacheAsync_ShouldForwardTheTokenToTheRequest()
+    {
+        using var cts = new CancellationTokenSource();
+        var act = () => this.client.PurgeProjectCacheAsync(options: null, cts.Token);
+        (await this.TokenSeenBy(act, cts)).Should().BeTrue(
+            "the project purge must carry the caller's token so an in-flight request can be cancelled");
+    }
+
     private async Task<bool> TokenSeenBy(Func<Task> act, CancellationTokenSource cts)
     {
         var requestSawLiveToken = false;

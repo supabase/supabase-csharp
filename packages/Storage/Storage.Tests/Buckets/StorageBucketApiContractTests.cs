@@ -240,6 +240,25 @@ public class StorageBucketApiContractTests
             "a raw '?' in the id would start a query string and purge the wrong bucket");
     }
 
+    [TestMethod]
+    public async Task PurgeProjectCacheAsync_ShouldDeleteTheCdnRoot()
+    {
+        this.Respond("/storage/v1/cdn/", "DELETE", 200, "{\"message\":\"success\"}");
+        await this.client.PurgeProjectCacheAsync();
+        var request = this.SingleRequest();
+        request.Method.Should().Be("DELETE");
+        request.Path.Should().Be("/storage/v1/cdn/");
+        request.Query.Should().BeNullOrEmpty("unset options must purge every cached version, not only the transformations");
+    }
+
+    [TestMethod]
+    public async Task PurgeProjectCacheAsync_ShouldRequestTransformationsOnly_GivenTheTransformationsOption()
+    {
+        this.Respond("/storage/v1/cdn/", "DELETE", 200, "{\"message\":\"success\"}");
+        await this.client.PurgeProjectCacheAsync(new PurgeCacheOptions { Transformations = true });
+        this.SingleRequest().Query.Should().Contain(pair => pair.Key == "transformations" && pair.Value.Contains("true"));
+    }
+
     private void Respond(string path, string method, int statusCode, string body) =>
         this.server.Given(Request.Create().WithPath(path).UsingMethod(method))
             .RespondWith(Response.Create().WithStatusCode(statusCode)

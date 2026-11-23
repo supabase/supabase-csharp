@@ -179,4 +179,9 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
         var url = options.ToPurgeUrl($"{this.Url}/cdn/{Helpers.EncodePath(id)}");
         return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("storage.file_buckets.purge_project_cache")]
+    public Task PurgeProjectCacheAsync(PurgeCacheOptions? options = null, CancellationToken cancellationToken = default) =>
+        Helpers.MakeRequestAsync(this.requestClient, this.Options, HttpMethod.Delete, options.ToPurgeUrl($"{this.Url}/cdn/"), null, this.Headers, cancellationToken);
 }
