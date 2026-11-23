@@ -98,6 +98,8 @@ Supabase.Realtime.ClientOptions.PostgrestClient.get -> Supabase.Postgrest.Interf
 Supabase.Realtime.ClientOptions.PostgrestClient.set -> void
 Supabase.Realtime.ClientOptions.ProbeTimeout.get -> System.TimeSpan
 Supabase.Realtime.ClientOptions.ProbeTimeout.set -> void
+Supabase.Realtime.ClientOptions.ProtocolVersion.get -> Supabase.Realtime.ProtocolVersion
+Supabase.Realtime.ClientOptions.ProtocolVersion.set -> void
 Supabase.Realtime.ClientOptions.ReconnectAfterInterval.get -> System.Func<int, System.TimeSpan>!
 Supabase.Realtime.ClientOptions.ReconnectAfterInterval.set -> void
 Supabase.Realtime.ClientOptions.RetrieveAccessToken.get -> System.Func<System.Threading.Tasks.Task<string?>!>?
@@ -173,6 +175,7 @@ Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler
 Supabase.Realtime.Interfaces.IRealtimeBroadcast.ClearBroadcastEventHandlers() -> void
 Supabase.Realtime.Interfaces.IRealtimeBroadcast.RemoveBroadcastEventHandler(Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler! broadcastEventHandler) -> void
 Supabase.Realtime.Interfaces.IRealtimeBroadcast.Send(string? broadcastEventName, object! payload, int timeoutMs = 10000) -> System.Threading.Tasks.Task<bool>!
+Supabase.Realtime.Interfaces.IRealtimeBroadcast.SendBinary(string! broadcastEventName, byte[]! payload, int timeoutMs = 10000) -> System.Threading.Tasks.Task!
 Supabase.Realtime.Interfaces.IRealtimeChannel
 Supabase.Realtime.Interfaces.IRealtimeChannel.AddErrorHandler(Supabase.Realtime.Interfaces.IRealtimeChannel.ErrorEventHandler! handler) -> void
 Supabase.Realtime.Interfaces.IRealtimeChannel.AddMessageReceivedHandler(Supabase.Realtime.Interfaces.IRealtimeChannel.MessageReceivedHandler! messageReceivedHandler) -> void
@@ -311,6 +314,7 @@ Supabase.Realtime.Interfaces.IRealtimeSocketResponse._event.get -> string?
 Supabase.Realtime.Interfaces.IRealtimeSocketResponse._event.set -> void
 Supabase.Realtime.Models.BaseBroadcast
 Supabase.Realtime.Models.BaseBroadcast.BaseBroadcast() -> void
+Supabase.Realtime.Models.BaseBroadcast.BinaryPayload.get -> byte[]?
 Supabase.Realtime.Models.BaseBroadcast.Event.get -> string?
 Supabase.Realtime.Models.BaseBroadcast.Event.set -> void
 Supabase.Realtime.Models.BaseBroadcast.Meta.get -> Supabase.Realtime.Models.BroadcastMeta?
@@ -404,6 +408,9 @@ Supabase.Realtime.Presence.Responses.PresenceStatePayload<TPresence>.PresenceSta
 Supabase.Realtime.Presence.Responses.PresenceStateSocketResponse<TPresence>
 Supabase.Realtime.Presence.Responses.PresenceStateSocketResponse<TPresence>.PresenceStateSocketResponse() -> void
 Supabase.Realtime.Presence.Responses.PresenceStateSocketResponse<TPresence>.PresenceStateSocketResponse(System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
+Supabase.Realtime.ProtocolVersion
+Supabase.Realtime.ProtocolVersion.V1 = 0 -> Supabase.Realtime.ProtocolVersion
+Supabase.Realtime.ProtocolVersion.V2 = 1 -> Supabase.Realtime.ProtocolVersion
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.AddBroadcastEventHandler(Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler! broadcastEventHandler) -> void
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.ClearBroadcastEventHandlers() -> void
@@ -411,6 +418,7 @@ Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.Current() -> TBroadcastMode
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.RealtimeBroadcast(Supabase.Realtime.RealtimeChannel! channel, Supabase.Realtime.Broadcast.BroadcastOptions! options, System.Text.Json.JsonSerializerOptions! serializerSettings) -> void
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.RemoveBroadcastEventHandler(Supabase.Realtime.Interfaces.IRealtimeBroadcast.BroadcastEventHandler! broadcastEventHandler) -> void
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.Send(string? broadcastEventName, object! payload, int timeoutMs = 10000) -> System.Threading.Tasks.Task<bool>!
+Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.SendBinary(string! broadcastEventName, byte[]! payload, int timeoutMs = 10000) -> System.Threading.Tasks.Task!
 Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.TriggerReceived(Supabase.Realtime.Socket.SocketResponse! response) -> void
 Supabase.Realtime.RealtimeChannel
 Supabase.Realtime.RealtimeChannel.AddErrorHandler(Supabase.Realtime.Interfaces.IRealtimeChannel.ErrorEventHandler! handler) -> void
