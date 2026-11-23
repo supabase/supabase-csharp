@@ -49,6 +49,15 @@ public class ClientOptions
     public TimeSpan HeartbeatInterval { get; set; } = TimeSpan.FromSeconds(20);
 
     /// <summary>
+    /// The version of the Realtime protocol the client speaks. <see cref="Supabase.Realtime.ProtocolVersion.V2"/>
+    /// carries a broadcast whose payload is bytes, sent with <see cref="Interfaces.IRealtimeBroadcast.SendBinary"/>
+    /// and read from <see cref="Models.BaseBroadcast.BinaryPayload"/>. Defaults to
+    /// <see cref="Supabase.Realtime.ProtocolVersion.V1"/>.
+    /// </summary>
+    [ImplementedCapability("realtime.configuration.binary_protocol")]
+    public ProtocolVersion ProtocolVersion { get; set; } = ProtocolVersion.V1;
+
+    /// <summary>
     /// How long <c>ProbeConnection</c> waits for the heartbeat reply before the socket reconnects. Defaults to 5 seconds.
     /// </summary>
     public TimeSpan ProbeTimeout { get; set; } = TimeSpan.FromSeconds(5);

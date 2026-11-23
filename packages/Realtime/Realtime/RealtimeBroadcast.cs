@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Realtime.Broadcast;
+using Supabase.Realtime.Exceptions;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Models;
 using Supabase.Realtime.Socket;
@@ -36,13 +37,14 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
     /// </summary>
     public TBroadcastModel? Current()
     {
-        if (this.lastSocketResponse == null) return null;
+        if (this.lastSocketResponse is not { } response) return null;
 
-        var obj = JsonSerializer.Deserialize<SocketResponse<TBroadcastModel>>(this.lastSocketResponse.Json!,
+        var obj = JsonSerializer.Deserialize<SocketResponse<TBroadcastModel>>(response.Json!,
             this.serializerSettings);
 
         if (obj == null || obj.Payload == null) return null;
 
+        obj.Payload.BinaryPayload = response.BinaryPayload;
         return obj.Payload;
     }
 
@@ -116,5 +118,21 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
             baseBroadcast.Event = broadcastEventName;
 
         return this.channel.Send(ChannelEventName.Broadcast, broadcastEventName, payload, timeoutMs);
+    }
+
+    /// <inheritdoc />
+    public async Task SendBinary(string broadcastEventName, byte[] payload, int timeoutMs = DefaultTimeout)
+    {
+        if (this.channel.Options.ClientOptions.ProtocolVersion != ProtocolVersion.V2)
+            throw new RealtimeException("A broadcast of bytes needs ClientOptions.ProtocolVersion set to V2.");
+        if (payload == null)
+            throw new ArgumentNullException(nameof(payload));
+        if (!WireFrame.Fits(broadcastEventName))
+            throw new ArgumentException("The event name of a broadcast of bytes must fit in 255 bytes.", nameof(broadcastEventName));
+        if (!WireFrame.Fits(this.channel.Topic))
+            throw new RealtimeException("The topic of a broadcast of bytes must fit in 255 bytes.");
+
+        if (!await this.channel.Send(ChannelEventName.Broadcast, null, new BinaryBroadcast(broadcastEventName, (byte[]) payload.Clone()), timeoutMs).ConfigureAwait(false))
+            throw new RealtimeException("The server rejected the broadcast of bytes.");
     }
 }

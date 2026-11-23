@@ -96,4 +96,10 @@ public class SocketResponse : IRealtimeSocketResponse
     /// </summary>
     [JsonIgnore]
     internal string? Json { get; set; }
+
+    /// <summary>
+    /// The bytes of a received broadcast whose payload is not JSON.
+    /// </summary>
+    [JsonIgnore]
+    internal byte[]? BinaryPayload { get; set; }
 }
