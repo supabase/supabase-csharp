@@ -912,6 +912,11 @@ features:
     symbols:
       - IStorageVectorBucketApi.DeleteVectorBucketAsync
 
+  storage.analytics.delete_analytics_bucket:
+    status: implemented
+    symbols:
+      - IStorageAnalyticsApi.DeleteBucketAsync
+
   storage.configuration.auto_retry:
     status: implemented
     note: "Applied to bucket and object metadata calls, writes included; uploads and downloads are sent once."
