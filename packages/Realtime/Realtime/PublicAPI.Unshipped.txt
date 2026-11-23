@@ -1,9 +1,1 @@
 #nullable enable
-Supabase.Realtime.ClientOptions.ProtocolVersion.get -> Supabase.Realtime.ProtocolVersion
-Supabase.Realtime.ClientOptions.ProtocolVersion.set -> void
-Supabase.Realtime.Interfaces.IRealtimeBroadcast.SendBinary(string! broadcastEventName, byte[]! payload, int timeoutMs = 10000) -> System.Threading.Tasks.Task!
-Supabase.Realtime.Models.BaseBroadcast.BinaryPayload.get -> byte[]?
-Supabase.Realtime.ProtocolVersion
-Supabase.Realtime.ProtocolVersion.V1 = 0 -> Supabase.Realtime.ProtocolVersion
-Supabase.Realtime.ProtocolVersion.V2 = 1 -> Supabase.Realtime.ProtocolVersion
-Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.SendBinary(string! broadcastEventName, byte[]! payload, int timeoutMs = 10000) -> System.Threading.Tasks.Task!

@@ -184,6 +184,7 @@ Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.Headers.set -> void
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.ListBuckets() -> System.Threading.Tasks.Task<System.Collections.Generic.List<TBucket!>?>!
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.Options.get -> Supabase.Storage.ClientOptions!
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.PurgeBucketCache(string! id, Supabase.Storage.PurgeCacheOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.GenericResponse?>!
+Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.PurgeProjectCacheAsync(Supabase.Storage.PurgeCacheOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.UpdateBucket(string! id, Supabase.Storage.BucketUpsertOptions? options = null) -> System.Threading.Tasks.Task<TBucket?>!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.From(string! id) -> Supabase.Storage.Interfaces.IStorageFileApi<TFileObject!>!
@@ -270,6 +271,7 @@ Supabase.Storage.StorageBucketApi.ListBuckets() -> System.Threading.Tasks.Task<S
 Supabase.Storage.StorageBucketApi.Options.get -> Supabase.Storage.ClientOptions!
 Supabase.Storage.StorageBucketApi.Options.set -> void
 Supabase.Storage.StorageBucketApi.PurgeBucketCache(string! id, Supabase.Storage.PurgeCacheOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.GenericResponse?>!
+Supabase.Storage.StorageBucketApi.PurgeProjectCacheAsync(Supabase.Storage.PurgeCacheOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.StorageBucketApi.StorageBucketApi(string! url, Supabase.Storage.ClientOptions? options, System.Collections.Generic.Dictionary<string!, string!>? headers = null) -> void
 Supabase.Storage.StorageBucketApi.StorageBucketApi(string! url, System.Collections.Generic.Dictionary<string!, string!>? headers = null) -> void
 Supabase.Storage.StorageBucketApi.UpdateBucket(string! id, Supabase.Storage.BucketUpsertOptions? options = null) -> System.Threading.Tasks.Task<Supabase.Storage.Bucket?>!
