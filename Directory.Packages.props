@@ -19,7 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="11.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageVersion Include="MimeMapping" Version="4.0.0" />
     <PackageVersion Include="PolySharp" Version="1.17.1">
@@ -27,7 +27,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageVersion>
     <PackageVersion Include="System.Text.Json" Version="8.0.6" />
-    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
+    <PackageVersion Include="System.Diagnostics.DiagnosticSource" Version="11.0.0" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.7.3" />
     <PackageVersion Include="Websocket.Client" Version="5.5.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="11.0.100" />
