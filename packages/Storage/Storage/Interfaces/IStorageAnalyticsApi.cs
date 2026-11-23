@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Supabase.Core.Attributes;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -22,5 +23,6 @@ public interface IStorageAnalyticsApi
     /// await storage.Analytics.DeleteBucketAsync("analytics-data");
     /// </code>
     /// </example>
+    [ImplementedCapability("storage.analytics.delete_analytics_bucket")]
     Task DeleteBucketAsync(string name, CancellationToken cancellationToken = default);
 }

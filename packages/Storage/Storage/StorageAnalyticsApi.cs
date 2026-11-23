@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Supabase.Core.Attributes;
 using Supabase.Storage.DeleteAnalyticsBucket;
 using Supabase.Storage.Interfaces;
 
@@ -25,7 +24,6 @@ internal class StorageAnalyticsApi : IStorageAnalyticsApi
     }
 
     /// <inheritdoc />
-    [ImplementedCapability("storage.analytics.delete_analytics_bucket")]
     public Task DeleteBucketAsync(string name, CancellationToken cancellationToken = default) =>
         Helpers.MakeRequestAsync(this.requestClient, this.options, HttpMethod.Delete, DeleteAnalyticsBucketPath.For(this.icebergUrl, name), null, this.headers(), cancellationToken);
 }
