@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
@@ -65,19 +64,13 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
     /// Adds a broadcast event listener.
     /// </summary>
     /// <param name="broadcastEventHandler"></param>
-    public void AddBroadcastEventHandler(IRealtimeBroadcast.BroadcastEventHandler broadcastEventHandler)
-    {
-        this.broadcastEventHandlers.Add(broadcastEventHandler);
-    }
+    public void AddBroadcastEventHandler(IRealtimeBroadcast.BroadcastEventHandler broadcastEventHandler) => this.broadcastEventHandlers.Add(broadcastEventHandler);
 
     /// <summary>
     /// Removes a broadcast event listener.
     /// </summary>
     /// <param name="broadcastEventHandler"></param>
-    public void RemoveBroadcastEventHandler(IRealtimeBroadcast.BroadcastEventHandler broadcastEventHandler)
-    {
-        this.broadcastEventHandlers.Remove(broadcastEventHandler);
-    }
+    public void RemoveBroadcastEventHandler(IRealtimeBroadcast.BroadcastEventHandler broadcastEventHandler) => this.broadcastEventHandlers.Remove(broadcastEventHandler);
 
     /// <summary>
     /// Clears all broadcast event listeners

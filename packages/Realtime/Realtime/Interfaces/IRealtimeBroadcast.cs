@@ -1,7 +1,7 @@
-﻿using Supabase.Realtime.Socket;
 using System;
 using System.Threading.Tasks;
 using Supabase.Realtime.Models;
+using Supabase.Realtime.Socket;
 using static Supabase.Realtime.Constants;
 
 namespace Supabase.Realtime.Interfaces;
@@ -21,13 +21,13 @@ public interface IRealtimeBroadcast
     /// </summary>
     /// <param name="broadcastEventHandler"></param>
     void AddBroadcastEventHandler(BroadcastEventHandler broadcastEventHandler);
-        
+
     /// <summary>
     /// Removes a broadcast event handler
     /// </summary>
     /// <param name="broadcastEventHandler"></param>
     void RemoveBroadcastEventHandler(BroadcastEventHandler broadcastEventHandler);
-        
+
     /// <summary>
     /// Clears all broadcast event handlers
     /// </summary>
