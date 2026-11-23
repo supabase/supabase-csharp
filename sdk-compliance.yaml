@@ -777,6 +777,10 @@ features:
     note: "NetworkChange.NetworkAddressChanged is the monitor; the option has no effect on a runtime that does not support it."
     symbols:
       - ClientOptions.MonitorsNetworkPath
+  realtime.configuration.binary_protocol:
+    status: implemented
+    symbols:
+      - ClientOptions.ProtocolVersion
 
   # ── Storage ────────────────────────────────────────────────────────────────
 
