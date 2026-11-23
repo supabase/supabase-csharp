@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Supabase.Core.Attributes;
 using Supabase.Core.Http;
 
 namespace Supabase.Storage;
@@ -55,6 +56,7 @@ public class ClientOptions
     /// the resumable upload APIs for interrupted transfers instead. Default (<see cref="RetryOptions.MaxRetries"/> 0)
     /// sends once, unretried.
     /// </summary>
+    [ImplementedCapability("storage.configuration.auto_retry", "Applied to bucket and object metadata calls, writes included; uploads and downloads are sent once.")]
     public RetryOptions Retry { get; set; } = new RetryOptions();
 
     /// <summary>
