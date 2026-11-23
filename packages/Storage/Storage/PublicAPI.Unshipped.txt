@@ -7,3 +7,6 @@ Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi
 Supabase.Storage.Interfaces.IStorageVectorBucketApi.DeleteVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.Interfaces.IStorageVectorBucketApi.From(string! vectorBucketName) -> Supabase.Storage.Interfaces.IVectorBucket!
+Supabase.Storage.Interfaces.IVectorBucket
+Supabase.Storage.Interfaces.IVectorBucket.DeleteIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!

@@ -10,6 +10,21 @@ namespace Supabase.Storage.Interfaces;
 public interface IStorageVectorBucketApi
 {
     /// <summary>
+    /// Scopes the following operations to one vector bucket. Nothing is sent to the service.
+    /// </summary>
+    /// <param name="vectorBucketName">The name of the vector bucket.</param>
+    /// <returns>A client for the operations that act inside that bucket.</returns>
+    /// <exception cref="System.ArgumentException">
+    /// <paramref name="vectorBucketName"/> is null, empty or whitespace.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var bucket = storage.Vectors.From("embeddings-prod");
+    /// </code>
+    /// </example>
+    IVectorBucket From(string vectorBucketName);
+
+    /// <summary>
     /// Deletes an empty vector bucket. The service rejects the call while the bucket still has
     /// indexes. Requires a service-role key.
     /// </summary>
