@@ -1,5 +1,22 @@
 # Changelog
 
+## [8.14.0](https://github.com/supabase/supabase-csharp/compare/v8.13.0...v8.14.0) (2026-11-23)
+
+
+### Features
+
+* **core:** originate a trace context when no trace is active ([#815](https://github.com/supabase/supabase-csharp/issues/815)) ([9f05773](https://github.com/supabase/supabase-csharp/commit/9f057737a92851897fcc2b1d1ac1aa8cd757f819))
+* **realtime:** select protocol 2.0.0 and broadcast bytes ([#814](https://github.com/supabase/supabase-csharp/issues/814)) ([b2a45b5](https://github.com/supabase/supabase-csharp/commit/b2a45b5ce275609fd71d6f7fc0db8da8a5b92fb2))
+* **storage:** claim auto_retry through ClientOptions.Retry ([#823](https://github.com/supabase/supabase-csharp/issues/823)) ([49c0bb3](https://github.com/supabase/supabase-csharp/commit/49c0bb36b74a50a98449bb5a698b3455c77ecebf))
+* **storage:** purge the CDN cache of the whole project ([#822](https://github.com/supabase/supabase-csharp/issues/822)) ([544daa6](https://github.com/supabase/supabase-csharp/commit/544daa686945a35ced247853e16d3adc76842902))
+
+
+### Bug Fixes
+
+* **realtime:** do not drop a message that arrives before the first heartbeat ([#820](https://github.com/supabase/supabase-csharp/issues/820)) ([8758db3](https://github.com/supabase/supabase-csharp/commit/8758db3aa4788a69853f21aa1a0bf9e186941734))
+* **realtime:** Send completes when the reply is already in ([#817](https://github.com/supabase/supabase-csharp/issues/817)) ([a0d26ea](https://github.com/supabase/supabase-csharp/commit/a0d26ea4d781869d9c0bc703049133dca2258bd9))
+* **realtime:** Send returns false on an error reply ([#816](https://github.com/supabase/supabase-csharp/issues/816)) ([76134e3](https://github.com/supabase/supabase-csharp/commit/76134e3aa589ff687ce8940416e74ade9c1ec7d1))
+
 ## [8.13.0](https://github.com/supabase/supabase-csharp/compare/v8.12.0...v8.13.0) (2026-11-19)
 
 
