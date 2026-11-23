@@ -145,7 +145,7 @@ internal static class Helpers
             if (!response.IsSuccessStatusCode)
             {
                 var errorResponse = ErrorResponse.TryParse(content);
-                var resolvedStatus = errorResponse?.StatusCode ?? (int) response.StatusCode;
+                var resolvedStatus = errorResponse?.StatusCode is > 0 ? errorResponse.StatusCode : (int) response.StatusCode;
                 errorType = resolvedStatus.ToString();
                 var e = new SupabaseStorageException(errorResponse?.Message ?? content)
                 {

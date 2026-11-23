@@ -12,6 +12,10 @@ public class Client : StorageBucketApi, IStorageClient<Bucket, FileObject>
     public Client(string url, ClientOptions? options, Dictionary<string, string>? headers = null) : base(url, options, headers)
     { }
 
+    /// <inheritdoc />
+    public IStorageAnalyticsApi Analytics =>
+        new StorageAnalyticsApi(this.Url, this.Options, this.requestClient, () => this.Headers);
+
     /// <summary>
     /// Perform a file operation in a bucket
     /// </summary>
