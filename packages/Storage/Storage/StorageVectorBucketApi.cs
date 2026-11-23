@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Supabase.Core.Attributes;
 using Supabase.Storage.DeleteVectorBucket;
 using Supabase.Storage.Interfaces;
 
@@ -25,7 +24,6 @@ internal sealed class StorageVectorBucketApi : IStorageVectorBucketApi
     }
 
     /// <inheritdoc />
-    [ImplementedCapability("storage.vector_buckets.delete_vector_bucket")]
     public Task DeleteVectorBucketAsync(string vectorBucketName, CancellationToken cancellationToken = default)
     {
         RequireName(vectorBucketName, nameof(vectorBucketName));
