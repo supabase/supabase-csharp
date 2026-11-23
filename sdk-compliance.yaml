@@ -902,6 +902,21 @@ features:
     status: implemented
     symbols:
       - StorageBucketApi.PurgeBucketCache
+  storage.file_buckets.purge_project_cache:
+    status: implemented
+    symbols:
+      - StorageBucketApi.PurgeProjectCacheAsync
+
+  storage.vector_buckets.delete_vector_bucket:
+    status: implemented
+    symbols:
+      - IStorageVectorBucketApi.DeleteVectorBucketAsync
+
+  storage.configuration.auto_retry:
+    status: implemented
+    note: "Applied to bucket and object metadata calls, writes included; uploads and downloads are sent once."
+    symbols:
+      - ClientOptions.Retry
 
   storage.errors.error_codes:
     status: implemented
