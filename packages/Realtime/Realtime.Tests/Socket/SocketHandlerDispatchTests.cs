@@ -196,6 +196,16 @@ public class SocketHandlerDispatchTests
     }
 
     [TestMethod]
+    public async Task MessageHandler_ShouldReceiveTheFrame_GivenNoRefBeforeTheFirstHeartbeat()
+    {
+        var server = new FakeWebsocketClient();
+        this.SocketOver(server).AddMessageReceivedHandler((_, _) => this.calls++);
+        await this.socket.Connect();
+        server.Receive("""{"topic":"room","event":"broadcast","ref":null,"payload":{}}""");
+        this.calls.Should().Be(1, "a frame without a ref is not the reply to a heartbeat");
+    }
+
+    [TestMethod]
     public async Task StateHandler_ShouldNotStopTheNextHandler_GivenItThrows()
     {
         this.SocketOver(new FakeWebsocketClient { OpenOnStart = true }).AddStateChangedHandler((_, _) => throw new InvalidOperationException("boom"));
