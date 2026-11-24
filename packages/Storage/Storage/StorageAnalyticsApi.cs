@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Supabase.Storage.CreateAnalyticsBucket;
 using Supabase.Storage.DeleteAnalyticsBucket;
 using Supabase.Storage.Interfaces;
 
@@ -21,6 +22,14 @@ internal class StorageAnalyticsApi : IStorageAnalyticsApi
         this.options = options;
         this.requestClient = requestClient;
         this.headers = headers;
+    }
+
+    /// <inheritdoc />
+    public async Task<AnalyticsBucket> CreateBucketAsync(string name, CancellationToken cancellationToken = default)
+    {
+        var body = CreateAnalyticsBucketBody.For(name);
+        var bucket = await Helpers.MakeRequestAsync<AnalyticsBucket>(this.requestClient, this.options, HttpMethod.Post, $"{this.icebergUrl}/bucket", body, this.headers(), cancellationToken).ConfigureAwait(false);
+        return bucket!;
     }
 
     /// <inheritdoc />
