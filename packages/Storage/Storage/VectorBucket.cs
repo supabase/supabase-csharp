@@ -20,6 +20,13 @@ internal sealed class VectorBucket : IVectorBucket
     }
 
     /// <inheritdoc />
+    public IVectorIndex Index(string indexName)
+    {
+        VectorService.RequireName(indexName, nameof(indexName));
+        return new VectorIndex();
+    }
+
+    /// <inheritdoc />
     public Task DeleteIndexAsync(string indexName, CancellationToken cancellationToken = default)
     {
         VectorService.RequireName(indexName, nameof(indexName));

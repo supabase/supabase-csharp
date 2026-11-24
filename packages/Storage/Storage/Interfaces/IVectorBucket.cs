@@ -11,6 +11,22 @@ namespace Supabase.Storage.Interfaces;
 public interface IVectorBucket
 {
     /// <summary>
+    /// Scopes the following operations to one vector index of this bucket. Nothing is sent to the service.
+    /// </summary>
+    /// <param name="indexName">The name of the vector index.</param>
+    /// <returns>A client for the operations that act inside that index.</returns>
+    /// <exception cref="System.ArgumentException">
+    /// <paramref name="indexName"/> is null, empty or whitespace.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var index = storage.Vectors.From("embeddings-prod").Index("docs-v1");
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.vector_buckets.access_vector_index")]
+    IVectorIndex Index(string indexName);
+
+    /// <summary>
     /// Creates a vector index in this bucket. Requires a service-role key.
     /// </summary>
     /// <param name="index">The settings of the index to create.</param>
