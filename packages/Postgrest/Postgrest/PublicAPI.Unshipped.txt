@@ -1,1 +1,3 @@
 #nullable enable
+*REMOVED*const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "Supabase.Postgrest" -> string!
+const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "supabase.postgrest" -> string!

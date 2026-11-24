@@ -36,9 +36,9 @@ internal static class RedactedUrl
     {
         var separator = pair.IndexOf('=');
         var key = separator < 0 ? pair : pair.Substring(0, separator);
-        return IsSafe(key) && separator >= 0 ? pair : $"{key}={Redacted}";
+        return IsSafe(key) ? pair : $"{key}={Redacted}";
     }
 
     private static bool IsSafe(string key) =>
-        SafeKeys.Contains(Uri.UnescapeDataString(key), StringComparer.Ordinal);
+        SafeKeys.Contains(key, StringComparer.Ordinal);
 }

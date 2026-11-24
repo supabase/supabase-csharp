@@ -30,7 +30,7 @@ public class TelemetryTests
 
     private readonly List<Activity> activities = new();
     private readonly List<KeyValuePair<double, Dictionary<string, object?>>> measurements = new();
-    private readonly List<string> instruments = new();
+    private readonly List<Instrument> instruments = new();
     private ActivityListener activityListener = null!;
     private MeterListener meterListener = null!;
     private WireMockServer server = null!;
@@ -61,7 +61,7 @@ public class TelemetryTests
             {
                 if (instrument.Meter.Name != PostgrestDiagnostics.SourceName)
                     return;
-                this.instruments.Add(instrument.Name);
+                this.instruments.Add(instrument);
                 listener.EnableMeasurementEvents(instrument);
             }
         };
@@ -170,20 +170,85 @@ public class TelemetryTests
     {
         this.MockTodosOk();
         await this.FilteredGet();
-        this.instruments.Should().ContainSingle().Which.Should().Be("http.client.request.duration");
+        this.instruments.Should().ContainSingle().Which.Name.Should().Be("http.client.request.duration");
     }
 
     [TestMethod]
-    public async Task DurationHistogram_ShouldRecordOneMeasurementPerRequestWithTheSupabaseAttributes()
+    public async Task DurationHistogram_ShouldMeasureInSeconds()
     {
         this.MockTodosOk();
         await this.FilteredGet();
-        var measurement = this.measurements.Should().ContainSingle().Subject;
-        measurement.Key.Should().BeGreaterThan(0);
-        measurement.Value.Should().Contain(new KeyValuePair<string, object?>("http.response.status_code", 200))
-            .And.Contain(new KeyValuePair<string, object?>("supabase.postgrest.operation", "select"))
-            .And.Contain(new KeyValuePair<string, object?>("supabase.postgrest.table", "todos"));
+        this.instruments.Single().Unit.Should().Be("s");
     }
+
+    [TestMethod]
+    public async Task DurationHistogram_ShouldBeDescribed()
+    {
+        this.MockTodosOk();
+        await this.FilteredGet();
+        this.instruments.Single().Description.Should().Be("Duration of HTTP client requests.");
+    }
+
+    [TestMethod]
+    public async Task DurationHistogram_ShouldRecordTheElapsedSeconds()
+    {
+        this.MockTodosOk();
+        await this.FilteredGet();
+        this.measurements.Single().Key.Should().BeInRange(0.000001, 30);
+    }
+
+    [TestMethod]
+    public async Task DurationHistogram_ShouldCarryTheHttpAndTableAttributes_GivenATableCall()
+    {
+        this.MockTodosOk();
+        await this.FilteredGet();
+        this.measurements.Single().Value.Should().BeEquivalentTo(new Dictionary<string, object?>
+        {
+            ["http.request.method"] = "GET",
+            ["server.address"] = "localhost",
+            ["server.port"] = this.server.Port,
+            ["url.scheme"] = "http",
+            ["http.response.status_code"] = 200,
+            ["supabase.postgrest.operation"] = "select",
+            ["supabase.postgrest.table"] = "todos"
+        });
+    }
+
+    [TestMethod]
+    public async Task DurationHistogram_ShouldCarryTheFunctionAttribute_GivenAnRpcCall()
+    {
+        this.MockRpcOk();
+        await this.client.Rpc("get_scores", null);
+        this.measurements.Single().Value.Should().BeEquivalentTo(new Dictionary<string, object?>
+        {
+            ["http.request.method"] = "POST",
+            ["server.address"] = "localhost",
+            ["server.port"] = this.server.Port,
+            ["url.scheme"] = "http",
+            ["http.response.status_code"] = 200,
+            ["supabase.postgrest.operation"] = "rpc",
+            ["supabase.postgrest.function"] = "get_scores"
+        });
+    }
+
+    [TestMethod]
+    public async Task DurationHistogram_ShouldCarryTheErrorType_GivenAFailedRequest()
+    {
+        this.server.Given(Request.Create().WithPath("/todos").UsingGet())
+            .RespondWith(Response.Create().WithStatusCode(500).WithBody("{\"message\":\"boom\"}"));
+        await ((Func<Task>) this.FilteredGet).Should().ThrowAsync<PostgrestException>();
+        this.measurements.Single().Value.Should().Contain(new KeyValuePair<string, object?>("error.type", "500"));
+    }
+
+    [TestMethod]
+    [DataRow("GET", false, false, false, "select")]
+    [DataRow("HEAD", false, false, false, "select")]
+    [DataRow("POST", true, false, false, "insert")]
+    [DataRow("PATCH", false, true, false, "update")]
+    [DataRow("POST", true, false, true, "upsert")]
+    [DataRow("DELETE", false, false, false, "delete")]
+    public void ResolveOperation_ShouldNameTheLogicalOperation(string method, bool isInsert, bool isUpdate, bool isUpsert, string expected) =>
+        PostgrestInstrumentation.ResolveOperation(new System.Net.Http.HttpMethod(method), isInsert, isUpdate, isUpsert).Should().Be(expected);
 
     [TestMethod]
     public async Task DurationHistogram_ShouldCarryNoUrl()

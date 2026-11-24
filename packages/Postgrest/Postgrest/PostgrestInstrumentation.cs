@@ -87,9 +87,6 @@ internal static class PostgrestInstrumentation
     /// <param name="startTimestamp">The <see cref="Stopwatch.GetTimestamp"/> value captured before the request.</param>
     internal static void RecordRequest(HttpMethod method, Uri uri, PostgrestCall call, int? statusCode, string? errorType, long startTimestamp)
     {
-        if (!RequestDuration.Enabled)
-            return;
-
         var tags = new TagList
         {
             { "http.request.method", method.Method },
