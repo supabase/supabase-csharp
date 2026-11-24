@@ -1,1 +1,3 @@
 #nullable enable
+*REMOVED*const Supabase.Gotrue.GotrueDiagnostics.SourceName = "Supabase.Gotrue" -> string!
+const Supabase.Gotrue.GotrueDiagnostics.SourceName = "supabase.gotrue" -> string!

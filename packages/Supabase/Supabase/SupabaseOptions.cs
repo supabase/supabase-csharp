@@ -175,8 +175,8 @@ public class SupabaseOptions
     /// <summary>
     /// Receives the diagnostics of every sub-client: request outcomes with timing and retry decisions at
     /// <c>Debug</c>, and failures of background work (token refresh, session persistence, Realtime reconnection) at
-    /// <c>Warning</c>. Each sub-client logs under its own category (<c>Supabase.Gotrue</c>, <c>Supabase.Postgrest</c>,
-    /// <c>Supabase.Storage</c>, <c>Supabase.Functions</c>, <c>Supabase.Realtime</c>). Left null, the SDK logs nothing.
+    /// <c>Warning</c>. Each sub-client logs under its own category (<c>supabase.gotrue</c>, <c>supabase.postgrest</c>,
+    /// <c>supabase.storage</c>, <c>supabase.functions</c>, <c>Supabase.Realtime</c>). Left null, the SDK logs nothing.
     /// </summary>
     /// <remarks>
     /// Credentials, tokens, request and response bodies, query strings and header values are never logged. A logger that

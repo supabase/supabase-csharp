@@ -1,1 +1,3 @@
 #nullable enable
+*REMOVED*const Supabase.Functions.FunctionsDiagnostics.SourceName = "Supabase.Functions" -> string!
+const Supabase.Functions.FunctionsDiagnostics.SourceName = "supabase.functions" -> string!

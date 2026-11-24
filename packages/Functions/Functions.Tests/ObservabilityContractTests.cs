@@ -12,199 +12,198 @@ using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
 
-namespace Functions.Tests
+namespace Functions.Tests;
+
+/// <summary>
+/// Contract tests for the diagnostics the client emits through <see cref="System.Diagnostics"/>
+/// (the <c>supabase.functions</c> <see cref="ActivitySource"/> and <see cref="Meter"/>): the span's
+/// OpenTelemetry tags and error status, the invocation duration histogram and its dimensions, and
+/// the sanitization rule that telemetry must never carry the query string, request body, or a token.
+/// </summary>
+[TestClass]
+[TestCategory("Contract")]
+public class ObservabilityContractTests
 {
-    /// <summary>
-    /// Contract tests for the diagnostics the client emits through <see cref="System.Diagnostics"/>
-    /// (the <c>Supabase.Functions</c> <see cref="ActivitySource"/> and <see cref="Meter"/>): the span's
-    /// OpenTelemetry tags and error status, the invocation duration histogram and its dimensions, and
-    /// the sanitization rule that telemetry must never carry the query string, request body, or a token.
-    /// </summary>
-    [TestClass]
-    [TestCategory("Contract")]
-    public class ObservabilityContractTests
+    private const string FunctionName = "hello";
+    private const string SecretBodyValue = "secret-body-value-42";
+
+    private readonly List<Activity> activities = new();
+    private readonly List<KeyValuePair<double, Dictionary<string, object?>>> measurements = new();
+    private ActivityListener activityListener = null!;
+    private MeterListener meterListener = null!;
+    private Instrument? durationInstrument;
+    private WireMockServer server = null!;
+    private Client client = null!;
+
+    [TestInitialize]
+    public void TestInitialize()
     {
-        private const string FunctionName = "hello";
-        private const string SecretBodyValue = "secret-body-value-42";
-
-        private readonly List<Activity> activities = new();
-        private readonly List<KeyValuePair<double, Dictionary<string, object?>>> measurements = new();
-        private ActivityListener activityListener = null!;
-        private MeterListener meterListener = null!;
-        private Instrument? durationInstrument;
-        private WireMockServer server = null!;
-        private Client client = null!;
-
-        [TestInitialize]
-        public void TestInitialize()
+        this.server = WireMockServer.Start();
+        this.client = new Client($"{this.server.Url}/functions/v1");
+        this.activityListener = new ActivityListener
         {
-            this.server = WireMockServer.Start();
-            this.client = new Client($"{this.server.Url}/functions/v1");
-            this.activityListener = new ActivityListener
-            {
-                ShouldListenTo = source => source.Name == FunctionsDiagnostics.SourceName,
-                Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
-                ActivityStopped = activity => this.activities.Add(activity)
-            };
-            ActivitySource.AddActivityListener(this.activityListener);
-            this.meterListener = new MeterListener
-            {
-                InstrumentPublished = (instrument, listener) =>
-                {
-                    if (instrument.Meter.Name != FunctionsDiagnostics.SourceName)
-                        return;
-                    this.durationInstrument = instrument;
-                    listener.EnableMeasurementEvents(instrument);
-                }
-            };
-            this.meterListener.SetMeasurementEventCallback<double>((_, value, tags, _) =>
-            {
-                var tagValues = new Dictionary<string, object?>();
-                foreach (var tag in tags)
-                    tagValues[tag.Key] = tag.Value;
-                this.measurements.Add(new KeyValuePair<double, Dictionary<string, object?>>(value, tagValues));
-            });
-            this.meterListener.Start();
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
+            ShouldListenTo = source => source.Name == FunctionsDiagnostics.SourceName,
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+            ActivityStopped = activity => this.activities.Add(activity)
+        };
+        ActivitySource.AddActivityListener(this.activityListener);
+        this.meterListener = new MeterListener
         {
-            this.activityListener.Dispose();
-            this.meterListener.Dispose();
-            this.server.Stop();
-        }
-
-        [TestMethod]
-        public async Task InvokeSpan_ShouldRecordUrlWithoutQueryString()
-        {
-            this.MockInvokeOk();
-            await this.Invoke();
-            this.InvokeSpan().GetTagItem("url.full").Should().Be($"{this.server.Url}/functions/v1/{FunctionName}",
-                "the query string must never be recorded");
-        }
-
-        [TestMethod]
-        public async Task InvokeSpan_ShouldFollowOpenTelemetryConventions()
-        {
-            this.MockInvokeOk();
-            await this.Invoke();
-            var span = this.InvokeSpan();
-            using (new AssertionScope())
+            InstrumentPublished = (instrument, listener) =>
             {
-                span.Kind.Should().Be(ActivityKind.Client);
-                span.GetTagItem("http.request.method").Should().Be("POST");
-                span.GetTagItem("http.response.status_code").Should().Be(200);
-                span.GetTagItem("faas.invoked_name").Should().Be(FunctionName);
+                if (instrument.Meter.Name != FunctionsDiagnostics.SourceName)
+                    return;
+                this.durationInstrument = instrument;
+                listener.EnableMeasurementEvents(instrument);
             }
-        }
-
-        [TestMethod]
-        public async Task InvokeSpan_ShouldMarkError_GivenFailedStatus()
+        };
+        this.meterListener.SetMeasurementEventCallback<double>((_, value, tags, _) =>
         {
-            this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingPost())
-                .RespondWith(Response.Create().WithStatusCode(500).WithBody("boom"));
-            var act = this.Invoke;
-            await act.Should().ThrowAsync<FunctionsException>();
-            var span = this.InvokeSpan();
-            using (new AssertionScope())
-            {
-                span.Status.Should().Be(ActivityStatusCode.Error);
-                span.GetTagItem("http.response.status_code").Should().Be(500);
-            }
-        }
-
-        [TestMethod]
-        public async Task InvokeSpan_ShouldMarkError_GivenRelayErrorOnSuccessStatus()
-        {
-            this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingPost())
-                .RespondWith(Response.Create().WithStatusCode(200).WithHeader("x-relay-error", "true").WithBody("relayed"));
-            var act = this.Invoke;
-            await act.Should().ThrowAsync<FunctionsException>();
-            var span = this.InvokeSpan();
-            using (new AssertionScope())
-            {
-                span.Status.Should().Be(ActivityStatusCode.Error);
-                span.GetTagItem("error.type").Should().Be("x-relay-error");
-            }
-        }
-
-        [TestMethod]
-        public async Task InvokeDuration_ShouldRecordPositiveDurationPerRequest()
-        {
-            this.MockInvokeOk();
-            await this.Invoke();
-            this.meterListener.RecordObservableInstruments();
-            var measurement = this.measurements.Should().ContainSingle().Which;
-            measurement.Key.Should().BeInRange(0, 60, "the value is an elapsed time in seconds, not raw ticks");
-            measurement.Key.Should().BeGreaterThan(0);
-        }
-
-        [TestMethod]
-        public async Task InvokeDuration_ShouldBeNamedAndMeasuredInSeconds()
-        {
-            this.MockInvokeOk();
-            await this.Invoke();
-            using (new AssertionScope())
-            {
-                this.durationInstrument!.Name.Should().Be("supabase.functions.invoke.duration");
-                this.durationInstrument!.Unit.Should().Be("s");
-            }
-        }
-
-        [TestMethod]
-        public async Task InvokeDuration_ShouldTagRequestDimensions()
-        {
-            this.MockInvokeOk();
-            await this.Invoke();
-            var dimensions = this.measurements.Should().ContainSingle().Which.Value;
-            using (new AssertionScope())
-            {
-                dimensions["http.request.method"].Should().Be("POST");
-                dimensions["http.response.status_code"].Should().Be(200);
-                dimensions["server.address"].Should().Be(new System.Uri(this.server.Url!).Host);
-                dimensions["url.path"].Should().Be($"/functions/v1/{FunctionName}");
-                dimensions["faas.invoked_name"].Should().Be(FunctionName);
-            }
-        }
-
-        [TestMethod]
-        public async Task InvokeDuration_ShouldTagErrorType_GivenFailedStatus()
-        {
-            this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingPost())
-                .RespondWith(Response.Create().WithStatusCode(500).WithBody("boom"));
-            var act = this.Invoke;
-            await act.Should().ThrowAsync<FunctionsException>();
-            this.measurements.Should().ContainSingle().Which.Value["error.type"].Should().Be("500");
-        }
-
-        [TestMethod]
-        public async Task Telemetry_ShouldNotLeakTheRequestBody()
-        {
-            this.MockInvokeOk();
-            await this.Invoke();
-            var recorded = this.activities
-                .SelectMany(a => a.TagObjects)
-                .Select(tag => tag.Value?.ToString() ?? "")
-                .Concat(this.measurements.SelectMany(m => m.Value.Values).Select(v => v?.ToString() ?? ""))
-                .Concat(this.activities.Select(a => a.DisplayName));
-            recorded.Should().NotContain(value => value.Contains(SecretBodyValue),
-                "no span name, tag, or metric dimension may contain the request body");
-        }
-
-        private Task<string> Invoke() =>
-            this.client.Invoke(FunctionName, options: new Client.InvokeFunctionOptions
-            {
-                Body = new Dictionary<string, object> { { "name", SecretBodyValue } }
-            });
-
-        private void MockInvokeOk() =>
-            this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingPost())
-                .RespondWith(Response.Create()
-                    .WithStatusCode(200)
-                    .WithHeader("Content-Type", "application/json")
-                    .WithBody("{\"message\":\"ok\"}"));
-
-        private Activity InvokeSpan() => this.activities.Single(a => a.OperationName == $"POST /functions/v1/{FunctionName}");
+            var tagValues = new Dictionary<string, object?>();
+            foreach (var tag in tags)
+                tagValues[tag.Key] = tag.Value;
+            this.measurements.Add(new KeyValuePair<double, Dictionary<string, object?>>(value, tagValues));
+        });
+        this.meterListener.Start();
     }
+
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        this.activityListener.Dispose();
+        this.meterListener.Dispose();
+        this.server.Stop();
+    }
+
+    [TestMethod]
+    public async Task InvokeSpan_ShouldRecordUrlWithoutQueryString()
+    {
+        this.MockInvokeOk();
+        await this.Invoke();
+        this.InvokeSpan().GetTagItem("url.full").Should().Be($"{this.server.Url}/functions/v1/{FunctionName}",
+            "the query string must never be recorded");
+    }
+
+    [TestMethod]
+    public async Task InvokeSpan_ShouldFollowOpenTelemetryConventions()
+    {
+        this.MockInvokeOk();
+        await this.Invoke();
+        var span = this.InvokeSpan();
+        using (new AssertionScope())
+        {
+            span.Kind.Should().Be(ActivityKind.Client);
+            span.GetTagItem("http.request.method").Should().Be("POST");
+            span.GetTagItem("http.response.status_code").Should().Be(200);
+            span.GetTagItem("faas.invoked_name").Should().Be(FunctionName);
+        }
+    }
+
+    [TestMethod]
+    public async Task InvokeSpan_ShouldMarkError_GivenFailedStatus()
+    {
+        this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(500).WithBody("boom"));
+        var act = this.Invoke;
+        await act.Should().ThrowAsync<FunctionsException>();
+        var span = this.InvokeSpan();
+        using (new AssertionScope())
+        {
+            span.Status.Should().Be(ActivityStatusCode.Error);
+            span.GetTagItem("http.response.status_code").Should().Be(500);
+        }
+    }
+
+    [TestMethod]
+    public async Task InvokeSpan_ShouldMarkError_GivenRelayErrorOnSuccessStatus()
+    {
+        this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(200).WithHeader("x-relay-error", "true").WithBody("relayed"));
+        var act = this.Invoke;
+        await act.Should().ThrowAsync<FunctionsException>();
+        var span = this.InvokeSpan();
+        using (new AssertionScope())
+        {
+            span.Status.Should().Be(ActivityStatusCode.Error);
+            span.GetTagItem("error.type").Should().Be("x-relay-error");
+        }
+    }
+
+    [TestMethod]
+    public async Task InvokeDuration_ShouldRecordPositiveDurationPerRequest()
+    {
+        this.MockInvokeOk();
+        await this.Invoke();
+        this.meterListener.RecordObservableInstruments();
+        var measurement = this.measurements.Should().ContainSingle().Which;
+        measurement.Key.Should().BeInRange(0, 60, "the value is an elapsed time in seconds, not raw ticks");
+        measurement.Key.Should().BeGreaterThan(0);
+    }
+
+    [TestMethod]
+    public async Task InvokeDuration_ShouldBeNamedAndMeasuredInSeconds()
+    {
+        this.MockInvokeOk();
+        await this.Invoke();
+        using (new AssertionScope())
+        {
+            this.durationInstrument!.Name.Should().Be("supabase.functions.invoke.duration");
+            this.durationInstrument!.Unit.Should().Be("s");
+        }
+    }
+
+    [TestMethod]
+    public async Task InvokeDuration_ShouldTagRequestDimensions()
+    {
+        this.MockInvokeOk();
+        await this.Invoke();
+        var dimensions = this.measurements.Should().ContainSingle().Which.Value;
+        using (new AssertionScope())
+        {
+            dimensions["http.request.method"].Should().Be("POST");
+            dimensions["http.response.status_code"].Should().Be(200);
+            dimensions["server.address"].Should().Be(new System.Uri(this.server.Url!).Host);
+            dimensions["url.path"].Should().Be($"/functions/v1/{FunctionName}");
+            dimensions["faas.invoked_name"].Should().Be(FunctionName);
+        }
+    }
+
+    [TestMethod]
+    public async Task InvokeDuration_ShouldTagErrorType_GivenFailedStatus()
+    {
+        this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(500).WithBody("boom"));
+        var act = this.Invoke;
+        await act.Should().ThrowAsync<FunctionsException>();
+        this.measurements.Should().ContainSingle().Which.Value["error.type"].Should().Be("500");
+    }
+
+    [TestMethod]
+    public async Task Telemetry_ShouldNotLeakTheRequestBody()
+    {
+        this.MockInvokeOk();
+        await this.Invoke();
+        var recorded = this.activities
+            .SelectMany(a => a.TagObjects)
+            .Select(tag => tag.Value?.ToString() ?? "")
+            .Concat(this.measurements.SelectMany(m => m.Value.Values).Select(v => v?.ToString() ?? ""))
+            .Concat(this.activities.Select(a => a.DisplayName));
+        recorded.Should().NotContain(value => value.Contains(SecretBodyValue),
+            "no span name, tag, or metric dimension may contain the request body");
+    }
+
+    private Task<string> Invoke() =>
+        this.client.Invoke(FunctionName, options: new Client.InvokeFunctionOptions
+        {
+            Body = new Dictionary<string, object> { { "name", SecretBodyValue } }
+        });
+
+    private void MockInvokeOk() =>
+        this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithHeader("Content-Type", "application/json")
+                .WithBody("{\"message\":\"ok\"}"));
+
+    private Activity InvokeSpan() => this.activities.Single(a => a.OperationName == $"POST /functions/v1/{FunctionName}");
 }

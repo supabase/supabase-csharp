@@ -22,7 +22,7 @@ using WireMock.ResponseBuilders;
 namespace Gotrue.Tests.Observability;
 
 /// <summary>
-///     Pins the diagnostics the SDK emits through System.Diagnostics (the "Supabase.Gotrue" ActivitySource
+///     Pins the diagnostics the SDK emits through System.Diagnostics (the "supabase.gotrue" ActivitySource
 ///     and Meter) and the sanitization rule that telemetry and debug output must never contain a token, JWT,
 ///     query string, or other secret. Exercised against a stubbed server.
 /// </summary>

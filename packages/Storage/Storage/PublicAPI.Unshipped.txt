@@ -10,3 +10,5 @@ Supabase.Storage.Interfaces.IStorageVectorBucketApi.DeleteVectorBucketAsync(stri
 Supabase.Storage.Interfaces.IStorageVectorBucketApi.From(string! vectorBucketName) -> Supabase.Storage.Interfaces.IVectorBucket!
 Supabase.Storage.Interfaces.IVectorBucket
 Supabase.Storage.Interfaces.IVectorBucket.DeleteIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+*REMOVED*const Supabase.Storage.StorageDiagnostics.SourceName = "Supabase.Storage" -> string!
+const Supabase.Storage.StorageDiagnostics.SourceName = "supabase.storage" -> string!

@@ -800,7 +800,7 @@ public interface IGotrueClient<TUser, TSession> : IGettableHeaders
     ///     that automatically manages refreshing the user's token.
     /// </summary>
     /// <param name="listener">Callback method for debug messages</param>
-    [Obsolete("The debug listener is replaced by OpenTelemetry-compatible diagnostics: subscribe to the ActivitySource and Meter named \"Supabase.Gotrue\". This member will be removed in v8.")]
+    [Obsolete("The debug listener is replaced by OpenTelemetry-compatible diagnostics: subscribe to the ActivitySource and Meter named \"supabase.gotrue\". This member will be removed in v8.")]
     void AddDebugListener(Action<string, Exception?> listener);
 
     /// <summary>
