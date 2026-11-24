@@ -71,12 +71,12 @@ internal static class Helpers
     /// <param name="serializerSettings"></param>
     /// <param name="getHeaders"></param>
     /// <param name="cancellationToken"></param>
-    /// <param name="operation">Logical operation name recorded on telemetry (select/insert/update/…).</param>
+    /// <param name="call">What the request is about (operation and table or function), recorded on telemetry.</param>
     /// <returns></returns>
-    public static async Task<ModeledResponse<T>> MakeRequestAsync<T>(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data,
-        Dictionary<string, string> headers, Func<Dictionary<string, string>>? getHeaders = null, CancellationToken cancellationToken = default, string? operation = null) where T : BaseModel, new()
+    public static async Task<ModeledResponse<T>> MakeRequestAsync<T>(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, PostgrestCall call, string url, JsonSerializerOptions serializerSettings, object? data,
+        Dictionary<string, string> headers, Func<Dictionary<string, string>>? getHeaders = null, CancellationToken cancellationToken = default) where T : BaseModel, new()
     {
-        var baseResponse = await MakeRequestAsync(clientOptions, httpClient, method, url, serializerSettings, data, headers, cancellationToken, operation).ConfigureAwait(false);
+        var baseResponse = await MakeRequestAsync(clientOptions, httpClient, method, call, url, serializerSettings, data, headers, cancellationToken).ConfigureAwait(false);
         return new ModeledResponse<T>(baseResponse, serializerSettings, getHeaders);
     }
 
@@ -91,10 +91,10 @@ internal static class Helpers
     /// <param name="headers"></param>
     /// <param name="serializerSettings"></param>
     /// <param name="cancellationToken"></param>
-    /// <param name="operation">Logical operation name recorded on telemetry (select/insert/update/…).</param>
+    /// <param name="call">What the request is about (operation and table or function), recorded on telemetry.</param>
     /// <returns></returns>
-    public static async Task<BaseResponse> MakeRequestAsync(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, string url, JsonSerializerOptions serializerSettings, object? data,
-        Dictionary<string, string> headers, CancellationToken cancellationToken = default, string? operation = null)
+    public static async Task<BaseResponse> MakeRequestAsync(ClientOptions clientOptions, HttpClient? httpClient, HttpMethod method, PostgrestCall call, string url, JsonSerializerOptions serializerSettings, object? data,
+        Dictionary<string, string> headers, CancellationToken cancellationToken = default)
     {
         var builder = new UriBuilder(url);
         var query = HttpUtility.ParseQueryString(builder.Query);
@@ -142,7 +142,7 @@ internal static class Helpers
             return requestMessage;
         }
 
-        using var activity = PostgrestInstrumentation.StartHttpActivity(method, builder.Uri, operation);
+        using var activity = PostgrestInstrumentation.StartHttpActivity(method, builder.Uri, call);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
         string? errorType = null;
@@ -187,7 +187,7 @@ internal static class Helpers
         }
         finally
         {
-            PostgrestInstrumentation.RecordRequest(method, builder.Uri, operation, statusCode, errorType, startTimestamp);
+            PostgrestInstrumentation.RecordRequest(method, builder.Uri, call, statusCode, errorType, startTimestamp);
         }
     }
 

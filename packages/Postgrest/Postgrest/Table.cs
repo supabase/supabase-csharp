@@ -1027,9 +1027,9 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             $"Headers:\n\t{JsonSerializer.Serialize(requestHeaders, PostgrestSerializerOptions.Passthrough)}\n" +
             $"Data:\n\t{JsonSerializer.Serialize(preparedData, PostgrestSerializerOptions.Passthrough)}");
 
-        var operation = PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert);
-        return Helpers.MakeRequestAsync(this.options, this.httpClient, method, url, this.serializerSettings, preparedData, requestHeaders,
-            cancellationToken, operation);
+        var call = PostgrestCall.OnTable(PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert), this.TableName);
+        return Helpers.MakeRequestAsync(this.options, this.httpClient, method, call, url, this.serializerSettings, preparedData, requestHeaders,
+            cancellationToken);
     }
 
     private Task<ModeledResponse<TU>> Send<TU>(HttpMethod method, object? data,
@@ -1058,8 +1058,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             $"Headers:\n\t{JsonSerializer.Serialize(requestHeaders, PostgrestSerializerOptions.Passthrough)}\n" +
             $"Data:\n\t{JsonSerializer.Serialize(preparedData, PostgrestSerializerOptions.Passthrough)}");
 
-        var operation = PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert);
-        return Helpers.MakeRequestAsync<TU>(this.options, this.httpClient, method, url, this.serializerSettings, preparedData, requestHeaders, this.GetHeaders, cancellationToken, operation);
+        var call = PostgrestCall.OnTable(PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert), this.TableName);
+        return Helpers.MakeRequestAsync<TU>(this.options, this.httpClient, method, call, url, this.serializerSettings, preparedData, requestHeaders, this.GetHeaders, cancellationToken);
     }
 
     private void SpecifyColumnsOfBulkRows(object? preparedData)

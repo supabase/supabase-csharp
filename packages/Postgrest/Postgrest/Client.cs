@@ -138,7 +138,7 @@ public class Client : IPostgrestClient
 
         // Send request
         var request =
-            Helpers.MakeRequestAsync(this.Options, this.httpClient, HttpMethod.Post, canonicalUri, serializerSettings, data, headers, operation: "rpc");
+            Helpers.MakeRequestAsync(this.Options, this.httpClient, HttpMethod.Post, PostgrestCall.ToFunction(procedureName), canonicalUri, serializerSettings, data, headers);
         return request;
     }
 }
