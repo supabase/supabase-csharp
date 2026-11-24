@@ -1,6 +1,30 @@
 #nullable enable
+override Supabase.Storage.CreateVectorIndex.NewVectorIndex.Equals(object? obj) -> bool
+override Supabase.Storage.CreateVectorIndex.NewVectorIndex.GetHashCode() -> int
+override Supabase.Storage.CreateVectorIndex.NewVectorIndex.ToString() -> string!
+static Supabase.Storage.CreateVectorIndex.NewVectorIndex.operator !=(Supabase.Storage.CreateVectorIndex.NewVectorIndex? left, Supabase.Storage.CreateVectorIndex.NewVectorIndex? right) -> bool
+static Supabase.Storage.CreateVectorIndex.NewVectorIndex.operator ==(Supabase.Storage.CreateVectorIndex.NewVectorIndex? left, Supabase.Storage.CreateVectorIndex.NewVectorIndex? right) -> bool
 Supabase.Storage.Client.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Client.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
+Supabase.Storage.CreateVectorIndex.NewVectorIndex
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.<Clone>$() -> Supabase.Storage.CreateVectorIndex.NewVectorIndex!
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.DataType.get -> Supabase.Storage.CreateVectorIndex.VectorDataType
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.DataType.init -> void
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.Dimension.get -> int
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.Dimension.init -> void
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.DistanceMetric.get -> Supabase.Storage.CreateVectorIndex.VectorDistanceMetric
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.DistanceMetric.init -> void
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.Equals(Supabase.Storage.CreateVectorIndex.NewVectorIndex? other) -> bool
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.IndexName.get -> string!
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.IndexName.init -> void
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.NewVectorIndex() -> void
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.NonFilterableMetadataKeys.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Supabase.Storage.CreateVectorIndex.NewVectorIndex.NonFilterableMetadataKeys.init -> void
+Supabase.Storage.CreateVectorIndex.VectorDataType
+Supabase.Storage.CreateVectorIndex.VectorDataType.Float32 = 0 -> Supabase.Storage.CreateVectorIndex.VectorDataType
+Supabase.Storage.CreateVectorIndex.VectorDistanceMetric
+Supabase.Storage.CreateVectorIndex.VectorDistanceMetric.Cosine = 0 -> Supabase.Storage.CreateVectorIndex.VectorDistanceMetric
+Supabase.Storage.CreateVectorIndex.VectorDistanceMetric.Euclidean = 1 -> Supabase.Storage.CreateVectorIndex.VectorDistanceMetric
 Supabase.Storage.Interfaces.IStorageAnalyticsApi
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.DeleteBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
@@ -9,6 +33,7 @@ Supabase.Storage.Interfaces.IStorageVectorBucketApi
 Supabase.Storage.Interfaces.IStorageVectorBucketApi.DeleteVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi.From(string! vectorBucketName) -> Supabase.Storage.Interfaces.IVectorBucket!
 Supabase.Storage.Interfaces.IVectorBucket
+Supabase.Storage.Interfaces.IVectorBucket.CreateIndexAsync(Supabase.Storage.CreateVectorIndex.NewVectorIndex! index, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IVectorBucket.DeleteIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 *REMOVED*const Supabase.Storage.StorageDiagnostics.SourceName = "Supabase.Storage" -> string!
 const Supabase.Storage.StorageDiagnostics.SourceName = "supabase.storage" -> string!

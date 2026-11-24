@@ -1,0 +1,1 @@
+﻿{"vectorBucketName":"embeddings-prod","indexName":"docs-v1","dimension":1536,"distanceMetric":"cosine","dataType":"float32","metadataConfiguration":{"nonFilterableMetadataKeys":["raw_text"]}}
