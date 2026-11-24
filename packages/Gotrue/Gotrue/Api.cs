@@ -6,9 +6,11 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Supabase.Core;
 using Supabase.Core.Extensions;
 using Supabase.Core.Http;
+using Supabase.Gotrue.AuthorizationOAuth;
 using Supabase.Gotrue.Claims;
 using Supabase.Gotrue.Common;
 using Supabase.Gotrue.CreateCustomProvider;
@@ -73,7 +75,7 @@ public class Api : IGotrueApi<User, Session>
 
     internal TracePropagation TracePropagation { get; init; } = TracePropagation.Enabled;
 
-    internal Microsoft.Extensions.Logging.ILogger? Logger { get; init; }
+    internal ILogger? Logger { get; init; }
 
     /// <summary>
     /// Creates a new API client
@@ -1194,6 +1196,86 @@ public class Api : IGotrueApi<User, Session>
         await this.MakeRequestAsync(HttpMethod.Post, url, body, this.Headers).ConfigureAwait(false);
 
         return new ResendState { PKCEVerifier = verifier };
+    }
+
+    /// <inheritdoc />
+    public async Task<OAuthAuthorizationResponse> GetAuthorizationDetails(
+        string jwt,
+        string authorizationId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var response = await this
+            .MakeRequestAsync<OAuthAuthorizationResponse>(
+                HttpMethod.Get,
+                $"{this.Url}/oauth/authorizations/{authorizationId}",
+                null,
+                this.CreateAuthedRequestHeaders(jwt),
+                cancellationToken
+            )
+            .ConfigureAwait(false);
+        return response ?? throw new InvalidOperationException("The OAuth authorization response was empty or invalid.");
+    }
+
+    /// <inheritdoc />
+    public Task<OAuthRedirect> ApproveAuthorization(
+        string jwt,
+        string authorizationId,
+        AuthorizationOptions? options = null,
+        CancellationToken cancellationToken = default
+    ) =>
+        this.SubmitAuthorizationDecision(jwt, authorizationId, "approve", cancellationToken);
+
+    /// <inheritdoc />
+    public Task<OAuthRedirect> DenyAuthorization(
+        string jwt,
+        string authorizationId,
+        AuthorizationOptions? options = null,
+        CancellationToken cancellationToken = default
+    ) =>
+        this.SubmitAuthorizationDecision(jwt, authorizationId, "deny", cancellationToken);
+
+    private async Task<OAuthRedirect> SubmitAuthorizationDecision(string jwt, string authorizationId, string action, CancellationToken cancellationToken)
+    {
+        var response = await this
+            .MakeRequestAsync<OAuthRedirect>(
+                HttpMethod.Post,
+                $"{this.Url}/oauth/authorizations/{PathSegment.Escape(authorizationId)}/consent",
+                new Dictionary<string, string> { ["action"] = action },
+                this.CreateAuthedRequestHeaders(jwt),
+                cancellationToken
+            )
+            .ConfigureAwait(false);
+        return response ?? throw new InvalidOperationException("The OAuth consent response did not contain a redirect URL.");
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<OAuthGrant>> ListGrants(string jwt, CancellationToken cancellationToken = default)
+    {
+        var grants = await this
+            .MakeRequestAsync<List<OAuthGrant>>(
+                HttpMethod.Get,
+                $"{this.Url}/user/oauth/grants",
+                null,
+                this.CreateAuthedRequestHeaders(jwt),
+                cancellationToken
+            )
+            .ConfigureAwait(false);
+        return grants ?? new List<OAuthGrant>();
+    }
+
+    /// <inheritdoc />
+    public async Task RevokeGrant(string jwt, RevokeGrantOptions options, CancellationToken cancellationToken = default)
+    {
+        var query = new Dictionary<string, string> { ["client_id"] = options.ClientId };
+        var url = Helpers.AddQueryParams($"{this.Url}/user/oauth/grants", query).ToString();
+        await this.MakeRequestAsync(
+            HttpMethod.Delete,
+            url,
+            null,
+            this.CreateAuthedRequestHeaders(jwt),
+            cancellationToken
+        ).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
