@@ -66,7 +66,7 @@ public class GotrueLoggingTests
         client.SetPersistence(persistence);
         client.LoadSession();
         capture.Records.Should().ContainSingle(record => record.Level == LogLevel.Warning).Which.Message.Should()
-            .Be("Supabase.Gotrue: Session load failed with InvalidOperationException", "the failure has no caller to return an error to");
+            .Be("supabase.gotrue: Session load failed with InvalidOperationException", "the failure has no caller to return an error to");
     }
 
     [TestMethod]
@@ -79,7 +79,7 @@ public class GotrueLoggingTests
         client.SetPersistence(persistence);
         await client.LoadSessionAsync();
         capture.Records.Should().ContainSingle(record => record.Level == LogLevel.Warning).Which.Message.Should()
-            .Be("Supabase.Gotrue: Session load failed with InvalidOperationException");
+            .Be("supabase.gotrue: Session load failed with InvalidOperationException");
     }
 
     [TestMethod]
@@ -91,7 +91,7 @@ public class GotrueLoggingTests
         client.AddStateChangedListener((_, _) => throw new InvalidOperationException("handler bug"));
         client.LoadSession();
         capture.Records.Should().ContainSingle(record => record.Level == LogLevel.Warning).Which.Message.Should()
-            .Be("Supabase.Gotrue: Auth state change handler failed with InvalidOperationException");
+            .Be("supabase.gotrue: Auth state change handler failed with InvalidOperationException");
     }
 
     [TestMethod]
@@ -104,7 +104,7 @@ public class GotrueLoggingTests
         client.SetPersistence(PersistenceOf(ExpiredSession()));
         client.LoadSession();
         await WaitUntil(() => capture.Records.Any(record => record.Level == LogLevel.Warning));
-        capture.Records.First(record => record.Level == LogLevel.Warning).Message.Should().Be("Supabase.Gotrue: Token refresh failed with GotrueException",
+        capture.Records.First(record => record.Level == LogLevel.Warning).Message.Should().Be("supabase.gotrue: Token refresh failed with GotrueException",
             "a refresh on the timer has no caller to return an error to");
     }
 
@@ -117,9 +117,9 @@ public class GotrueLoggingTests
         var client = this.ClientWith(capture.Logger, autoRefresh: true);
         client.SetPersistence(PersistenceOf(ExpiredSession()));
         client.LoadSession();
-        await WaitUntil(() => capture.Records.Any(record => record.Message == "Supabase.Gotrue: refresh timer scheduled"));
+        await WaitUntil(() => capture.Records.Any(record => record.Message == "supabase.gotrue: refresh timer scheduled"));
         client.StopAutoRefresh();
-        capture.Records.Should().Contain(record => record.Level == LogLevel.Debug && record.Message == "Supabase.Gotrue: refresh timer scheduled");
+        capture.Records.Should().Contain(record => record.Level == LogLevel.Debug && record.Message == "supabase.gotrue: refresh timer scheduled");
     }
 
     [TestMethod]
@@ -132,7 +132,7 @@ public class GotrueLoggingTests
         client.SetPersistence(PersistenceOf(new Session { AccessToken = "an-access-token", RefreshToken = "a-refresh-token", ExpiresIn = 3600, CreatedAt = DateTime.UtcNow }));
         client.LoadSession();
         await client.SignOut();
-        capture.Records.Should().Contain(record => record.Message == "Supabase.Gotrue: refresh timer stopped");
+        capture.Records.Should().Contain(record => record.Message == "supabase.gotrue: refresh timer stopped");
     }
 
     [TestMethod]
@@ -148,7 +148,7 @@ public class GotrueLoggingTests
         client.SetPersistence(persistence);
         client.LoadSession();
         await client.SignOut();
-        capture.Records.Should().Contain(record => record.Level == LogLevel.Warning && record.Message == "Supabase.Gotrue: Session persistence handler failed with InvalidOperationException");
+        capture.Records.Should().Contain(record => record.Level == LogLevel.Warning && record.Message == "supabase.gotrue: Session persistence handler failed with InvalidOperationException");
     }
 
     [TestMethod]
@@ -158,7 +158,7 @@ public class GotrueLoggingTests
         var client = new Client(new ClientOptions { Url = this.server.Url!, AutoRefreshToken = true, MaximumRefreshWaitTime = int.MaxValue, Logger = capture.Logger });
         client.SetPersistence(PersistenceOf(new Session { AccessToken = "an-access-token", RefreshToken = "a-refresh-token", ExpiresIn = 4_000_000_000, CreatedAt = DateTime.UtcNow }));
         client.LoadSession();
-        capture.Records.Should().Contain(record => record.Level == LogLevel.Warning && record.Message == "Supabase.Gotrue: Refresh timer initialization failed with ArgumentOutOfRangeException");
+        capture.Records.Should().Contain(record => record.Level == LogLevel.Warning && record.Message == "supabase.gotrue: Refresh timer initialization failed with ArgumentOutOfRangeException");
     }
 
     private static async Task WaitUntil(Func<bool> condition)

@@ -33,11 +33,11 @@ public class DiagnosticLoggingWiringTests
             ((Supabase.Functions.Client) client.Functions).Options.Logger.Should().NotBeNull();
             client.Realtime.Options.Logger.Should().NotBeNull();
             client.Storage.Options.Logger.Should().NotBeNull();
-            factory.Received(1).CreateLogger("Supabase.Gotrue");
+            factory.Received(1).CreateLogger("supabase.gotrue");
             factory.Received(1).CreateLogger("supabase.postgrest");
-            factory.Received(1).CreateLogger("Supabase.Functions");
+            factory.Received(1).CreateLogger("supabase.functions");
             factory.Received(1).CreateLogger("Supabase.Realtime");
-            factory.Received(1).CreateLogger("Supabase.Storage");
+            factory.Received(1).CreateLogger("supabase.storage");
         }
     }
 
@@ -72,7 +72,7 @@ public class DiagnosticLoggingWiringTests
     {
         var factory = FactoryOfDistinctLoggers();
         new Supabase.Client("http://localhost", "test-key", new SupabaseOptions { LoggerFactory = factory }).AdminAuth("service-key");
-        factory.Received(2).CreateLogger("Supabase.Gotrue");
+        factory.Received(2).CreateLogger("supabase.gotrue");
     }
 
     [TestMethod]

@@ -17,7 +17,7 @@ namespace Storage.Tests.Observability;
 
 /// <summary>
 /// Contract tests for the diagnostics the SDK emits through System.Diagnostics
-/// (ActivitySource/Meter "Supabase.Storage") and for the sanitization rule: telemetry must never
+/// (ActivitySource/Meter "supabase.storage") and for the sanitization rule: telemetry must never
 /// contain a query string, a signed-URL token, or file contents. Also covers the transfer-size
 /// metric that distinguishes uploads/downloads from control-plane requests.
 /// </summary>
