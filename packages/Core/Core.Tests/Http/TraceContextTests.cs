@@ -48,7 +48,7 @@ public class TraceContextTests
         var handler = new CapturingHandler();
         using var client = new HttpClient(handler);
         (await RetryExecutor.SendAsync(client, request ?? (() => new HttpRequestMessage(HttpMethod.Get, "http://localhost/")),
-            new RetryOptions(), propagation, null, CancellationToken.None)).Dispose();
+            new RetryOptions(), propagation, null, TimeProvider.System, CancellationToken.None)).Dispose();
         return handler.Sent!;
     }
 
@@ -109,7 +109,7 @@ public class TraceContextTests
         using var client = new HttpClient(handler);
         var options = new RetryOptions { MaxRetries = 1, BaseDelay = TimeSpan.Zero, MaxDelay = TimeSpan.Zero };
         (await RetryExecutor.SendAsync(client, () => new HttpRequestMessage(HttpMethod.Get, "http://localhost/"),
-            options, TracePropagation.Enabled, null, CancellationToken.None)).Dispose();
+            options, TracePropagation.Enabled, null, TimeProvider.System, CancellationToken.None)).Dispose();
 
         var attempts = handler.Received.Select(request => request.Headers.GetValues("traceparent").Single()).ToList();
         using (new AssertionScope())

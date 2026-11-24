@@ -73,4 +73,11 @@ public class ClientOptions
     /// query strings or header values.
     /// </summary>
     public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
+
+    /// <summary>
+    /// The clock the retry backoff waits on. Defaults to <see cref="System.TimeProvider.System"/>; supply another provider to
+    /// run it from a host's own timers, such as a frame loop where OS timers never fire. The HTTP timeouts belong to the
+    /// <see cref="HttpClient"/> and keep running on the system clock.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 }

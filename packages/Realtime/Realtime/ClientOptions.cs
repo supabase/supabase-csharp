@@ -140,4 +140,13 @@ public class ClientOptions
     /// </summary>
     [ImplementedCapability("realtime.configuration.custom_logger")]
     public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
+
+    /// <summary>
+    /// The clock the socket heartbeat and probe, push timeouts, channel rejoin, reconnect delays, the
+    /// <see cref="DisconnectOnEmptyChannelsAfter"/> delay and the HTTP broadcast timeout wait on. Defaults to
+    /// <see cref="System.TimeProvider.System"/>; supply another provider to run them from a host's own timers, such as
+    /// a frame loop where OS timers never fire. The WebSocket transport's own timers belong to the
+    /// <see cref="IWebSocketFactory"/> and are not affected.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 }

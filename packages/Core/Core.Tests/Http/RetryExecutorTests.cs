@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Core.Http;
 
@@ -95,6 +96,31 @@ public class RetryExecutorTests
         await act.Should().ThrowAsync<OperationCanceledException>();
         handler.CallCount.Should().Be(1, "cancellation fires during the first backoff delay, before a second attempt");
     }
+
+    [TestMethod]
+    public async Task SendAsync_ShouldRetry_GivenTheSuppliedClockReachedTheBackoff()
+    {
+        var clock = new FakeTimeProvider();
+        var responses = new Queue<HttpStatusCode>([HttpStatusCode.ServiceUnavailable, HttpStatusCode.OK]);
+        var handler = new StubHandler(_ => new HttpResponseMessage(responses.Dequeue()));
+        using var client = new HttpClient(handler);
+        var send = RetryExecutor.SendAsync(client, Get, OneRetryAfter(TimeSpan.FromHours(1)), TracePropagation.Enabled, null, clock, CancellationToken.None);
+        clock.Advance(TimeSpan.FromHours(1));
+        (await send.WaitAsync(TimeSpan.FromSeconds(5))).StatusCode.Should().Be(HttpStatusCode.OK, "an hour on the supplied clock is the whole backoff, however little real time passed");
+    }
+
+    [TestMethod]
+    public void SendAsync_ShouldNotRetryYet_GivenTheSuppliedClockIsShortOfTheBackoff()
+    {
+        var clock = new FakeTimeProvider();
+        var handler = new StubHandler(_ => new HttpResponseMessage(HttpStatusCode.ServiceUnavailable));
+        using var client = new HttpClient(handler);
+        _ = RetryExecutor.SendAsync(client, Get, OneRetryAfter(TimeSpan.FromHours(1)), TracePropagation.Enabled, null, clock, CancellationToken.None);
+        clock.Advance(TimeSpan.FromHours(1) - TimeSpan.FromTicks(1));
+        handler.CallCount.Should().Be(1, "the retry waits the full backoff on the supplied clock");
+    }
+
+    private static RetryOptions OneRetryAfter(TimeSpan backoff) => new() { MaxRetries = 1, BaseDelay = backoff, MaxDelay = backoff, UseJitter = false };
 
     private static HttpRequestMessage Get() => new(HttpMethod.Get, "http://localhost/");
 

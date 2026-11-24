@@ -1,6 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Timers;
+using System.Threading;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Socket;
 
@@ -56,16 +55,16 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// </summary>
     public string? Ref { get; private set; }
 
-    private string? _msgRefEvent;
-    private int _timeoutMs;
-    private readonly Timer _timer;
+    private string? msgRefEvent;
+    private int timeoutMs;
+    private readonly ITimer timer;
 
     private IRealtimeSocket Socket => this.Channel.Socket;
 
     /// <summary>
     /// Handlers for notifications of message events.
     /// </summary>
-    private readonly HandlerCollection<IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler> _messageEventHandlers = new();
+    private readonly HandlerCollection<IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler> messageEventHandlers = new();
 
     /// <summary>
     /// Initializes a single request that will be `Pushed` to the Socket server.
@@ -79,9 +78,9 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     public Push(IRealtimeSocket socket, RealtimeChannel channel, string eventName, string? type = null,
         object? payload = null, int timeoutMs = Constants.DefaultTimeout)
     {
-        this._timeoutMs = timeoutMs;
-        this._timer = new Timer(this._timeoutMs) { AutoReset = false };
-        this._timer.Elapsed += this.HandleTimeoutElapsed;
+        this.timeoutMs = timeoutMs;
+        this.timer = channel.Options.ClientOptions.TimeProvider.CreateTimer(_ => Debugger.Instance.Guard(this, this.HandleTimeoutElapsed), null,
+            Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 
         this.Channel = channel;
         this.Type = type;
@@ -97,9 +96,9 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="timeoutMs"></param>
     public void Resend(int timeoutMs = Constants.DefaultTimeout)
     {
-        this._timer.Interval = timeoutMs;
+        this.timeoutMs = timeoutMs;
         this.Ref = null;
-        this._msgRefEvent = null;
+        this.msgRefEvent = null;
 
         this.IsSent = false;
         this.Send();
@@ -131,11 +130,10 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// </summary>
     internal void StartTimeout()
     {
-        this._timer.Stop();
-        this._timer.Start();
         this.Socket.AddMessageReceivedHandler(this.HandleSocketMessageReceived);
         this.Ref = this.Socket.MakeMsgRef();
-        this._msgRefEvent = this.Socket.ReplyEventName(this.Ref);
+        this.msgRefEvent = this.Socket.ReplyEventName(this.Ref);
+        this.timer.Change(TimeSpan.FromMilliseconds(this.timeoutMs), Timeout.InfiniteTimeSpan);
     }
 
     /// <summary>
@@ -159,18 +157,14 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// </summary>
     /// <param name="handler"></param>
     public void AddMessageReceivedHandler(IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler handler)
-    {
-        this._messageEventHandlers.Add(handler);
-    }
+        => this.messageEventHandlers.Add(handler);
 
     /// <summary>
     /// Removes a specified listener from messages received.
     /// </summary>
     /// <param name="handler"></param>
     public void RemoveMessageReceivedHandler(IRealtimePush<RealtimeChannel, SocketResponse>.MessageEventHandler handler)
-    {
-        this._messageEventHandlers.Remove(handler);
-    }
+        => this.messageEventHandlers.Remove(handler);
 
     /// <summary>
     /// Notifies all listeners that the socket has received a message
@@ -178,7 +172,7 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// <param name="messageResponse"></param>
     private void NotifyMessageReceived(SocketResponse messageResponse)
     {
-        foreach (var handler in this._messageEventHandlers.Snapshot())
+        foreach (var handler in this.messageEventHandlers.Snapshot())
             handler.Invoke(this, messageResponse);
     }
 
@@ -186,13 +180,13 @@ public class Push : IRealtimePush<RealtimeChannel, SocketResponse>
     /// Clears all of the listeners from receiving event state changes.
     /// </summary>
     public void ClearMessageReceivedHandler() =>
-        this._messageEventHandlers.Clear();
+        this.messageEventHandlers.Clear();
 
-    private void HandleTimeoutElapsed(object sender, ElapsedEventArgs e)
+    private void HandleTimeoutElapsed()
     {
         this.Socket.RemoveMessageReceivedHandler(this.HandleSocketMessageReceived);
         OnTimeout?.Invoke(this, null);
     }
 
-    private void CancelTimeout() => this._timer.Stop();
+    private void CancelTimeout() => this.timer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 }

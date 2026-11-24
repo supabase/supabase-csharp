@@ -12,3 +12,5 @@ Supabase.Storage.Interfaces.IVectorBucket
 Supabase.Storage.Interfaces.IVectorBucket.DeleteIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 *REMOVED*const Supabase.Storage.StorageDiagnostics.SourceName = "Supabase.Storage" -> string!
 const Supabase.Storage.StorageDiagnostics.SourceName = "supabase.storage" -> string!
+Supabase.Storage.ClientOptions.TimeProvider.get -> System.TimeProvider!
+Supabase.Storage.ClientOptions.TimeProvider.set -> void

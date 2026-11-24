@@ -21,16 +21,16 @@ public static class RetryExecutor
         SendAsync(client, requestFactory, options, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
     internal static Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
-        RetryOptions options, TracePropagation tracePropagation, ILogger? logger, CancellationToken cancellationToken) =>
-        SendAsync(client, requestFactory, options, tracePropagation, logger, HttpCompletionOption.ResponseContentRead, cancellationToken);
+        RetryOptions options, TracePropagation tracePropagation, ILogger? logger, TimeProvider timeProvider, CancellationToken cancellationToken) =>
+        SendAsync(client, requestFactory, options, tracePropagation, logger, timeProvider, HttpCompletionOption.ResponseContentRead, cancellationToken);
 
     /// <summary>Sends a request with the specified <paramref name="completionOption"/>.</summary>
     public static Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
         RetryOptions options, HttpCompletionOption completionOption, CancellationToken cancellationToken) =>
-        SendAsync(client, requestFactory, options, TracePropagation.Enabled, null, completionOption, cancellationToken);
+        SendAsync(client, requestFactory, options, TracePropagation.Enabled, null, TimeProvider.System, completionOption, cancellationToken);
 
     internal static async Task<HttpResponseMessage> SendAsync(HttpClient client, Func<HttpRequestMessage> requestFactory,
-        RetryOptions options, TracePropagation tracePropagation, ILogger? logger, HttpCompletionOption completionOption, CancellationToken cancellationToken)
+        RetryOptions options, TracePropagation tracePropagation, ILogger? logger, TimeProvider timeProvider, HttpCompletionOption completionOption, CancellationToken cancellationToken)
     {
         var attempt = 0;
         var traceId = ActivityTraceId.CreateRandom();
@@ -44,7 +44,7 @@ public static class RetryExecutor
             var delay = BackoffDelay(options, attempt);
             logger.RetryScheduled(sent.Method, sent.Uri, attempt, RetryReason(response, exception), delay);
             response?.Dispose();
-            await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+            await timeProvider.Delay(delay, cancellationToken).ConfigureAwait(false);
         }
     }
 

@@ -119,7 +119,8 @@ public class Client : IGotrueClient<User, Session>
         this.api = new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
         {
             TracePropagation = options.TracePropagation,
-            Logger = options.Logger
+            Logger = options.Logger,
+            TimeProvider = options.TimeProvider
         };
         if (options.AutoRefreshToken)
             this.StartAutoRefresh();

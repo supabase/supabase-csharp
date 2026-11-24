@@ -61,6 +61,12 @@ public class ClientOptions
     public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
 
     /// <summary>
+    /// The clock the retry backoff and <see cref="Timeout"/> wait on. Defaults to <see cref="System.TimeProvider.System"/>;
+    /// supply another provider to run them from a host's own timers, such as a frame loop where OS timers never fire.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
+    /// <summary>
     /// Fails a request that runs longer than this, retries included, with a TaskCanceledException.
     /// The HttpClient timeout, 100 seconds by default, still applies.
     /// </summary>

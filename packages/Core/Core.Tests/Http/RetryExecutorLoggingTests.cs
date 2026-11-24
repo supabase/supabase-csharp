@@ -34,7 +34,7 @@ public class RetryExecutorLoggingTests
     private static async Task Send(HttpMessageHandler handler, ILogger? logger, RetryOptions? retry = null)
     {
         using var client = new HttpClient(handler);
-        (await RetryExecutor.SendAsync(client, Get, retry ?? new RetryOptions(), TracePropagation.Disabled, logger, CancellationToken.None)).Dispose();
+        (await RetryExecutor.SendAsync(client, Get, retry ?? new RetryOptions(), TracePropagation.Disabled, logger, TimeProvider.System, CancellationToken.None)).Dispose();
     }
 
     [TestMethod]
@@ -143,7 +143,7 @@ public class RetryExecutorLoggingTests
     {
         var responses = new Queue<HttpStatusCode>([HttpStatusCode.ServiceUnavailable, HttpStatusCode.OK]);
         using var client = new HttpClient(new SlowHandler(() => responses.Dequeue()));
-        BlockingCaller.Completes(() => RetryExecutor.SendAsync(client, Get, Delayed, TracePropagation.Disabled, new LogCapture().Logger, CancellationToken.None))
+        BlockingCaller.Completes(() => RetryExecutor.SendAsync(client, Get, Delayed, TracePropagation.Disabled, new LogCapture().Logger, TimeProvider.System, CancellationToken.None))
             .Should().BeTrue("the SDK never resumes on the caller's synchronization context");
     }
 

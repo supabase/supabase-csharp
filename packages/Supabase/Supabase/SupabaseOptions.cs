@@ -173,6 +173,23 @@ public class SupabaseOptions
     public Supabase.Core.Http.TracePropagation TracePropagation { get; set; } = Supabase.Core.Http.TracePropagation.Enabled;
 
     /// <summary>
+    /// The clock every sub-client's timers, delays and timeouts wait on: the Auth refresh timer, retry backoff, the
+    /// Database and Edge Functions request timeouts, and the Realtime heartbeat, push timeouts, channel rejoin, reconnect
+    /// and disconnect delays. Defaults to <see cref="System.TimeProvider.System"/>; supply another provider to run them
+    /// from a host's own timers, such as a frame loop where OS timers never fire. When set, it replaces the
+    /// <see cref="StorageClientOptions"/> clock.
+    /// </summary>
+    /// <remarks>
+    /// Whether a session is due for refresh is still measured against the system clock, as is the HTTP timeout of Storage.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var client = new Supabase.Client(url, key, new SupabaseOptions { TimeProvider = frameLoopClock });
+    /// </code>
+    /// </example>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
+    /// <summary>
     /// Receives the diagnostics of every sub-client: request outcomes with timing and retry decisions at
     /// <c>Debug</c>, and failures of background work (token refresh, session persistence, Realtime reconnection) at
     /// <c>Warning</c>. Each sub-client logs under its own category (<c>supabase.gotrue</c>, <c>supabase.postgrest</c>,

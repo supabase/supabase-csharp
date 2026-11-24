@@ -218,12 +218,12 @@ public partial class Client : IFunctionsClient
         int? statusCode = null;
         string? errorType = null;
 
-        using var timeoutCts = new CancellationTokenSource(options.HttpTimeout);
+        using var timeoutCts = this.Options.TimeProvider.CreateCancellationTokenSource(options.HttpTimeout);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
         try
         {
-            var response = await RetryExecutor.SendAsync(this.httpClient, () => BuildRequestMessage(options, headers, uri), this.Options.Retry, this.Options.TracePropagation, this.Options.Logger, completionOption, linkedCts.Token).ConfigureAwait(false);
+            var response = await RetryExecutor.SendAsync(this.httpClient, () => BuildRequestMessage(options, headers, uri), this.Options.Retry, this.Options.TracePropagation, this.Options.Logger, this.Options.TimeProvider, completionOption, linkedCts.Token).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             var isRelayError = response.Headers.Contains("x-relay-error");
             activity.SetHttpResponseTags(statusCode.Value);

@@ -147,12 +147,12 @@ internal static class Helpers
         int? statusCode = null;
         string? errorType = null;
 
-        using var timeoutCts = new CancellationTokenSource(clientOptions.Timeout ?? Timeout.InfiniteTimeSpan);
+        using var timeoutCts = clientOptions.TimeProvider.CreateCancellationTokenSource(clientOptions.Timeout ?? Timeout.InfiniteTimeSpan);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
         try
         {
-            using var response = await RetryExecutor.SendAsync(httpClient ?? Client, CreateRequest, clientOptions.Retry, clientOptions.TracePropagation, clientOptions.Logger, linkedCts.Token).ConfigureAwait(false);
+            using var response = await RetryExecutor.SendAsync(httpClient ?? Client, CreateRequest, clientOptions.Retry, clientOptions.TracePropagation, clientOptions.Logger, clientOptions.TimeProvider, linkedCts.Token).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 

@@ -41,4 +41,11 @@ public sealed record ClientOptions
     /// query strings or header values.
     /// </summary>
     public Microsoft.Extensions.Logging.ILogger? Logger { get; init; }
+
+    /// <summary>
+    /// The clock the retry backoff and each invocation's <see cref="Client.InvokeFunctionOptions.HttpTimeout"/> wait on. Defaults to
+    /// <see cref="System.TimeProvider.System"/>; supply another provider to run them from a host's own timers, such as a
+    /// frame loop where OS timers never fire.
+    /// </summary>
+    public TimeProvider TimeProvider { get; init; } = TimeProvider.System;
 }
