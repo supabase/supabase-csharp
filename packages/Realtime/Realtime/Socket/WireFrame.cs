@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using Supabase.Realtime.Broadcast;
 
 namespace Supabase.Realtime.Socket;
 
@@ -14,7 +15,6 @@ internal static class WireFrame
 {
     private const byte UserBroadcastPushType = 3;
     private const byte UserBroadcastType = 4;
-    private const byte NoMetadata = 0;
     private const byte BinaryEncoding = 0;
     private const byte JsonEncoding = 1;
     private const int UserBroadcastHeaderSize = 5;
@@ -71,20 +71,19 @@ internal static class WireFrame
     }
 
     /// <summary>
-    /// Builds the binary frame that pushes a user broadcast whose payload is not JSON.
+    /// Builds the binary frame that pushes a user broadcast.
     /// </summary>
-    internal static byte[] UserBroadcastPush(string joinRef, string reference, string topic, string userEvent, byte[] payload)
+    internal static byte[] UserBroadcastPush(string joinRef, string reference, string topic, BinaryBroadcast broadcast)
     {
-        var fields = new[] { joinRef, reference, topic, userEvent }.Select(Encoding.UTF8.GetBytes).ToArray();
+        var fields = new[] { joinRef, reference, topic, broadcast.Event, broadcast.Metadata }.Select(Encoding.UTF8.GetBytes).ToArray();
         using var frame = new MemoryStream();
         frame.WriteByte(UserBroadcastPushType);
         foreach (var field in fields)
             frame.WriteByte((byte) field.Length);
-        frame.WriteByte(NoMetadata);
-        frame.WriteByte(BinaryEncoding);
+        frame.WriteByte(broadcast.IsJson ? JsonEncoding : BinaryEncoding);
         foreach (var field in fields)
             frame.Write(field, 0, field.Length);
-        frame.Write(payload, 0, payload.Length);
+        frame.Write(broadcast.Payload, 0, broadcast.Payload.Length);
         return frame.ToArray();
     }
 }

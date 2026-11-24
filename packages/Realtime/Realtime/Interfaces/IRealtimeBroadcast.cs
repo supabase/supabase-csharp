@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Models;
 using Supabase.Realtime.Socket;
 using static Supabase.Realtime.Constants;
@@ -60,6 +61,24 @@ public interface IRealtimeBroadcast
     /// </code>
     /// </example>
     Task SendBinary(string broadcastEventName, byte[] payload, int timeoutMs = DefaultTimeout);
+
+    /// <summary>
+    /// Sends a broadcast that the server stores for replay. Needs a private channel and a client that speaks
+    /// <see cref="ProtocolVersion.V2"/>. Unlike <see cref="Send"/>, it takes the payload itself, not a
+    /// <see cref="BaseBroadcast"/>: a <c>byte[]</c> is sent as bytes, anything else as JSON. With
+    /// <see cref="BroadcastOptions.BroadcastAck"/> on, the send fails when the server did not store the broadcast.
+    /// </summary>
+    /// <exception cref="Supabase.Realtime.Exceptions.RealtimeException">The channel is public, the client speaks protocol 1.0.0, the channel topic is longer than 255 bytes, or the server did not store the broadcast or did not acknowledge it in time.</exception>
+    /// <exception cref="ArgumentException">The payload is a <see cref="BaseBroadcast"/>, or the event name is longer than 255 bytes.</exception>
+    /// <example>
+    /// <code>
+    /// var channel = client.PrivateChannel("room");
+    /// var broadcast = channel.Register&lt;BaseBroadcast&gt;(broadcastAck: true);
+    /// await channel.Subscribe();
+    /// await broadcast.SendAsync("chat", new { text = "hi" }, new BroadcastPersistence(TimeSpan.FromHours(1)));
+    /// </code>
+    /// </example>
+    Task SendAsync(string eventName, object payload, BroadcastPersistence persistence, int timeoutMs = DefaultTimeout);
 
     /// <summary>
     /// An internal trigger used for notifying event delegates.

@@ -618,25 +618,58 @@ public class RealtimeChannel : IRealtimeChannel
     /// <param name="payload"></param>
     /// <param name="timeoutMs"></param>
     [ImplementedCapability("realtime.channel.broadcast")]
-    public Task<bool> Send(ChannelEventName eventName, string? type, object payload, int timeoutMs = DefaultTimeout)
+    public Task<bool> Send(ChannelEventName eventName, string? type, object payload, int timeoutMs = DefaultTimeout) =>
+        IsOk(this.SendForReply(eventName, type, payload, timeoutMs));
+
+    /// <summary>
+    /// Sends a push and returns the server's reply, or null when the server sends none.
+    /// </summary>
+    internal Task<SocketResponse?> SendForReply(ChannelEventName eventName, string? type, object payload, int timeoutMs)
     {
         var push = this.Push(Core.Helpers.GetMappedToAttr(eventName).Mapping, type, payload, timeoutMs);
         // The server only sends a `phx_reply` for a `broadcast` push when the channel joined
         // with `config.broadcast.ack = true`. Without that, no reply will ever arrive, so
         // waiting for one would hang forever - resolve as soon as the push has been dispatched.
         return eventName == ChannelEventName.Broadcast && this.BroadcastOptions?.BroadcastAck != true
-            ? Task.FromResult(true)
+            ? Task.FromResult<SocketResponse?>(null)
             : PushAwaiter.Await(push);
+    }
+
+    private static async Task<bool> IsOk(Task<SocketResponse?> sending)
+    {
+        var reply = await sending.ConfigureAwait(false);
+        return reply == null || reply.Payload?.Status == PhoenixStatusOk;
     }
 
     /// <inheritdoc />
     [ImplementedCapability("realtime.channel.broadcast_http")]
     public Task HttpSendAsync(string eventName, object payload, CancellationToken cancellationToken = default) =>
-        this.Socket.HttpSendAsync(this, eventName, payload, cancellationToken);
+        this.Socket.HttpSendAsync(this, eventName, payload, null, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.channel.broadcast_persist")]
+    public Task HttpSendAsync(string eventName, object payload, BroadcastPersistence persistence) =>
+        this.HttpSendAsync(eventName, payload, persistence, CancellationToken.None);
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.channel.broadcast_persist")]
+    public Task HttpSendAsync(string eventName, object payload, BroadcastPersistence persistence, CancellationToken cancellationToken)
+    {
+        this.EnsureCanPersist(persistence);
+        return this.Socket.HttpSendAsync(this, eventName, payload, persistence, cancellationToken);
+    }
+
+    internal void EnsureCanPersist(BroadcastPersistence persistence)
+    {
+        if (persistence == null)
+            throw new ArgumentNullException(nameof(persistence));
+        if (!this.Options.IsPrivate)
+            throw new RealtimeException("A persisted broadcast needs a private channel.");
+    }
 
     /// <summary>
-    /// Awaits a reply for a given <see cref="Channel.Push"/>, resolving with whether the server replied
-    /// <c>ok</c>, or faulting with a <see cref="RealtimeException"/> if the push times out first.
+    /// Awaits a reply for a given <see cref="Channel.Push"/>, resolving with the reply, or faulting with a
+    /// <see cref="RealtimeException"/> if the push times out first.
     ///
     /// Kept as instance methods (rather than local lambdas referencing each other) so there's no
     /// self/mutually-referencing closure over locals that get assigned after the closure is created.
@@ -644,7 +677,7 @@ public class RealtimeChannel : IRealtimeChannel
     private sealed class PushAwaiter
     {
         private readonly Push push;
-        private readonly TaskCompletionSource<bool> taskCompletion = new();
+        private readonly TaskCompletionSource<SocketResponse?> taskCompletion = new();
 
         private PushAwaiter(Push push)
         {
@@ -655,12 +688,12 @@ public class RealtimeChannel : IRealtimeChannel
                 this.HandleMessageReceived(this.push, reply);
         }
 
-        public static Task<bool> Await(Push push) => new PushAwaiter(push).taskCompletion.Task;
+        public static Task<SocketResponse?> Await(Push push) => new PushAwaiter(push).taskCompletion.Task;
 
         private void HandleMessageReceived(IRealtimePush<RealtimeChannel, SocketResponse> sender, SocketResponse message)
         {
             this.Detach();
-            this.taskCompletion.TrySetResult(message.Payload?.Status == PhoenixStatusOk);
+            this.taskCompletion.TrySetResult(message);
         }
 
         private void HandleTimeout(object sender, EventArgs e)

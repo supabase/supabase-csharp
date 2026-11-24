@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Exceptions;
 
 namespace Supabase.Realtime.HttpSend;
@@ -30,9 +31,9 @@ internal sealed class HttpBroadcaster
         this.getHeaders = getHeaders;
     }
 
-    internal async Task SendAsync(RealtimeChannel channel, string eventName, object payload, CancellationToken cancellationToken)
+    internal async Task SendAsync(RealtimeChannel channel, string eventName, object payload, BroadcastPersistence? persistence, CancellationToken cancellationToken)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Post, this.BuildUrl(channel, eventName))
+        using var request = new HttpRequestMessage(HttpMethod.Post, this.BuildUrl(channel, eventName, persistence))
         {
             Content = BuildContent(payload, channel.Options.SerializerSettings)
         };
@@ -45,13 +46,15 @@ internal sealed class HttpBroadcaster
             throw new RealtimeException(await response.Content.ReadAsStringAsync()) { StatusCode = (int) response.StatusCode };
     }
 
-    private string BuildUrl(RealtimeChannel channel, string eventName)
+    private string BuildUrl(RealtimeChannel channel, string eventName, BroadcastPersistence? persistence)
     {
         var topic = channel.Topic.StartsWith(TopicPrefix, StringComparison.Ordinal)
             ? channel.Topic.Substring(TopicPrefix.Length)
             : channel.Topic;
         var url = $"{this.endpoint}/{Uri.EscapeDataString(topic)}/events/{Uri.EscapeDataString(eventName)}";
-        return channel.Options.IsPrivate ? $"{url}?private=true" : url;
+        if (!channel.Options.IsPrivate)
+            return url;
+        return persistence == null ? $"{url}?private=true" : $"{url}?private=true&{persistence.Query}";
     }
 
     private static HttpContent BuildContent(object payload, JsonSerializerOptions serializerOptions) =>

@@ -5,6 +5,7 @@ using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
+using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Channel;
 using Supabase.Realtime.Exceptions;
 using WireMock;
@@ -75,6 +76,36 @@ public class HttpSendRequestTests
     {
         await this.Channel(options: Wire.PrivateOptions()).HttpSendAsync("cursor", new { x = 1 });
         this.SentRequest().RawQuery.Should().Be("?private=true");
+    }
+
+    [TestMethod]
+    [DataRow(null, "?private=true&persist=true")]
+    [DataRow(3600, "?private=true&persist[ttl]=3600")]
+    [DataRow(0, "?private=true&persist[ttl]=0")]
+    public async Task HttpSendAsync_ShouldAskToStoreTheMessageInTheQuery_GivenAPersistence(int? ttlSeconds, string query)
+    {
+        await this.Channel(options: Wire.PrivateOptions()).HttpSendAsync("cursor", new { x = 1 }, new BroadcastPersistence(ttlSeconds is { } seconds ? TimeSpan.FromSeconds(seconds) : null));
+        var sent = this.SentRequest();
+        using (new AssertionScope())
+        {
+            sent.RawQuery.Should().Be(query, "the server reads persist only from the query string, and owns the range of the ttl");
+            sent.Body.Should().Be("""{"x":1}""", "a persist key in the body would be delivered as data");
+        }
+    }
+
+    [TestMethod]
+    public async Task HttpSendAsync_ShouldThrowAndSendNothing_GivenAPersistenceOnAPublicChannel()
+    {
+        var act = () => this.Channel().HttpSendAsync("cursor", new { x = 1 }, new BroadcastPersistence());
+        (await act.Should().ThrowAsync<RealtimeException>()).WithMessage("A persisted broadcast needs a private channel.");
+        this.server.LogEntries.Should().BeEmpty("the server answers 422 to persist on a public channel");
+    }
+
+    [TestMethod]
+    public async Task HttpSendAsync_ShouldThrow_GivenNoPersistence()
+    {
+        var act = () => this.Channel(options: Wire.PrivateOptions()).HttpSendAsync("cursor", new { x = 1 }, null!);
+        await act.Should().ThrowAsync<ArgumentNullException>();
     }
 
     [TestMethod]

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
@@ -127,5 +128,35 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
 
         if (!await this.channel.Send(ChannelEventName.Broadcast, null, new BinaryBroadcast(broadcastEventName, (byte[]) payload.Clone()), timeoutMs).ConfigureAwait(false))
             throw new RealtimeException("The server rejected the broadcast of bytes.");
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("realtime.channel.broadcast_persist")]
+    public async Task SendAsync(string eventName, object payload, BroadcastPersistence persistence, int timeoutMs = DefaultTimeout)
+    {
+        this.channel.EnsureCanPersist(persistence);
+        if (payload is BaseBroadcast)
+            throw new ArgumentException("A persisted broadcast takes the payload itself, not a BaseBroadcast.", nameof(payload));
+        if (this.channel.Options.ClientOptions.ProtocolVersion != ProtocolVersion.V2)
+            throw new RealtimeException("A persisted broadcast needs ClientOptions.ProtocolVersion set to V2.");
+        if (!WireFrame.Fits(eventName))
+            throw new ArgumentException("The event name of a persisted broadcast must fit in 255 bytes.", nameof(eventName));
+        if (!WireFrame.Fits(this.channel.Topic))
+            throw new RealtimeException("The topic of a persisted broadcast must fit in 255 bytes.");
+
+        var reply = await this.channel.SendForReply(ChannelEventName.Broadcast, null, this.PersistedBroadcast(eventName, payload, persistence), timeoutMs).ConfigureAwait(false);
+        if (reply != null && reply.Payload?.Status != PhoenixStatusOk)
+            throw NotStored(reply);
+    }
+
+    private BinaryBroadcast PersistedBroadcast(string eventName, object payload, BroadcastPersistence persistence) =>
+        payload is byte[] bytes
+            ? new BinaryBroadcast(eventName, (byte[]) bytes.Clone(), metadata: persistence.Metadata)
+            : new BinaryBroadcast(eventName, JsonSerializer.SerializeToUtf8Bytes(payload, this.serializerSettings), isJson: true, persistence.Metadata);
+
+    private static RealtimeException NotStored(SocketResponse reply)
+    {
+        var code = reply.Payload?.Response is Dictionary<string, object> body && body.TryGetValue("error", out var error) ? error as string : null;
+        return new RealtimeException($"The server did not store the broadcast ({code}).") { Reason = FailureHint.Parse(code) };
     }
 }
