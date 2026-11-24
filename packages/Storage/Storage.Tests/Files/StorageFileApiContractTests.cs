@@ -378,6 +378,25 @@ public class StorageFileApiContractTests
     }
 
     [TestMethod]
+    public async Task Download_ShouldReplaceTheFile_GivenALongerFileAtTheLocalPath()
+    {
+        var payload = Encoding.UTF8.GetBytes("new");
+        this.server.Given(Request.Create().WithPath($"/storage/v1/object/{Bucket}/a.bin").UsingGet())
+            .RespondWith(Response.Create().WithStatusCode(200).WithBody(payload));
+        var localPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.bin");
+        try
+        {
+            await File.WriteAllTextAsync(localPath, "a longer old file");
+            await this.client.From(Bucket).Download("a.bin", localPath, (EventHandler<float>?) null);
+            (await File.ReadAllBytesAsync(localPath)).Should().Equal(payload, "no byte of the old file may be left after the download");
+        }
+        finally
+        {
+            File.Delete(localPath);
+        }
+    }
+
+    [TestMethod]
     public async Task Download_ShouldSendTheCacheNonceInTheQuery_GivenACacheNonce()
     {
         this.server.Given(Request.Create().WithPath($"/storage/v1/object/{Bucket}/a.bin").UsingGet())
