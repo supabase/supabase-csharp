@@ -34,7 +34,7 @@ public class DiagnosticLoggingWiringTests
             client.Realtime.Options.Logger.Should().NotBeNull();
             client.Storage.Options.Logger.Should().NotBeNull();
             factory.Received(1).CreateLogger("Supabase.Gotrue");
-            factory.Received(1).CreateLogger("Supabase.Postgrest");
+            factory.Received(1).CreateLogger("supabase.postgrest");
             factory.Received(1).CreateLogger("Supabase.Functions");
             factory.Received(1).CreateLogger("Supabase.Realtime");
             factory.Received(1).CreateLogger("Supabase.Storage");

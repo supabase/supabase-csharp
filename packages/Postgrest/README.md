@@ -316,12 +316,18 @@ builder.Services.AddOpenTelemetry()
 Once subscribed you get:
 
 - A client span per request, named `{METHOD} {path}` and following OpenTelemetry HTTP conventions
-  (method, status code, and a sanitized URL). The query string is **never** recorded — in PostgREST
-  it carries the column filters and their values, which are potential PII. A `db.operation` tag
-  (`select`, `insert`, `update`, `upsert`, `delete`, `count`, `rpc`) distinguishes the logical
-  operation, since several map to the same HTTP verb.
-- A `supabase.postgrest.http.request.duration` histogram (seconds), tagged with method, host, path,
-  operation, and status code.
+  (method, status code, `url.full`). Filter values are potential PII, so every query value in
+  `url.full` is replaced by `REDACTED`. Keys are kept, except that the values of `select`, `order`,
+  `limit` and `offset` are left as is. For example,
+  `?select=id,email&email=eq.john@doe.com&limit=10` is recorded as
+  `?select=id,email&email=REDACTED&limit=10` (the client percent-encodes the query it sends, so a
+  comma appears as `%2c`).
+- Supabase attributes on the span and the metric: `supabase.postgrest.operation` (`select`, `insert`,
+  `update`, `upsert`, `delete`, `rpc`; a count is a `select`), `supabase.postgrest.table` for table
+  calls and `supabase.postgrest.function` for RPC calls.
+- The standard `http.client.request.duration` histogram (seconds) on the `supabase.postgrest` meter,
+  tagged with method, server address and port, scheme, status code, error type and the Supabase
+  attributes. It carries no URL.
 
 If you are not using the OpenTelemetry SDK, a raw listener works too:
 
