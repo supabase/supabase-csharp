@@ -43,4 +43,33 @@ public class ErrorResponseTests
             parsed!.Code.Should().BeNull();
         }
     }
+
+    [TestMethod]
+    public void TryParse_ShouldReadMessageAndTypeAsCode_GivenIcebergEnvelope()
+    {
+        var parsed = ErrorResponse.TryParse(
+            "{\"error\":{\"message\":\"Catalog name \\\"x\\\" not found\",\"type\":\"NoSuchCatalog\",\"code\":404}}");
+        using (new AssertionScope())
+        {
+            parsed.Should().NotBeNull();
+            parsed!.Message.Should().Be("Catalog name \"x\" not found", "the Iceberg routes nest the message under error");
+            parsed.Code.Should().Be("NoSuchCatalog", "the Iceberg routes name the failure in error.type");
+        }
+    }
+
+    [TestMethod]
+    public void TryParse_ShouldKeepTopLevelFields_GivenErrorIsAString()
+    {
+        var parsed = ErrorResponse.TryParse(
+            "{\"statusCode\":\"404\",\"error\":\"not_found\",\"code\":\"NoSuchKey\",\"message\":\"Object not found\"}");
+        using (new AssertionScope())
+        {
+            parsed!.Code.Should().Be("NoSuchKey");
+            parsed.Message.Should().Be("Object not found");
+        }
+    }
+
+    [TestMethod]
+    public void TryParse_ShouldReturnNull_GivenNonObjectJson() =>
+        ErrorResponse.TryParse("[1]").Should().BeNull("a JSON array is not an error body");
 }
