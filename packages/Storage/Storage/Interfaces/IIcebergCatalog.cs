@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Storage.Common;
+using Supabase.Storage.CreateNamespace;
 using Supabase.Storage.ListNamespaces;
 
 namespace Supabase.Storage.Interfaces;
@@ -31,6 +32,31 @@ public interface IIcebergCatalog
     /// </example>
     [ImplementedCapability("storage.analytics.namespace_exists")]
     Task<bool> NamespaceExistsAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Creates a namespace. Creating a namespace that already exists succeeds: Storage merges the given properties into
+    /// the stored ones, where the Iceberg REST spec answers 409.
+    /// </summary>
+    /// <param name="namespace">The namespace to create. The service validates its name and only accepts a single level today.</param>
+    /// <param name="options">Optional properties to store against the namespace.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The namespace as the service stored it, with all its properties after the merge.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="namespace"/> is null.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the name is invalid (status 400, <c>Code</c> <c>InvalidParameter</c>),
+    /// the bucket does not exist (status 404, <c>Code</c> <c>NoSuchCatalog</c>), the namespace limit is reached
+    /// (status 409, <c>Code</c> <c>IcebergMaximumResourceLimit</c>) or the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var created = await catalog.CreateNamespaceAsync(
+    ///     IcebergNamespace.Of("sales"),
+    ///     new CreateNamespaceOptions { Properties = new Dictionary&lt;string, string&gt; { ["owner"] = "data-team" } });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.create_namespace")]
+    Task<IcebergNamespaceDetails> CreateNamespaceAsync(IcebergNamespace @namespace, CreateNamespaceOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Lists the namespaces of the analytics bucket, one page at a time. Storage ignores the options today and returns
