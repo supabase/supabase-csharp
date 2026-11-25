@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -51,6 +52,13 @@ public class ClientOptions
     /// query strings or header values.
     /// </summary>
     public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
+
+    /// <summary>
+    /// The clock the auto-refresh timer and the retry backoff wait on. Defaults to <see cref="System.TimeProvider.System"/>;
+    /// supply another provider to run them from a host's own timers, such as a frame loop where OS timers never fire.
+    /// When a session is due for refresh is still measured against the system clock, as <see cref="Session.CreatedAt"/> is.
+    /// </summary>
+    public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 
     /// <summary>
     /// Should the Client automatically handle refreshing the User's Token?

@@ -1,3 +1,5 @@
 #nullable enable
 *REMOVED*const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "Supabase.Postgrest" -> string!
 const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "supabase.postgrest" -> string!
+Supabase.Postgrest.ClientOptions.TimeProvider.get -> System.TimeProvider!
+Supabase.Postgrest.ClientOptions.TimeProvider.set -> void

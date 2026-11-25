@@ -71,7 +71,8 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             Proxy = this.options.Proxy,
             Retry = this.options.GotrueRetry,
             TracePropagation = this.options.TracePropagation,
-            Logger = this.options.LoggerFor(GotrueDiagnostics.SourceName)
+            Logger = this.options.LoggerFor(GotrueDiagnostics.SourceName),
+            TimeProvider = this.options.TimeProvider
         })
         {
             GetHeaders = () => this.GetAuthHeaders(),
@@ -205,6 +206,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             Retry = this.options.PostgrestRetry,
             TracePropagation = this.options.TracePropagation,
             Logger = this.options.LoggerFor(Supabase.Postgrest.PostgrestDiagnostics.SourceName),
+            TimeProvider = this.options.TimeProvider,
             Timeout = this.options.PostgrestTimeout,
             HttpClient = this.options.HttpClient,
             Proxy = this.options.Proxy,
@@ -220,6 +222,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             PostgrestClient = this.postgrest,
             WebSocketFactory = this.options.WebSocketFactory,
             Logger = this.options.LoggerFor(SupabaseOptions.RealtimeLoggerCategory),
+            TimeProvider = this.options.TimeProvider,
             RetrieveAccessToken = ThirdPartyAuthorization.RealtimeAccessToken(thirdPartyAccessToken, this.supabaseKey)
         };
         this.realtime = new Realtime.Client(realtimeUrl, realtimeOptions);
@@ -236,6 +239,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             Retry = this.options.FunctionsRetry,
             TracePropagation = this.options.TracePropagation,
             Logger = this.options.LoggerFor(Supabase.Functions.FunctionsDiagnostics.SourceName),
+            TimeProvider = this.options.TimeProvider,
             RetrieveAccessToken = thirdPartyAccessToken
         });
         // Edge Functions must not receive a new-format (opaque) API key on the Authorization
@@ -256,6 +260,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             Retry = this.options.GotrueRetry,
             TracePropagation = this.options.TracePropagation,
             Logger = this.options.LoggerFor(GotrueDiagnostics.SourceName),
+            TimeProvider = this.options.TimeProvider,
             FlowType = this.options.AuthFlowType
         });
         supabaseAuth.SetPersistence(this.options.SessionHandler);

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Core.Http;
 
@@ -35,6 +36,7 @@ public class StorageOptionsCopyTests
         [typeof(RetryOptions)] = position => new RetryOptions { MaxRetries = position + 1 },
         [typeof(TracePropagation)] = _ => TracePropagation.Disabled,
         [typeof(ILogger)] = _ => NullLogger.Instance,
+        [typeof(TimeProvider)] = _ => new FakeTimeProvider(),
     };
 
     public static IEnumerable<object[]> CarriedSettings => CarriedSettingsOf().Select(setting => new object[] { setting.Name });

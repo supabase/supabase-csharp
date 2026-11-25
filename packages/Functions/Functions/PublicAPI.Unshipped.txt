@@ -1,3 +1,5 @@
 #nullable enable
 *REMOVED*const Supabase.Functions.FunctionsDiagnostics.SourceName = "Supabase.Functions" -> string!
 const Supabase.Functions.FunctionsDiagnostics.SourceName = "supabase.functions" -> string!
+Supabase.Functions.ClientOptions.TimeProvider.get -> System.TimeProvider!
+Supabase.Functions.ClientOptions.TimeProvider.init -> void

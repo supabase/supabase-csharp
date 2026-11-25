@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Core.Http;
 using Supabase.Realtime.Sockets;
@@ -58,6 +59,63 @@ public class ClientHttpInjectionTests
             client.Postgrest.Options.Retry.Should().BeSameAs(postgrestRetry);
             ((Supabase.Functions.Client) client.Functions).Options.Retry.Should().BeSameAs(functionsRetry);
         }
+    }
+
+    [TestMethod]
+    public void Client_ShouldMirrorTimeProviderToEveryChildClient()
+    {
+        var clock = new FakeTimeProvider();
+        var client = new Client("http://localhost:54321", "test-key", new SupabaseOptions { TimeProvider = clock });
+        using (new AssertionScope())
+        {
+            client.Auth.Options.TimeProvider.Should().BeSameAs(clock, "the auth refresh timer and retry backoff must wait on the supplied clock");
+            client.Postgrest.Options.TimeProvider.Should().BeSameAs(clock, "the request timeout and retry backoff must wait on the supplied clock");
+            ((Supabase.Functions.Client) client.Functions).Options.TimeProvider.Should().BeSameAs(clock, "the invocation timeout and retry backoff must wait on the supplied clock");
+            ((Supabase.Storage.Client) client.Storage).Options.TimeProvider.Should().BeSameAs(clock, "the retry backoff must wait on the supplied clock");
+            client.Realtime.Options.TimeProvider.Should().BeSameAs(clock, "every realtime timer must wait on the supplied clock");
+        }
+    }
+
+    [TestMethod]
+    public void Client_ShouldMirrorTimeProviderToAdminAuth()
+    {
+        var clock = new FakeTimeProvider();
+        var admin = new Client("http://localhost:54321", "test-key", new SupabaseOptions { TimeProvider = clock }).AdminAuth("service-key");
+        ((Supabase.Gotrue.AdminClient) admin).Options.TimeProvider.Should().BeSameAs(clock, "admin auth retry backoff must wait on the supplied clock");
+    }
+
+    [TestMethod]
+    public void Client_ShouldLeaveEveryChildClientOnTheSystemClock_GivenNoTimeProvider()
+    {
+        var client = new Client("http://localhost:54321", "test-key", new SupabaseOptions());
+        using (new AssertionScope())
+        {
+            client.Auth.Options.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            client.Postgrest.Options.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            ((Supabase.Functions.Client) client.Functions).Options.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            ((Supabase.Storage.Client) client.Storage).Options.TimeProvider.Should().BeSameAs(TimeProvider.System);
+            client.Realtime.Options.TimeProvider.Should().BeSameAs(TimeProvider.System);
+        }
+    }
+
+    [TestMethod]
+    public void Client_ShouldKeepTheStorageTimeProvider_GivenNoTimeProviderOnSupabaseOptions()
+    {
+        var storageClock = new FakeTimeProvider();
+        var options = new SupabaseOptions { StorageClientOptions = new Supabase.Storage.ClientOptions { TimeProvider = storageClock } };
+        ((Supabase.Storage.Client) new Client("http://localhost:54321", "test-key", options).Storage).Options.TimeProvider.Should().BeSameAs(storageClock);
+    }
+
+    [TestMethod]
+    public void Client_ShouldPreferTheSupabaseTimeProviderToTheStorageOne_GivenBoth()
+    {
+        var supabaseClock = new FakeTimeProvider();
+        var options = new SupabaseOptions
+        {
+            TimeProvider = supabaseClock,
+            StorageClientOptions = new Supabase.Storage.ClientOptions { TimeProvider = new FakeTimeProvider() }
+        };
+        ((Supabase.Storage.Client) new Client("http://localhost:54321", "test-key", options).Storage).Options.TimeProvider.Should().BeSameAs(supabaseClock);
     }
 
     [TestMethod]

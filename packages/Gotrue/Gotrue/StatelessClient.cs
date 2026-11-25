@@ -116,7 +116,8 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
         new Api(options.Url, options.Headers, Helpers.ResolveHttpClient(options.HttpClient, options.Proxy), options.Retry)
         {
             TracePropagation = options.TracePropagation,
-            Logger = options.Logger
+            Logger = options.Logger,
+            TimeProvider = options.TimeProvider
         };
 
     /// <inheritdoc />
@@ -379,6 +380,12 @@ public class StatelessClient : IGotrueStatelessClient<User, Session>
         /// query strings or header values.
         /// </summary>
         public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
+
+        /// <summary>
+        /// The clock the retry backoff waits on. Defaults to <see cref="System.TimeProvider.System"/>; supply another provider
+        /// to run it from a host's own timers, such as a frame loop where OS timers never fire.
+        /// </summary>
+        public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 
         /// <summary>
         ///     Allows sign-in to return a session for an unconfirmed user. Defaults to false.

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Core.Http;
 using Supabase.Functions;
@@ -291,6 +292,20 @@ public class ClientContractTests
             .RespondWith(Response.Create().WithStatusCode(200).WithDelay(TimeSpan.FromMilliseconds(200)));
         var act = () => this.client.Invoke(FunctionName, options: new InvokeFunctionOptions { HttpTimeout = TimeSpan.FromMilliseconds(20) });
         (await act.Should().ThrowAsync<TaskCanceledException>()).Which.InnerException.Should().BeOfType<TimeoutException>();
+    }
+
+    [TestMethod]
+    public async Task Invoke_ShouldThrowTimeoutException_GivenTheSuppliedClockReachedTheHttpTimeout()
+    {
+        this.server.Given(Request.Create().WithPath($"/functions/v1/{FunctionName}").UsingAnyMethod())
+            .RespondWith(Response.Create().WithStatusCode(200).WithDelay(TimeSpan.FromMinutes(1)));
+        var clock = new FakeTimeProvider();
+        this.client = new Client($"{this.server.Url}/functions/v1", options: new ClientOptions { TimeProvider = clock });
+        var invoke = this.client.Invoke(FunctionName, options: new InvokeFunctionOptions { HttpTimeout = TimeSpan.FromHours(1) });
+        clock.Advance(TimeSpan.FromHours(1));
+        var act = () => invoke;
+        (await act.Should().ThrowAsync<TaskCanceledException>().WaitAsync(Deadline)).Which.InnerException.Should().BeOfType<TimeoutException>(
+            "the timeout runs on the supplied clock, so an hour there outlasts a response a minute away on the system one");
     }
 
     [TestMethod]
