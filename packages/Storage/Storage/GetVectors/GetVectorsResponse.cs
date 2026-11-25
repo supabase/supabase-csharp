@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -7,10 +8,9 @@ namespace Supabase.Storage.GetVectors;
 
 internal sealed class GetVectorsResponse
 {
-    [JsonRequired]
     [JsonPropertyName("vectors")]
-    public IReadOnlyList<StoredVectorBody> Vectors { get; init; } = null!;
+    public IReadOnlyList<StoredVectorBody>? Vectors { get; init; }
 
     internal IReadOnlyList<StoredVector> ToStoredVectors() =>
-        this.Vectors.Select(vector => vector.ToStoredVector()).ToList();
+        (this.Vectors ?? Array.Empty<StoredVectorBody>()).Select(vector => vector.ToStoredVector()).ToList();
 }
