@@ -63,7 +63,7 @@ public class ListVectorsContractTests
         using (new AssertionScope())
         {
             page.Items.Select(vector => vector.Key).Should().Equal("doc-1", "doc-2");
-            page.Items[0].Data.Should().Equal(0.5f, 0.25f);
+            page.Items[0].Data!.Float32.Should().Equal(0.5f, 0.25f);
             page.Items[0].Metadata!["title"].GetString().Should().Be("Intro");
             page.Items[1].Should().Be(new StoredVector { Key = "doc-2" });
             page.NextToken.Should().Be("doc-2");

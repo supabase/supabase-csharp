@@ -11,8 +11,11 @@ public sealed record StoredVector
     /// <summary>The key that identifies the vector within its index.</summary>
     public required string Key { get; init; }
 
-    /// <summary>The components of the vector, or null when the call did not ask for them.</summary>
-    public IReadOnlyList<float>? Data { get; init; }
+    /// <summary>
+    /// The components of the vector and their type, or null when the call did not ask for them. Read float32
+    /// components with <c>vector.Data?.Float32</c>.
+    /// </summary>
+    public VectorData? Data { get; init; }
 
     /// <summary>
     /// The metadata stored with the vector, or null when the call did not ask for it. Empty when the vector has none.

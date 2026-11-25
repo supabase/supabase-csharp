@@ -60,7 +60,7 @@ public class VectorListingTests : VectorIndexE2EFixture
         var vector = page.Items.Single(item => item.Key == "doc-1");
         using (new AssertionScope())
         {
-            vector.Data.Should().Equal(0.5f, 0.25f);
+            vector.Data!.Float32.Should().Equal(0.5f, 0.25f);
             vector.Metadata!["title"].GetString().Should().Be("Intro");
         }
     }

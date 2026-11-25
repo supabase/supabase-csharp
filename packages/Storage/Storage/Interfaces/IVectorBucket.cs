@@ -40,7 +40,8 @@ public interface IVectorBucket
     /// </exception>
     /// <exception cref="Exceptions.SupabaseStorageException">
     /// The service refused the call, for example because the bucket does not exist
-    /// (<c>Code</c> <c>S3VectorNotFoundException</c>) or the settings are invalid (status 400).
+    /// (<c>Code</c> <c>NotFoundException</c>), an index of that name already exists (<c>Code</c> <c>ConflictException</c>)
+    /// or the settings are invalid (<c>Code</c> <c>InvalidRequest</c>).
     /// </exception>
     /// <example>
     /// <code>
@@ -115,7 +116,7 @@ public interface IVectorBucket
     /// </exception>
     /// <exception cref="Exceptions.SupabaseStorageException">
     /// The service refused the call, for example because the bucket or the index does not exist
-    /// (<c>Code</c> <c>S3VectorNotFoundException</c>).
+    /// (<c>Code</c> <c>NotFoundException</c>).
     /// </exception>
     /// <example>
     /// <code>
