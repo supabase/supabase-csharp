@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Storage.Common;
 using Supabase.Storage.ListVectors;
+using Supabase.Storage.PutVectors;
 using Supabase.Storage.QueryVectors;
 
 namespace Supabase.Storage.Interfaces;
@@ -83,6 +84,36 @@ public interface IVectorIndex
     /// </example>
     [ImplementedCapability("storage.vector_buckets.list_vectors")]
     Task<VectorListPage<StoredVector>> ListVectorsAsync(ListVectorsOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Stores the vectors in this index. A vector whose key is already in use replaces the stored one. Requires a
+    /// service-role key.
+    /// </summary>
+    /// <param name="vectors">
+    /// The vectors to store. The service judges the batch size, each key, the component count and the metadata.
+    /// </param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <exception cref="System.ArgumentNullException"><paramref name="vectors"/> is null.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the bucket or the index does not exist
+    /// (<c>Code</c> <c>NotFoundException</c>) or the batch is invalid, such as an empty batch, an empty or duplicated
+    /// key or more vectors than the service accepts at once (<c>Code</c> <c>InvalidRequest</c> or <c>InvalidParameter</c>).
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// await storage.Vectors.From("embeddings-prod").Index("docs-v1").PutVectorsAsync(new[]
+    /// {
+    ///     new NewVector
+    ///     {
+    ///         Key = "doc-1",
+    ///         Data = new[] { 0.5f, 0.25f },
+    ///         Metadata = new Dictionary&lt;string, JsonElement&gt; { ["title"] = JsonSerializer.SerializeToElement("Intro") },
+    ///     },
+    /// });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.vector_buckets.put_vectors")]
+    Task PutVectorsAsync(IReadOnlyCollection<NewVector> vectors, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Searches this index for the vectors closest to the query vector, nearest first. Requires a service-role key.

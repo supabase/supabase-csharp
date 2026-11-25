@@ -35,6 +35,9 @@ override Supabase.Storage.ListVectors.ListVectorsOptions.ToString() -> string!
 override Supabase.Storage.ListVectors.VectorSegment.Equals(object? obj) -> bool
 override Supabase.Storage.ListVectors.VectorSegment.GetHashCode() -> int
 override Supabase.Storage.ListVectors.VectorSegment.ToString() -> string!
+override Supabase.Storage.PutVectors.NewVector.Equals(object? obj) -> bool
+override Supabase.Storage.PutVectors.NewVector.GetHashCode() -> int
+override Supabase.Storage.PutVectors.NewVector.ToString() -> string!
 override Supabase.Storage.QueryVectors.QueryVectorsOptions.Equals(object? obj) -> bool
 override Supabase.Storage.QueryVectors.QueryVectorsOptions.GetHashCode() -> int
 override Supabase.Storage.QueryVectors.QueryVectorsOptions.ToString() -> string!
@@ -71,6 +74,8 @@ static Supabase.Storage.ListVectors.ListVectorsOptions.operator !=(Supabase.Stor
 static Supabase.Storage.ListVectors.ListVectorsOptions.operator ==(Supabase.Storage.ListVectors.ListVectorsOptions? left, Supabase.Storage.ListVectors.ListVectorsOptions? right) -> bool
 static Supabase.Storage.ListVectors.VectorSegment.operator !=(Supabase.Storage.ListVectors.VectorSegment? left, Supabase.Storage.ListVectors.VectorSegment? right) -> bool
 static Supabase.Storage.ListVectors.VectorSegment.operator ==(Supabase.Storage.ListVectors.VectorSegment? left, Supabase.Storage.ListVectors.VectorSegment? right) -> bool
+static Supabase.Storage.PutVectors.NewVector.operator !=(Supabase.Storage.PutVectors.NewVector? left, Supabase.Storage.PutVectors.NewVector? right) -> bool
+static Supabase.Storage.PutVectors.NewVector.operator ==(Supabase.Storage.PutVectors.NewVector? left, Supabase.Storage.PutVectors.NewVector? right) -> bool
 static Supabase.Storage.QueryVectors.QueryVectorsOptions.operator !=(Supabase.Storage.QueryVectors.QueryVectorsOptions? left, Supabase.Storage.QueryVectors.QueryVectorsOptions? right) -> bool
 static Supabase.Storage.QueryVectors.QueryVectorsOptions.operator ==(Supabase.Storage.QueryVectors.QueryVectorsOptions? left, Supabase.Storage.QueryVectors.QueryVectorsOptions? right) -> bool
 static Supabase.Storage.QueryVectors.VectorMatch.operator !=(Supabase.Storage.QueryVectors.VectorMatch? left, Supabase.Storage.QueryVectors.VectorMatch? right) -> bool
@@ -160,6 +165,7 @@ Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.DeleteBucketLifecycleAsyn
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi
+Supabase.Storage.Interfaces.IStorageVectorBucketApi.CreateVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi.DeleteVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi.From(string! vectorBucketName) -> Supabase.Storage.Interfaces.IVectorBucket!
 Supabase.Storage.Interfaces.IVectorBucket
@@ -176,6 +182,7 @@ Supabase.Storage.Interfaces.IVectorIndex
 Supabase.Storage.Interfaces.IVectorIndex.DeleteVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IVectorIndex.GetVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, Supabase.Storage.Common.VectorContent include = Supabase.Storage.Common.VectorContent.None, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.StoredVector!>!>!
 Supabase.Storage.Interfaces.IVectorIndex.ListVectorsAsync(Supabase.Storage.ListVectors.ListVectorsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.VectorListPage<Supabase.Storage.Common.StoredVector!>!>!
+Supabase.Storage.Interfaces.IVectorIndex.PutVectorsAsync(System.Collections.Generic.IReadOnlyCollection<Supabase.Storage.PutVectors.NewVector!>! vectors, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IVectorIndex.QueryVectorsAsync(System.Collections.Generic.IReadOnlyList<float>! queryVector, int topK, Supabase.Storage.QueryVectors.QueryVectorsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.QueryVectors.VectorQueryResult!>!
 Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort
 Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.<Clone>$() -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort!
@@ -241,6 +248,16 @@ Supabase.Storage.ListVectors.VectorSegment.Equals(Supabase.Storage.ListVectors.V
 Supabase.Storage.ListVectors.VectorSegment.Index.get -> int
 Supabase.Storage.ListVectors.VectorSegment.Index.init -> void
 Supabase.Storage.ListVectors.VectorSegment.VectorSegment(int Index, int Count) -> void
+Supabase.Storage.PutVectors.NewVector
+Supabase.Storage.PutVectors.NewVector.<Clone>$() -> Supabase.Storage.PutVectors.NewVector!
+Supabase.Storage.PutVectors.NewVector.Data.get -> System.Collections.Generic.IReadOnlyList<float>!
+Supabase.Storage.PutVectors.NewVector.Data.init -> void
+Supabase.Storage.PutVectors.NewVector.Equals(Supabase.Storage.PutVectors.NewVector? other) -> bool
+Supabase.Storage.PutVectors.NewVector.Key.get -> string!
+Supabase.Storage.PutVectors.NewVector.Key.init -> void
+Supabase.Storage.PutVectors.NewVector.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
+Supabase.Storage.PutVectors.NewVector.Metadata.init -> void
+Supabase.Storage.PutVectors.NewVector.NewVector() -> void
 Supabase.Storage.QueryVectors.QueryVectorsOptions
 Supabase.Storage.QueryVectors.QueryVectorsOptions.<Clone>$() -> Supabase.Storage.QueryVectors.QueryVectorsOptions!
 Supabase.Storage.QueryVectors.QueryVectorsOptions.Equals(Supabase.Storage.QueryVectors.QueryVectorsOptions? other) -> bool
