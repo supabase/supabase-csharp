@@ -25,6 +25,27 @@ public interface IStorageVectorBucketApi
     IVectorBucket From(string vectorBucketName);
 
     /// <summary>
+    /// Creates a vector bucket, which holds vector indexes. Requires a service-role key.
+    /// </summary>
+    /// <param name="vectorBucketName">The name of the vector bucket to create. The service validates it.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <exception cref="System.ArgumentException">
+    /// <paramref name="vectorBucketName"/> is null, empty or whitespace.
+    /// </exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the bucket already exists
+    /// (<c>Code</c> <c>ConflictException</c>, status 409) or the project reached its bucket quota
+    /// (<c>Code</c> <c>S3VectorMaxBucketsExceeded</c>, status 400).
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// await storage.Vectors.CreateVectorBucketAsync("embeddings-prod");
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.vector_buckets.create_vector_bucket")]
+    Task CreateVectorBucketAsync(string vectorBucketName, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Deletes an empty vector bucket. The service rejects the call while the bucket still has
     /// indexes, and accepts it for a bucket that does not exist. Requires a service-role key.
     /// </summary>
