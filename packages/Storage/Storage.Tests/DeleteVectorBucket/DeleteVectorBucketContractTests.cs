@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -66,12 +67,11 @@ public class DeleteVectorBucketContractTests
     }
 
     [TestMethod]
-    [DataRow(400, "S3VectorBucketNotEmpty", "the service refuses to delete a bucket that still has indexes")]
-    [DataRow(404, "S3VectorNotFoundException", "the bucket does not exist")]
-    [DataRow(500, "InternalError", "the service failed internally")]
-    public async Task DeleteVectorBucketAsync_ShouldThrowStorageException_GivenAServiceError(int status, string code, string because)
+    [DataRow(400, "VectorBucketNotEmpty", "VectorBucketNotEmpty", "Vector Bucket \"embeddings-prod\" not empty", "the service refuses to delete a bucket that still has indexes")]
+    [DataRow(500, "Internal", "InternalError", "Internal Server Error", "the service failed internally")]
+    public async Task DeleteVectorBucketAsync_ShouldThrowStorageException_GivenAServiceError(int status, string error, string code, string message, string because)
     {
-        this.Respond(status, $"{{\"statusCode\":\"{status}\",\"code\":\"{code}\",\"message\":\"refused\"}}");
+        this.Respond(status, JsonSerializer.Serialize(new { statusCode = status.ToString(), error, message, code }));
         var thrown = await FluentActions.Awaiting(() => this.client.Vectors.DeleteVectorBucketAsync("embeddings-prod"))
             .Should().ThrowAsync<SupabaseStorageException>(because);
         using (new AssertionScope())

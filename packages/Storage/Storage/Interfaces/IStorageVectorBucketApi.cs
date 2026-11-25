@@ -26,7 +26,7 @@ public interface IStorageVectorBucketApi
 
     /// <summary>
     /// Deletes an empty vector bucket. The service rejects the call while the bucket still has
-    /// indexes. Requires a service-role key.
+    /// indexes, and accepts it for a bucket that does not exist. Requires a service-role key.
     /// </summary>
     /// <param name="vectorBucketName">The name of the vector bucket to delete.</param>
     /// <param name="cancellationToken">Token used to cancel the request.</param>
@@ -34,8 +34,8 @@ public interface IStorageVectorBucketApi
     /// <paramref name="vectorBucketName"/> is null, empty or whitespace.
     /// </exception>
     /// <exception cref="Exceptions.SupabaseStorageException">
-    /// The service refused the call, for example because the bucket does not exist
-    /// (<c>Code</c> <c>S3VectorNotFoundException</c>) or is not empty (<c>Code</c> <c>S3VectorBucketNotEmpty</c>).
+    /// The service refused the call, for example because the bucket still has indexes
+    /// (<c>Code</c> <c>VectorBucketNotEmpty</c>, status 400).
     /// </exception>
     /// <example>
     /// <code>
