@@ -72,7 +72,8 @@ internal static class Helpers
         Dictionary<string, string> headers, CancellationToken cancellationToken = default) where T : class
     {
         var response = await MakeRequestAsync(httpClient, options, method, url, data, headers, cancellationToken).ConfigureAwait(false);
-        var content = await response.Content.ReadAsStringAsync();
+        // Stryker disable once Boolean : the body is already buffered and an earlier await left the caller's context
+        var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
         return JsonBodyReader.Deserialize<T>(content, SerializerOptions, e => new SupabaseStorageException(e.Message, e)
         {
@@ -140,7 +141,8 @@ internal static class Helpers
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 
-            var content = await response.Content.ReadAsStringAsync();
+            // Stryker disable once Boolean : the body is already buffered and an earlier await left the caller's context
+            var content = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!response.IsSuccessStatusCode)
             {
