@@ -1,0 +1,1 @@
+﻿{"vectorBucketName":"embeddings-prod","indexName":"docs-v1","keys":["doc-1","doc-2"]}

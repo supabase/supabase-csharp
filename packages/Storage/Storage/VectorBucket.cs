@@ -23,7 +23,7 @@ internal sealed class VectorBucket : IVectorBucket
     public IVectorIndex Index(string indexName)
     {
         VectorService.RequireName(indexName, nameof(indexName));
-        return new VectorIndex();
+        return new VectorIndex(this.vectorBucketName, indexName, this.service);
     }
 
     /// <inheritdoc />

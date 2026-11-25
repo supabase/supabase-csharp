@@ -69,6 +69,7 @@ Supabase.Storage.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Storage.ClientOptions.TimeProvider.set -> void
 Supabase.Storage.Interfaces.IVectorBucket.Index(string! indexName) -> Supabase.Storage.Interfaces.IVectorIndex!
 Supabase.Storage.Interfaces.IVectorIndex
+Supabase.Storage.Interfaces.IVectorIndex.DeleteVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort
 Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.<Clone>$() -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort!
 Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.AnalyticsBucketSort(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn Column, System.ComponentModel.ListSortDirection Direction = System.ComponentModel.ListSortDirection.Ascending) -> void
