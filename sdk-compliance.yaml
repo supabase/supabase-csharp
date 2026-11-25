@@ -932,6 +932,10 @@ features:
     status: implemented
     symbols:
       - IVectorIndex.DeleteVectorsAsync
+  storage.vector_buckets.get_index:
+    status: implemented
+    symbols:
+      - IVectorBucket.GetIndexAsync
   storage.vector_buckets.delete_vector_bucket:
     status: implemented
     symbols:
