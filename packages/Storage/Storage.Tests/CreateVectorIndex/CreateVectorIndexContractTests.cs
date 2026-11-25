@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -95,12 +96,13 @@ public class CreateVectorIndexContractTests
     }
 
     [TestMethod]
-    [DataRow(400, "InvalidRequest", "the service rejects invalid settings")]
-    [DataRow(404, "S3VectorNotFoundException", "the bucket does not exist")]
-    [DataRow(500, "InternalError", "the service failed internally")]
-    public async Task CreateIndexAsync_ShouldThrowStorageException_GivenAServiceError(int status, string code, string because)
+    [DataRow(400, "Error", "InvalidRequest", "body/dimension must be >= 1", "the service rejects invalid settings")]
+    [DataRow(404, "NotFoundException", "NotFoundException", "resource \"embeddings-prod\" not found", "the bucket does not exist")]
+    [DataRow(409, "ConflictException", "ConflictException", "vector index \"docs-v1\" already exists", "the bucket already holds an index of that name")]
+    [DataRow(500, "Internal", "InternalError", "Internal Server Error", "the service failed internally")]
+    public async Task CreateIndexAsync_ShouldThrowStorageException_GivenAServiceError(int status, string error, string code, string message, string because)
     {
-        this.Respond(status, $"{{\"statusCode\":\"{status}\",\"code\":\"{code}\",\"message\":\"refused\"}}");
+        this.Respond(status, JsonSerializer.Serialize(new { statusCode = status.ToString(), error, message, code }));
         var thrown = await FluentActions.Awaiting(() => this.client.Vectors.From("embeddings-prod").CreateIndexAsync(Index))
             .Should().ThrowAsync<SupabaseStorageException>(because);
         using (new AssertionScope())
