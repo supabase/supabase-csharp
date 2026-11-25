@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Supabase.Storage.NamespaceExists;
+using Supabase.Storage.Common;
 
-namespace Storage.Tests.NamespaceExists;
+namespace Storage.Tests.Common;
 
 /// <summary>
 /// Unit tests for how a namespace is written into a request path.

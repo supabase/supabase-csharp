@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Storage;
+using Supabase.Storage.Common;
 
 namespace Storage.Tests.NamespaceExists;
 
@@ -38,7 +39,7 @@ public class NamespaceExistsTests
     [DataRow(".")]
     [DataRow("..")]
     public async Task NamespaceExistsAsync_ShouldThrowArgumentException_GivenRelativeSegmentNamespace(string level) =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").NamespaceExistsAsync(Supabase.Storage.NamespaceExists.IcebergNamespace.Of(level)))
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").NamespaceExistsAsync(IcebergNamespace.Of(level)))
             .Should().ThrowAsync<ArgumentException>("a dot-segment level would reach another route"))
             .WithMessage("A namespace cannot be a relative path segment.*");
 }
