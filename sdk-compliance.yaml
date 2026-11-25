@@ -985,6 +985,14 @@ features:
     status: implemented
     symbols:
       - IStorageAnalyticsApi.DeleteBucketAsync
+  storage.analytics.namespace_exists:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.NamespaceExistsAsync
+  storage.analytics.access_catalog:
+    status: implemented
+    symbols:
+      - IStorageAnalyticsApi.From
 
   storage.configuration.auto_retry:
     status: implemented
