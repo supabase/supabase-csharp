@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
-using Supabase.Storage.NamespaceExists;
+using Supabase.Storage.Common;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -30,4 +30,24 @@ public interface IIcebergCatalog
     /// </example>
     [ImplementedCapability("storage.analytics.namespace_exists")]
     Task<bool> NamespaceExistsAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes an empty namespace.
+    /// </summary>
+    /// <param name="namespace">The namespace to delete.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <exception cref="System.ArgumentNullException"><paramref name="namespace"/> is null.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the namespace or its bucket does not exist (status 404,
+    /// <c>Code</c> <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>), the namespace still holds tables (status 400,
+    /// <c>Code</c> <c>IcebergResourceNotEmpty</c>) or the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// await catalog.DeleteNamespaceAsync(IcebergNamespace.Of("sales"));
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.delete_namespace")]
+    Task DeleteNamespaceAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default);
 }

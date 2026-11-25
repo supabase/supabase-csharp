@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Supabase.Storage.NamespaceExists;
+using Supabase.Storage.Common;
 
-namespace Storage.Tests.NamespaceExists;
+namespace Storage.Tests.Common;
 
 /// <summary>
 /// Unit tests for building the identifier of a namespace: which levels it refuses and how two identifiers compare.

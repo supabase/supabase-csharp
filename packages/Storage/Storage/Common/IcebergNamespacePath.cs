@@ -1,6 +1,4 @@
-using Supabase.Storage.Common;
-
-namespace Supabase.Storage.NamespaceExists;
+namespace Supabase.Storage.Common;
 
 internal static class IcebergNamespacePath
 {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Supabase.Storage.NamespaceExists;
+namespace Supabase.Storage.Common;
 
 /// <summary>
 /// The identifier of an Iceberg namespace: one or more levels, outermost first.
