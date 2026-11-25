@@ -1,0 +1,1 @@
+﻿{"vectorBucketName":"embeddings-prod"}
