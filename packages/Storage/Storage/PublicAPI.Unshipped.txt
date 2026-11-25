@@ -1,26 +1,36 @@
 #nullable enable
-override Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.Equals(object? obj) -> bool
-override Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.GetHashCode() -> int
-override Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.ToString() -> string!
+override Supabase.Storage.Common.AnalyticsBucket.Equals(object? obj) -> bool
+override Supabase.Storage.Common.AnalyticsBucket.GetHashCode() -> int
+override Supabase.Storage.Common.AnalyticsBucket.ToString() -> string!
 override Supabase.Storage.CreateVectorIndex.NewVectorIndex.Equals(object? obj) -> bool
 override Supabase.Storage.CreateVectorIndex.NewVectorIndex.GetHashCode() -> int
 override Supabase.Storage.CreateVectorIndex.NewVectorIndex.ToString() -> string!
-static Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.operator !=(Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket? left, Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket? right) -> bool
-static Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.operator ==(Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket? left, Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket? right) -> bool
+override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Equals(object? obj) -> bool
+override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.GetHashCode() -> int
+override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.ToString() -> string!
+override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Equals(object? obj) -> bool
+override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.GetHashCode() -> int
+override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.ToString() -> string!
+static Supabase.Storage.Common.AnalyticsBucket.operator !=(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
+static Supabase.Storage.Common.AnalyticsBucket.operator ==(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
 static Supabase.Storage.CreateVectorIndex.NewVectorIndex.operator !=(Supabase.Storage.CreateVectorIndex.NewVectorIndex? left, Supabase.Storage.CreateVectorIndex.NewVectorIndex? right) -> bool
 static Supabase.Storage.CreateVectorIndex.NewVectorIndex.operator ==(Supabase.Storage.CreateVectorIndex.NewVectorIndex? left, Supabase.Storage.CreateVectorIndex.NewVectorIndex? right) -> bool
+static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator !=(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? left, Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? right) -> bool
+static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator ==(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? left, Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? right) -> bool
+static Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.operator !=(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? right) -> bool
+static Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.operator ==(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? right) -> bool
 Supabase.Storage.Client.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Client.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.<Clone>$() -> Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket!
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.AnalyticsBucket() -> void
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.CreatedAt.get -> System.DateTimeOffset
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.CreatedAt.init -> void
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.Equals(Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket? other) -> bool
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.Name.get -> string!
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.Name.init -> void
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.UpdatedAt.get -> System.DateTimeOffset
-Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket.UpdatedAt.init -> void
+Supabase.Storage.Common.AnalyticsBucket
+Supabase.Storage.Common.AnalyticsBucket.<Clone>$() -> Supabase.Storage.Common.AnalyticsBucket!
+Supabase.Storage.Common.AnalyticsBucket.AnalyticsBucket() -> void
+Supabase.Storage.Common.AnalyticsBucket.CreatedAt.get -> System.DateTimeOffset
+Supabase.Storage.Common.AnalyticsBucket.CreatedAt.init -> void
+Supabase.Storage.Common.AnalyticsBucket.Equals(Supabase.Storage.Common.AnalyticsBucket? other) -> bool
+Supabase.Storage.Common.AnalyticsBucket.Name.get -> string!
+Supabase.Storage.Common.AnalyticsBucket.Name.init -> void
+Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.get -> System.DateTimeOffset
+Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.init -> void
 Supabase.Storage.CreateVectorIndex.NewVectorIndex
 Supabase.Storage.CreateVectorIndex.NewVectorIndex.<Clone>$() -> Supabase.Storage.CreateVectorIndex.NewVectorIndex!
 Supabase.Storage.CreateVectorIndex.NewVectorIndex.DataType.get -> Supabase.Storage.CreateVectorIndex.VectorDataType
@@ -41,8 +51,9 @@ Supabase.Storage.CreateVectorIndex.VectorDistanceMetric
 Supabase.Storage.CreateVectorIndex.VectorDistanceMetric.Cosine = 0 -> Supabase.Storage.CreateVectorIndex.VectorDistanceMetric
 Supabase.Storage.CreateVectorIndex.VectorDistanceMetric.Euclidean = 1 -> Supabase.Storage.CreateVectorIndex.VectorDistanceMetric
 Supabase.Storage.Interfaces.IStorageAnalyticsApi
-Supabase.Storage.Interfaces.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket!>!
+Supabase.Storage.Interfaces.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.AnalyticsBucket!>!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.DeleteBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.Interfaces.IStorageAnalyticsApi.ListBucketsAsync(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.AnalyticsBucket!>!>!
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
@@ -58,4 +69,29 @@ Supabase.Storage.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Storage.ClientOptions.TimeProvider.set -> void
 Supabase.Storage.Interfaces.IVectorBucket.Index(string! indexName) -> Supabase.Storage.Interfaces.IVectorIndex!
 Supabase.Storage.Interfaces.IVectorIndex
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.<Clone>$() -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort!
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.AnalyticsBucketSort(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn Column, System.ComponentModel.ListSortDirection Direction = System.ComponentModel.ListSortDirection.Ascending) -> void
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Column.get -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Column.init -> void
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Deconstruct(out Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn Column, out System.ComponentModel.ListSortDirection Direction) -> void
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Direction.get -> System.ComponentModel.ListSortDirection
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Direction.init -> void
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Equals(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? other) -> bool
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn.CreatedAt = 1 -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn.Name = 0 -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn.UpdatedAt = 2 -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.<Clone>$() -> Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions!
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Equals(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? other) -> bool
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Limit.get -> int?
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Limit.init -> void
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.ListAnalyticsBucketsOptions() -> void
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Offset.get -> int?
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Offset.init -> void
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Search.get -> string?
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Search.init -> void
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Sort.get -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort?
+Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Sort.init -> void
 Supabase.Storage.StorageBucketApi.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
