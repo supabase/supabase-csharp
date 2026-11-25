@@ -92,6 +92,15 @@ public class StorageAnalyticsApiContractTests
     }
 
     [TestMethod]
+    public async Task DeleteBucketAsync_ShouldExposeEnvelopeTypeAsCode_GivenIcebergError()
+    {
+        this.Respond(BucketPath, 404, "{\"error\":{\"message\":\"Bucket not found\",\"type\":\"NoSuchBucket\",\"code\":404}}");
+        var act = () => this.client.Analytics.DeleteBucketAsync("analytics-data");
+        (await act.Should().ThrowAsync<SupabaseStorageException>()).Which.Code
+            .Should().Be("NoSuchBucket", "the Iceberg error envelope names the failure in error.type");
+    }
+
+    [TestMethod]
     public async Task DeleteBucketAsync_ShouldReportBodyStatusCode_GivenBodyDiffersFromHttpStatus()
     {
         this.Respond(BucketPath, 400, "{\"statusCode\":\"404\",\"error\":\"not_found\",\"message\":\"Bucket not found\"}");

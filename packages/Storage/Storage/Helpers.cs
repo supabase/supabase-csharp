@@ -235,11 +235,37 @@ public class ErrorResponse
     {
         try
         {
-            return JsonSerializer.Deserialize<ErrorResponse>(content, Helpers.SerializerOptions);
+            return ReadIcebergEnvelope(content) ?? JsonSerializer.Deserialize<ErrorResponse>(content, Helpers.SerializerOptions);
         }
         catch (JsonException)
         {
             return null;
         }
+    }
+
+    private static ErrorResponse? ReadIcebergEnvelope(string content)
+    {
+        var envelope = JsonSerializer.Deserialize<ErrorEnvelope>(content, Helpers.SerializerOptions)?.Error;
+        return envelope is { ValueKind: JsonValueKind.Object }
+            ? ToErrorResponse(envelope.Value.Deserialize<IcebergError>(Helpers.SerializerOptions)!)
+            : null;
+    }
+
+    private static ErrorResponse ToErrorResponse(IcebergError error) =>
+        new() { Message = error.Message, Code = error.Type };
+
+    private sealed class ErrorEnvelope
+    {
+        [JsonPropertyName("error")]
+        public JsonElement? Error { get; set; }
+    }
+
+    private sealed class IcebergError
+    {
+        [JsonPropertyName("message")]
+        public string? Message { get; set; }
+
+        [JsonPropertyName("type")]
+        public string? Type { get; set; }
     }
 }
