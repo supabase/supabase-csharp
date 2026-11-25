@@ -76,7 +76,7 @@ Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.get -> System.DateTimeOffset
 Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.init -> void
 Supabase.Storage.Common.StoredVector
 Supabase.Storage.Common.StoredVector.<Clone>$() -> Supabase.Storage.Common.StoredVector!
-Supabase.Storage.Common.StoredVector.Data.get -> System.Collections.Generic.IReadOnlyList<float>?
+Supabase.Storage.Common.StoredVector.Data.get -> Supabase.Storage.Common.VectorData?
 Supabase.Storage.Common.StoredVector.Data.init -> void
 Supabase.Storage.Common.StoredVector.Equals(Supabase.Storage.Common.StoredVector? other) -> bool
 Supabase.Storage.Common.StoredVector.Key.get -> string!
@@ -226,3 +226,16 @@ Supabase.Storage.ListVectors.VectorSegment.Index.get -> int
 Supabase.Storage.ListVectors.VectorSegment.Index.init -> void
 Supabase.Storage.ListVectors.VectorSegment.VectorSegment(int Index, int Count) -> void
 Supabase.Storage.StorageBucketApi.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+override Supabase.Storage.Common.VectorData.Equals(object? obj) -> bool
+override Supabase.Storage.Common.VectorData.GetHashCode() -> int
+override Supabase.Storage.Common.VectorData.ToString() -> string!
+static Supabase.Storage.Common.VectorData.operator !=(Supabase.Storage.Common.VectorData? left, Supabase.Storage.Common.VectorData? right) -> bool
+static Supabase.Storage.Common.VectorData.operator ==(Supabase.Storage.Common.VectorData? left, Supabase.Storage.Common.VectorData? right) -> bool
+Supabase.Storage.Common.VectorData
+Supabase.Storage.Common.VectorData.<Clone>$() -> Supabase.Storage.Common.VectorData!
+Supabase.Storage.Common.VectorData.DataType.get -> Supabase.Storage.Common.VectorDataType!
+Supabase.Storage.Common.VectorData.DataType.init -> void
+Supabase.Storage.Common.VectorData.Equals(Supabase.Storage.Common.VectorData? other) -> bool
+Supabase.Storage.Common.VectorData.Float32.get -> System.Collections.Generic.IReadOnlyList<float>?
+Supabase.Storage.Common.VectorData.Float32.init -> void
+Supabase.Storage.Common.VectorData.VectorData() -> void

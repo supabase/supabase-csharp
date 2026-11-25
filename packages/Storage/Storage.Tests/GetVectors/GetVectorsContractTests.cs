@@ -72,7 +72,8 @@ public class GetVectorsContractTests
         using (new AssertionScope())
         {
             vector.Key.Should().Be("doc-1");
-            vector.Data.Should().Equal(0.5f, 0.25f);
+            vector.Data!.DataType.Should().Be(VectorDataType.Float32);
+            vector.Data.Float32.Should().Equal(0.5f, 0.25f);
             vector.Metadata!["title"].GetString().Should().Be("Intro");
             vector.Metadata["page"].GetInt32().Should().Be(3);
             vector.Metadata["tags"].EnumerateArray().Select(tag => tag.GetString()).Should().Equal("a", "b");
@@ -103,11 +104,32 @@ public class GetVectorsContractTests
     }
 
     [TestMethod]
-    public async Task GetVectorsAsync_ShouldLeaveDataNull_GivenADataTypeItDoesNotKnow()
+    public async Task GetVectorsAsync_ShouldKeepTheTypeName_GivenADataTypeItDoesNotKnow()
     {
         this.Respond(200, "{\"vectors\":[{\"key\":\"doc-1\",\"data\":{\"float16\":[0.5,0.25]}}]}");
+        var data = (await this.Index().GetVectorsAsync(Keys, VectorContent.Data)).Should().ContainSingle().Which.Data;
+        using (new AssertionScope("decoding is open to new values: https://github.com/supabase/sdk/blob/main/docs/principles.md#decoding-is-open-to-new-values"))
+        {
+            data!.DataType.ToString().Should().Be("float16");
+            data.DataType.Should().NotBe(VectorDataType.Float32);
+            data.Float32.Should().BeNull("the components are not float32");
+        }
+    }
+
+    [TestMethod]
+    public async Task GetVectorsAsync_ShouldKeepTheAlphabeticallyFirstTypeName_GivenSeveralDataTypesItDoesNotKnow()
+    {
+        this.Respond(200, "{\"vectors\":[{\"key\":\"doc-1\",\"data\":{\"int8\":[1,2],\"bfloat16\":[0.5,0.25]}}]}");
         (await this.Index().GetVectorsAsync(Keys, VectorContent.Data)).Should().ContainSingle()
-            .Which.Data.Should().BeNull("decoding is open to new values: https://github.com/supabase/sdk/blob/main/docs/principles.md#decoding-is-open-to-new-values");
+            .Which.Data!.DataType.ToString().Should().Be("bfloat16", "the type name must not depend on the order of the service's JSON keys");
+    }
+
+    [TestMethod]
+    public async Task GetVectorsAsync_ShouldLeaveDataNull_GivenAnEmptyDataObject()
+    {
+        this.Respond(200, "{\"vectors\":[{\"key\":\"doc-1\",\"data\":{}}]}");
+        (await this.Index().GetVectorsAsync(Keys, VectorContent.Data)).Should().ContainSingle()
+            .Which.Data.Should().BeNull("an empty data object names no type and holds no components");
     }
 
     [TestMethod]
