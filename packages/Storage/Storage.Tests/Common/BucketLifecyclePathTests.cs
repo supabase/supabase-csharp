@@ -1,9 +1,9 @@
 using System;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Supabase.Storage.DeleteBucketLifecycle;
+using Supabase.Storage.Common;
 
-namespace Storage.Tests.DeleteBucketLifecycle;
+namespace Storage.Tests.Common;
 
 /// <summary>
 /// Unit tests for the path of a bucket's lifecycle policy: the ids it refuses and how it escapes the rest.

@@ -1,6 +1,6 @@
 using System;
 
-namespace Supabase.Storage.DeleteBucketLifecycle;
+namespace Supabase.Storage.Common;
 
 internal static class BucketLifecyclePath
 {
