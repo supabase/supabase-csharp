@@ -23,6 +23,12 @@ override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.ToString() ->
 override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Equals(object? obj) -> bool
 override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.GetHashCode() -> int
 override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.ToString() -> string!
+override Supabase.Storage.ListNamespaces.IcebergNamespacePage.Equals(object? obj) -> bool
+override Supabase.Storage.ListNamespaces.IcebergNamespacePage.GetHashCode() -> int
+override Supabase.Storage.ListNamespaces.IcebergNamespacePage.ToString() -> string!
+override Supabase.Storage.ListNamespaces.ListNamespacesOptions.Equals(object? obj) -> bool
+override Supabase.Storage.ListNamespaces.ListNamespacesOptions.GetHashCode() -> int
+override Supabase.Storage.ListNamespaces.ListNamespacesOptions.ToString() -> string!
 override Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.Equals(object? obj) -> bool
 override Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.GetHashCode() -> int
 override Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.ToString() -> string!
@@ -75,6 +81,10 @@ static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator !=(Sup
 static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator ==(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? left, Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? right) -> bool
 static Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.operator !=(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? right) -> bool
 static Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.operator ==(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? right) -> bool
+static Supabase.Storage.ListNamespaces.IcebergNamespacePage.operator !=(Supabase.Storage.ListNamespaces.IcebergNamespacePage? left, Supabase.Storage.ListNamespaces.IcebergNamespacePage? right) -> bool
+static Supabase.Storage.ListNamespaces.IcebergNamespacePage.operator ==(Supabase.Storage.ListNamespaces.IcebergNamespacePage? left, Supabase.Storage.ListNamespaces.IcebergNamespacePage? right) -> bool
+static Supabase.Storage.ListNamespaces.ListNamespacesOptions.operator !=(Supabase.Storage.ListNamespaces.ListNamespacesOptions? left, Supabase.Storage.ListNamespaces.ListNamespacesOptions? right) -> bool
+static Supabase.Storage.ListNamespaces.ListNamespacesOptions.operator ==(Supabase.Storage.ListNamespaces.ListNamespacesOptions? left, Supabase.Storage.ListNamespaces.ListNamespacesOptions? right) -> bool
 static Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.operator !=(Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? left, Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? right) -> bool
 static Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.operator ==(Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? left, Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? right) -> bool
 static Supabase.Storage.ListVectorBuckets.VectorBucketSummary.operator !=(Supabase.Storage.ListVectorBuckets.VectorBucketSummary? left, Supabase.Storage.ListVectorBuckets.VectorBucketSummary? right) -> bool
@@ -175,6 +185,7 @@ Supabase.Storage.GetVectorIndex.VectorIndexDetails.NonFilterableMetadataKeys.ini
 Supabase.Storage.GetVectorIndex.VectorIndexDetails.VectorIndexDetails() -> void
 Supabase.Storage.Interfaces.IIcebergCatalog
 Supabase.Storage.Interfaces.IIcebergCatalog.DeleteNamespaceAsync(Supabase.Storage.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.Interfaces.IIcebergCatalog.ListNamespacesAsync(Supabase.Storage.ListNamespaces.ListNamespacesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.ListNamespaces.IcebergNamespacePage!>!
 Supabase.Storage.Interfaces.IIcebergCatalog.NamespaceExistsAsync(Supabase.Storage.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.AnalyticsBucket!>!
@@ -230,6 +241,24 @@ Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Search.get -> 
 Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Search.init -> void
 Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Sort.get -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort?
 Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Sort.init -> void
+Supabase.Storage.ListNamespaces.IcebergNamespacePage
+Supabase.Storage.ListNamespaces.IcebergNamespacePage.<Clone>$() -> Supabase.Storage.ListNamespaces.IcebergNamespacePage!
+Supabase.Storage.ListNamespaces.IcebergNamespacePage.Equals(Supabase.Storage.ListNamespaces.IcebergNamespacePage? other) -> bool
+Supabase.Storage.ListNamespaces.IcebergNamespacePage.IcebergNamespacePage() -> void
+Supabase.Storage.ListNamespaces.IcebergNamespacePage.Namespaces.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.IcebergNamespace!>!
+Supabase.Storage.ListNamespaces.IcebergNamespacePage.Namespaces.init -> void
+Supabase.Storage.ListNamespaces.IcebergNamespacePage.NextPageToken.get -> string?
+Supabase.Storage.ListNamespaces.IcebergNamespacePage.NextPageToken.init -> void
+Supabase.Storage.ListNamespaces.ListNamespacesOptions
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.<Clone>$() -> Supabase.Storage.ListNamespaces.ListNamespacesOptions!
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.Equals(Supabase.Storage.ListNamespaces.ListNamespacesOptions? other) -> bool
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.ListNamespacesOptions() -> void
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.PageSize.get -> int?
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.PageSize.init -> void
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.PageToken.get -> string?
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.PageToken.init -> void
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.Parent.get -> Supabase.Storage.Common.IcebergNamespace?
+Supabase.Storage.ListNamespaces.ListNamespacesOptions.Parent.init -> void
 Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions
 Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.<Clone>$() -> Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions!
 Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.Equals(Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? other) -> bool
