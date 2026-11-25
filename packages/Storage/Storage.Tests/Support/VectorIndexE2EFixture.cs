@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -28,6 +29,7 @@ public abstract class VectorIndexE2EFixture
 
     private static readonly JsonSerializerOptions SeedOptions = new() { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
     private readonly HttpClient http = new();
+    private readonly List<string> trackedIndexNames = new() { IndexName };
 
     /// <summary>Service-role client: the vector service accepts no other role.</summary>
     protected Client Storage { get; } = Helpers.GetServiceClient();
@@ -53,9 +55,19 @@ public abstract class VectorIndexE2EFixture
     [TestCleanup]
     public async Task RemoveBucketWithIndex()
     {
-        await IgnoreRefusal(() => this.Storage.Vectors.From(this.VectorBucketName).DeleteIndexAsync(IndexName));
+        foreach (var indexName in this.trackedIndexNames)
+        {
+            await IgnoreRefusal(() => this.Storage.Vectors.From(this.VectorBucketName).DeleteIndexAsync(indexName));
+        }
         await IgnoreRefusal(() => this.Storage.Vectors.DeleteVectorBucketAsync(this.VectorBucketName));
         this.http.Dispose();
+    }
+
+    /// <summary>Registers an index a test creates in its bucket, so teardown removes it before the bucket. Returns the name for chaining.</summary>
+    protected string TrackIndex(string indexName)
+    {
+        this.trackedIndexNames.Add(indexName);
+        return indexName;
     }
 
     /// <summary>Writes the vectors to the index through the service's <c>PutVectors</c> route.</summary>
