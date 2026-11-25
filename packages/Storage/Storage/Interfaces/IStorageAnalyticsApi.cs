@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
-using Supabase.Storage.CreateAnalyticsBucket;
+using Supabase.Storage.Common;
+using Supabase.Storage.ListAnalyticsBuckets;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -27,6 +29,27 @@ public interface IStorageAnalyticsApi
     /// </example>
     [ImplementedCapability("storage.analytics.create_analytics_bucket")]
     Task<AnalyticsBucket> CreateBucketAsync(string name, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the analytics buckets of the project.
+    /// </summary>
+    /// <param name="options">Pagination, sort and search options. Without them the service returns every bucket, sorted by name in ascending order.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The buckets, in the order the service returned them. Empty when there are none.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">The sort column is not a defined <see cref="AnalyticsBucketSortColumn"/>.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">The service rejected the request, for example because the pagination is out of range, the caller is not authorized or the feature is not enabled.</exception>
+    /// <example>
+    /// <code>
+    /// var storage = new Client(url, headers);
+    /// var buckets = await storage.Analytics.ListBucketsAsync(new ListAnalyticsBucketsOptions
+    /// {
+    ///     Limit = 10,
+    ///     Sort = new AnalyticsBucketSort(AnalyticsBucketSortColumn.CreatedAt, ListSortDirection.Descending),
+    /// });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.list_analytics_buckets")]
+    Task<IReadOnlyList<AnalyticsBucket>> ListBucketsAsync(ListAnalyticsBucketsOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes an empty analytics bucket.

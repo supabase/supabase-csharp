@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace Supabase.Storage.CreateAnalyticsBucket;
+namespace Supabase.Storage.Common;
 
 /// <summary>
 /// An analytics bucket, the Apache Iceberg backed kind of Supabase Storage bucket.
