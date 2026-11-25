@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Storage.Common;
 using Supabase.Storage.CreateNamespace;
+using Supabase.Storage.ListNamespaces;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -56,6 +57,28 @@ public interface IIcebergCatalog
     /// </example>
     [ImplementedCapability("storage.analytics.create_namespace")]
     Task<IcebergNamespaceDetails> CreateNamespaceAsync(IcebergNamespace @namespace, CreateNamespaceOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the namespaces of the analytics bucket, one page at a time. Storage ignores the options today and returns
+    /// every namespace in one page, without a next-page token.
+    /// </summary>
+    /// <param name="options">Parent, page size and page token, following the Iceberg REST Catalog spec. When null, none is sent.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>One page of namespaces. Empty when there are none.</returns>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the bucket does not exist (status 404, <c>Code</c>
+    /// <c>NoSuchCatalog</c>) or the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var page = await catalog.ListNamespacesAsync();
+    /// foreach (var @namespace in page.Namespaces)
+    ///     Console.WriteLine(@namespace);
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.list_namespaces")]
+    Task<IcebergNamespacePage> ListNamespacesAsync(ListNamespacesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes an empty namespace.
