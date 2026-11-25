@@ -26,7 +26,7 @@ public class VectorBucketListingTests : VectorIndexE2EFixture
         this.prefix = $"list-{this.VectorBucketName}";
         this.names = new[] { "a", "b", "c" }.Select(suffix => $"{this.prefix}-{suffix}").ToArray();
         foreach (var name in this.names)
-            await this.PostToVectorService("CreateVectorBucket", new { vectorBucketName = name });
+            await this.Storage.Vectors.CreateVectorBucketAsync(name);
     }
 
     [TestCleanup]

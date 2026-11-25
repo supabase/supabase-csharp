@@ -14,14 +14,13 @@ using Supabase.Storage.Common;
 using Supabase.Storage.CreateVectorIndex;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;
+using Supabase.Storage.PutVectors;
 
 namespace Storage.Tests.Support;
 
 /// <summary>
 ///     Base fixture for E2E tests of the operations scoped to one vector index. Each test gets its own uniquely named
-///     vector bucket holding one two-dimensional index, removed whatever the outcome. The bucket and the vectors are
-///     written over plain HTTP, through the service's own routes, because the SDK cannot create a vector bucket or put
-///     vectors yet.
+///     vector bucket holding one two-dimensional index, removed whatever the outcome.
 /// </summary>
 public abstract class VectorIndexE2EFixture
 {
@@ -43,7 +42,7 @@ public abstract class VectorIndexE2EFixture
     [TestInitialize]
     public async Task CreateBucketWithIndex()
     {
-        await this.PostToVectorService("CreateVectorBucket", new { vectorBucketName = this.VectorBucketName });
+        await this.Storage.Vectors.CreateVectorBucketAsync(this.VectorBucketName);
         await this.Storage.Vectors.From(this.VectorBucketName).CreateIndexAsync(new NewVectorIndex
         {
             IndexName = IndexName,
@@ -70,16 +69,11 @@ public abstract class VectorIndexE2EFixture
         return indexName;
     }
 
-    /// <summary>Writes the vectors to the index through the service's <c>PutVectors</c> route.</summary>
+    /// <summary>Writes the vectors to the index.</summary>
     protected Task PutVectors(params SeededVector[] vectors) =>
-        this.PostToVectorService("PutVectors", new
-        {
-            vectorBucketName = this.VectorBucketName,
-            indexName = IndexName,
-            vectors = vectors.Select(vector => new { key = vector.Key, data = new { float32 = vector.Data }, metadata = vector.Metadata }),
-        });
+        this.Index.PutVectorsAsync(vectors.Select(ToNewVector).ToArray());
 
-    /// <summary>Posts the body to a vector service route as the service role and returns the response body; fails the test on refusal.</summary>
+    /// <summary>Posts the body to a vector service route as the service role and returns the response body, so a test can check the stored state independently of the SDK; fails the test on refusal.</summary>
     protected async Task<string> PostToVectorService(string operation, object body)
     {
         using var request = new HttpRequestMessage(HttpMethod.Post, $"{Helpers.StorageUrl}/vector/{operation}")
@@ -92,6 +86,13 @@ public abstract class VectorIndexE2EFixture
         response.IsSuccessStatusCode.Should().BeTrue($"seeding through {operation} must succeed: {content}");
         return content;
     }
+
+    private static NewVector ToNewVector(SeededVector vector) => new()
+    {
+        Key = vector.Key,
+        Data = vector.Data,
+        Metadata = vector.Metadata?.ToDictionary(pair => pair.Key, pair => JsonSerializer.SerializeToElement(pair.Value)),
+    };
 
     private static async Task IgnoreRefusal(Func<Task> teardown)
     {
