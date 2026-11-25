@@ -117,7 +117,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
     /// <inheritdoc />
     public async Task SendBinary(string broadcastEventName, byte[] payload, int timeoutMs = DefaultTimeout)
     {
-        if (this.channel.Options.ClientOptions.ProtocolVersion != ProtocolVersion.V2)
+        if (!this.channel.Options.ClientOptions.IsProtocolVersionV2())
             throw new RealtimeException("A broadcast of bytes needs ClientOptions.ProtocolVersion set to V2.");
         if (payload == null)
             throw new ArgumentNullException(nameof(payload));
@@ -137,7 +137,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
         this.channel.EnsureCanPersist(persistence);
         if (payload is BaseBroadcast)
             throw new ArgumentException("A persisted broadcast takes the payload itself, not a BaseBroadcast.", nameof(payload));
-        if (this.channel.Options.ClientOptions.ProtocolVersion != ProtocolVersion.V2)
+        if (!this.channel.Options.ClientOptions.IsProtocolVersionV2())
             throw new RealtimeException("A persisted broadcast needs ClientOptions.ProtocolVersion set to V2.");
         if (!WireFrame.Fits(eventName))
             throw new ArgumentException("The event name of a persisted broadcast must fit in 255 bytes.", nameof(eventName));

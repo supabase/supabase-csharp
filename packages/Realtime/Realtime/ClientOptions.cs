@@ -140,4 +140,6 @@ public class ClientOptions
     /// </summary>
     [ImplementedCapability("realtime.configuration.custom_logger")]
     public Microsoft.Extensions.Logging.ILogger? Logger { get; set; }
+
+    internal bool IsProtocolVersionV2() => this.ProtocolVersion == ProtocolVersion.V2;
 }
