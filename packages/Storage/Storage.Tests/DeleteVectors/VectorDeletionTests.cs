@@ -10,6 +10,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Storage;
+using Supabase.Storage.Common;
 using Supabase.Storage.CreateVectorIndex;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;

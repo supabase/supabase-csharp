@@ -6,6 +6,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Storage;
+using Supabase.Storage.Common;
 using Supabase.Storage.CreateVectorIndex;
 using Supabase.Storage.Exceptions;
 using WireMock.RequestBuilders;
@@ -66,6 +67,24 @@ public class CreateVectorIndexContractTests
         await this.client.Vectors.From("embeddings-prod").CreateIndexAsync(Index with { NonFilterableMetadataKeys = Array.Empty<string>() });
         this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Body
             .Should().Contain("\"metadataConfiguration\":{\"nonFilterableMetadataKeys\":[]}", "the service, not the SDK, judges an empty list");
+    }
+
+    [TestMethod]
+    public async Task CreateIndexAsync_ShouldSendTheEuclideanMetricByItsServiceName()
+    {
+        this.Respond(200, string.Empty);
+        await this.client.Vectors.From("embeddings-prod").CreateIndexAsync(Index with { DistanceMetric = VectorDistanceMetric.Euclidean });
+        this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Body
+            .Should().Contain("\"distanceMetric\":\"euclidean\"", "the service's CreateIndex schema names the metric euclidean");
+    }
+
+    [TestMethod]
+    public async Task CreateIndexAsync_ShouldLeaveMissingSettingsToTheService_GivenNullMetricAndDataType()
+    {
+        this.Respond(200, string.Empty);
+        await this.client.Vectors.From("embeddings-prod").CreateIndexAsync(Index with { DistanceMetric = null!, DataType = null! });
+        this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Body
+            .Should().Contain("\"distanceMetric\":null,\"dataType\":null", "the service, not the SDK, validates the index settings");
     }
 
     [TestMethod]

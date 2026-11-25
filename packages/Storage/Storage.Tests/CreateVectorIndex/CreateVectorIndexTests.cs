@@ -6,6 +6,7 @@ using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Supabase.Storage;
+using Supabase.Storage.Common;
 using Supabase.Storage.CreateVectorIndex;
 
 namespace Storage.Tests.CreateVectorIndex;
@@ -67,25 +68,5 @@ public class CreateVectorIndexTests
         await FluentActions.Awaiting(() => sut.Vectors.From("embeddings-prod").CreateIndexAsync(
             new NewVectorIndex { IndexName = "docs-v1", Dimension = 0, DistanceMetric = VectorDistanceMetric.Cosine }))
             .Should().NotThrowAsync<ArgumentException>("the service owns dimension validation");
-    }
-
-    [TestMethod]
-    public async Task CreateIndexAsync_ShouldThrowArgumentOutOfRangeException_GivenAnUnknownDistanceMetric()
-    {
-        var sut = new Client("http://localhost:1/storage/v1");
-        (await FluentActions.Awaiting(() => sut.Vectors.From("embeddings-prod").CreateIndexAsync(
-                new NewVectorIndex { IndexName = "docs-v1", Dimension = 3, DistanceMetric = (VectorDistanceMetric) 99 }))
-            .Should().ThrowAsync<ArgumentOutOfRangeException>("an enum value the SDK cannot map to a service value must not be guessed"))
-            .Which.Message.Should().Contain("distance metric", "the caller needs to know which setting was refused");
-    }
-
-    [TestMethod]
-    public async Task CreateIndexAsync_ShouldThrowArgumentOutOfRangeException_GivenAnUnknownDataType()
-    {
-        var sut = new Client("http://localhost:1/storage/v1");
-        (await FluentActions.Awaiting(() => sut.Vectors.From("embeddings-prod").CreateIndexAsync(
-                new NewVectorIndex { IndexName = "docs-v1", Dimension = 3, DistanceMetric = VectorDistanceMetric.Cosine, DataType = (VectorDataType) 99 }))
-            .Should().ThrowAsync<ArgumentOutOfRangeException>("an enum value the SDK cannot map to a service value must not be guessed"))
-            .Which.Message.Should().Contain("data type", "the caller needs to know which setting was refused");
     }
 }
