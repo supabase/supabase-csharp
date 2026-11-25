@@ -985,6 +985,14 @@ features:
     status: implemented
     symbols:
       - IStorageAnalyticsApi.DeleteBucketAsync
+  storage.analytics.create_namespace:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.CreateNamespaceAsync
+  storage.analytics.list_namespaces:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.ListNamespacesAsync
   storage.analytics.delete_namespace:
     status: implemented
     symbols:
