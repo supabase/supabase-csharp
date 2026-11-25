@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -41,6 +42,28 @@ public class PublicUrlTests
         var url = Bucket().GetPublicUrl("a.png", new TransformOptions());
         url.Should().StartWith($"{BaseUrl}/object/public/bucket/a.png").And.NotContain("/render/image/",
             "an empty TransformOptions requests no transform, so it must not route to the render endpoint (issue #37)");
+    }
+
+    [TestMethod]
+    public void GetPublicUrl_ShouldEncodeEachSegment_GivenAKeyWithUrlDelimiters()
+    {
+        var plain = Bucket().GetPublicUrl("folder/a?b#c.png", null);
+        var transformed = Bucket().GetPublicUrl("folder/a?b#c.png", new TransformOptions { Width = 100 });
+
+        new Uri(plain).AbsolutePath.Should().EndWith("/object/public/bucket/folder/a%3Fb%23c.png");
+        new Uri(transformed).AbsolutePath.Should().EndWith("/render/image/public/bucket/folder/a%3Fb%23c.png");
+    }
+
+    [TestMethod]
+    [DataRow("../other/a.png")]
+    [DataRow("folder/./a.png")]
+    public void GetPublicUrl_ShouldThrow_GivenAKeyWithADotSegment(string key)
+    {
+        var plain = () => Bucket().GetPublicUrl(key, null);
+        var transformed = () => Bucket().GetPublicUrl(key, new TransformOptions { Width = 100 });
+
+        plain.Should().Throw<ArgumentException>().WithMessage("*'.' or '..' segment*");
+        transformed.Should().Throw<ArgumentException>();
     }
 
     [TestMethod]

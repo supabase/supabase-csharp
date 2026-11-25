@@ -202,8 +202,16 @@ internal static class Helpers
     /// Percent-encodes each segment of a storage path so a <c>?</c> or <c>#</c> in a key can't start
     /// a query string or fragment, while <c>/</c> stays literal as the separator.
     /// </summary>
+    /// <exception cref="ArgumentException">A segment is <c>.</c> or <c>..</c>.</exception>
     internal static string EncodePath(string path) =>
-        string.Join("/", path.Split('/').Select(Uri.EscapeDataString));
+        string.Join("/", path.Split('/').Select(EncodeSegment));
+
+    private static string EncodeSegment(string segment)
+    {
+        if (segment is "." or "..")
+            throw new ArgumentException("A storage path cannot contain a '.' or '..' segment: System.Uri resolves it into another route.");
+        return Uri.EscapeDataString(segment);
+    }
 }
 
 public class GenericResponse
