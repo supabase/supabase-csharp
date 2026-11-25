@@ -14,6 +14,20 @@ namespace Supabase.Storage.Interfaces;
 public interface IStorageAnalyticsApi
 {
     /// <summary>
+    /// Scopes the following operations to the Iceberg REST Catalog of one analytics bucket. Nothing is sent to the service.
+    /// </summary>
+    /// <param name="bucketName">The name of the analytics bucket, which the catalog calls its warehouse.</param>
+    /// <returns>A client for the catalog operations of that bucket.</returns>
+    /// <exception cref="ArgumentException">The name is null, empty, whitespace or a relative path segment.</exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.access_catalog")]
+    IIcebergCatalog From(string bucketName);
+
+    /// <summary>
     /// Creates an analytics bucket, a bucket backed by the Apache Iceberg table format.
     /// </summary>
     /// <param name="name">The name of the analytics bucket to create. The service validates it.</param>
