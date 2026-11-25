@@ -944,6 +944,10 @@ features:
     status: implemented
     symbols:
       - IVectorBucket.ListIndexesAsync
+  storage.vector_buckets.list_vectors:
+    status: implemented
+    symbols:
+      - IVectorIndex.ListVectorsAsync
   storage.vector_buckets.delete_vector_bucket:
     status: implemented
     symbols:
