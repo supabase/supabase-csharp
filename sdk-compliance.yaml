@@ -906,6 +906,10 @@ features:
     status: implemented
     symbols:
       - StorageBucketApi.PurgeProjectCacheAsync
+  storage.file_buckets.delete_bucket_lifecycle:
+    status: implemented
+    symbols:
+      - StorageBucketApi.DeleteBucketLifecycleAsync
 
   storage.vector_buckets.access_vector_index:
     status: implemented
@@ -928,6 +932,10 @@ features:
     status: implemented
     symbols:
       - IStorageAnalyticsApi.CreateBucketAsync
+  storage.analytics.list_analytics_buckets:
+    status: implemented
+    symbols:
+      - IStorageAnalyticsApi.ListBucketsAsync
   storage.analytics.delete_analytics_bucket:
     status: implemented
     symbols:
