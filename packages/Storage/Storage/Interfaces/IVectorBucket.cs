@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Storage.CreateVectorIndex;
 using Supabase.Storage.GetVectorIndex;
+using Supabase.Storage.ListVectorIndexes;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -78,6 +79,30 @@ public interface IVectorBucket
     /// </example>
     [ImplementedCapability("storage.vector_buckets.get_index")]
     Task<VectorIndexDetails> GetIndexAsync(string indexName, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the vector indexes of this bucket a page at a time, sorted by name. A bucket that does not exist lists
+    /// no index. Requires a service-role key.
+    /// </summary>
+    /// <param name="options">The name prefix and paging to apply. Null lists the first page of every index.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>A page of indexes, and the token of the next page when there is one.</returns>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because <see cref="ListVectorIndexesOptions.MaxResults"/> is out of
+    /// range (<c>Code</c> <c>InvalidRequest</c>), or its answer could not be read.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var bucket = storage.Vectors.From("embeddings-prod");
+    /// var page = await bucket.ListIndexesAsync(new ListVectorIndexesOptions { Prefix = "docs-" });
+    /// while (page.NextToken is not null)
+    /// {
+    ///     page = await bucket.ListIndexesAsync(new ListVectorIndexesOptions { Prefix = "docs-", NextToken = page.NextToken });
+    /// }
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.vector_buckets.list_indexes")]
+    Task<VectorListPage<VectorIndexSummary>> ListIndexesAsync(ListVectorIndexesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a vector index from this bucket, together with its vectors. Requires a service-role key.
