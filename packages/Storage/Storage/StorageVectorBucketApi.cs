@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Storage.Common;
+using Supabase.Storage.CreateVectorBucket;
 using Supabase.Storage.DeleteVectorBucket;
 using Supabase.Storage.Interfaces;
 using Supabase.Storage.ListVectorBuckets;
@@ -22,6 +23,13 @@ internal sealed class StorageVectorBucketApi : IStorageVectorBucketApi
     {
         VectorService.RequireName(vectorBucketName, nameof(vectorBucketName));
         return new VectorBucket(vectorBucketName, this.service);
+    }
+
+    /// <inheritdoc />
+    public Task CreateVectorBucketAsync(string vectorBucketName, CancellationToken cancellationToken = default)
+    {
+        VectorService.RequireName(vectorBucketName, nameof(vectorBucketName));
+        return this.service.Post("CreateVectorBucket", new CreateVectorBucketBody(vectorBucketName), cancellationToken);
     }
 
     /// <inheritdoc />
