@@ -52,6 +52,21 @@ public static class FailureHint
         /// Cannot make changes after subscribe
         /// </summary>
         StateInvalid,
+
+        /// <summary>
+        /// The sender has no policy that lets it store a broadcast. The broadcast was delivered but not stored.
+        /// </summary>
+        PersistenceUnauthorized,
+
+        /// <summary>
+        /// The server failed to store a broadcast. The broadcast was delivered but not stored.
+        /// </summary>
+        PersistenceFailed,
+
+        /// <summary>
+        /// The server refused the ttl. The broadcast was neither delivered nor stored.
+        /// </summary>
+        PersistenceInvalidTtl,
     }
 
     /// <summary>
@@ -70,4 +85,12 @@ public static class FailureHint
             _ => Reason.Unknown,
         };
     }
+
+    internal static Reason Parse(string? code) => code switch
+    {
+        "persistence_unauthorized" => Reason.PersistenceUnauthorized,
+        "persistence_failed" => Reason.PersistenceFailed,
+        "persistence_invalid_ttl" => Reason.PersistenceInvalidTtl,
+        _ => Reason.Unknown,
+    };
 }

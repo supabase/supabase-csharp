@@ -247,6 +247,21 @@ public interface IRealtimeChannel
     Task HttpSendAsync(string eventName, object payload, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Broadcasts through the REST API and asks the server to store the message for replay. Needs a private channel.
+    /// </summary>
+    /// <exception cref="RealtimeException">The channel is public, or the server rejected the broadcast.</exception>
+    /// <example>
+    /// <code>
+    /// var channel = client.PrivateChannel("room");
+    /// await channel.HttpSendAsync("chat", new { text = "hi" }, new BroadcastPersistence());
+    /// </code>
+    /// </example>
+    Task HttpSendAsync(string eventName, object payload, BroadcastPersistence persistence);
+
+    /// <inheritdoc cref="HttpSendAsync(string, object, BroadcastPersistence)"/>
+    Task HttpSendAsync(string eventName, object payload, BroadcastPersistence persistence, CancellationToken cancellationToken);
+
+    /// <summary>
     /// Register broadcast options, must be called to use <see cref="IRealtimeBroadcast"/>, and prior to <see cref="Subscribe"/>
     /// </summary>
     /// <param name="broadcastSelf"></param>

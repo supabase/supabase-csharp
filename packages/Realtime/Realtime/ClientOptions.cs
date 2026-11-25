@@ -149,4 +149,6 @@ public class ClientOptions
     /// <see cref="IWebSocketFactory"/> and are not affected.
     /// </summary>
     public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
+
+    internal bool IsProtocolVersionV2() => this.ProtocolVersion == ProtocolVersion.V2;
 }

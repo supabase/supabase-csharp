@@ -152,11 +152,11 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     }
 
     /// <summary>Delivers the server's reply to the frame sent with <paramref name="reference" />, in the protocol version the socket last wrote.</summary>
-    public void Reply(string topic, string? reference, string status = "ok") =>
+    public void Reply(string topic, string? reference, string status = "ok", string response = "{}") =>
         this.Receive((this.speaksArrays
-                ? """[null,"REF","TOPIC","phx_reply",{"status":"STATUS","response":{}}]"""
-                : """{"topic":"TOPIC","event":"phx_reply","ref":"REF","payload":{"status":"STATUS","response":{}}}""")
-            .Replace("TOPIC", topic).Replace("REF", reference).Replace("STATUS", status));
+                ? """[null,"REF","TOPIC","phx_reply",{"status":"STATUS","response":RESPONSE}]"""
+                : """{"topic":"TOPIC","event":"phx_reply","ref":"REF","payload":{"status":"STATUS","response":RESPONSE}}""")
+            .Replace("TOPIC", topic).Replace("REF", reference).Replace("STATUS", status).Replace("RESPONSE", response));
 
     public Task Reconnect()
     {

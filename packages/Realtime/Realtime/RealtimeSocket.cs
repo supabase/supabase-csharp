@@ -119,8 +119,8 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.reconnectTimer = options.TimeProvider.CreateTimer(_ => this.Reconnect(), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
     }
 
-    Task IRealtimeSocket.HttpSendAsync(RealtimeChannel channel, string eventName, object payload, CancellationToken cancellationToken) =>
-        this.httpBroadcaster.SendAsync(channel, eventName, payload, cancellationToken);
+    Task IRealtimeSocket.HttpSendAsync(RealtimeChannel channel, string eventName, object payload, BroadcastPersistence? persistence, CancellationToken cancellationToken) =>
+        this.httpBroadcaster.SendAsync(channel, eventName, payload, persistence, cancellationToken);
 
     void IDisposable.Dispose()
     {
@@ -316,7 +316,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private void Write(SocketRequest data)
     {
         if (data.Payload is BinaryBroadcast broadcast)
-            this.connection.Send(WireFrame.UserBroadcastPush(data.JoinRef!, data.Ref!, data.Topic!, broadcast.Event, broadcast.Payload));
+            this.connection.Send(WireFrame.UserBroadcastPush(data.JoinRef!, data.Ref!, data.Topic!, broadcast));
         else
             this.options.Encode!(data, encoded => this.connection.Send(this.options.ProtocolVersion == ProtocolVersion.V2 ? WireFrame.ToTextFrame(encoded) : encoded));
     }

@@ -1,3 +1,15 @@
 #nullable enable
+Supabase.Realtime.Broadcast.BroadcastPersistence
+Supabase.Realtime.Broadcast.BroadcastPersistence.BroadcastPersistence(System.TimeSpan? ttl = null) -> void
+Supabase.Realtime.Broadcast.BroadcastPersistence.Ttl.get -> System.TimeSpan?
 Supabase.Realtime.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Realtime.ClientOptions.TimeProvider.set -> void
+Supabase.Realtime.Exceptions.FailureHint.Reason.PersistenceFailed = 9 -> Supabase.Realtime.Exceptions.FailureHint.Reason
+Supabase.Realtime.Exceptions.FailureHint.Reason.PersistenceInvalidTtl = 10 -> Supabase.Realtime.Exceptions.FailureHint.Reason
+Supabase.Realtime.Exceptions.FailureHint.Reason.PersistenceUnauthorized = 8 -> Supabase.Realtime.Exceptions.FailureHint.Reason
+Supabase.Realtime.Interfaces.IRealtimeBroadcast.SendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, int timeoutMs = 10000) -> System.Threading.Tasks.Task!
+Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence) -> System.Threading.Tasks.Task!
+Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.SendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, int timeoutMs = 10000) -> System.Threading.Tasks.Task!
+Supabase.Realtime.RealtimeChannel.HttpSendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence) -> System.Threading.Tasks.Task!
+Supabase.Realtime.RealtimeChannel.HttpSendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
