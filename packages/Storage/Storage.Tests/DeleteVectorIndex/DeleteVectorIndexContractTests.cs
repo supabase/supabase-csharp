@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -58,12 +59,12 @@ public class DeleteVectorIndexContractTests
     }
 
     [TestMethod]
-    [DataRow(400, "InvalidRequest", "the service rejects a malformed index name")]
-    [DataRow(404, "S3VectorNotFoundException", "the bucket or the index does not exist")]
-    [DataRow(500, "InternalError", "the service failed internally")]
-    public async Task DeleteIndexAsync_ShouldThrowStorageException_GivenAServiceError(int status, string code, string because)
+    [DataRow(400, "Error", "InvalidRequest", "body/indexName must NOT have fewer than 3 characters", "the service rejects a malformed index name")]
+    [DataRow(404, "NotFoundException", "NotFoundException", "resource \"docs-v1\" not found", "the bucket or the index does not exist")]
+    [DataRow(500, "Internal", "InternalError", "Internal Server Error", "the service failed internally")]
+    public async Task DeleteIndexAsync_ShouldThrowStorageException_GivenAServiceError(int status, string error, string code, string message, string because)
     {
-        this.Respond(status, $"{{\"statusCode\":\"{status}\",\"code\":\"{code}\",\"message\":\"refused\"}}");
+        this.Respond(status, JsonSerializer.Serialize(new { statusCode = status.ToString(), error, message, code }));
         var thrown = await FluentActions.Awaiting(() => this.client.Vectors.From("embeddings-prod").DeleteIndexAsync("docs-v1"))
             .Should().ThrowAsync<SupabaseStorageException>(because);
         using (new AssertionScope())
