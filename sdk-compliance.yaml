@@ -669,6 +669,11 @@ features:
     symbols:
       - RealtimeChannel.Push
       - RealtimeChannel.Send
+  realtime.channel.broadcast_persist:
+    status: implemented
+    symbols:
+      - RealtimeBroadcast.SendAsync
+      - RealtimeChannel.HttpSendAsync
   realtime.channel.subscribe:
     status: implemented
     symbols:
@@ -923,6 +928,10 @@ features:
     status: implemented
     symbols:
       - IVectorBucket.DeleteIndexAsync
+  storage.vector_buckets.delete_vectors:
+    status: implemented
+    symbols:
+      - IVectorIndex.DeleteVectorsAsync
   storage.vector_buckets.delete_vector_bucket:
     status: implemented
     symbols:
