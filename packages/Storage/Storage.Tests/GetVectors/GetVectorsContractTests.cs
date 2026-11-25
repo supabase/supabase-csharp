@@ -133,10 +133,12 @@ public class GetVectorsContractTests
     }
 
     [TestMethod]
-    public async Task GetVectorsAsync_ShouldReturnNoVectors_GivenNoKeyMatched()
+    [DataRow("{\"vectors\":[]}", "the service leaves out keys that match no vector")]
+    [DataRow("{}", "an answer without vectors lists none, as for list_vectors and list_indexes")]
+    public async Task GetVectorsAsync_ShouldReturnNoVectors_GivenNoVectorInTheAnswer(string body, string because)
     {
-        this.Respond(200, "{\"vectors\":[]}");
-        (await this.Index().GetVectorsAsync(Keys)).Should().BeEmpty("the service leaves out keys that match no vector");
+        this.Respond(200, body);
+        (await this.Index().GetVectorsAsync(Keys)).Should().BeEmpty(because);
     }
 
     [TestMethod]
@@ -148,7 +150,7 @@ public class GetVectorsContractTests
 
     [TestMethod]
     [DataRow("null", "the service answered with no body")]
-    [DataRow("{}", "the answer lacks the vectors")]
+    [DataRow("", "the service answered with an empty body")]
     [DataRow("{\"vectors\":[{\"data\":{\"float32\":[0.5]}}]}", "a vector lacks its key")]
     [DataRow("<html>", "the answer is not JSON")]
     public async Task GetVectorsAsync_ShouldThrowStorageException_GivenAnUnreadableAnswer(string body, string because)
