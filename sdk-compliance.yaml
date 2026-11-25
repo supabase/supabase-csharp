@@ -952,14 +952,26 @@ features:
     status: implemented
     symbols:
       - IVectorIndex.PutVectorsAsync
+  storage.vector_buckets.query_vectors:
+    status: implemented
+    symbols:
+      - IVectorIndex.QueryVectorsAsync
   storage.vector_buckets.create_vector_bucket:
     status: implemented
     symbols:
       - IStorageVectorBucketApi.CreateVectorBucketAsync
+  storage.vector_buckets.list_vector_buckets:
+    status: implemented
+    symbols:
+      - IStorageVectorBucketApi.ListVectorBucketsAsync
   storage.vector_buckets.delete_vector_bucket:
     status: implemented
     symbols:
       - IStorageVectorBucketApi.DeleteVectorBucketAsync
+  storage.vector_buckets.parallel_scan:
+    status: implemented
+    symbols:
+      - IVectorIndex.ListVectorsAsync
 
   storage.analytics.create_analytics_bucket:
     status: implemented
