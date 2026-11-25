@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Storage.Common;
 using Supabase.Storage.DeleteVectors;
+using Supabase.Storage.GetVectors;
 using Supabase.Storage.Interfaces;
 
 namespace Supabase.Storage;
@@ -27,5 +28,14 @@ internal sealed class VectorIndex : IVectorIndex
         if (keys is null)
             throw new ArgumentNullException(nameof(keys));
         return this.service.Post("DeleteVectors", new DeleteVectorsBody(this.vectorBucketName, this.indexName, keys), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<StoredVector>> GetVectorsAsync(IReadOnlyCollection<string> keys, VectorContent include = VectorContent.None, CancellationToken cancellationToken = default)
+    {
+        if (keys is null)
+            throw new ArgumentNullException(nameof(keys));
+        var response = await this.service.PostAsync<GetVectorsResponse>("GetVectors", new GetVectorsBody(this.vectorBucketName, this.indexName, keys, include), cancellationToken).ConfigureAwait(false);
+        return response.ToStoredVectors();
     }
 }
