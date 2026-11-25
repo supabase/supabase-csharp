@@ -1,0 +1,1 @@
+﻿{"vectorBucketName":"embeddings-prod","indexName":"docs-v1","vectors":[{"key":"doc-1","data":{"float32":[0.5,0.25]},"metadata":{"title":"Intro","tags":["a","b"],"pages":12}},{"key":"doc-2","data":{"float32":[1,2]}}]}
