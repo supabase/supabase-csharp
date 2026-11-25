@@ -54,6 +54,7 @@ Supabase.Storage.Interfaces.IStorageAnalyticsApi
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.AnalyticsBucket!>!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.DeleteBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.ListBucketsAsync(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.AnalyticsBucket!>!>!
+Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi
@@ -93,3 +94,4 @@ Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Search.get -> 
 Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Search.init -> void
 Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Sort.get -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort?
 Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Sort.init -> void
+Supabase.Storage.StorageBucketApi.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
