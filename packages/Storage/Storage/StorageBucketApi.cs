@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Supabase.Core;
 using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
+using Supabase.Storage.DeleteBucketLifecycle;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Extensions;
 using Supabase.Storage.Interfaces;
@@ -184,4 +185,9 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     [ImplementedCapability("storage.file_buckets.purge_project_cache")]
     public Task PurgeProjectCacheAsync(PurgeCacheOptions? options = null, CancellationToken cancellationToken = default) =>
         Helpers.MakeRequestAsync(this.requestClient, this.Options, HttpMethod.Delete, options.ToPurgeUrl($"{this.Url}/cdn/"), null, this.Headers, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("storage.file_buckets.delete_bucket_lifecycle")]
+    public Task DeleteBucketLifecycleAsync(string id, CancellationToken cancellationToken = default) =>
+        Helpers.MakeRequestAsync(this.requestClient, this.Options, HttpMethod.Delete, BucketLifecyclePath.For(this.Url, id), null, this.Headers, cancellationToken);
 }
