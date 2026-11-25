@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Storage.Common;
+using Supabase.Storage.CreateNamespace;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;
 
@@ -39,6 +40,14 @@ internal sealed class IcebergCatalog : IIcebergCatalog
         {
             return false;
         }
+    }
+
+    /// <inheritdoc />
+    public async Task<IcebergNamespaceDetails> CreateNamespaceAsync(IcebergNamespace @namespace, CreateNamespaceOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        RequireNamespace(@namespace);
+        var response = await Helpers.MakeRequestAsync<CreateNamespaceResponse>(this.requestClient, this.options, HttpMethod.Post, $"{this.catalogUrl}/namespaces", CreateNamespaceBody.For(@namespace, options), this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToDetails(@namespace);
     }
 
     /// <inheritdoc />
