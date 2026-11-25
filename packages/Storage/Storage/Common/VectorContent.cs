@@ -1,6 +1,6 @@
 using System;
 
-namespace Supabase.Storage.GetVectors;
+namespace Supabase.Storage.Common;
 
 /// <summary>
 /// What the service returns with each vector besides its key. Combine the values to ask for several,

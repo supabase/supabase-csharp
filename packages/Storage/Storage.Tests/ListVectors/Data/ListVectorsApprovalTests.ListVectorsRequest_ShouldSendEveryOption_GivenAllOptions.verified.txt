@@ -1,0 +1,1 @@
+﻿{"vectorBucketName":"embeddings-prod","indexName":"docs-v1","maxResults":100,"nextToken":"doc-100","returnData":true,"returnMetadata":true,"segmentCount":4,"segmentIndex":1}

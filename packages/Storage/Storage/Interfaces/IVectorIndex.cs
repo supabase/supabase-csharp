@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
-using Supabase.Storage.GetVectors;
+using Supabase.Storage.Common;
+using Supabase.Storage.ListVectors;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -57,4 +58,28 @@ public interface IVectorIndex
     /// </example>
     [ImplementedCapability("storage.vector_buckets.get_vectors")]
     Task<IReadOnlyList<StoredVector>> GetVectorsAsync(IReadOnlyCollection<string> keys, VectorContent include = VectorContent.None, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the vectors of this index, one page at a time. Pass the <see cref="VectorListPage{TItem}.NextToken"/> of a
+    /// page back in <see cref="ListVectorsOptions.NextToken"/> to read the next one. Requires a service-role key.
+    /// </summary>
+    /// <param name="options">Paging, content and segment options. When null, the service applies its defaults.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>One page of vectors, with their data and metadata when <see cref="ListVectorsOptions.Include"/> asks for them.</returns>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the bucket or the index does not exist
+    /// (<c>Code</c> <c>NotFoundException</c>), a value is out of range (<c>Code</c> <c>InvalidRequest</c>) or the
+    /// segment index is not below the segment count (<c>Code</c> <c>InvalidParameter</c>).
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var index = storage.Vectors.From("embeddings-prod").Index("docs-v1");
+    /// var options = new ListVectorsOptions { MaxResults = 100, Include = VectorContent.Metadata };
+    /// var page = await index.ListVectorsAsync(options);
+    /// while (page.NextToken is not null)
+    ///     page = await index.ListVectorsAsync(options with { NextToken = page.NextToken });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.vector_buckets.list_vectors")]
+    Task<VectorListPage<StoredVector>> ListVectorsAsync(ListVectorsOptions? options = null, CancellationToken cancellationToken = default);
 }

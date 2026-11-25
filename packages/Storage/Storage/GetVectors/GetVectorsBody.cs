@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Supabase.Storage.Common;
 
 namespace Supabase.Storage.GetVectors;
 
@@ -10,8 +11,8 @@ internal sealed class GetVectorsBody
         this.VectorBucketName = vectorBucketName;
         this.IndexName = indexName;
         this.Keys = keys;
-        this.ReturnData = RequestedOrOmitted(include, VectorContent.Data);
-        this.ReturnMetadata = RequestedOrOmitted(include, VectorContent.Metadata);
+        this.ReturnData = VectorContentRequest.RequestedOrOmitted(include, VectorContent.Data);
+        this.ReturnMetadata = VectorContentRequest.RequestedOrOmitted(include, VectorContent.Metadata);
     }
 
     [JsonPropertyName("vectorBucketName")]
@@ -30,7 +31,4 @@ internal sealed class GetVectorsBody
     [JsonPropertyName("returnMetadata")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? ReturnMetadata { get; }
-
-    private static bool? RequestedOrOmitted(VectorContent include, VectorContent content) =>
-        (include & content) == content ? true : null;
 }

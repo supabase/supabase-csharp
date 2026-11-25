@@ -5,8 +5,8 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
+using Supabase.Storage.Common;
 using Supabase.Storage.Exceptions;
-using Supabase.Storage.GetVectors;
 
 namespace Storage.Tests.GetVectors;
 

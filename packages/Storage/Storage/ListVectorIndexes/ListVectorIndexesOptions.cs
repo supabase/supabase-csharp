@@ -1,3 +1,5 @@
+using Supabase.Storage.Common;
+
 namespace Supabase.Storage.ListVectorIndexes;
 
 /// <summary>

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
-using Supabase.Storage.GetVectors;
+using Supabase.Storage.Common;
 
 namespace Storage.Tests.GetVectors;
 
