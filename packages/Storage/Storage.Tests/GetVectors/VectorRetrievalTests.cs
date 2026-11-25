@@ -38,7 +38,7 @@ public class VectorRetrievalTests : VectorIndexE2EFixture
     public async Task GetVectorsAsync_ShouldReturnTheData_GivenDataContent()
     {
         var vectors = await this.Index.GetVectorsAsync(SeededKeys, VectorContent.Data);
-        vectors.Single(vector => vector.Key == "doc-1").Data.Should().Equal(0.5f, 0.25f);
+        vectors.Single(vector => vector.Key == "doc-1").Data!.Float32.Should().Equal(0.5f, 0.25f);
     }
 
     [TestMethod]
