@@ -31,7 +31,7 @@ public class TokenRefresh
     ///     <cref>AutoRefreshToken</cref>
     /// </see>
     /// </summary>
-    private Timer? refreshTimer;
+    private ITimer? refreshTimer;
 
     /// <summary>
     /// Set by Stop, so nothing re-arms the timer before Start.
@@ -163,7 +163,7 @@ public class TokenRefresh
     /// We pass <see cref="Timeout.InfiniteTimeSpan"/> to ensure the handler only runs once.
     /// We create a new timer after each refresh instead of a repeating one, so the next tick is
     /// scheduled from the session we ended up with rather than from a fixed interval.
-    /// The callbacks run on the thread pool, so a timer per refresh is cheap at this cadence.
+    /// The timer runs on <see cref="ClientOptions.TimeProvider"/>; on the system clock its callbacks run on the thread pool, so a timer per refresh is cheap at this cadence.
     /// </summary>
     private void CreateNewTimer(TimeSpan minimumDelay = default)
     {
@@ -181,7 +181,7 @@ public class TokenRefresh
                     return;
                 }
                 this.refreshTimer?.Dispose();
-                this.refreshTimer = new Timer(this.HandleRefreshTimerTick, null, refreshDueTime, Timeout.InfiniteTimeSpan);
+                this.refreshTimer = this.client.Options.TimeProvider.CreateTimer(this.HandleRefreshTimerTick, null, refreshDueTime, Timeout.InfiniteTimeSpan);
             }
 
             this.Logger.BackgroundWorkEvent(Component, "refresh timer scheduled");

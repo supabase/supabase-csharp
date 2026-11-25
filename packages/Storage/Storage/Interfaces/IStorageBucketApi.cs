@@ -44,5 +44,15 @@ namespace Supabase.Storage.Interfaces
 		/// </code>
 		/// </example>
 		Task PurgeProjectCacheAsync(PurgeCacheOptions? options = null, CancellationToken cancellationToken = default);
+
+		/// <summary>
+		/// Removes the lifecycle policy from a bucket. Succeeds even when no policy is stored.
+		/// </summary>
+		/// <example>
+		/// <code>
+		/// await storage.DeleteBucketLifecycleAsync("avatars");
+		/// </code>
+		/// </example>
+		Task DeleteBucketLifecycleAsync(string id, CancellationToken cancellationToken = default);
 	}
 }

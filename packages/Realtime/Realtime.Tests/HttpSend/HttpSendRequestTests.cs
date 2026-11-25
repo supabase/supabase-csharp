@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
@@ -153,6 +154,20 @@ public class HttpSendRequestTests
         this.clientOptions.Timeout = TimeSpan.FromMilliseconds(200);
         var act = () => this.Channel().HttpSendAsync("cursor", new { x = 1 });
         await act.Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    [TestMethod]
+    public async Task HttpSendAsync_ShouldThrow_GivenTheSuppliedClockReachedTheClientTimeout()
+    {
+        this.server.ResetMappings();
+        this.server.Given(Request.Create().UsingPost()).RespondWith(Response.Create().WithStatusCode(202).WithDelay(TimeSpan.FromMinutes(1)));
+        var clock = new FakeTimeProvider();
+        this.clientOptions.Timeout = TimeSpan.FromHours(1);
+        this.clientOptions.TimeProvider = clock;
+        var send = this.Channel().HttpSendAsync("cursor", new { x = 1 });
+        clock.Advance(TimeSpan.FromHours(1));
+        var act = () => send;
+        await act.Should().ThrowAsync<OperationCanceledException>().WaitAsync(TimeSpan.FromSeconds(5));
     }
 
     [TestMethod]

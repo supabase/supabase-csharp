@@ -203,13 +203,14 @@ public static class Helpers
     /// <param name="retry">Retry policy to apply. Defaults to no retries.</param>
     /// <param name="tracePropagation">Whether to add the current trace context to the request. Defaults to enabled.</param>
     /// <param name="logger">Receives the request diagnostics when not null.</param>
+    /// <param name="timeProvider">The clock the retry backoff waits on. Defaults to the system clock.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     internal static async Task<T?> MakeRequestAsync<T>(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null,
-        HttpClient? httpClient = null, RetryOptions? retry = null, TracePropagation tracePropagation = TracePropagation.Enabled, Microsoft.Extensions.Logging.ILogger? logger = null, CancellationToken cancellationToken = default)
+        HttpClient? httpClient = null, RetryOptions? retry = null, TracePropagation tracePropagation = TracePropagation.Enabled, Microsoft.Extensions.Logging.ILogger? logger = null, TimeProvider? timeProvider = null, CancellationToken cancellationToken = default)
         where T : class
     {
-        var baseResponse = await MakeRequestAsync(method, url, data, headers, httpClient, retry, tracePropagation, logger, cancellationToken).ConfigureAwait(false);
+        var baseResponse = await MakeRequestAsync(method, url, data, headers, httpClient, retry, tracePropagation, logger, timeProvider, cancellationToken).ConfigureAwait(false);
         return baseResponse.Content != null ? DeserializeBody<T>(baseResponse) : default;
     }
 
@@ -234,10 +235,11 @@ public static class Helpers
     /// <param name="retry">Retry policy to apply. Defaults to no retries.</param>
     /// <param name="tracePropagation">Whether to add the current trace context to the request. Defaults to enabled.</param>
     /// <param name="logger">Receives the request diagnostics when not null.</param>
+    /// <param name="timeProvider">The clock the retry backoff waits on. Defaults to the system clock.</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     internal static async Task<BaseResponse> MakeRequestAsync(HttpMethod method, string url, object? data = null, Dictionary<string, string>? headers = null,
-        HttpClient? httpClient = null, RetryOptions? retry = null, TracePropagation tracePropagation = TracePropagation.Enabled, Microsoft.Extensions.Logging.ILogger? logger = null, CancellationToken cancellationToken = default)
+        HttpClient? httpClient = null, RetryOptions? retry = null, TracePropagation tracePropagation = TracePropagation.Enabled, Microsoft.Extensions.Logging.ILogger? logger = null, TimeProvider? timeProvider = null, CancellationToken cancellationToken = default)
     {
         var uri = BuildUri(url, method, data);
 
@@ -249,7 +251,7 @@ public static class Helpers
         try
         {
             using var response = await RetryExecutor.SendAsync(httpClient ?? Client, () => BuildRequestMessage(method, uri, data, headers),
-                retry ?? new RetryOptions(), tracePropagation, logger, cancellationToken).ConfigureAwait(false);
+                retry ?? new RetryOptions(), tracePropagation, logger, timeProvider ?? TimeProvider.System, cancellationToken).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 

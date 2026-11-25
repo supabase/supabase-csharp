@@ -80,7 +80,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private readonly IWebsocketClient connection;
     private readonly HttpBroadcaster httpBroadcaster;
 
-    private CancellationTokenSource? heartbeatTokenSource;
+    private ITimer? heartbeatTimer;
 
     private bool hasSuccessfullyConnectedOnce;
     private bool hasPendingHeartbeat;
@@ -94,9 +94,9 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private bool isOpen;
     private bool disconnectRequested;
     private int reconnectionAttempts = 0;
-    private readonly Timer reconnectTimer;
+    private readonly ITimer reconnectTimer;
     private readonly object reconnectLock = new();
-    private readonly Stopwatch attemptClock = new();
+    private long? attemptStartedAt;
     private long reconnectDueAt = NotWaiting;
     private Action stopWatchingNetworkPath = () => { };
 
@@ -116,7 +116,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.connection = (options.WebSocketFactory ?? DefaultWebSocketFactory.Instance)
             .Create(new Uri(this.EndpointUrl), () => this.Headers);
         this.httpBroadcaster = new HttpBroadcaster(endpoint, options, () => this.Headers);
-        this.reconnectTimer = new Timer(_ => this.Reconnect());
+        this.reconnectTimer = options.TimeProvider.CreateTimer(_ => this.Reconnect(), null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
     }
 
     Task IRealtimeSocket.HttpSendAsync(RealtimeChannel channel, string eventName, object payload, BroadcastPersistence? persistence, CancellationToken cancellationToken) =>
@@ -126,7 +126,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     {
         this.disconnectRequested = true;
         this.stopWatchingNetworkPath();
-        this.heartbeatTokenSource?.Cancel();
+        this.StopHeartbeat();
         this.DisposeConnection();
     }
 
@@ -168,7 +168,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     {
         this.disconnectRequested = true;
         this.stopWatchingNetworkPath();
-        this.heartbeatTokenSource?.Cancel();
+        this.StopHeartbeat();
         this.connection.IsReconnectionEnabled = false;
         this.connection.Stop(code, reason);
     }
@@ -397,10 +397,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         Debugger.Instance.Log(this, $"Socket Connected to: {this.EndpointUrl}");
         this.options.Logger.BackgroundWorkEvent(LogComponent, "connected");
 
-        this.heartbeatTokenSource?.Cancel();
-        this.hasPendingHeartbeat = false;
-        this.heartbeatTokenSource = new CancellationTokenSource();
-        Task.Run(this.EmitHeartbeat, this.heartbeatTokenSource.Token);
+        this.StartHeartbeat();
 
         // Send any pending `Push` messages that were queued while socket was disconnected.
         this.FlushBuffer();
@@ -409,14 +406,30 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         this.NotifySocketStateChange(SocketState.Open);
     }
 
-    private async Task EmitHeartbeat()
+    private void StartHeartbeat()
     {
-        while (this.heartbeatTokenSource is { IsCancellationRequested: false })
+        lock (this.heartbeatLock)
         {
-            lock (this.heartbeatLock)
-                this.SendHeartbeat();
-            await Task.Delay(this.options.HeartbeatInterval, this.heartbeatTokenSource.Token);
+            this.heartbeatTimer?.Dispose();
+            this.hasPendingHeartbeat = false;
+            this.heartbeatTimer = this.options.TimeProvider.CreateTimer(_ => Debugger.Instance.Guard(this, this.EmitHeartbeat), null,
+                TimeSpan.Zero, this.options.HeartbeatInterval);
         }
+    }
+
+    private void StopHeartbeat()
+    {
+        lock (this.heartbeatLock)
+        {
+            this.heartbeatTimer?.Dispose();
+            this.heartbeatTimer = null;
+        }
+    }
+
+    private void EmitHeartbeat()
+    {
+        lock (this.heartbeatLock)
+            this.SendHeartbeat();
     }
 
     internal void Probe() => Task.Run(this.ProbeAsync);
@@ -436,7 +449,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
             this.probedHeartbeatRef = probed;
         }
 
-        await Task.Delay(this.options.ProbeTimeout);
+        await this.options.TimeProvider.Delay(this.options.ProbeTimeout).ConfigureAwait(false);
 
         lock (this.heartbeatLock)
         {
@@ -542,7 +555,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
                     var delay = new TimeSpan(Math.Max(0, this.options.ReconnectAfterInterval(++this.reconnectionAttempts).Ticks));
                     lock (this.reconnectLock)
                     {
-                        this.reconnectDueAt = this.attemptClock.Elapsed.Ticks + delay.Ticks;
+                        this.reconnectDueAt = this.SinceAttemptStarted.Ticks + delay.Ticks;
                         this.reconnectTimer.Change(delay, Timeout.InfiniteTimeSpan);
                     }
 
@@ -564,13 +577,16 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
             _ = this.connection.Reconnect();
     }
 
+    private TimeSpan SinceAttemptStarted =>
+        this.attemptStartedAt is { } startedAt ? this.options.TimeProvider.GetElapsedTime(startedAt) : TimeSpan.Zero;
+
     private void MarkAttemptStarted()
     {
         lock (this.reconnectLock)
         {
             this.reconnectDueAt = NotWaiting;
             this.reconnectTimer.Change(Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
-            this.attemptClock.Restart();
+            this.attemptStartedAt = this.options.TimeProvider.GetTimestamp();
         }
     }
 
@@ -581,7 +597,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
             if (this.reconnectDueAt != NotWaiting)
             {
                 var wakeAt = Math.Min(this.reconnectDueAt, NetworkWakeSpacing.Ticks);
-                this.reconnectTimer.Change(new TimeSpan(Math.Max(0, wakeAt - this.attemptClock.Elapsed.Ticks)), Timeout.InfiniteTimeSpan);
+                this.reconnectTimer.Change(new TimeSpan(Math.Max(0, wakeAt - this.SinceAttemptStarted.Ticks)), Timeout.InfiniteTimeSpan);
             }
         }
     }

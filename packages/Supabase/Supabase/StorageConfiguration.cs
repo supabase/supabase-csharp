@@ -15,18 +15,21 @@ internal static class StorageConfiguration
 
     private static Storage.ClientOptions For(SupabaseOptions options, Func<CancellationToken, Task<string?>>? accessToken, ILogger? logger) =>
         options.HttpClient is null && accessToken is null && TracePropagationFor(options) == options.StorageClientOptions.TracePropagation
-            && logger == options.StorageClientOptions.Logger
+            && logger == options.StorageClientOptions.Logger && TimeProviderFor(options) == options.StorageClientOptions.TimeProvider
             ? options.StorageClientOptions
-            : Copy(options.StorageClientOptions, options.HttpClient, accessToken, TracePropagationFor(options), logger);
+            : Copy(options.StorageClientOptions, options.HttpClient, accessToken, TracePropagationFor(options), logger, TimeProviderFor(options));
 
     private static TracePropagation TracePropagationFor(SupabaseOptions options) =>
         options.TracePropagation == TracePropagation.Disabled ? TracePropagation.Disabled : options.StorageClientOptions.TracePropagation;
+
+    private static TimeProvider TimeProviderFor(SupabaseOptions options) =>
+        options.TimeProvider != TimeProvider.System ? options.TimeProvider : options.StorageClientOptions.TimeProvider;
 
     private static ILogger? LoggerFor(SupabaseOptions options) =>
         options.StorageClientOptions.Logger ?? options.LoggerFor(StorageDiagnostics.SourceName);
 
     private static Storage.ClientOptions Copy(Storage.ClientOptions options, HttpClient? sharedClient, Func<CancellationToken, Task<string?>>? accessToken,
-        TracePropagation tracePropagation, ILogger? logger) =>
+        TracePropagation tracePropagation, ILogger? logger, TimeProvider timeProvider) =>
         new()
         {
             HttpUploadTimeout = options.HttpUploadTimeout,
@@ -39,6 +42,7 @@ internal static class StorageConfiguration
             Retry = options.Retry,
             TracePropagation = tracePropagation,
             Logger = logger,
+            TimeProvider = timeProvider,
             RetrieveAccessToken = accessToken ?? options.RetrieveAccessToken,
         };
 }

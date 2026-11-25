@@ -66,8 +66,12 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     public Task<bool> Stop(WebSocketCloseStatus status, string reason)
     {
         this.IsRunning = false;
+        this.Stopped.TrySetResult();
         return Task.FromResult(true);
     }
+
+    /// <summary>Completes when the socket closes the connection.</summary>
+    public TaskCompletionSource Stopped { get; } = new();
 
     /// <summary>Completes when the socket sends its first frame, the heartbeat that starts on open.</summary>
     public TaskCompletionSource FirstSend { get; } = new();

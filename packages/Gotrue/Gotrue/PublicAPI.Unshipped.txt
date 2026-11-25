@@ -1,3 +1,7 @@
 #nullable enable
 *REMOVED*const Supabase.Gotrue.GotrueDiagnostics.SourceName = "Supabase.Gotrue" -> string!
 const Supabase.Gotrue.GotrueDiagnostics.SourceName = "supabase.gotrue" -> string!
+Supabase.Gotrue.ClientOptions.TimeProvider.get -> System.TimeProvider!
+Supabase.Gotrue.ClientOptions.TimeProvider.set -> void
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.TimeProvider.get -> System.TimeProvider!
+Supabase.Gotrue.StatelessClient.StatelessClientOptions.TimeProvider.set -> void

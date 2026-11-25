@@ -1095,7 +1095,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
 
         using var fileStream = new FileStream(
             localPath,
-            FileMode.OpenOrCreate,
+            FileMode.Create,
             FileAccess.Write
         );
 

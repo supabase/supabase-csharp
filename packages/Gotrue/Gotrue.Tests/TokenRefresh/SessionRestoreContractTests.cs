@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Gotrue.Tests.Support;
+using Microsoft.Extensions.Time.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
 using Supabase.Gotrue;
@@ -201,6 +202,27 @@ public class SessionRestoreContractTests
         client.Shutdown();
         await Task.Delay(1500);
         handler.Attempts.Should().Be(0, "a shut down client must not refresh");
+    }
+
+    [TestMethod]
+    public async Task TokenRefresh_ShouldFire_GivenTheSuppliedClockReachedFourFifthsOfTheSessionLifetime()
+    {
+        var clock = new FakeTimeProvider();
+        var handler = new UnreachableHandler();
+        this.Restore(TestClients.Against(this.server, autoRefreshToken: true, new HttpClient(handler), clock));
+        clock.Advance(TimeSpan.FromSeconds(2880));
+        await handler.Started;
+        handler.Attempts.Should().Be(1, "a one-hour session refreshes at 2880 seconds on the supplied clock");
+    }
+
+    [TestMethod]
+    public void TokenRefresh_ShouldWait_GivenTheSuppliedClockIsShortOfFourFifthsOfTheSessionLifetime()
+    {
+        var clock = new FakeTimeProvider();
+        var handler = new UnreachableHandler();
+        this.Restore(TestClients.Against(this.server, autoRefreshToken: true, new HttpClient(handler), clock));
+        clock.Advance(TimeSpan.FromSeconds(2870));
+        handler.Attempts.Should().Be(0, "the refresh timer waits on the supplied clock, not the system one");
     }
 
     [TestMethod]

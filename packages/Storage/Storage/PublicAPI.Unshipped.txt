@@ -43,6 +43,7 @@ Supabase.Storage.CreateVectorIndex.VectorDistanceMetric.Euclidean = 1 -> Supabas
 Supabase.Storage.Interfaces.IStorageAnalyticsApi
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.CreateAnalyticsBucket.AnalyticsBucket!>!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.DeleteBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi
@@ -53,5 +54,8 @@ Supabase.Storage.Interfaces.IVectorBucket.CreateIndexAsync(Supabase.Storage.Crea
 Supabase.Storage.Interfaces.IVectorBucket.DeleteIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 *REMOVED*const Supabase.Storage.StorageDiagnostics.SourceName = "Supabase.Storage" -> string!
 const Supabase.Storage.StorageDiagnostics.SourceName = "supabase.storage" -> string!
+Supabase.Storage.ClientOptions.TimeProvider.get -> System.TimeProvider!
+Supabase.Storage.ClientOptions.TimeProvider.set -> void
 Supabase.Storage.Interfaces.IVectorBucket.Index(string! indexName) -> Supabase.Storage.Interfaces.IVectorIndex!
 Supabase.Storage.Interfaces.IVectorIndex
+Supabase.Storage.StorageBucketApi.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!

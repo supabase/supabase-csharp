@@ -38,6 +38,7 @@ public static class StatelessClient
             Retry = options.GotrueRetry,
             TracePropagation = options.TracePropagation,
             Logger = options.LoggerFor(Supabase.Gotrue.GotrueDiagnostics.SourceName),
+            TimeProvider = options.TimeProvider,
             FlowType = options.AuthFlowType
         };
     }
@@ -61,6 +62,7 @@ public static class StatelessClient
             Retry = options.PostgrestRetry,
             TracePropagation = options.TracePropagation,
             Logger = options.LoggerFor(Supabase.Postgrest.PostgrestDiagnostics.SourceName),
+            TimeProvider = options.TimeProvider,
             Timeout = options.PostgrestTimeout,
             HttpClient = options.HttpClient,
             Proxy = options.Proxy
@@ -115,7 +117,8 @@ public static class StatelessClient
             Proxy = options.Proxy,
             Retry = options.FunctionsRetry,
             TracePropagation = options.TracePropagation,
-            Logger = options.LoggerFor(Supabase.Functions.FunctionsDiagnostics.SourceName)
+            Logger = options.LoggerFor(Supabase.Functions.FunctionsDiagnostics.SourceName),
+            TimeProvider = options.TimeProvider
         });
         client.GetHeaders = () => headers;
 
@@ -140,7 +143,8 @@ public static class StatelessClient
         var realtimeOptions = new Realtime.ClientOptions
         {
             Parameters = { ApiKey = supabaseKey },
-            WebSocketFactory = options.WebSocketFactory
+            WebSocketFactory = options.WebSocketFactory,
+            TimeProvider = options.TimeProvider
         };
 
         var postgrestClient = new Postgrest.Client(restUrl, restOptions);
