@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Storage.Common;
 using Supabase.Storage.ListVectors;
+using Supabase.Storage.QueryVectors;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -82,4 +83,34 @@ public interface IVectorIndex
     /// </example>
     [ImplementedCapability("storage.vector_buckets.list_vectors")]
     Task<VectorListPage<StoredVector>> ListVectorsAsync(ListVectorsOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Searches this index for the vectors closest to the query vector, nearest first. Requires a service-role key.
+    /// </summary>
+    /// <param name="queryVector">The 32-bit floating point components to search around. The service checks the count against the index dimension.</param>
+    /// <param name="topK">The number of matches to return. The service accepts 1 to 10,000 on S3 Vectors and a lower limit on other backends.</param>
+    /// <param name="options">Filter, content and paging options. When null, the service applies its defaults.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The matches nearest first, with their distance and metadata when <see cref="QueryVectorsOptions.Include"/> asks for them.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="queryVector"/> is null.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the bucket or the index does not exist
+    /// (<c>Code</c> <c>NotFoundException</c>) or a value is invalid, such as a <paramref name="topK"/> out of range or a
+    /// malformed filter (<c>Code</c> <c>InvalidRequest</c> or <c>InvalidParameter</c>).
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var index = storage.Vectors.From("embeddings-prod").Index("docs-v1");
+    /// var options = new QueryVectorsOptions
+    /// {
+    ///     Include = VectorMatchContent.Distance | VectorMatchContent.Metadata,
+    ///     Filter = JsonDocument.Parse("{\"category\":\"docs\"}").RootElement,
+    /// };
+    /// var result = await index.QueryVectorsAsync(new[] { 0.5f, 0.25f }, topK: 5, options);
+    /// foreach (var match in result.Matches)
+    ///     Console.WriteLine($"{match.Key} {match.Distance}");
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.vector_buckets.query_vectors")]
+    Task<VectorQueryResult> QueryVectorsAsync(IReadOnlyList<float> queryVector, int topK, QueryVectorsOptions? options = null, CancellationToken cancellationToken = default);
 }
