@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Storage.CreateVectorIndex;
+using Supabase.Storage.GetVectorIndex;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -52,6 +53,31 @@ public interface IVectorBucket
     /// </example>
     [ImplementedCapability("storage.vector_buckets.create_index")]
     Task CreateIndexAsync(NewVectorIndex index, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the settings and creation time of a vector index of this bucket. Requires a service-role key.
+    /// </summary>
+    /// <param name="indexName">The name of the index to describe.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The index as the service describes it.</returns>
+    /// <exception cref="System.ArgumentException">
+    /// <paramref name="indexName"/> is null, empty or whitespace.
+    /// </exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the bucket or the index does not exist
+    /// (<c>Code</c> <c>NotFoundException</c>), or its answer could not be read.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var index = await storage.Vectors.From("embeddings-prod").GetIndexAsync("docs-v1");
+    /// if (index.DistanceMetric == VectorDistanceMetric.Cosine)
+    /// {
+    ///     Console.WriteLine($"{index.IndexName} holds {index.Dimension}-dimensional vectors");
+    /// }
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.vector_buckets.get_index")]
+    Task<VectorIndexDetails> GetIndexAsync(string indexName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a vector index from this bucket, together with its vectors. Requires a service-role key.

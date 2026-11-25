@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
+using Supabase.Storage.Common;
 using Supabase.Storage.CreateVectorIndex;
 
 namespace Storage.Tests.CreateVectorIndex;

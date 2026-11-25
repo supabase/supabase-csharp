@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Supabase.Storage.Common;
 using Supabase.Storage.CreateVectorIndex;
 using Supabase.Storage.DeleteVectorIndex;
+using Supabase.Storage.GetVectorIndex;
 using Supabase.Storage.Interfaces;
 
 namespace Supabase.Storage;
@@ -24,6 +25,14 @@ internal sealed class VectorBucket : IVectorBucket
     {
         VectorService.RequireName(indexName, nameof(indexName));
         return new VectorIndex(this.vectorBucketName, indexName, this.service);
+    }
+
+    /// <inheritdoc />
+    public async Task<VectorIndexDetails> GetIndexAsync(string indexName, CancellationToken cancellationToken = default)
+    {
+        VectorService.RequireName(indexName, nameof(indexName));
+        var response = await this.service.PostAsync<GetVectorIndexResponse>("GetIndex", new GetVectorIndexBody(this.vectorBucketName, indexName), cancellationToken).ConfigureAwait(false);
+        return response.ToDetails();
     }
 
     /// <inheritdoc />

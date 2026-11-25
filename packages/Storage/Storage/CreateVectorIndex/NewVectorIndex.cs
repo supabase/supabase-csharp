@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Supabase.Storage.Common;
 
 namespace Supabase.Storage.CreateVectorIndex;
 
