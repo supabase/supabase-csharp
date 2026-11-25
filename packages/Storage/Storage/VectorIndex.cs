@@ -8,6 +8,7 @@ using Supabase.Storage.GetVectors;
 using Supabase.Storage.Interfaces;
 using Supabase.Storage.ListVectors;
 using Supabase.Storage.PutVectors;
+using Supabase.Storage.QueryVectors;
 
 namespace Supabase.Storage;
 
@@ -55,5 +56,15 @@ internal sealed class VectorIndex : IVectorIndex
         if (vectors is null)
             throw new ArgumentNullException(nameof(vectors));
         return this.service.Post("PutVectors", new PutVectorsBody(this.vectorBucketName, this.indexName, vectors), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<VectorQueryResult> QueryVectorsAsync(IReadOnlyList<float> queryVector, int topK, QueryVectorsOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        if (queryVector is null)
+            throw new ArgumentNullException(nameof(queryVector));
+        var body = new QueryVectorsBody(this.vectorBucketName, this.indexName, queryVector, topK, options ?? new QueryVectorsOptions());
+        var response = await this.service.PostAsync<QueryVectorsResponse>("QueryVectors", body, cancellationToken).ConfigureAwait(false);
+        return response.ToResult();
     }
 }

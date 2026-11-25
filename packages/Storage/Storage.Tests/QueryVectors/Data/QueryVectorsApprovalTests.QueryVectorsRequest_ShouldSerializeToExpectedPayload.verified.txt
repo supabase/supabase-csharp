@@ -1,0 +1,1 @@
+﻿{"vectorBucketName":"embeddings-prod","indexName":"docs-v1","queryVector":{"float32":[0.5,0.25]},"topK":10,"filter":{"$and":[{"year":{"$gte":2024}},{"lang":{"$in":["en","fr"]}}]},"nextToken":"token","returnDistance":true,"returnMetadata":true}
