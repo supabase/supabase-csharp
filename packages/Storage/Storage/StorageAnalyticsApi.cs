@@ -27,6 +27,10 @@ internal class StorageAnalyticsApi : IStorageAnalyticsApi
     }
 
     /// <inheritdoc />
+    public IIcebergCatalog From(string bucketName) =>
+        new IcebergCatalog($"{this.icebergUrl}/v1/{AnalyticsBucketName.Escape(bucketName, nameof(bucketName))}", this.options, this.requestClient, this.headers);
+
+    /// <inheritdoc />
     public async Task<AnalyticsBucket> CreateBucketAsync(string name, CancellationToken cancellationToken = default)
     {
         var body = CreateAnalyticsBucketBody.For(name);
