@@ -62,6 +62,8 @@ public interface IVectorIndex
     /// <summary>
     /// Lists the vectors of this index, one page at a time. Pass the <see cref="VectorListPage{TItem}.NextToken"/> of a
     /// page back in <see cref="ListVectorsOptions.NextToken"/> to read the next one. Requires a service-role key.
+    /// To scan a large index in parallel, give each worker its own <see cref="ListVectorsOptions.Segment"/> of the same
+    /// count: every vector belongs to exactly one segment, and each worker pages through its segment alone.
     /// </summary>
     /// <param name="options">Paging, content and segment options. When null, the service applies its defaults.</param>
     /// <param name="cancellationToken">Token used to cancel the request.</param>
@@ -79,7 +81,28 @@ public interface IVectorIndex
     /// while (page.NextToken is not null)
     ///     page = await index.ListVectorsAsync(options with { NextToken = page.NextToken });
     /// </code>
+    /// A full scan split across four parallel workers:
+    /// <code>
+    /// const int segmentCount = 4;
+    /// var index = storage.Vectors.From("embeddings-prod").Index("docs-v1");
+    /// var scans = Enumerable.Range(0, segmentCount).Select(async segmentIndex =>
+    /// {
+    ///     var keys = new List&lt;string&gt;();
+    ///     var options = new ListVectorsOptions { Segment = new VectorSegment(segmentIndex, segmentCount) };
+    ///     VectorListPage&lt;StoredVector&gt; page;
+    ///     do
+    ///     {
+    ///         page = await index.ListVectorsAsync(options);
+    ///         keys.AddRange(page.Items.Select(vector => vector.Key));
+    ///         options = options with { NextToken = page.NextToken };
+    ///     }
+    ///     while (page.NextToken is not null);
+    ///     return keys;
+    /// });
+    /// var allKeys = (await Task.WhenAll(scans)).SelectMany(keys => keys);
+    /// </code>
     /// </example>
     [ImplementedCapability("storage.vector_buckets.list_vectors")]
+    [ImplementedCapability("storage.vector_buckets.parallel_scan")]
     Task<VectorListPage<StoredVector>> ListVectorsAsync(ListVectorsOptions? options = null, CancellationToken cancellationToken = default);
 }
