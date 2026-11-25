@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Supabase.Storage.ListVectorIndexes;
+namespace Supabase.Storage.Common;
 
 /// <summary>
 /// One page of a list the vector service returns a page at a time.

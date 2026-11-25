@@ -2,18 +2,21 @@
 override Supabase.Storage.Common.AnalyticsBucket.Equals(object? obj) -> bool
 override Supabase.Storage.Common.AnalyticsBucket.GetHashCode() -> int
 override Supabase.Storage.Common.AnalyticsBucket.ToString() -> string!
+override Supabase.Storage.Common.StoredVector.Equals(object? obj) -> bool
+override Supabase.Storage.Common.StoredVector.GetHashCode() -> int
+override Supabase.Storage.Common.StoredVector.ToString() -> string!
 override Supabase.Storage.Common.VectorDataType.Equals(object? obj) -> bool
 override Supabase.Storage.Common.VectorDataType.GetHashCode() -> int
 override Supabase.Storage.Common.VectorDataType.ToString() -> string!
 override Supabase.Storage.Common.VectorDistanceMetric.Equals(object? obj) -> bool
 override Supabase.Storage.Common.VectorDistanceMetric.GetHashCode() -> int
 override Supabase.Storage.Common.VectorDistanceMetric.ToString() -> string!
+override Supabase.Storage.Common.VectorListPage<TItem>.Equals(object? obj) -> bool
+override Supabase.Storage.Common.VectorListPage<TItem>.GetHashCode() -> int
+override Supabase.Storage.Common.VectorListPage<TItem>.ToString() -> string!
 override Supabase.Storage.GetVectorIndex.VectorIndexDetails.Equals(object? obj) -> bool
 override Supabase.Storage.GetVectorIndex.VectorIndexDetails.GetHashCode() -> int
 override Supabase.Storage.GetVectorIndex.VectorIndexDetails.ToString() -> string!
-override Supabase.Storage.GetVectors.StoredVector.Equals(object? obj) -> bool
-override Supabase.Storage.GetVectors.StoredVector.GetHashCode() -> int
-override Supabase.Storage.GetVectors.StoredVector.ToString() -> string!
 override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Equals(object? obj) -> bool
 override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.GetHashCode() -> int
 override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.ToString() -> string!
@@ -26,11 +29,16 @@ override Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.ToString() 
 override Supabase.Storage.ListVectorIndexes.VectorIndexSummary.Equals(object? obj) -> bool
 override Supabase.Storage.ListVectorIndexes.VectorIndexSummary.GetHashCode() -> int
 override Supabase.Storage.ListVectorIndexes.VectorIndexSummary.ToString() -> string!
-override Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.Equals(object? obj) -> bool
-override Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.GetHashCode() -> int
-override Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.ToString() -> string!
+override Supabase.Storage.ListVectors.ListVectorsOptions.Equals(object? obj) -> bool
+override Supabase.Storage.ListVectors.ListVectorsOptions.GetHashCode() -> int
+override Supabase.Storage.ListVectors.ListVectorsOptions.ToString() -> string!
+override Supabase.Storage.ListVectors.VectorSegment.Equals(object? obj) -> bool
+override Supabase.Storage.ListVectors.VectorSegment.GetHashCode() -> int
+override Supabase.Storage.ListVectors.VectorSegment.ToString() -> string!
 static Supabase.Storage.Common.AnalyticsBucket.operator !=(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
 static Supabase.Storage.Common.AnalyticsBucket.operator ==(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
+static Supabase.Storage.Common.StoredVector.operator !=(Supabase.Storage.Common.StoredVector? left, Supabase.Storage.Common.StoredVector? right) -> bool
+static Supabase.Storage.Common.StoredVector.operator ==(Supabase.Storage.Common.StoredVector? left, Supabase.Storage.Common.StoredVector? right) -> bool
 static Supabase.Storage.Common.VectorDataType.Float32.get -> Supabase.Storage.Common.VectorDataType!
 static Supabase.Storage.Common.VectorDataType.operator !=(Supabase.Storage.Common.VectorDataType? left, Supabase.Storage.Common.VectorDataType? right) -> bool
 static Supabase.Storage.Common.VectorDataType.operator ==(Supabase.Storage.Common.VectorDataType? left, Supabase.Storage.Common.VectorDataType? right) -> bool
@@ -38,10 +46,10 @@ static Supabase.Storage.Common.VectorDistanceMetric.Cosine.get -> Supabase.Stora
 static Supabase.Storage.Common.VectorDistanceMetric.Euclidean.get -> Supabase.Storage.Common.VectorDistanceMetric!
 static Supabase.Storage.Common.VectorDistanceMetric.operator !=(Supabase.Storage.Common.VectorDistanceMetric? left, Supabase.Storage.Common.VectorDistanceMetric? right) -> bool
 static Supabase.Storage.Common.VectorDistanceMetric.operator ==(Supabase.Storage.Common.VectorDistanceMetric? left, Supabase.Storage.Common.VectorDistanceMetric? right) -> bool
+static Supabase.Storage.Common.VectorListPage<TItem>.operator !=(Supabase.Storage.Common.VectorListPage<TItem>? left, Supabase.Storage.Common.VectorListPage<TItem>? right) -> bool
+static Supabase.Storage.Common.VectorListPage<TItem>.operator ==(Supabase.Storage.Common.VectorListPage<TItem>? left, Supabase.Storage.Common.VectorListPage<TItem>? right) -> bool
 static Supabase.Storage.GetVectorIndex.VectorIndexDetails.operator !=(Supabase.Storage.GetVectorIndex.VectorIndexDetails? left, Supabase.Storage.GetVectorIndex.VectorIndexDetails? right) -> bool
 static Supabase.Storage.GetVectorIndex.VectorIndexDetails.operator ==(Supabase.Storage.GetVectorIndex.VectorIndexDetails? left, Supabase.Storage.GetVectorIndex.VectorIndexDetails? right) -> bool
-static Supabase.Storage.GetVectors.StoredVector.operator !=(Supabase.Storage.GetVectors.StoredVector? left, Supabase.Storage.GetVectors.StoredVector? right) -> bool
-static Supabase.Storage.GetVectors.StoredVector.operator ==(Supabase.Storage.GetVectors.StoredVector? left, Supabase.Storage.GetVectors.StoredVector? right) -> bool
 static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator !=(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? left, Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? right) -> bool
 static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator ==(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? left, Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? right) -> bool
 static Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.operator !=(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? right) -> bool
@@ -50,8 +58,10 @@ static Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.operator !=(S
 static Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.operator ==(Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? left, Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? right) -> bool
 static Supabase.Storage.ListVectorIndexes.VectorIndexSummary.operator !=(Supabase.Storage.ListVectorIndexes.VectorIndexSummary? left, Supabase.Storage.ListVectorIndexes.VectorIndexSummary? right) -> bool
 static Supabase.Storage.ListVectorIndexes.VectorIndexSummary.operator ==(Supabase.Storage.ListVectorIndexes.VectorIndexSummary? left, Supabase.Storage.ListVectorIndexes.VectorIndexSummary? right) -> bool
-static Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.operator !=(Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>? left, Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>? right) -> bool
-static Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.operator ==(Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>? left, Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>? right) -> bool
+static Supabase.Storage.ListVectors.ListVectorsOptions.operator !=(Supabase.Storage.ListVectors.ListVectorsOptions? left, Supabase.Storage.ListVectors.ListVectorsOptions? right) -> bool
+static Supabase.Storage.ListVectors.ListVectorsOptions.operator ==(Supabase.Storage.ListVectors.ListVectorsOptions? left, Supabase.Storage.ListVectors.ListVectorsOptions? right) -> bool
+static Supabase.Storage.ListVectors.VectorSegment.operator !=(Supabase.Storage.ListVectors.VectorSegment? left, Supabase.Storage.ListVectors.VectorSegment? right) -> bool
+static Supabase.Storage.ListVectors.VectorSegment.operator ==(Supabase.Storage.ListVectors.VectorSegment? left, Supabase.Storage.ListVectors.VectorSegment? right) -> bool
 Supabase.Storage.Client.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Client.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
 Supabase.Storage.Common.AnalyticsBucket
@@ -64,12 +74,34 @@ Supabase.Storage.Common.AnalyticsBucket.Name.get -> string!
 Supabase.Storage.Common.AnalyticsBucket.Name.init -> void
 Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.get -> System.DateTimeOffset
 Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.init -> void
+Supabase.Storage.Common.StoredVector
+Supabase.Storage.Common.StoredVector.<Clone>$() -> Supabase.Storage.Common.StoredVector!
+Supabase.Storage.Common.StoredVector.Data.get -> System.Collections.Generic.IReadOnlyList<float>?
+Supabase.Storage.Common.StoredVector.Data.init -> void
+Supabase.Storage.Common.StoredVector.Equals(Supabase.Storage.Common.StoredVector? other) -> bool
+Supabase.Storage.Common.StoredVector.Key.get -> string!
+Supabase.Storage.Common.StoredVector.Key.init -> void
+Supabase.Storage.Common.StoredVector.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
+Supabase.Storage.Common.StoredVector.Metadata.init -> void
+Supabase.Storage.Common.StoredVector.StoredVector() -> void
+Supabase.Storage.Common.VectorContent
+Supabase.Storage.Common.VectorContent.Data = 1 -> Supabase.Storage.Common.VectorContent
+Supabase.Storage.Common.VectorContent.Metadata = 2 -> Supabase.Storage.Common.VectorContent
+Supabase.Storage.Common.VectorContent.None = 0 -> Supabase.Storage.Common.VectorContent
 Supabase.Storage.Common.VectorDataType
 Supabase.Storage.Common.VectorDataType.<Clone>$() -> Supabase.Storage.Common.VectorDataType!
 Supabase.Storage.Common.VectorDataType.Equals(Supabase.Storage.Common.VectorDataType? other) -> bool
 Supabase.Storage.Common.VectorDistanceMetric
 Supabase.Storage.Common.VectorDistanceMetric.<Clone>$() -> Supabase.Storage.Common.VectorDistanceMetric!
 Supabase.Storage.Common.VectorDistanceMetric.Equals(Supabase.Storage.Common.VectorDistanceMetric? other) -> bool
+Supabase.Storage.Common.VectorListPage<TItem>
+Supabase.Storage.Common.VectorListPage<TItem>.<Clone>$() -> Supabase.Storage.Common.VectorListPage<TItem>!
+Supabase.Storage.Common.VectorListPage<TItem>.Equals(Supabase.Storage.Common.VectorListPage<TItem>? other) -> bool
+Supabase.Storage.Common.VectorListPage<TItem>.Items.get -> System.Collections.Generic.IReadOnlyList<TItem>!
+Supabase.Storage.Common.VectorListPage<TItem>.Items.init -> void
+Supabase.Storage.Common.VectorListPage<TItem>.NextToken.get -> string?
+Supabase.Storage.Common.VectorListPage<TItem>.NextToken.init -> void
+Supabase.Storage.Common.VectorListPage<TItem>.VectorListPage() -> void
 Supabase.Storage.CreateVectorIndex.NewVectorIndex
 Supabase.Storage.CreateVectorIndex.NewVectorIndex.Equals(Supabase.Storage.CreateVectorIndex.NewVectorIndex? other) -> bool
 Supabase.Storage.CreateVectorIndex.NewVectorIndex.<Clone>$() -> Supabase.Storage.CreateVectorIndex.NewVectorIndex!
@@ -105,20 +137,6 @@ Supabase.Storage.GetVectorIndex.VectorIndexDetails.IndexName.init -> void
 Supabase.Storage.GetVectorIndex.VectorIndexDetails.NonFilterableMetadataKeys.get -> System.Collections.Generic.IReadOnlyList<string!>!
 Supabase.Storage.GetVectorIndex.VectorIndexDetails.NonFilterableMetadataKeys.init -> void
 Supabase.Storage.GetVectorIndex.VectorIndexDetails.VectorIndexDetails() -> void
-Supabase.Storage.GetVectors.StoredVector
-Supabase.Storage.GetVectors.StoredVector.<Clone>$() -> Supabase.Storage.GetVectors.StoredVector!
-Supabase.Storage.GetVectors.StoredVector.Data.get -> System.Collections.Generic.IReadOnlyList<float>?
-Supabase.Storage.GetVectors.StoredVector.Data.init -> void
-Supabase.Storage.GetVectors.StoredVector.Equals(Supabase.Storage.GetVectors.StoredVector? other) -> bool
-Supabase.Storage.GetVectors.StoredVector.Key.get -> string!
-Supabase.Storage.GetVectors.StoredVector.Key.init -> void
-Supabase.Storage.GetVectors.StoredVector.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
-Supabase.Storage.GetVectors.StoredVector.Metadata.init -> void
-Supabase.Storage.GetVectors.StoredVector.StoredVector() -> void
-Supabase.Storage.GetVectors.VectorContent
-Supabase.Storage.GetVectors.VectorContent.Data = 1 -> Supabase.Storage.GetVectors.VectorContent
-Supabase.Storage.GetVectors.VectorContent.Metadata = 2 -> Supabase.Storage.GetVectors.VectorContent
-Supabase.Storage.GetVectors.VectorContent.None = 0 -> Supabase.Storage.GetVectors.VectorContent
 Supabase.Storage.Interfaces.IStorageAnalyticsApi
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.AnalyticsBucket!>!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.DeleteBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
@@ -138,10 +156,11 @@ Supabase.Storage.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Storage.ClientOptions.TimeProvider.set -> void
 Supabase.Storage.Interfaces.IVectorBucket.GetIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.GetVectorIndex.VectorIndexDetails!>!
 Supabase.Storage.Interfaces.IVectorBucket.Index(string! indexName) -> Supabase.Storage.Interfaces.IVectorIndex!
-Supabase.Storage.Interfaces.IVectorBucket.ListIndexesAsync(Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.ListVectorIndexes.VectorListPage<Supabase.Storage.ListVectorIndexes.VectorIndexSummary!>!>!
+Supabase.Storage.Interfaces.IVectorBucket.ListIndexesAsync(Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.VectorListPage<Supabase.Storage.ListVectorIndexes.VectorIndexSummary!>!>!
 Supabase.Storage.Interfaces.IVectorIndex
 Supabase.Storage.Interfaces.IVectorIndex.DeleteVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IVectorIndex.GetVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, Supabase.Storage.GetVectors.VectorContent include = Supabase.Storage.GetVectors.VectorContent.None, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.GetVectors.StoredVector!>!>!
+Supabase.Storage.Interfaces.IVectorIndex.GetVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, Supabase.Storage.Common.VectorContent include = Supabase.Storage.Common.VectorContent.None, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.StoredVector!>!>!
+Supabase.Storage.Interfaces.IVectorIndex.ListVectorsAsync(Supabase.Storage.ListVectors.ListVectorsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.VectorListPage<Supabase.Storage.Common.StoredVector!>!>!
 Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort
 Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.<Clone>$() -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort!
 Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.AnalyticsBucketSort(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn Column, System.ComponentModel.ListSortDirection Direction = System.ComponentModel.ListSortDirection.Ascending) -> void
@@ -185,12 +204,25 @@ Supabase.Storage.ListVectorIndexes.VectorIndexSummary.Equals(Supabase.Storage.Li
 Supabase.Storage.ListVectorIndexes.VectorIndexSummary.IndexName.get -> string!
 Supabase.Storage.ListVectorIndexes.VectorIndexSummary.IndexName.init -> void
 Supabase.Storage.ListVectorIndexes.VectorIndexSummary.VectorIndexSummary() -> void
-Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>
-Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.<Clone>$() -> Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>!
-Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.Equals(Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>? other) -> bool
-Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.Items.get -> System.Collections.Generic.IReadOnlyList<TItem>!
-Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.Items.init -> void
-Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.NextToken.get -> string?
-Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.NextToken.init -> void
-Supabase.Storage.ListVectorIndexes.VectorListPage<TItem>.VectorListPage() -> void
+Supabase.Storage.ListVectors.ListVectorsOptions
+Supabase.Storage.ListVectors.ListVectorsOptions.<Clone>$() -> Supabase.Storage.ListVectors.ListVectorsOptions!
+Supabase.Storage.ListVectors.ListVectorsOptions.Equals(Supabase.Storage.ListVectors.ListVectorsOptions? other) -> bool
+Supabase.Storage.ListVectors.ListVectorsOptions.Include.get -> Supabase.Storage.Common.VectorContent
+Supabase.Storage.ListVectors.ListVectorsOptions.Include.init -> void
+Supabase.Storage.ListVectors.ListVectorsOptions.ListVectorsOptions() -> void
+Supabase.Storage.ListVectors.ListVectorsOptions.MaxResults.get -> int?
+Supabase.Storage.ListVectors.ListVectorsOptions.MaxResults.init -> void
+Supabase.Storage.ListVectors.ListVectorsOptions.NextToken.get -> string?
+Supabase.Storage.ListVectors.ListVectorsOptions.NextToken.init -> void
+Supabase.Storage.ListVectors.ListVectorsOptions.Segment.get -> Supabase.Storage.ListVectors.VectorSegment?
+Supabase.Storage.ListVectors.ListVectorsOptions.Segment.init -> void
+Supabase.Storage.ListVectors.VectorSegment
+Supabase.Storage.ListVectors.VectorSegment.<Clone>$() -> Supabase.Storage.ListVectors.VectorSegment!
+Supabase.Storage.ListVectors.VectorSegment.Count.get -> int
+Supabase.Storage.ListVectors.VectorSegment.Count.init -> void
+Supabase.Storage.ListVectors.VectorSegment.Deconstruct(out int Index, out int Count) -> void
+Supabase.Storage.ListVectors.VectorSegment.Equals(Supabase.Storage.ListVectors.VectorSegment? other) -> bool
+Supabase.Storage.ListVectors.VectorSegment.Index.get -> int
+Supabase.Storage.ListVectors.VectorSegment.Index.init -> void
+Supabase.Storage.ListVectors.VectorSegment.VectorSegment(int Index, int Count) -> void
 Supabase.Storage.StorageBucketApi.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!

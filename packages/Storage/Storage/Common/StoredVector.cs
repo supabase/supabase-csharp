@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 
-namespace Supabase.Storage.GetVectors;
+namespace Supabase.Storage.Common;
 
 /// <summary>
 /// A vector as it is stored in an index: its key, and its data and metadata when the call asked for them.

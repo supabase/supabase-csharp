@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
+using Supabase.Storage.Common;
 using Supabase.Storage.CreateVectorIndex;
 using Supabase.Storage.GetVectorIndex;
 using Supabase.Storage.ListVectorIndexes;

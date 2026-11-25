@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Supabase.Storage.GetVectors;
+namespace Supabase.Storage.Common;
 
 internal sealed class StoredVectorBody
 {
