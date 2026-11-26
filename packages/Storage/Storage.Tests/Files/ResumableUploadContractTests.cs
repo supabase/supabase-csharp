@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -104,6 +105,18 @@ namespace Storage.Tests.Files
             FluentActions.Invoking(() => File.Open(path, FileMode.Open, FileAccess.Read, FileShare.None).Dispose())
                 .Should().NotThrow("the caller must be able to move or delete the file after the upload");
             File.Delete(path);
+        }
+
+        [TestMethod]
+        public async Task UploadOrResume_ShouldSendMetadataInTheUploadMetadata_GivenLocalFile()
+        {
+            var path = Path.GetTempFileName();
+            await File.WriteAllBytesAsync(path, Payload);
+            await this.client.From(Bucket).UploadOrResume(path, FileName, new FileOptions { Metadata = new Dictionary<string, string> { ["k"] = "v" } });
+            File.Delete(path);
+            var uploadMetadata = this.server.LogEntries.Single(entry => entry.RequestMessage!.Method == "POST").RequestMessage!.Headers!["Upload-Metadata"].ToString();
+            var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes("""{"k":"v"}"""));
+            uploadMetadata.Should().Contain($",metadata {encoded}", "a resumable upload stores only the metadata sent in Upload-Metadata");
         }
 
         [TestMethod]
