@@ -1,4 +1,6 @@
 using Supabase.Core.Interfaces;
+using Supabase.Storage.AnalyticsBuckets;
+using Supabase.Storage.VectorBuckets;
 
 namespace Supabase.Storage.Interfaces;
 

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
-using Supabase.Storage.Common;
+using Supabase.Storage.FileBuckets.Common;
 
 namespace Supabase.Storage.Interfaces;
 

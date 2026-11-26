@@ -44,6 +44,7 @@ Gotrue/
 
 - **A type belongs to the use case that uses it.** Public inputs and outputs, internal wire DTOs, mapping and validation used by one use case go in its folder.
 - **Promote only what is shared.** A type moves to `Common/` when a second use case needs it, never ahead of time; the PR that adds the second use case makes the move.
+- **A product with several domains gets one folder per domain.** Storage has file, vector and analytics buckets: each domain is a folder (`FileBuckets/`, `VectorBuckets/`, `AnalyticsBuckets/`) holding its use cases and its own `Common/`. The product's `Common/` keeps only what two domains share. A sub-domain reached through another domain's entry point nests inside it (the Iceberg catalog, reached from an analytics bucket, is `AnalyticsBuckets/Iceberg/`). A domain's shipped code stays where it is until the v9 migration, so a domain may sit partly at the package root and partly in its folder.
 - **No shared type serving several use cases through a mode switch.** One wire body per use case beats one body with `ForCreation`/`ForChanges` factories: each use case can then change without touching the other. Put the shared mapping in a helper in `Common/` instead.
 - **Namespaces follow folders** (`Supabase.Gotrue.CreateCustomProvider`, `Supabase.Gotrue.Common`), so a use case's public types sit in their own namespace. Never name a folder after a type in scope; it would shadow the type (`CS0118`).
 - **A use case with no types of its own needs no folder.** Its tests still get one.
