@@ -5,6 +5,7 @@ using Supabase.Storage.Common;
 using Supabase.Storage.CreateNamespace;
 using Supabase.Storage.CreateTable;
 using Supabase.Storage.ListNamespaces;
+using Supabase.Storage.ListTables;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -143,4 +144,30 @@ public interface IIcebergCatalog
     /// </example>
     [ImplementedCapability("storage.analytics.create_table")]
     Task<IcebergTableMetadata> CreateTableAsync(IcebergTable table, IcebergSchema schema, CreateTableOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Lists the tables of a namespace, one page at a time. Storage applies the page size as a limit and ignores the
+    /// page token today: it returns the first tables in creation order, without a next-page token.
+    /// </summary>
+    /// <param name="namespace">The namespace whose tables to list.</param>
+    /// <param name="options">Page size and page token, following the Iceberg REST Catalog spec. When null, none is sent.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>One page of tables. Empty when the namespace holds none.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="namespace"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The namespace is a relative path segment.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the namespace or its bucket does not exist (status 404,
+    /// <c>Code</c> <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>), the page size is negative (status 400) or
+    /// the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var page = await catalog.ListTablesAsync(IcebergNamespace.Of("sales"));
+    /// foreach (var table in page.Tables)
+    ///     Console.WriteLine(table.Name);
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.list_tables")]
+    Task<IcebergTablePage> ListTablesAsync(IcebergNamespace @namespace, ListTablesOptions? options = null, CancellationToken cancellationToken = default);
 }
