@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Realtime.Broadcast;
@@ -132,7 +133,7 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
 
     /// <inheritdoc />
     [ImplementedCapability("realtime.channel.broadcast_persist")]
-    public async Task SendAsync(string eventName, object payload, BroadcastPersistence persistence, int timeoutMs = DefaultTimeout)
+    public async Task SendPersistedAsync(string eventName, object payload, BroadcastPersistence persistence, int timeoutMs = DefaultTimeout, CancellationToken cancellationToken = default)
     {
         this.channel.EnsureCanPersist(persistence);
         if (payload is BaseBroadcast)
@@ -143,8 +144,9 @@ public class RealtimeBroadcast<TBroadcastModel> : IRealtimeBroadcast where TBroa
             throw new ArgumentException("The event name of a persisted broadcast must fit in 255 bytes.", nameof(eventName));
         if (!WireFrame.Fits(this.channel.Topic))
             throw new RealtimeException("The topic of a persisted broadcast must fit in 255 bytes.");
+        cancellationToken.ThrowIfCancellationRequested();
 
-        var reply = await this.channel.SendForReply(ChannelEventName.Broadcast, null, this.PersistedBroadcast(eventName, payload, persistence), timeoutMs).ConfigureAwait(false);
+        var reply = await this.channel.SendForReply(ChannelEventName.Broadcast, null, this.PersistedBroadcast(eventName, payload, persistence), timeoutMs, cancellationToken).ConfigureAwait(false);
         if (reply != null && reply.Payload?.Status != PhoenixStatusOk)
             throw NotStored(reply);
     }

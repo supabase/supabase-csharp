@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
@@ -29,6 +30,8 @@ public class BroadcastPersistenceTests
     private const byte BinaryEncoding = 0;
     private const byte JsonEncoding = 1;
     private const int LongestFieldInBytes = 255;
+    private const int OneHourInSeconds = 3600;
+    private const string NotAPositiveWholeNumberOfSeconds = "The ttl of a persisted broadcast must be a positive whole number of seconds.*";
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
     private static readonly byte[] Bytes = [0, 159, 146, 150, 255];
 
@@ -49,29 +52,29 @@ public class BroadcastPersistenceTests
 
     [TestMethod]
     [DataRow(null, StoreForTheMaximumRetention)]
-    [DataRow(3600, """{"persist":{"ttl":3600}}""")]
-    public async Task SendAsync_ShouldPutThePersistOptionInTheFrameMetadata(int? ttlSeconds, string metadata)
+    [DataRow(OneHourInSeconds, """{"persist":{"ttl":3600}}""")]
+    public async Task SendPersistedAsync_ShouldPutThePersistOptionInTheFrameMetadata(int? ttlSeconds, string metadata)
     {
         var broadcast = await this.Joined();
-        await broadcast.SendAsync(Event, new { text = "hi" }, new BroadcastPersistence(ttlSeconds is { } seconds ? TimeSpan.FromSeconds(seconds) : null));
+        await broadcast.SendPersistedAsync(Event, new { text = "hi" }, Persistence(ttlSeconds));
         (await this.SentFrame()).Should().Equal(this.Frame(metadata, JsonEncoding, Utf8("""{"text":"hi"}""")), "the server reads persist only from the frame metadata, so the JSON payload must go out as given");
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldPushTheBytesBinaryEncoded_GivenAByteArray()
+    public async Task SendPersistedAsync_ShouldPushTheBytesBinaryEncoded_GivenAByteArray()
     {
         byte[] reused = [.. Bytes];
         var broadcast = await this.Joined();
-        await broadcast.SendAsync(Event, reused, new BroadcastPersistence());
+        await broadcast.SendPersistedAsync(Event, reused, BroadcastPersistence.ForMaximumRetention);
         Array.Clear(reused);
         (await this.SentFrame()).Should().Equal(this.Frame(StoreForTheMaximumRetention, BinaryEncoding, Bytes), "a byte array must go out with the binary encoding, as it was at the call");
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldComplete_GivenAnOkReply()
+    public async Task SendPersistedAsync_ShouldComplete_GivenAnOkReply()
     {
         var broadcast = await this.Joined(acknowledged: true);
-        var send = broadcast.SendAsync(Event, Bytes, new BroadcastPersistence());
+        var send = broadcast.SendPersistedAsync(Event, Bytes, BroadcastPersistence.ForMaximumRetention);
         this.socket.Reply(Topic, this.channel.LastPush!.Ref);
         await send.Awaiting(s => s).Should().CompleteWithinAsync(Patience, "an ok reply means the server stored the message");
     }
@@ -81,12 +84,12 @@ public class BroadcastPersistenceTests
     [DataRow("persistence_failed", FailureHint.Reason.PersistenceFailed)]
     [DataRow("persistence_invalid_ttl", FailureHint.Reason.PersistenceInvalidTtl)]
     [DataRow("persistence_unheard_of", FailureHint.Reason.Unknown)]
-    public async Task SendAsync_ShouldThrowTheServerCode_GivenAnErrorReply(string code, FailureHint.Reason reason)
+    public async Task SendPersistedAsync_ShouldThrowTheServerCode_GivenAnErrorReply(string code, FailureHint.Reason reason)
     {
         var broadcast = await this.Joined(acknowledged: true);
-        var send = broadcast.SendAsync(Event, Bytes, new BroadcastPersistence());
+        var send = broadcast.SendPersistedAsync(Event, Bytes, BroadcastPersistence.ForMaximumRetention);
         this.socket.Reply(Topic, this.channel.LastPush!.Ref, "error", $$"""{"error":"{{code}}"}""");
-        var exception = (await send.Awaiting(s => s).Should().ThrowWithinAsync<RealtimeException>(Patience)).Which;
+        var exception = (await send.Awaiting(s => s).Should().ThrowWithinAsync<RealtimeException>(Patience, "an error reply means the server did not store the message")).Which;
         using (new AssertionScope())
         {
             exception.Reason.Should().Be(reason, "the server names why it did not store the message, and a code this client does not know must still be accepted");
@@ -95,55 +98,86 @@ public class BroadcastPersistenceTests
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldThrowAndSendNothing_GivenAPublicChannel()
+    public async Task SendPersistedAsync_ShouldThrowAndSendNothing_GivenAPublicChannel()
     {
         var broadcast = await this.Joined(isPrivate: false);
-        (await broadcast.Awaiting(b => b.SendAsync(Event, Bytes, new BroadcastPersistence())).Should().ThrowAsync<RealtimeException>()).WithMessage("A persisted broadcast needs a private channel.", "the server ignores persist on a public channel and still replies ok");
+        (await broadcast.Awaiting(b => b.SendPersistedAsync(Event, Bytes, BroadcastPersistence.ForMaximumRetention)).Should().ThrowAsync<RealtimeException>()).WithMessage("A persisted broadcast needs a private channel.", "the server ignores persist on a public channel and still replies ok");
         this.channel.LastPush.Should().BeNull("nothing must be sent for a message the server would not store");
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldThrowAndSendNothing_GivenProtocolV1()
+    public async Task SendPersistedAsync_ShouldThrowAndSendNothing_GivenProtocolV1()
     {
         this.options.ProtocolVersion = ProtocolVersion.V1;
         var broadcast = await this.Joined();
-        (await broadcast.Awaiting(b => b.SendAsync(Event, Bytes, new BroadcastPersistence())).Should().ThrowAsync<RealtimeException>()).WithMessage("A persisted broadcast needs ClientOptions.ProtocolVersion set to V2.", "only the binary frame of protocol 2.0.0 carries the metadata the server reads persist from");
+        (await broadcast.Awaiting(b => b.SendPersistedAsync(Event, Bytes, BroadcastPersistence.ForMaximumRetention)).Should().ThrowAsync<RealtimeException>()).WithMessage("A persisted broadcast needs ClientOptions.ProtocolVersion set to V2.", "only the binary frame of protocol 2.0.0 carries the metadata the server reads persist from");
         this.channel.LastPush.Should().BeNull("nothing must be sent for a message the server would not store");
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldThrowAndSendNothing_GivenABroadcastModel()
+    public async Task SendPersistedAsync_ShouldThrowAndSendNothing_GivenABroadcastModel()
     {
         var broadcast = await this.Joined();
-        (await broadcast.Awaiting(b => b.SendAsync(Event, new BroadcastExample { UserId = "1" }, new BroadcastPersistence())).Should().ThrowAsync<ArgumentException>()).WithMessage("A persisted broadcast takes the payload itself, not a BaseBroadcast.*", "the frame already carries the event, so a model would reach receivers nested inside the payload");
+        (await broadcast.Awaiting(b => b.SendPersistedAsync(Event, new BroadcastExample { UserId = "1" }, BroadcastPersistence.ForMaximumRetention)).Should().ThrowAsync<ArgumentException>()).WithMessage("A persisted broadcast takes the payload itself, not a BaseBroadcast.*", "the frame already carries the event, so a model would reach receivers nested inside the payload");
         this.channel.LastPush.Should().BeNull("nothing must be sent for a payload the receivers would not read");
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldThrow_GivenAnEventNameOverTheLongestSize()
+    public async Task SendPersistedAsync_ShouldThrow_GivenAnEventNameOverTheLongestSize()
     {
         var broadcast = await this.Joined();
-        (await broadcast.Awaiting(b => b.SendAsync(new string('e', LongestFieldInBytes + 1), Bytes, new BroadcastPersistence())).Should().ThrowAsync<ArgumentException>()).WithMessage("The event name of a persisted broadcast must fit in 255 bytes.*", "a binary frame has one byte for the size of the event name");
+        (await broadcast.Awaiting(b => b.SendPersistedAsync(new string('e', LongestFieldInBytes + 1), Bytes, BroadcastPersistence.ForMaximumRetention)).Should().ThrowAsync<ArgumentException>()).WithMessage("The event name of a persisted broadcast must fit in 255 bytes.*", "a binary frame has one byte for the size of the event name");
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldThrow_GivenATopicOverTheLongestSize()
+    public async Task SendPersistedAsync_ShouldThrow_GivenATopicOverTheLongestSize()
     {
         var broadcast = await this.Joined(new string('t', LongestFieldInBytes));
-        (await broadcast.Awaiting(b => b.SendAsync(Event, Bytes, new BroadcastPersistence())).Should().ThrowAsync<RealtimeException>()).WithMessage("The topic of a persisted broadcast must fit in 255 bytes.", "a binary frame has one byte for the size of the topic");
+        (await broadcast.Awaiting(b => b.SendPersistedAsync(Event, Bytes, BroadcastPersistence.ForMaximumRetention)).Should().ThrowAsync<RealtimeException>()).WithMessage("The topic of a persisted broadcast must fit in 255 bytes.", "a binary frame has one byte for the size of the topic");
     }
 
     [TestMethod]
-    public async Task SendAsync_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
+    public async Task SendPersistedAsync_ShouldComplete_GivenCallerBlockingOnContextThatNeverRunsContinuations()
     {
         var broadcast = await this.Joined(acknowledged: true);
         BlockingCaller.Completes(() =>
         {
-            var sending = broadcast.SendAsync(Event, Bytes, new BroadcastPersistence());
+            var sending = broadcast.SendPersistedAsync(Event, Bytes, BroadcastPersistence.ForMaximumRetention);
             Task.Run(() => this.socket.Reply(Topic, this.channel.LastPush!.Ref));
             return sending;
         }).Should().BeTrue("the SDK must not resume on the caller's synchronization context");
     }
+
+    [TestMethod]
+    public async Task SendPersistedAsync_ShouldStopWaitingForTheAck_GivenACancellation()
+    {
+        using var cancellation = new CancellationTokenSource();
+        var broadcast = await this.Joined(acknowledged: true);
+        var send = broadcast.SendPersistedAsync(Event, Bytes, BroadcastPersistence.ForMaximumRetention, cancellationToken: cancellation.Token);
+        await cancellation.CancelAsync();
+        await send.Awaiting(s => s).Should().ThrowWithinAsync<OperationCanceledException>(Patience, "a cancelled caller must not wait for an ack the server may never send");
+    }
+
+    [TestMethod]
+    public async Task SendPersistedAsync_ShouldThrowAndSendNothing_GivenACancelledToken()
+    {
+        using var cancellation = new CancellationTokenSource();
+        await cancellation.CancelAsync();
+        var broadcast = await this.Joined(acknowledged: true);
+        await broadcast.Awaiting(b => b.SendPersistedAsync(Event, Bytes, BroadcastPersistence.ForMaximumRetention, cancellationToken: cancellation.Token)).Should().ThrowAsync<OperationCanceledException>("a caller that already gave up must not have the broadcast stored");
+        this.channel.LastPush.Should().BeNull("nothing must be sent once the caller cancelled");
+    }
+
+    [TestMethod]
+    [DataRow(0)]
+    [DataRow(-1000)]
+    [DataRow(500)]
+    [DataRow(1500)]
+    public void For_ShouldThrow_GivenATtlThatIsNotAPositiveWholeNumberOfSeconds(int milliseconds) =>
+        FluentActions.Invoking(() => BroadcastPersistence.For(TimeSpan.FromMilliseconds(milliseconds))).Should().Throw<ArgumentException>().WithMessage(NotAPositiveWholeNumberOfSeconds, "the server reads the ttl as a positive integer of seconds, so the client must not round or truncate it");
+
+    private static BroadcastPersistence Persistence(int? ttlSeconds) =>
+        ttlSeconds is { } seconds ? BroadcastPersistence.For(TimeSpan.FromSeconds(seconds)) : BroadcastPersistence.ForMaximumRetention;
 
     private async Task<RealtimeBroadcast<BaseBroadcast>> Joined(string channelName = "room", bool isPrivate = true, bool acknowledged = false)
     {

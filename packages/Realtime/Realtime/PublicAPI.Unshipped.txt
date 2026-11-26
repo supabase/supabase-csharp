@@ -1,15 +1,20 @@
 #nullable enable
+override Supabase.Realtime.Broadcast.BroadcastPersistence.Equals(object? obj) -> bool
+override Supabase.Realtime.Broadcast.BroadcastPersistence.GetHashCode() -> int
+override Supabase.Realtime.Broadcast.BroadcastPersistence.ToString() -> string!
+static Supabase.Realtime.Broadcast.BroadcastPersistence.For(System.TimeSpan ttl) -> Supabase.Realtime.Broadcast.BroadcastPersistence!
+static Supabase.Realtime.Broadcast.BroadcastPersistence.ForMaximumRetention.get -> Supabase.Realtime.Broadcast.BroadcastPersistence!
+static Supabase.Realtime.Broadcast.BroadcastPersistence.operator !=(Supabase.Realtime.Broadcast.BroadcastPersistence? left, Supabase.Realtime.Broadcast.BroadcastPersistence? right) -> bool
+static Supabase.Realtime.Broadcast.BroadcastPersistence.operator ==(Supabase.Realtime.Broadcast.BroadcastPersistence? left, Supabase.Realtime.Broadcast.BroadcastPersistence? right) -> bool
 Supabase.Realtime.Broadcast.BroadcastPersistence
-Supabase.Realtime.Broadcast.BroadcastPersistence.BroadcastPersistence(System.TimeSpan? ttl = null) -> void
-Supabase.Realtime.Broadcast.BroadcastPersistence.Ttl.get -> System.TimeSpan?
+Supabase.Realtime.Broadcast.BroadcastPersistence.<Clone>$() -> Supabase.Realtime.Broadcast.BroadcastPersistence!
+Supabase.Realtime.Broadcast.BroadcastPersistence.Equals(Supabase.Realtime.Broadcast.BroadcastPersistence? other) -> bool
 Supabase.Realtime.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Realtime.ClientOptions.TimeProvider.set -> void
 Supabase.Realtime.Exceptions.FailureHint.Reason.PersistenceFailed = 9 -> Supabase.Realtime.Exceptions.FailureHint.Reason
 Supabase.Realtime.Exceptions.FailureHint.Reason.PersistenceInvalidTtl = 10 -> Supabase.Realtime.Exceptions.FailureHint.Reason
 Supabase.Realtime.Exceptions.FailureHint.Reason.PersistenceUnauthorized = 8 -> Supabase.Realtime.Exceptions.FailureHint.Reason
-Supabase.Realtime.Interfaces.IRealtimeBroadcast.SendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, int timeoutMs = 10000) -> System.Threading.Tasks.Task!
-Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence) -> System.Threading.Tasks.Task!
-Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
-Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.SendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, int timeoutMs = 10000) -> System.Threading.Tasks.Task!
-Supabase.Realtime.RealtimeChannel.HttpSendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence) -> System.Threading.Tasks.Task!
-Supabase.Realtime.RealtimeChannel.HttpSendAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Supabase.Realtime.Interfaces.IRealtimeBroadcast.SendPersistedAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, int timeoutMs = 10000, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Realtime.Interfaces.IRealtimeChannel.HttpSendPersistedAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Realtime.RealtimeBroadcast<TBroadcastModel>.SendPersistedAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, int timeoutMs = 10000, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Realtime.RealtimeChannel.HttpSendPersistedAsync(string! eventName, object! payload, Supabase.Realtime.Broadcast.BroadcastPersistence! persistence, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
