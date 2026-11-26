@@ -30,6 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Update="CreateTable\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
         <None Update="Assets\supabase-csharp.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>

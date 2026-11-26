@@ -1,0 +1,120 @@
+{
+  "metadata-location": "s3://analytics-data/sales/events/metadata/00000-2eed5277-661d-47b5-84c0-30ce9dbad149.metadata.json",
+  "metadata": {
+    "format-version": 2,
+    "table-uuid": "b734865e-f9a5-4654-8b0b-e15683fcb195",
+    "location": "s3://analytics-data/sales/events",
+    "last-updated-ms": 1752062419286,
+    "last-column-id": 9,
+    "last-partition-id": 1001,
+    "current-schema-id": 1,
+    "schemas": [
+      {
+        "type": "struct",
+        "schema-id": 0,
+        "fields": [
+          {
+            "id": 1,
+            "name": "id",
+            "type": "long",
+            "required": true
+          }
+        ]
+      },
+      {
+        "type": "struct",
+        "schema-id": 1,
+        "fields": [
+          {
+            "id": 1,
+            "name": "id",
+            "type": "long",
+            "required": true,
+            "doc": "The event identifier"
+          },
+          {
+            "id": 2,
+            "name": "amount",
+            "type": "decimal(10,2)",
+            "required": false
+          },
+          {
+            "id": 3,
+            "name": "origin",
+            "type": {
+              "type": "struct",
+              "fields": [
+                {
+                  "id": 4,
+                  "name": "country",
+                  "type": "string",
+                  "required": false
+                }
+              ]
+            },
+            "required": false
+          },
+          {
+            "id": 5,
+            "name": "tags",
+            "type": {
+              "type": "list",
+              "element-id": 6,
+              "element": "string",
+              "element-required": true
+            },
+            "required": false
+          },
+          {
+            "id": 7,
+            "name": "attributes",
+            "type": {
+              "type": "map",
+              "key-id": 8,
+              "key": "string",
+              "value-id": 9,
+              "value": "int",
+              "value-required": false
+            },
+            "required": false
+          }
+        ]
+      }
+    ],
+    "default-spec-id": 1,
+    "partition-specs": [
+      {
+        "spec-id": 0,
+        "fields": []
+      },
+      {
+        "spec-id": 1,
+        "fields": [
+          {
+            "source-id": 1,
+            "field-id": 1000,
+            "name": "id_bucket",
+            "transform": "bucket[16]"
+          },
+          {
+            "source-id": 2,
+            "field-id": 1001,
+            "name": "amount_truncate",
+            "transform": "truncate[4]"
+          }
+        ]
+      }
+    ],
+    "properties": {
+      "write.parquet.compression-codec": "zstd"
+    },
+    "sort-orders": [
+      {
+        "order-id": 0,
+        "fields": []
+      }
+    ],
+    "default-sort-order-id": 0,
+    "snapshots": []
+  }
+}

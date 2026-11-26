@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Storage.Common;
 using Supabase.Storage.CreateNamespace;
+using Supabase.Storage.CreateTable;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;
 using Supabase.Storage.ListNamespaces;
@@ -31,7 +32,7 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     /// <inheritdoc />
     public async Task<bool> NamespaceExistsAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default)
     {
-        RequireNamespace(@namespace);
+        RequireArgument(@namespace, nameof(@namespace));
         try
         {
             using var response = await Helpers.MakeRequestAsync(this.requestClient, this.options, HttpMethod.Head, this.NamespaceUrl(@namespace), null, this.headers(), cancellationToken).ConfigureAwait(false);
@@ -46,7 +47,7 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     /// <inheritdoc />
     public async Task<IcebergNamespaceDetails> CreateNamespaceAsync(IcebergNamespace @namespace, CreateNamespaceOptions? options = null, CancellationToken cancellationToken = default)
     {
-        RequireNamespace(@namespace);
+        RequireArgument(@namespace, nameof(@namespace));
         var response = await Helpers.MakeRequestAsync<CreateNamespaceResponse>(this.requestClient, this.options, HttpMethod.Post, $"{this.catalogUrl}/namespaces", CreateNamespaceBody.For(@namespace, options), this.headers(), cancellationToken).ConfigureAwait(false);
         return response!.ToDetails(@namespace);
     }
@@ -62,18 +63,29 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     /// <inheritdoc />
     public Task DeleteNamespaceAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default)
     {
-        RequireNamespace(@namespace);
+        RequireArgument(@namespace, nameof(@namespace));
         return Helpers.MakeRequestAsync(this.requestClient, this.options, HttpMethod.Delete, this.NamespaceUrl(@namespace), null, this.headers(), cancellationToken);
     }
+
+    /// <inheritdoc />
+    public async Task<IcebergTableMetadata> CreateTableAsync(IcebergTable table, IcebergSchema schema, CreateTableOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(table, nameof(table));
+        RequireArgument(schema, nameof(schema));
+        var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Post, this.TablesUrl(table.Namespace), CreateTableBody.For(table, schema, options), this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToMetadata();
+    }
+
+    private string TablesUrl(IcebergNamespace @namespace) => $"{this.NamespaceUrl(@namespace)}/tables";
 
     private string NamespaceUrl(IcebergNamespace @namespace) =>
         $"{this.catalogUrl}/namespaces/{IcebergNamespacePath.For(@namespace)}";
 
     private static bool IsNotFound(SupabaseStorageException exception) => exception.StatusCode == NotFoundStatus;
 
-    private static void RequireNamespace(IcebergNamespace? @namespace)
+    private static void RequireArgument(object? argument, string parameterName)
     {
-        if (@namespace is null)
-            throw new ArgumentNullException(nameof(@namespace));
+        if (argument is null)
+            throw new ArgumentNullException(parameterName);
     }
 }
