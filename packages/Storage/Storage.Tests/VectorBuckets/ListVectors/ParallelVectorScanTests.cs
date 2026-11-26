@@ -5,6 +5,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
+using Supabase.Storage.Common;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.VectorBuckets.Common;
 using Supabase.Storage.VectorBuckets.ListVectors;
@@ -56,15 +57,15 @@ public class ParallelVectorScanTests : VectorIndexE2EFixture
     private async Task<IReadOnlyList<string>> ScanSegment(int segmentIndex)
     {
         var keys = new List<string>();
-        var options = new ListVectorsOptions { MaxResults = 1, Segment = new VectorSegment(segmentIndex, SegmentCount) };
-        VectorListPage<StoredVector> page;
+        var options = new ListVectorsOptions { PageSize = 1, Segment = new VectorSegment(segmentIndex, SegmentCount) };
+        Page<StoredVector> page;
         do
         {
             page = await this.Index.ListVectorsAsync(options);
             keys.AddRange(page.Items.Select(vector => vector.Key));
-            options = options with { NextToken = page.NextToken };
+            options = options with { NextPageToken = page.NextPageToken };
         }
-        while (page.NextToken is not null);
+        while (page.NextPageToken is not null);
         return keys;
     }
 }

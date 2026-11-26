@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
-using Supabase.Storage.Common;
+using Supabase.Storage.AnalyticsBuckets.Common;
 
 namespace Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables;
 
@@ -11,8 +11,8 @@ internal static class ListTablesQuery
 
     private static IEnumerable<string> ParametersOf(ListTablesOptions options)
     {
-        if (options.PageToken is { } pageToken)
-            yield return QueryString.Parameter("pageToken", pageToken);
+        if (options.NextPageToken is { } nextPageToken)
+            yield return QueryString.Parameter("pageToken", nextPageToken);
 
         if (options.PageSize is { } pageSize)
             yield return QueryString.Parameter("pageSize", pageSize.ToString(CultureInfo.InvariantCulture));

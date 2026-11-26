@@ -75,7 +75,7 @@ public class ListTablesContractTests
     public async Task ListTablesAsync_ShouldSendPageSizeAndToken_GivenOptions()
     {
         this.Respond(TablesPath, 200, Listed);
-        await this.Catalog().ListTablesAsync(Sales, new ListTablesOptions { PageSize = 2, PageToken = "next/page token" });
+        await this.Catalog().ListTablesAsync(Sales, new ListTablesOptions { PageSize = 2, NextPageToken = "next/page token" });
         var query = this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Query!;
         using (new AssertionScope())
         {
@@ -97,7 +97,7 @@ public class ListTablesContractTests
     public async Task ListTablesAsync_ShouldReturnTheListedTablesInOrder()
     {
         this.Respond(TablesPath, 200, Listed);
-        (await this.Catalog().ListTablesAsync(Sales)).Tables
+        (await this.Catalog().ListTablesAsync(Sales)).Items
             .Should().Equal(Sales.Table("events"), Sales.Table("orders"));
     }
 
@@ -105,7 +105,7 @@ public class ListTablesContractTests
     public async Task ListTablesAsync_ShouldReturnTheNamespaceTheServiceSent()
     {
         this.Respond(TablesPath, 200, "{\"identifiers\":[{\"namespace\":[\"sales\",\"europe\"],\"name\":\"events\"}]}");
-        (await this.Catalog().ListTablesAsync(Sales)).Tables
+        (await this.Catalog().ListTablesAsync(Sales)).Items
             .Should().ContainSingle().Which.Should().Be(IcebergNamespace.Of("sales", "europe").Table("events"));
     }
 
@@ -115,7 +115,7 @@ public class ListTablesContractTests
     public async Task ListTablesAsync_ShouldReturnTheListedNamespace_GivenIdentifierWithoutNamespace(string body)
     {
         this.Respond(TablesPath, 200, body);
-        (await this.Catalog().ListTablesAsync(Sales)).Tables
+        (await this.Catalog().ListTablesAsync(Sales)).Items
             .Should().ContainSingle().Which.Should().Be(Sales.Table("events"));
     }
 
@@ -123,7 +123,7 @@ public class ListTablesContractTests
     public async Task ListTablesAsync_ShouldReturnNoTable_GivenResponseOmitsIdentifiers()
     {
         this.Respond(TablesPath, 200, "{}");
-        (await this.Catalog().ListTablesAsync(Sales)).Tables.Should().BeEmpty();
+        (await this.Catalog().ListTablesAsync(Sales)).Items.Should().BeEmpty();
     }
 
     [TestMethod]

@@ -35,20 +35,20 @@ public class VectorListingTests : VectorIndexE2EFixture
         using (new AssertionScope())
         {
             page.Items.Should().BeEquivalentTo(SeededKeys.Select(key => new StoredVector { Key = key }), "the service returns keys only unless asked");
-            page.NextToken.Should().BeNull("every vector fits on the default page");
+            page.NextPageToken.Should().BeNull("every vector fits on the default page");
         }
     }
 
     [TestMethod]
-    public async Task ListVectorsAsync_ShouldPageThroughTheIndex_GivenMaxResults()
+    public async Task ListVectorsAsync_ShouldPageThroughTheIndex_GivenAPageSize()
     {
-        var options = new ListVectorsOptions { MaxResults = 2 };
+        var options = new ListVectorsOptions { PageSize = 2 };
         var first = await this.Index.ListVectorsAsync(options);
-        var second = await this.Index.ListVectorsAsync(options with { NextToken = first.NextToken });
+        var second = await this.Index.ListVectorsAsync(options with { NextPageToken = first.NextPageToken });
         using (new AssertionScope())
         {
             first.Items.Should().HaveCount(2);
-            second.NextToken.Should().BeNull("the second page is the last");
+            second.NextPageToken.Should().BeNull("the second page is the last");
             first.Items.Concat(second.Items).Select(vector => vector.Key).Should().BeEquivalentTo(SeededKeys, "the pages together cover the index");
         }
     }

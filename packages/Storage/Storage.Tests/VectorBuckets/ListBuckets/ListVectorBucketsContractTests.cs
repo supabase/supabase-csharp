@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
 using Supabase.Storage;
 using Supabase.Storage.Exceptions;
-using Supabase.Storage.VectorBuckets.Common;
+using Supabase.Storage.Common;
 using Supabase.Storage.VectorBuckets.ListBuckets;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -61,7 +61,7 @@ public class ListVectorBucketsContractTests
     public async Task ListVectorBucketsAsync_ShouldSendThePrefixAndPaging_GivenOptions()
     {
         this.Respond(200, FirstPageBody);
-        await this.client.Vectors.ListVectorBucketsAsync(new ListVectorBucketsOptions { Prefix = "embeddings-", MaxResults = 2, NextToken = "embeddings-a" });
+        await this.client.Vectors.ListVectorBucketsAsync(new ListVectorBucketsOptions { Prefix = "embeddings-", PageSize = 2, NextPageToken = "embeddings-a" });
         this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Body
             .Should().Be("{\"maxResults\":2,\"nextToken\":\"embeddings-a\",\"prefix\":\"embeddings-\"}", "the ListVectorBuckets schema names them maxResults, nextToken and prefix");
     }
@@ -70,22 +70,22 @@ public class ListVectorBucketsContractTests
     public async Task ListVectorBucketsAsync_ShouldReturnThePage()
     {
         this.Respond(200, FirstPageBody);
-        (await this.client.Vectors.ListVectorBucketsAsync()).Should().BeEquivalentTo(new VectorListPage<VectorBucketSummary>
+        (await this.client.Vectors.ListVectorBucketsAsync()).Should().BeEquivalentTo(new Page<VectorBucketSummary>
         {
             Items = new[]
             {
                 new VectorBucketSummary { VectorBucketName = "embeddings-v1", CreatedAt = DateTimeOffset.FromUnixTimeSeconds(FirstCreationTime) },
                 new VectorBucketSummary { VectorBucketName = "embeddings-v2", CreatedAt = DateTimeOffset.FromUnixTimeSeconds(SecondCreationTime) },
             },
-            NextToken = "embeddings-v2",
+            NextPageToken = "embeddings-v2",
         }, options => options.WithStrictOrdering(), "the service lists buckets by name with creation times in Unix seconds and a token while more remain");
     }
 
     [TestMethod]
-    public async Task ListVectorBucketsAsync_ShouldReturnNoNextToken_GivenTheLastPage()
+    public async Task ListVectorBucketsAsync_ShouldReturnNoNextPageToken_GivenTheLastPage()
     {
         this.Respond(200, $"{{\"vectorBuckets\":[{{\"vectorBucketName\":\"embeddings-v3\",\"creationTime\":{FirstCreationTime}}}]}}");
-        (await this.client.Vectors.ListVectorBucketsAsync()).NextToken
+        (await this.client.Vectors.ListVectorBucketsAsync()).NextPageToken
             .Should().BeNull("the service omits the token when no bucket remains");
     }
 
@@ -126,10 +126,10 @@ public class ListVectorBucketsContractTests
     }
 
     [TestMethod]
-    public async Task ListVectorBucketsAsync_ShouldClassifyAsInvalidInput_GivenAnOutOfRangeMaxResults()
+    public async Task ListVectorBucketsAsync_ShouldClassifyAsInvalidInput_GivenAnOutOfRangePageSize()
     {
         this.Respond(400, "{\"statusCode\":\"400\",\"error\":\"Error\",\"message\":\"body/maxResults must be >= 1\",\"code\":\"InvalidRequest\"}");
-        (await FluentActions.Awaiting(() => this.client.Vectors.ListVectorBucketsAsync(new ListVectorBucketsOptions { MaxResults = 0 }))
+        (await FluentActions.Awaiting(() => this.client.Vectors.ListVectorBucketsAsync(new ListVectorBucketsOptions { PageSize = 0 }))
             .Should().ThrowAsync<SupabaseStorageException>())
             .Which.Reason.Should().Be(FailureHint.Reason.InvalidInput);
     }

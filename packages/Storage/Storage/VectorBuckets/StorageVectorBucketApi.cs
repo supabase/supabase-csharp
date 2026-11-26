@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Supabase.Storage.Common;
 using Supabase.Storage.VectorBuckets.Common;
 using Supabase.Storage.VectorBuckets.CreateBucket;
 using Supabase.Storage.VectorBuckets.DeleteBucket;
@@ -32,7 +33,7 @@ internal sealed class StorageVectorBucketApi : IStorageVectorBucketApi
     }
 
     /// <inheritdoc />
-    public async Task<VectorListPage<VectorBucketSummary>> ListVectorBucketsAsync(ListVectorBucketsOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<Page<VectorBucketSummary>> ListVectorBucketsAsync(ListVectorBucketsOptions? options = null, CancellationToken cancellationToken = default)
     {
         var body = new ListVectorBucketsBody(options ?? new ListVectorBucketsOptions());
         var response = await this.service.PostAsync<ListVectorBucketsResponse>("ListVectorBuckets", body, cancellationToken).ConfigureAwait(false);

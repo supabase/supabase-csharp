@@ -11,7 +11,7 @@ namespace Storage.Tests.AnalyticsBuckets.Iceberg.ListTables;
 
 /// <summary>
 /// Unit tests for the checks made before the wire when listing the tables of a namespace, and for the defaults of its
-/// options and page.
+/// options.
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
@@ -38,11 +38,7 @@ public class ListTablesTests
         using (new AssertionScope())
         {
             options.PageSize.Should().BeNull("the service owns the default page size");
-            options.PageToken.Should().BeNull("the first page needs no token");
+            options.NextPageToken.Should().BeNull("the first page needs no token");
         }
     }
-
-    [TestMethod]
-    public void IcebergTablePage_ShouldHaveNoTable_GivenNoneSet() =>
-        new IcebergTablePage().Tables.Should().BeEmpty();
 }

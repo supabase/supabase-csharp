@@ -10,6 +10,7 @@ using Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable;
 using Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces;
 using Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables;
 using Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable;
+using Supabase.Storage.Common;
 using Supabase.Storage.Exceptions;
 
 namespace Supabase.Storage.AnalyticsBuckets.Iceberg;
@@ -47,7 +48,7 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     }
 
     /// <inheritdoc />
-    public async Task<IcebergNamespacePage> ListNamespacesAsync(ListNamespacesOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<Page<IcebergNamespace>> ListNamespacesAsync(ListNamespacesOptions? options = null, CancellationToken cancellationToken = default)
     {
         var url = ListNamespacesQuery.For($"{this.catalogUrl}/namespaces", options);
         var response = await Helpers.MakeRequestAsync<ListNamespacesResponse>(this.requestClient, this.options, HttpMethod.Get, url, null, this.headers(), cancellationToken).ConfigureAwait(false);
@@ -93,7 +94,7 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     }
 
     /// <inheritdoc />
-    public async Task<IcebergTablePage> ListTablesAsync(IcebergNamespace @namespace, ListTablesOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<Page<IcebergTable>> ListTablesAsync(IcebergNamespace @namespace, ListTablesOptions? options = null, CancellationToken cancellationToken = default)
     {
         RequireArgument(@namespace, nameof(@namespace));
         var url = ListTablesQuery.For(this.ResourceUrl(@namespace.TablesPath), options);

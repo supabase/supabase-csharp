@@ -48,16 +48,17 @@ public class VectorIndexListingTests : VectorIndexE2EFixture
     }
 
     [TestMethod]
-    public async Task ListIndexesAsync_ShouldPageThroughEveryIndex_GivenMaxResults()
+    public async Task ListIndexesAsync_ShouldPageThroughEveryIndex_GivenAPageSize()
     {
         var bucket = this.Storage.Vectors.From(this.VectorBucketName);
-        var first = await bucket.ListIndexesAsync(new ListVectorIndexesOptions { MaxResults = 2 });
-        var last = await bucket.ListIndexesAsync(new ListVectorIndexesOptions { MaxResults = 2, NextToken = first.NextToken });
+        var options = new ListVectorIndexesOptions { PageSize = 2 };
+        var first = await bucket.ListIndexesAsync(options);
+        var last = await bucket.ListIndexesAsync(options with { NextPageToken = first.NextPageToken });
         using (new AssertionScope())
         {
             first.Items.Select(index => index.IndexName).Should().Equal(new[] { "docs-v1", "docs-v2" });
             last.Items.Select(index => index.IndexName).Should().Equal(new[] { "notes-v1" }, "the token resumes after the previous page");
-            last.NextToken.Should().BeNull("no index remains after the last page");
+            last.NextPageToken.Should().BeNull("no index remains after the last page");
         }
     }
 
@@ -69,9 +70,9 @@ public class VectorIndexListingTests : VectorIndexE2EFixture
     }
 
     [TestMethod]
-    public async Task ListIndexesAsync_ShouldThrowInvalidInput_GivenAnOutOfRangeMaxResults()
+    public async Task ListIndexesAsync_ShouldThrowInvalidInput_GivenAnOutOfRangePageSize()
     {
-        var thrown = await FluentActions.Awaiting(() => this.Storage.Vectors.From(this.VectorBucketName).ListIndexesAsync(new ListVectorIndexesOptions { MaxResults = 0 }))
+        var thrown = await FluentActions.Awaiting(() => this.Storage.Vectors.From(this.VectorBucketName).ListIndexesAsync(new ListVectorIndexesOptions { PageSize = 0 }))
             .Should().ThrowAsync<SupabaseStorageException>("the service accepts 1 to 500 results per page");
         using (new AssertionScope())
         {

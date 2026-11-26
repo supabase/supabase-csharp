@@ -8,6 +8,7 @@ using Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable;
 using Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces;
 using Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables;
 using Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable;
+using Supabase.Storage.Common;
 
 namespace Supabase.Storage.AnalyticsBuckets.Iceberg;
 
@@ -76,13 +77,20 @@ public interface IIcebergCatalog
     /// <example>
     /// <code>
     /// var catalog = storage.Analytics.From("analytics-data");
-    /// var page = await catalog.ListNamespacesAsync();
-    /// foreach (var @namespace in page.Namespaces)
-    ///     Console.WriteLine(@namespace);
+    /// var options = new ListNamespacesOptions { PageSize = 50 };
+    /// Page&lt;IcebergNamespace&gt; page;
+    /// do
+    /// {
+    ///     page = await catalog.ListNamespacesAsync(options);
+    ///     foreach (var @namespace in page.Items)
+    ///         Console.WriteLine(@namespace);
+    ///     options = options with { NextPageToken = page.NextPageToken };
+    /// }
+    /// while (page.NextPageToken is not null);
     /// </code>
     /// </example>
     [ImplementedCapability("storage.analytics.list_namespaces")]
-    Task<IcebergNamespacePage> ListNamespacesAsync(ListNamespacesOptions? options = null, CancellationToken cancellationToken = default);
+    Task<Page<IcebergNamespace>> ListNamespacesAsync(ListNamespacesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes an empty namespace.
@@ -234,13 +242,21 @@ public interface IIcebergCatalog
     /// <example>
     /// <code>
     /// var catalog = storage.Analytics.From("analytics-data");
-    /// var page = await catalog.ListTablesAsync(IcebergNamespace.Of("sales"));
-    /// foreach (var table in page.Tables)
-    ///     Console.WriteLine(table.Name);
+    /// var sales = IcebergNamespace.Of("sales");
+    /// var options = new ListTablesOptions { PageSize = 50 };
+    /// Page&lt;IcebergTable&gt; page;
+    /// do
+    /// {
+    ///     page = await catalog.ListTablesAsync(sales, options);
+    ///     foreach (var table in page.Items)
+    ///         Console.WriteLine(table.Name);
+    ///     options = options with { NextPageToken = page.NextPageToken };
+    /// }
+    /// while (page.NextPageToken is not null);
     /// </code>
     /// </example>
     [ImplementedCapability("storage.analytics.list_tables")]
-    Task<IcebergTablePage> ListTablesAsync(IcebergNamespace @namespace, ListTablesOptions? options = null, CancellationToken cancellationToken = default);
+    Task<Page<IcebergTable>> ListTablesAsync(IcebergNamespace @namespace, ListTablesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Commits a new current schema, a new default partition spec, or both, to an Iceberg table.

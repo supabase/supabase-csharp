@@ -9,8 +9,8 @@ internal sealed class ListVectorsBody
     {
         this.VectorBucketName = vectorBucketName;
         this.IndexName = indexName;
-        this.MaxResults = options.MaxResults;
-        this.NextToken = options.NextToken;
+        this.MaxResults = options.PageSize;
+        this.NextToken = options.NextPageToken;
         this.ReturnData = VectorContentRequest.RequestedOrOmitted(options.Include, VectorContent.Data);
         this.ReturnMetadata = VectorContentRequest.RequestedOrOmitted(options.Include, VectorContent.Metadata);
         this.SegmentCount = options.Segment?.Count;
