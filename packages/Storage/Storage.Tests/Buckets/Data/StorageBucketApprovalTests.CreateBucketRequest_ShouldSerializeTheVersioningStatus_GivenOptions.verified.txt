@@ -1,0 +1,1 @@
+﻿{"id":"photos","name":"photos","owner":null,"created_at":null,"updated_at":null,"public":false,"file_size_limit":null,"versioning_status":"ENABLED"}
