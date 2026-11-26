@@ -25,6 +25,11 @@ public class IcebergTableTests
         IcebergNamespace.Of("sales").Table("events").Should().NotBe(IcebergNamespace.Of("sales").Table("orders"));
 
     [TestMethod]
+    public void CollectionPath_ShouldBeTheTablesCollectionOfItsNamespace() =>
+        IcebergNamespace.Of("sales", "europe").Table("events").CollectionPath
+            .Should().Be("namespaces/sales%1Feurope/tables", "a table is created by posting to its namespace's tables");
+
+    [TestMethod]
     public void Path_ShouldNestTheEscapedNameUnderTheTablesOfItsNamespace() =>
         IcebergNamespace.Of("sales", "europe").Table("a/b?c#d").Path
             .Should().Be("namespaces/sales%1Feurope/tables/a%2Fb%3Fc%23d", "a name must not start a path segment, query or fragment");
