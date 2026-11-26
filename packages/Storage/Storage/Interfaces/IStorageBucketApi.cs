@@ -1,4 +1,5 @@
 ﻿using Supabase.Core.Interfaces;
+using Supabase.Storage.Common;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,5 +55,15 @@ namespace Supabase.Storage.Interfaces
 		/// </code>
 		/// </example>
 		Task DeleteBucketLifecycleAsync(string id, CancellationToken cancellationToken = default);
+
+		/// <summary>
+		/// Gets the lifecycle policy stored on a bucket. Throws when no policy is stored.
+		/// </summary>
+		/// <example>
+		/// <code>
+		/// var lifecycle = await storage.GetBucketLifecycleAsync("avatars");
+		/// </code>
+		/// </example>
+		Task<BucketLifecycle> GetBucketLifecycleAsync(string id, CancellationToken cancellationToken = default);
 	}
 }

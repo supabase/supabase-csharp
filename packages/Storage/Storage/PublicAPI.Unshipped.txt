@@ -2,6 +2,18 @@
 override Supabase.Storage.Common.AnalyticsBucket.Equals(object? obj) -> bool
 override Supabase.Storage.Common.AnalyticsBucket.GetHashCode() -> int
 override Supabase.Storage.Common.AnalyticsBucket.ToString() -> string!
+override Supabase.Storage.Common.BucketLifecycle.Equals(object? obj) -> bool
+override Supabase.Storage.Common.BucketLifecycle.GetHashCode() -> int
+override Supabase.Storage.Common.BucketLifecycle.ToString() -> string!
+override Supabase.Storage.Common.LifecycleRule.Equals(object? obj) -> bool
+override Supabase.Storage.Common.LifecycleRule.GetHashCode() -> int
+override Supabase.Storage.Common.LifecycleRule.ToString() -> string!
+override Supabase.Storage.Common.LifecycleRuleStatus.Equals(object? obj) -> bool
+override Supabase.Storage.Common.LifecycleRuleStatus.GetHashCode() -> int
+override Supabase.Storage.Common.LifecycleRuleStatus.ToString() -> string!
+override Supabase.Storage.Common.NoncurrentVersionExpiration.Equals(object? obj) -> bool
+override Supabase.Storage.Common.NoncurrentVersionExpiration.GetHashCode() -> int
+override Supabase.Storage.Common.NoncurrentVersionExpiration.ToString() -> string!
 override Supabase.Storage.Common.StoredVector.Equals(object? obj) -> bool
 override Supabase.Storage.Common.StoredVector.GetHashCode() -> int
 override Supabase.Storage.Common.StoredVector.ToString() -> string!
@@ -70,6 +82,16 @@ override Supabase.Storage.QueryVectors.VectorQueryResult.GetHashCode() -> int
 override Supabase.Storage.QueryVectors.VectorQueryResult.ToString() -> string!
 static Supabase.Storage.Common.AnalyticsBucket.operator !=(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
 static Supabase.Storage.Common.AnalyticsBucket.operator ==(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
+static Supabase.Storage.Common.BucketLifecycle.operator !=(Supabase.Storage.Common.BucketLifecycle? left, Supabase.Storage.Common.BucketLifecycle? right) -> bool
+static Supabase.Storage.Common.BucketLifecycle.operator ==(Supabase.Storage.Common.BucketLifecycle? left, Supabase.Storage.Common.BucketLifecycle? right) -> bool
+static Supabase.Storage.Common.LifecycleRule.operator !=(Supabase.Storage.Common.LifecycleRule? left, Supabase.Storage.Common.LifecycleRule? right) -> bool
+static Supabase.Storage.Common.LifecycleRule.operator ==(Supabase.Storage.Common.LifecycleRule? left, Supabase.Storage.Common.LifecycleRule? right) -> bool
+static Supabase.Storage.Common.LifecycleRuleStatus.Disabled.get -> Supabase.Storage.Common.LifecycleRuleStatus!
+static Supabase.Storage.Common.LifecycleRuleStatus.Enabled.get -> Supabase.Storage.Common.LifecycleRuleStatus!
+static Supabase.Storage.Common.LifecycleRuleStatus.operator !=(Supabase.Storage.Common.LifecycleRuleStatus? left, Supabase.Storage.Common.LifecycleRuleStatus? right) -> bool
+static Supabase.Storage.Common.LifecycleRuleStatus.operator ==(Supabase.Storage.Common.LifecycleRuleStatus? left, Supabase.Storage.Common.LifecycleRuleStatus? right) -> bool
+static Supabase.Storage.Common.NoncurrentVersionExpiration.operator !=(Supabase.Storage.Common.NoncurrentVersionExpiration? left, Supabase.Storage.Common.NoncurrentVersionExpiration? right) -> bool
+static Supabase.Storage.Common.NoncurrentVersionExpiration.operator ==(Supabase.Storage.Common.NoncurrentVersionExpiration? left, Supabase.Storage.Common.NoncurrentVersionExpiration? right) -> bool
 static Supabase.Storage.Common.StoredVector.operator !=(Supabase.Storage.Common.StoredVector? left, Supabase.Storage.Common.StoredVector? right) -> bool
 static Supabase.Storage.Common.StoredVector.operator ==(Supabase.Storage.Common.StoredVector? left, Supabase.Storage.Common.StoredVector? right) -> bool
 static Supabase.Storage.Common.VectorDataType.Float32.get -> Supabase.Storage.Common.VectorDataType!
@@ -130,6 +152,33 @@ Supabase.Storage.Common.AnalyticsBucket.Name.get -> string!
 Supabase.Storage.Common.AnalyticsBucket.Name.init -> void
 Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.get -> System.DateTimeOffset
 Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.init -> void
+Supabase.Storage.Common.BucketLifecycle
+Supabase.Storage.Common.BucketLifecycle.<Clone>$() -> Supabase.Storage.Common.BucketLifecycle!
+Supabase.Storage.Common.BucketLifecycle.BucketLifecycle() -> void
+Supabase.Storage.Common.BucketLifecycle.Equals(Supabase.Storage.Common.BucketLifecycle? other) -> bool
+Supabase.Storage.Common.BucketLifecycle.Rules.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.LifecycleRule!>!
+Supabase.Storage.Common.BucketLifecycle.Rules.init -> void
+Supabase.Storage.Common.LifecycleRule
+Supabase.Storage.Common.LifecycleRule.<Clone>$() -> Supabase.Storage.Common.LifecycleRule!
+Supabase.Storage.Common.LifecycleRule.Equals(Supabase.Storage.Common.LifecycleRule? other) -> bool
+Supabase.Storage.Common.LifecycleRule.Id.get -> string?
+Supabase.Storage.Common.LifecycleRule.Id.init -> void
+Supabase.Storage.Common.LifecycleRule.LifecycleRule() -> void
+Supabase.Storage.Common.LifecycleRule.NoncurrentVersionExpiration.get -> Supabase.Storage.Common.NoncurrentVersionExpiration?
+Supabase.Storage.Common.LifecycleRule.NoncurrentVersionExpiration.init -> void
+Supabase.Storage.Common.LifecycleRule.Status.get -> Supabase.Storage.Common.LifecycleRuleStatus!
+Supabase.Storage.Common.LifecycleRule.Status.init -> void
+Supabase.Storage.Common.LifecycleRuleStatus
+Supabase.Storage.Common.LifecycleRuleStatus.<Clone>$() -> Supabase.Storage.Common.LifecycleRuleStatus!
+Supabase.Storage.Common.LifecycleRuleStatus.Equals(Supabase.Storage.Common.LifecycleRuleStatus? other) -> bool
+Supabase.Storage.Common.NoncurrentVersionExpiration
+Supabase.Storage.Common.NoncurrentVersionExpiration.<Clone>$() -> Supabase.Storage.Common.NoncurrentVersionExpiration!
+Supabase.Storage.Common.NoncurrentVersionExpiration.Equals(Supabase.Storage.Common.NoncurrentVersionExpiration? other) -> bool
+Supabase.Storage.Common.NoncurrentVersionExpiration.NewerNoncurrentVersions.get -> int?
+Supabase.Storage.Common.NoncurrentVersionExpiration.NewerNoncurrentVersions.init -> void
+Supabase.Storage.Common.NoncurrentVersionExpiration.NoncurrentDays.get -> int
+Supabase.Storage.Common.NoncurrentVersionExpiration.NoncurrentDays.init -> void
+Supabase.Storage.Common.NoncurrentVersionExpiration.NoncurrentVersionExpiration() -> void
 Supabase.Storage.Common.StoredVector
 Supabase.Storage.Common.StoredVector.<Clone>$() -> Supabase.Storage.Common.StoredVector!
 Supabase.Storage.Common.StoredVector.Data.get -> Supabase.Storage.Common.VectorData?
@@ -218,6 +267,7 @@ Supabase.Storage.Interfaces.IStorageAnalyticsApi.DeleteBucketAsync(string! name,
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.From(string! bucketName) -> Supabase.Storage.Interfaces.IIcebergCatalog!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.ListBucketsAsync(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.AnalyticsBucket!>!>!
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi
@@ -403,3 +453,4 @@ Supabase.Storage.Common.VectorData.Equals(Supabase.Storage.Common.VectorData? ot
 Supabase.Storage.Common.VectorData.Float32.get -> System.Collections.Generic.IReadOnlyList<float>?
 Supabase.Storage.Common.VectorData.Float32.init -> void
 Supabase.Storage.Common.VectorData.VectorData() -> void
+Supabase.Storage.StorageBucketApi.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
