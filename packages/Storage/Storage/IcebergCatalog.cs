@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Supabase.Storage.Common;
 using Supabase.Storage.CreateNamespace;
 using Supabase.Storage.CreateTable;
-using Supabase.Storage.DeleteTable;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;
 using Supabase.Storage.ListNamespaces;
+using Supabase.Storage.DeleteTable;
 
 namespace Supabase.Storage;
 
@@ -74,6 +74,14 @@ internal sealed class IcebergCatalog : IIcebergCatalog
         RequireArgument(table, nameof(table));
         RequireArgument(schema, nameof(schema));
         var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Post, this.ResourceUrl($"{table.Namespace.Path}/tables"), CreateTableBody.For(table, schema, options), this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToMetadata();
+    }
+
+    /// <inheritdoc />
+    public async Task<IcebergTableMetadata> LoadTableAsync(IcebergTable table, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(table, nameof(table));
+        var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Get, this.ResourceUrl(table.Path), null, this.headers(), cancellationToken).ConfigureAwait(false);
         return response!.ToMetadata();
     }
 
