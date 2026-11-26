@@ -11,6 +11,7 @@ using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;
 using Supabase.Storage.ListNamespaces;
 using Supabase.Storage.ListTables;
+using Supabase.Storage.UpdateTable;
 
 namespace Supabase.Storage;
 
@@ -99,6 +100,15 @@ internal sealed class IcebergCatalog : IIcebergCatalog
         var url = ListTablesQuery.For(this.ResourceUrl($"{@namespace.Path}/tables"), options);
         var response = await Helpers.MakeRequestAsync<ListTablesResponse>(this.requestClient, this.options, HttpMethod.Get, url, null, this.headers(), cancellationToken).ConfigureAwait(false);
         return response!.ToPage(@namespace);
+    }
+
+    /// <inheritdoc />
+    public async Task<IcebergTableMetadata> UpdateTableAsync(IcebergTable table, IcebergTableChanges changes, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(table, nameof(table));
+        RequireArgument(changes, nameof(changes));
+        var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Post, this.ResourceUrl(table.Path), UpdateTableBody.For(changes), this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToMetadata();
     }
 
     private string ResourceUrl(string path) => $"{this.catalogUrl}/{path}";

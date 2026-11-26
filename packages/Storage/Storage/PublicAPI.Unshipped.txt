@@ -137,6 +137,9 @@ override Supabase.Storage.QueryVectors.VectorMatch.ToString() -> string!
 override Supabase.Storage.QueryVectors.VectorQueryResult.Equals(object? obj) -> bool
 override Supabase.Storage.QueryVectors.VectorQueryResult.GetHashCode() -> int
 override Supabase.Storage.QueryVectors.VectorQueryResult.ToString() -> string!
+override Supabase.Storage.UpdateTable.IcebergTableChanges.Equals(object? obj) -> bool
+override Supabase.Storage.UpdateTable.IcebergTableChanges.GetHashCode() -> int
+override Supabase.Storage.UpdateTable.IcebergTableChanges.ToString() -> string!
 static Supabase.Storage.Common.AnalyticsBucket.operator !=(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
 static Supabase.Storage.Common.AnalyticsBucket.operator ==(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
 static Supabase.Storage.Common.BucketLifecycle.operator !=(Supabase.Storage.Common.BucketLifecycle? left, Supabase.Storage.Common.BucketLifecycle? right) -> bool
@@ -251,6 +254,8 @@ static Supabase.Storage.QueryVectors.VectorMatch.operator !=(Supabase.Storage.Qu
 static Supabase.Storage.QueryVectors.VectorMatch.operator ==(Supabase.Storage.QueryVectors.VectorMatch? left, Supabase.Storage.QueryVectors.VectorMatch? right) -> bool
 static Supabase.Storage.QueryVectors.VectorQueryResult.operator !=(Supabase.Storage.QueryVectors.VectorQueryResult? left, Supabase.Storage.QueryVectors.VectorQueryResult? right) -> bool
 static Supabase.Storage.QueryVectors.VectorQueryResult.operator ==(Supabase.Storage.QueryVectors.VectorQueryResult? left, Supabase.Storage.QueryVectors.VectorQueryResult? right) -> bool
+static Supabase.Storage.UpdateTable.IcebergTableChanges.operator !=(Supabase.Storage.UpdateTable.IcebergTableChanges? left, Supabase.Storage.UpdateTable.IcebergTableChanges? right) -> bool
+static Supabase.Storage.UpdateTable.IcebergTableChanges.operator ==(Supabase.Storage.UpdateTable.IcebergTableChanges? left, Supabase.Storage.UpdateTable.IcebergTableChanges? right) -> bool
 Supabase.Storage.Client.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Client.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
 Supabase.Storage.Common.AnalyticsBucket
@@ -497,6 +502,7 @@ Supabase.Storage.Interfaces.IIcebergCatalog.ListTablesAsync(Supabase.Storage.Com
 Supabase.Storage.Interfaces.IIcebergCatalog.LoadTableAsync(Supabase.Storage.Common.IcebergTable! table, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.IcebergTableMetadata!>!
 Supabase.Storage.Interfaces.IIcebergCatalog.NamespaceExistsAsync(Supabase.Storage.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Supabase.Storage.Interfaces.IIcebergCatalog.TableExistsAsync(Supabase.Storage.Common.IcebergTable! table, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Supabase.Storage.Interfaces.IIcebergCatalog.UpdateTableAsync(Supabase.Storage.Common.IcebergTable! table, Supabase.Storage.UpdateTable.IcebergTableChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.IcebergTableMetadata!>!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.AnalyticsBucket!>!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.DeleteBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
@@ -706,6 +712,16 @@ Supabase.Storage.Common.VectorData.Float32.get -> System.Collections.Generic.IRe
 Supabase.Storage.Common.VectorData.Float32.init -> void
 Supabase.Storage.Common.VectorData.VectorData() -> void
 Supabase.Storage.StorageBucketApi.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
+Supabase.Storage.UpdateTable.IcebergTableChanges
+Supabase.Storage.UpdateTable.IcebergTableChanges.<Clone>$() -> Supabase.Storage.UpdateTable.IcebergTableChanges!
+Supabase.Storage.UpdateTable.IcebergTableChanges.BasedOn.get -> Supabase.Storage.Common.IcebergTableMetadata?
+Supabase.Storage.UpdateTable.IcebergTableChanges.BasedOn.init -> void
+Supabase.Storage.UpdateTable.IcebergTableChanges.Equals(Supabase.Storage.UpdateTable.IcebergTableChanges? other) -> bool
+Supabase.Storage.UpdateTable.IcebergTableChanges.IcebergTableChanges() -> void
+Supabase.Storage.UpdateTable.IcebergTableChanges.PartitionSpec.get -> Supabase.Storage.Common.IcebergPartitionSpec?
+Supabase.Storage.UpdateTable.IcebergTableChanges.PartitionSpec.init -> void
+Supabase.Storage.UpdateTable.IcebergTableChanges.Schema.get -> Supabase.Storage.Common.IcebergSchema?
+Supabase.Storage.UpdateTable.IcebergTableChanges.Schema.init -> void
 virtual Supabase.Storage.Common.IcebergType.EqualityContract.get -> System.Type!
 virtual Supabase.Storage.Common.IcebergType.Equals(Supabase.Storage.Common.IcebergType? other) -> bool
 virtual Supabase.Storage.Common.IcebergType.PrintMembers(System.Text.StringBuilder! builder) -> bool

@@ -7,6 +7,7 @@ using Supabase.Storage.CreateTable;
 using Supabase.Storage.DeleteTable;
 using Supabase.Storage.ListNamespaces;
 using Supabase.Storage.ListTables;
+using Supabase.Storage.UpdateTable;
 
 namespace Supabase.Storage.Interfaces;
 
@@ -240,4 +241,35 @@ public interface IIcebergCatalog
     /// </example>
     [ImplementedCapability("storage.analytics.list_tables")]
     Task<IcebergTablePage> ListTablesAsync(IcebergNamespace @namespace, ListTablesOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Commits a new current schema, a new default partition spec, or both, to an Iceberg table.
+    /// </summary>
+    /// <param name="table">The table to update.</param>
+    /// <param name="changes">The schema and partition spec to make current, and optionally the metadata they were made from.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The metadata of the table after the commit, as the catalog stored it.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="table"/> or <paramref name="changes"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the table changed since <see cref="UpdateTable.IcebergTableChanges.BasedOn"/>
+    /// (status 409, <c>Code</c> <c>CommitFailedException</c>), the changes are invalid (status 400), the table, its namespace
+    /// or its bucket does not exist (status 404, <c>Code</c> <c>NoSuchTableException</c>, <c>NoSuchNamespaceException</c>
+    /// or <c>NoSuchCatalog</c>) or the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var events = IcebergNamespace.Of("sales").Table("events");
+    /// var current = await catalog.LoadTableAsync(events);
+    /// var country = new IcebergField { Id = current.LastColumnId + 1, Name = "country", Type = IcebergPrimitiveType.String, Required = false };
+    /// var updated = await catalog.UpdateTableAsync(events, new IcebergTableChanges
+    /// {
+    ///     Schema = new IcebergSchema { Fields = current.CurrentSchema.Fields.Append(country).ToList() },
+    ///     BasedOn = current,
+    /// });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.update_table")]
+    Task<IcebergTableMetadata> UpdateTableAsync(IcebergTable table, IcebergTableChanges changes, CancellationToken cancellationToken = default);
 }

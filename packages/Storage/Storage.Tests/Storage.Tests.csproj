@@ -32,6 +32,7 @@
     <ItemGroup>
         <None Update="CreateTable\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
         <None Update="LoadTable\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="UpdateTable\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
         <None Update="Assets\supabase-csharp.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
