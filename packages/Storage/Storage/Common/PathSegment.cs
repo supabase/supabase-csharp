@@ -13,7 +13,7 @@ internal static class PathSegment
         return Uri.EscapeDataString(value);
     }
 
-    private static void RejectBlank(string value, string subject, string paramName)
+    internal static void RejectBlank(string value, string subject, string paramName)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new ArgumentException($"{subject} must be provided.", paramName);

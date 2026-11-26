@@ -24,15 +24,6 @@ public class LoadTableTests
             .Which.ParamName.Should().Be("table");
 
     [TestMethod]
-    [DataRow("")]
-    [DataRow("   ")]
-    public async Task LoadTableAsync_ShouldThrowArgumentException_GivenBlankName(string name) =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").LoadTableAsync(IcebergNamespace.Of("sales").Table(name)))
-            .Should().ThrowAsync<ArgumentException>("a blank name would reach the route that lists tables")
-            .WithMessage("A table name must be provided.*"))
-            .Which.ParamName.Should().Be("table");
-
-    [TestMethod]
     [DataRow(".")]
     [DataRow("..")]
     public async Task LoadTableAsync_ShouldThrowArgumentException_GivenRelativeSegmentName(string name) =>

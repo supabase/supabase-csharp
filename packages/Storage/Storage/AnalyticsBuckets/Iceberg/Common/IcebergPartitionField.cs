@@ -15,8 +15,10 @@ public sealed record IcebergPartitionField
     public required IcebergTransform Transform { get; init; }
 
     /// <summary>
-    /// The identifier of the partition field. The catalog assigns it: leave it unset when defining a spec, and it is
-    /// only sent when set.
+    /// The identifier of the partition field, unique across all the specs of the table. Leave it unset on a new field
+    /// and the catalog assigns one above <see cref="IcebergTableMetadata.LastPartitionId"/>. Keep it on a field taken
+    /// from a loaded spec: the Iceberg table spec requires an equivalent field to keep its identifier. It is only sent
+    /// when set.
     /// </summary>
     public int? FieldId { get; init; }
 }

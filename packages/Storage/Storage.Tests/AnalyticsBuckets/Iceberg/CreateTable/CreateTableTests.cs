@@ -39,6 +39,14 @@ public class CreateTableTests
             .WithMessage("A namespace cannot be a relative path segment.*");
 
     [TestMethod]
+    [DataRow("")]
+    [DataRow("   ")]
+    public async Task CreateTableAsync_ShouldThrowArgumentException_GivenBlankTableName(string name) =>
+        await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").CreateTableAsync(IcebergNamespace.Of("sales").Table(name), Schema))
+            .Should().ThrowAsync<ArgumentException>("the Iceberg REST CreateTableRequest requires a name, so a blank one must never be posted")
+            .WithMessage("A table name must be provided.*");
+
+    [TestMethod]
     public void CreateTableOptions_ShouldHaveNoProperties_GivenNoneSet() =>
         new CreateTableOptions().Properties.Should().BeEmpty();
 

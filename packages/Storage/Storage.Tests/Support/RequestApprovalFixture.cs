@@ -42,6 +42,12 @@ public abstract class RequestApprovalFixture : VerifyBase
                 .WithHeader("Content-Type", "application/json").WithBody(json));
 
     /// <summary>
+    ///     Clears the requests received so far, so a test can prepare its input through earlier calls (for example
+    ///     loading a table) and still snapshot only the request under test.
+    /// </summary>
+    protected void ForgetEmittedRequests() => this.server.ResetLogEntries();
+
+    /// <summary>
     ///     The exact bytes of the single request the SDK emitted. Tests pass this to <c>Verify</c> from their
     ///     own method so the snapshot file lands next to the test (domain-first layout), not beside this fixture.
     /// </summary>

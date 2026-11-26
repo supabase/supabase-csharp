@@ -8,7 +8,7 @@ namespace Storage.Tests.AnalyticsBuckets.Iceberg.Common;
 
 /// <summary>
 /// Unit tests for building the identifier of a namespace and of its tables: which arguments it refuses and how two
-/// identifiers compare. Table names are validated by the service.
+/// identifiers compare. Beyond blank names, table names are validated by the service.
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
@@ -117,6 +117,11 @@ public class IcebergNamespaceTests
             .Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("name");
 
     [TestMethod]
-    public void Table_ShouldAcceptBlankName() =>
-        IcebergNamespace.Of("sales").Table(" ").Name.Should().Be(" ", "the service, not the SDK, judges the name");
+    [DataRow("")]
+    [DataRow("   ")]
+    public void Table_ShouldThrowArgumentException_GivenBlankName(string name) =>
+        FluentActions.Invoking(() => IcebergNamespace.Of("sales").Table(name))
+            .Should().Throw<ArgumentException>("the Iceberg REST spec requires a table name, and a blank one names nothing")
+            .WithMessage("A table name must be provided.*")
+            .Which.ParamName.Should().Be("name");
 }

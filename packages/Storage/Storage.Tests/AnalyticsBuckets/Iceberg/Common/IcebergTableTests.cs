@@ -35,15 +35,6 @@ public class IcebergTableTests
             .Should().Be("namespaces/sales%1Feurope/tables/a%2Fb%3Fc%23d", "a name must not start a path segment, query or fragment");
 
     [TestMethod]
-    [DataRow("")]
-    [DataRow("   ")]
-    public void Path_ShouldThrowArgumentException_GivenBlankName(string name) =>
-        FluentActions.Invoking(() => IcebergNamespace.Of("sales").Table(name).Path)
-            .Should().Throw<ArgumentException>("a blank name would reach the route of the namespace's tables")
-            .WithMessage("A table name must be provided.*")
-            .Which.ParamName.Should().Be("table");
-
-    [TestMethod]
     [DataRow(".")]
     [DataRow("..")]
     public void Path_ShouldThrowArgumentException_GivenRelativeSegmentName(string name) =>

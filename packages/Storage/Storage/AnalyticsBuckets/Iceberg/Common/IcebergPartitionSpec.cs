@@ -11,8 +11,8 @@ public sealed record IcebergPartitionSpec
     public required IReadOnlyList<IcebergPartitionField> Fields { get; init; }
 
     /// <summary>
-    /// The identifier of the spec within the table. The catalog assigns it: leave it unset when defining a spec,
-    /// and it is only sent when set.
+    /// The identifier the catalog gave the spec within the table, or null on a spec that was not loaded from the
+    /// catalog. The catalog assigns it, so it is never sent: a loaded spec can be reused as is.
     /// </summary>
-    public int? SpecId { get; init; }
+    public int? SpecId { get; internal init; }
 }

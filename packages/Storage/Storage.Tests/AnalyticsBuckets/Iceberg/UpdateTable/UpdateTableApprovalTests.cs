@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
@@ -12,7 +12,8 @@ namespace Storage.Tests.AnalyticsBuckets.Iceberg.UpdateTable;
 /// <summary>
 /// Pins the exact bytes <c>UpdateTableAsync</c> puts on the wire; the approved bodies must match the Iceberg REST
 /// <c>CommitTableRequest</c> that Storage forwards from <c>POST /iceberg/v1/:prefix/namespaces/:namespace/tables/:table</c>
-/// (<c>requirements</c> and <c>updates</c> both required; <c>-1</c> names the schema or spec added by the same commit).
+/// (<c>requirements</c> and <c>updates</c> both required; <c>-1</c> names the schema or spec added by the same commit;
+/// <c>schema-id</c> and <c>spec-id</c> read-only, so the catalog assigns them).
 /// </summary>
 [TestClass]
 [TestCategory("Contract")]
@@ -34,19 +35,6 @@ public class UpdateTableApprovalTests : RequestApprovalFixture
         Fields = new[] { new IcebergPartitionField { SourceId = 3, Name = "country", Transform = IcebergTransform.Identity } },
     };
 
-    private static readonly IcebergTableMetadata Current = new()
-    {
-        TableUuid = Guid.Parse("b734865e-f9a5-4654-8b0b-e15683fcb195"),
-        FormatVersion = 2,
-        Location = "s3://analytics-data/sales/events",
-        LastUpdatedAt = DateTimeOffset.FromUnixTimeMilliseconds(1752062419286),
-        CurrentSchema = new IcebergSchema { SchemaId = 4, Fields = Array.Empty<IcebergField>() },
-        DefaultPartitionSpec = new IcebergPartitionSpec { SpecId = 5, Fields = Array.Empty<IcebergPartitionField>() },
-        LastColumnId = 2,
-        LastPartitionId = 1000,
-        Properties = new Dictionary<string, string>(),
-    };
-
     [TestMethod]
     public async Task UpdateTableRequest_ShouldSerializeSchemaChange()
     {
@@ -66,27 +54,53 @@ public class UpdateTableApprovalTests : RequestApprovalFixture
     [TestMethod]
     public async Task UpdateTableRequest_ShouldSerializeRequirementsOfSchemaChange_GivenBasedOn()
     {
-        this.RespondWith(Updated());
-        await this.Client.Analytics.From("analytics-data").UpdateTableAsync(Events, new IcebergTableChanges { Schema = Evolved, BasedOn = Current });
+        var current = await this.LoadEvents();
+        await this.Client.Analytics.From("analytics-data").UpdateTableAsync(Events, new IcebergTableChanges { Schema = Evolved, BasedOn = current });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
 
     [TestMethod]
     public async Task UpdateTableRequest_ShouldSerializeRequirementsOfPartitionSpecChange_GivenBasedOn()
     {
-        this.RespondWith(Updated());
-        await this.Client.Analytics.From("analytics-data").UpdateTableAsync(Events, new IcebergTableChanges { PartitionSpec = ByCountry, BasedOn = Current });
+        var current = await this.LoadEvents();
+        await this.Client.Analytics.From("analytics-data").UpdateTableAsync(Events, new IcebergTableChanges { PartitionSpec = ByCountry, BasedOn = current });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
 
     [TestMethod]
-    public async Task UpdateTableRequest_ShouldSerializeEmptyCommit_GivenNoChange()
+    public async Task UpdateTableRequest_ShouldLeaveTheSchemaIdToTheCatalog_GivenLoadedSchema()
     {
-        this.RespondWith(Updated());
-        await this.Client.Analytics.From("analytics-data").UpdateTableAsync(Events, new IcebergTableChanges());
+        var current = await this.LoadEvents();
+        var country = new IcebergField { Id = current.LastColumnId + 1, Name = "country", Type = IcebergPrimitiveType.String, Required = false };
+        await this.Client.Analytics.From("analytics-data").UpdateTableAsync(Events, new IcebergTableChanges
+        {
+            Schema = current.CurrentSchema with { Fields = current.CurrentSchema.Fields.Append(country).ToList() },
+        });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
 
-    private static string Updated() =>
-        File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnalyticsBuckets", "Iceberg", "UpdateTable", "Data", "TableUpdated.json"));
+    [TestMethod]
+    public async Task UpdateTableRequest_ShouldLeaveTheSpecIdToTheCatalogAndKeepFieldIds_GivenLoadedSpec()
+    {
+        var current = await this.LoadEvents();
+        var byId = new IcebergPartitionField { SourceId = 1, Name = "id_bucket", Transform = IcebergTransform.Bucket(16) };
+        await this.Client.Analytics.From("analytics-data").UpdateTableAsync(Events, new IcebergTableChanges
+        {
+            PartitionSpec = current.DefaultPartitionSpec with { Fields = current.DefaultPartitionSpec.Fields.Append(byId).ToList() },
+        });
+        await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
+
+    private async Task<IcebergTableMetadata> LoadEvents()
+    {
+        this.RespondWith(Fixture("TableToUpdate.json"));
+        var current = await this.Client.Analytics.From("analytics-data").LoadTableAsync(Events);
+        this.ForgetEmittedRequests();
+        return current;
+    }
+
+    private static string Updated() => Fixture("TableUpdated.json");
+
+    private static string Fixture(string name) =>
+        File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnalyticsBuckets", "Iceberg", "UpdateTable", "Data", name));
 }

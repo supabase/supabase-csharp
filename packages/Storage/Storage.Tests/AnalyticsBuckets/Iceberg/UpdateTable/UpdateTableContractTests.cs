@@ -31,7 +31,10 @@ public class UpdateTableContractTests
 {
     private const string TablePath = "/storage/v1/iceberg/v1/analytics-data/namespaces/sales/tables/events";
     private static readonly IcebergTable Events = IcebergNamespace.Of("sales").Table("events");
-    private static readonly IcebergTableChanges NoChange = new();
+    private static readonly IcebergTableChanges NewSchema = new()
+    {
+        Schema = new IcebergSchema { Fields = new[] { new IcebergField { Id = 1, Name = "id", Type = IcebergPrimitiveType.Long, Required = true } } },
+    };
     private WireMockServer server = null!;
     private Client client = null!;
 
@@ -52,7 +55,7 @@ public class UpdateTableContractTests
     public async Task UpdateTableAsync_ShouldPostToTheTableRoute()
     {
         this.Respond(TablePath, 200, Fixture("TableUpdated.json"));
-        await this.Catalog().UpdateTableAsync(Events, NoChange);
+        await this.Catalog().UpdateTableAsync(Events, NewSchema);
         var request = this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!;
         using (new AssertionScope())
         {
@@ -67,7 +70,7 @@ public class UpdateTableContractTests
     public async Task UpdateTableAsync_ShouldEscapeTheTableNameAsOneSegment()
     {
         this.Respond("/storage/v1/iceberg/v1/*", 200, Fixture("TableUpdated.json"));
-        await this.Catalog().UpdateTableAsync(IcebergNamespace.Of("sales", "europe").Table("a/b?c#d"), NoChange);
+        await this.Catalog().UpdateTableAsync(IcebergNamespace.Of("sales", "europe").Table("a/b?c#d"), NewSchema);
         this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Url
             .Should().EndWith("/namespaces/sales%1Feurope/tables/a%2Fb%3Fc%23d", "a name must not start a path segment, query or fragment");
     }
@@ -76,7 +79,7 @@ public class UpdateTableContractTests
     public async Task UpdateTableAsync_ShouldReturnTheMetadataAfterTheCommit()
     {
         this.Respond(TablePath, 200, Fixture("TableUpdated.json"));
-        var metadata = await this.Catalog().UpdateTableAsync(Events, NoChange);
+        var metadata = await this.Catalog().UpdateTableAsync(Events, NewSchema);
         using (new AssertionScope())
         {
             metadata.MetadataLocation.Should().Be("s3://analytics-data/sales/events/metadata/00002-7a1f0c8e-2b4d-4e6f-9a1b-3c5d7e9f1a2b.metadata.json");
@@ -90,7 +93,7 @@ public class UpdateTableContractTests
     public async Task UpdateTableAsync_ShouldThrowConflict_GivenTableChangedSinceBasedOn()
     {
         this.Respond(TablePath, 409, Envelope("Requirement failed: current schema changed: expected id 0 != 1", "CommitFailedException", 409));
-        var act = () => this.Catalog().UpdateTableAsync(Events, NoChange);
+        var act = () => this.Catalog().UpdateTableAsync(Events, NewSchema);
         var exception = (await act.Should().ThrowAsync<SupabaseStorageException>()).Which;
         using (new AssertionScope())
         {
@@ -103,7 +106,7 @@ public class UpdateTableContractTests
     public async Task UpdateTableAsync_ShouldThrow_GivenInvalidChange()
     {
         this.Respond(TablePath, 400, Envelope("Cannot add field country as an identifier field: not a primitive type", "BadRequestException", 400));
-        var act = () => this.Catalog().UpdateTableAsync(Events, NoChange);
+        var act = () => this.Catalog().UpdateTableAsync(Events, NewSchema);
         var exception = (await act.Should().ThrowAsync<SupabaseStorageException>()).Which;
         using (new AssertionScope())
         {
@@ -119,7 +122,7 @@ public class UpdateTableContractTests
     public async Task UpdateTableAsync_ShouldThrowNotFound_GivenMissingTableNamespaceOrBucket(string message, string code)
     {
         this.Respond(TablePath, 404, Envelope(message, code, 404));
-        var act = () => this.Catalog().UpdateTableAsync(Events, NoChange);
+        var act = () => this.Catalog().UpdateTableAsync(Events, NewSchema);
         var exception = (await act.Should().ThrowAsync<SupabaseStorageException>()).Which;
         using (new AssertionScope())
         {
@@ -132,7 +135,7 @@ public class UpdateTableContractTests
     public async Task UpdateTableAsync_ShouldThrow_GivenForbidden()
     {
         this.Respond(TablePath, 403, Envelope("Access denied: Invalid role", "AccessDenied", 403));
-        var act = () => this.Catalog().UpdateTableAsync(Events, NoChange);
+        var act = () => this.Catalog().UpdateTableAsync(Events, NewSchema);
         var exception = (await act.Should().ThrowAsync<SupabaseStorageException>()).Which;
         using (new AssertionScope())
         {
@@ -147,7 +150,7 @@ public class UpdateTableContractTests
         this.Respond(TablePath, 200, Fixture("TableUpdated.json"));
         var catalog = this.Catalog();
         this.client.GetHeaders = () => new Dictionary<string, string> { { "apikey", "rotated" } };
-        await catalog.UpdateTableAsync(Events, NoChange);
+        await catalog.UpdateTableAsync(Events, NewSchema);
         this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Headers!["apikey"]
             .Should().ContainSingle().Which.Should().Be("rotated");
     }
@@ -158,7 +161,7 @@ public class UpdateTableContractTests
         this.Respond(TablePath, 200, Fixture("TableUpdated.json"));
         using var cts = new CancellationTokenSource();
         cts.Cancel();
-        var act = () => this.Catalog().UpdateTableAsync(Events, NoChange, cts.Token);
+        var act = () => this.Catalog().UpdateTableAsync(Events, NewSchema, cts.Token);
         await act.Should().ThrowAsync<OperationCanceledException>("the token must reach the HTTP call");
     }
 
@@ -166,7 +169,7 @@ public class UpdateTableContractTests
     public void UpdateTableAsync_ShouldNotResumeOnTheCallersContext()
     {
         this.Respond(TablePath, 200, Fixture("TableUpdated.json"));
-        BlockingCaller.Completes(() => this.Catalog().UpdateTableAsync(Events, NoChange))
+        BlockingCaller.Completes(() => this.Catalog().UpdateTableAsync(Events, NewSchema))
             .Should().BeTrue("the SDK never resumes on the caller's synchronization context");
     }
 

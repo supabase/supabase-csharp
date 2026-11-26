@@ -24,15 +24,6 @@ public class TableExistsTests
             .Which.ParamName.Should().Be("table");
 
     [TestMethod]
-    [DataRow("")]
-    [DataRow("   ")]
-    public async Task TableExistsAsync_ShouldThrowArgumentException_GivenBlankName(string name) =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").TableExistsAsync(IcebergNamespace.Of("sales").Table(name)))
-            .Should().ThrowAsync<ArgumentException>("a blank name would reach the route that lists tables")
-            .WithMessage("A table name must be provided.*"))
-            .Which.ParamName.Should().Be("table");
-
-    [TestMethod]
     [DataRow(".")]
     [DataRow("..")]
     public async Task TableExistsAsync_ShouldThrowArgumentException_GivenRelativeSegmentName(string name) =>

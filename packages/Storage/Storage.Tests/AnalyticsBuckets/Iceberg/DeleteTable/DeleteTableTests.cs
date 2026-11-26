@@ -24,15 +24,6 @@ public class DeleteTableTests
             .Which.ParamName.Should().Be("table");
 
     [TestMethod]
-    [DataRow("")]
-    [DataRow("   ")]
-    public async Task DeleteTableAsync_ShouldThrowArgumentException_GivenBlankName(string name) =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").DeleteTableAsync(IcebergNamespace.Of("sales").Table(name)))
-            .Should().ThrowAsync<ArgumentException>("a blank name would reach the route of the namespace's tables")
-            .WithMessage("A table name must be provided.*"))
-            .Which.ParamName.Should().Be("table");
-
-    [TestMethod]
     [DataRow(".")]
     [DataRow("..")]
     public async Task DeleteTableAsync_ShouldThrowArgumentException_GivenRelativeSegmentName(string name) =>

@@ -1,9 +1,11 @@
+using System;
 using Supabase.Storage.AnalyticsBuckets.Iceberg.Common;
 
 namespace Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable;
 
 /// <summary>
-/// The changes to commit to an Iceberg table: a new current schema, a new default partition spec, or both.
+/// The changes to commit to an Iceberg table: a new current schema, a new default partition spec, or both. At least
+/// one of <see cref="Schema"/> and <see cref="PartitionSpec"/> must be set.
 /// </summary>
 public sealed record IcebergTableChanges
 {
@@ -22,4 +24,12 @@ public sealed record IcebergTableChanges
     /// committed whatever happened to the table in between.
     /// </summary>
     public IcebergTableMetadata? BasedOn { get; init; }
+
+    private bool ChangesNothing => this.Schema is null && this.PartitionSpec is null;
+
+    internal void RequireAChange(string parameterName)
+    {
+        if (this.ChangesNothing)
+            throw new ArgumentException("The changes need a schema, a partition spec or both.", parameterName);
+    }
 }

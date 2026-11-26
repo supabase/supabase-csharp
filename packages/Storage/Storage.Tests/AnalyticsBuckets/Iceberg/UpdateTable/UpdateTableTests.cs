@@ -17,26 +17,35 @@ namespace Storage.Tests.AnalyticsBuckets.Iceberg.UpdateTable;
 [TestCategory("Unit")]
 public class UpdateTableTests
 {
+    private static readonly IcebergTable Events = IcebergNamespace.Of("sales").Table("events");
+    private static readonly IcebergTableChanges NewSchema = new() { Schema = new IcebergSchema { Fields = Array.Empty<IcebergField>() } };
     private readonly Client sut = new("http://localhost:1/storage/v1");
 
     [TestMethod]
     public async Task UpdateTableAsync_ShouldThrowArgumentNullException_GivenNoTable() =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").UpdateTableAsync(null!, new IcebergTableChanges()))
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").UpdateTableAsync(null!, NewSchema))
             .Should().ThrowAsync<ArgumentNullException>("there is no table to update"))
             .Which.ParamName.Should().Be("table");
 
     [TestMethod]
     public async Task UpdateTableAsync_ShouldThrowArgumentNullException_GivenNoChanges() =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").UpdateTableAsync(IcebergNamespace.Of("sales").Table("events"), null!))
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").UpdateTableAsync(Events, null!))
             .Should().ThrowAsync<ArgumentNullException>("there are no changes to commit"))
             .Which.ParamName.Should().Be("changes");
 
     [TestMethod]
-    [DataRow("")]
+    public async Task UpdateTableAsync_ShouldThrowArgumentException_GivenNeitherSchemaNorPartitionSpec() =>
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").UpdateTableAsync(Events, new IcebergTableChanges()))
+            .Should().ThrowAsync<ArgumentException>("a commit without an add-schema or add-spec update changes nothing in the table")
+            .WithMessage("The changes need a schema, a partition spec or both.*"))
+            .Which.ParamName.Should().Be("changes");
+
+    [TestMethod]
+    [DataRow(".")]
     [DataRow("..")]
     public async Task UpdateTableAsync_ShouldThrowArgumentException_GivenNameThatChangesTheRoute(string name) =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").UpdateTableAsync(IcebergNamespace.Of("sales").Table(name), new IcebergTableChanges()))
-            .Should().ThrowAsync<ArgumentException>("a blank or dot-segment name would post to another route"))
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").UpdateTableAsync(IcebergNamespace.Of("sales").Table(name), NewSchema))
+            .Should().ThrowAsync<ArgumentException>("a dot-segment name would post to another route"))
             .Which.ParamName.Should().Be("table");
 
     [TestMethod]

@@ -16,7 +16,6 @@ internal sealed class IcebergPartitionSpecBody
 
     internal static IcebergPartitionSpecBody From(IcebergPartitionSpec spec) => new()
     {
-        SpecId = spec.SpecId,
         Fields = spec.Fields.Select(PartitionFieldBody.From).ToList(),
     };
 

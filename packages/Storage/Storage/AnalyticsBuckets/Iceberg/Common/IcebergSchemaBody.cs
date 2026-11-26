@@ -19,7 +19,6 @@ internal sealed class IcebergSchemaBody
     internal static IcebergSchemaBody From(IcebergSchema schema) => new()
     {
         Fields = IcebergFieldBody.FromAll(schema.Fields),
-        SchemaId = schema.SchemaId,
     };
 
     internal IcebergSchema ToSchema() => new()

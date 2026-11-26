@@ -1,0 +1,18 @@
+{
+  "metadata-location": "s3://analytics-data/sales/events/metadata/00005-1c3e5a7b-9d2f-4b6a-8c1e-3f5a7b9d1e2c.metadata.json",
+  "metadata": {
+    "format-version": 2,
+    "table-uuid": "b734865e-f9a5-4654-8b0b-e15683fcb195",
+    "location": "s3://analytics-data/sales/events",
+    "last-updated-ms": 1752062419286,
+    "last-column-id": 2,
+    "last-partition-id": 1000,
+    "current-schema-id": 4,
+    "schemas": [
+      { "type": "struct", "schema-id": 4, "fields": [ { "id": 1, "name": "id", "type": "long", "required": true }, { "id": 2, "name": "occurred_at", "type": "timestamptz", "required": true } ] }
+    ],
+    "default-spec-id": 5,
+    "partition-specs": [ { "spec-id": 5, "fields": [ { "source-id": 2, "field-id": 1000, "name": "occurred_day", "transform": "day" } ] } ],
+    "properties": {}
+  }
+}
