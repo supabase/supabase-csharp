@@ -56,7 +56,7 @@ public class ListVectorsContractTests
     }
 
     [TestMethod]
-    public async Task ListVectorsAsync_ShouldReturnThePageAndTheNextToken()
+    public async Task ListVectorsAsync_ShouldReturnThePageAndTheNextPageToken()
     {
         this.Respond(200, "{\"vectors\":[{\"key\":\"doc-1\",\"data\":{\"float32\":[0.5,0.25]},\"metadata\":{\"title\":\"Intro\"}},{\"key\":\"doc-2\"}],\"nextToken\":\"doc-2\"}");
         var page = await this.Index().ListVectorsAsync(new ListVectorsOptions { Include = VectorContent.Data | VectorContent.Metadata });
@@ -66,15 +66,15 @@ public class ListVectorsContractTests
             page.Items[0].Data!.Float32.Should().Equal(0.5f, 0.25f);
             page.Items[0].Metadata!["title"].GetString().Should().Be("Intro");
             page.Items[1].Should().Be(new StoredVector { Key = "doc-2" });
-            page.NextToken.Should().Be("doc-2");
+            page.NextPageToken.Should().Be("doc-2");
         }
     }
 
     [TestMethod]
-    public async Task ListVectorsAsync_ShouldReturnNoNextToken_GivenTheLastPage()
+    public async Task ListVectorsAsync_ShouldReturnNoNextPageToken_GivenTheLastPage()
     {
         this.Respond(200, "{\"vectors\":[{\"key\":\"doc-1\"}]}");
-        (await this.Index().ListVectorsAsync()).NextToken.Should().BeNull("the service leaves out the token on the last page");
+        (await this.Index().ListVectorsAsync()).NextPageToken.Should().BeNull("the service leaves out the token on the last page");
     }
 
     [TestMethod]

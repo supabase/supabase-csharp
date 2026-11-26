@@ -20,12 +20,12 @@ public class SdkLogTests
     public void BackgroundWorkEvent_ShouldLogTheComponentAtDebug()
     {
         var capture = new LogCapture();
-        capture.Logger.BackgroundWorkEvent("Supabase.Realtime", "connected");
+        capture.Logger.BackgroundWorkEvent("supabase.realtime", "connected");
         var record = capture.Records.Should().ContainSingle().Which;
         using (new AssertionScope())
         {
             record.Level.Should().Be(LogLevel.Debug);
-            record.Message.Should().Be("Supabase.Realtime: connected");
+            record.Message.Should().Be("supabase.realtime: connected");
         }
     }
 

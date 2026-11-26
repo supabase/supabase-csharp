@@ -2,33 +2,32 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using Supabase.Storage.AnalyticsBuckets.Common;
 
 namespace Supabase.Storage.AnalyticsBuckets.ListBuckets;
 
 internal static class ListAnalyticsBucketsQuery
 {
     internal static string For(string bucketUrl, ListAnalyticsBucketsOptions? options) =>
-        $"{bucketUrl}?{string.Join("&", ParametersOf(options ?? new ListAnalyticsBucketsOptions()))}";
+        QueryString.Append(bucketUrl, ParametersOf(options ?? new ListAnalyticsBucketsOptions()));
 
     private static IEnumerable<string> ParametersOf(ListAnalyticsBucketsOptions options)
     {
         if (options.Limit is { } limit)
-            yield return Parameter("limit", limit.ToString(CultureInfo.InvariantCulture));
+            yield return QueryString.Parameter("limit", limit.ToString(CultureInfo.InvariantCulture));
 
         if (options.Offset is { } offset)
-            yield return Parameter("offset", offset.ToString(CultureInfo.InvariantCulture));
+            yield return QueryString.Parameter("offset", offset.ToString(CultureInfo.InvariantCulture));
 
         if (options.Sort is { } sort)
         {
-            yield return Parameter("sortColumn", WireNameOf(sort.Column));
-            yield return Parameter("sortOrder", WireNameOf(sort.Direction));
+            yield return QueryString.Parameter("sortColumn", WireNameOf(sort.Column));
+            yield return QueryString.Parameter("sortOrder", WireNameOf(sort.Direction));
         }
 
         if (options.Search is { } search)
-            yield return Parameter("search", search);
+            yield return QueryString.Parameter("search", search);
     }
-
-    private static string Parameter(string name, string value) => $"{name}={Uri.EscapeDataString(value)}";
 
     private static string WireNameOf(AnalyticsBucketSortColumn column) => column switch
     {

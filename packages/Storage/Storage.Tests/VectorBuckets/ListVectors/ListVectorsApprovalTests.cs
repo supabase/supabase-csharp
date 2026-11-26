@@ -28,8 +28,8 @@ public class ListVectorsApprovalTests : RequestApprovalFixture
         this.RespondWith("{\"vectors\":[]}");
         await this.Client.Vectors.From("embeddings-prod").Index("docs-v1").ListVectorsAsync(new ListVectorsOptions
         {
-            MaxResults = 100,
-            NextToken = "doc-100",
+            PageSize = 100,
+            NextPageToken = "doc-100",
             Include = VectorContent.Data | VectorContent.Metadata,
             Segment = new VectorSegment(1, 4),
         });

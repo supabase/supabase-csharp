@@ -32,6 +32,7 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="Realtime.Tests" />
+        <InternalsVisibleTo Include="Supabase" />
     </ItemGroup>
 
     <ItemGroup>

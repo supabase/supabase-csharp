@@ -20,7 +20,7 @@ public class ListVectorIndexesApprovalTests : RequestApprovalFixture
     public async Task ListIndexesRequest_ShouldSerializeToExpectedPayload()
     {
         this.RespondWith(EmptyPage);
-        await this.Client.Vectors.From("embeddings-prod").ListIndexesAsync(new ListVectorIndexesOptions { Prefix = "docs-", MaxResults = 50, NextToken = "docs-v1" });
+        await this.Client.Vectors.From("embeddings-prod").ListIndexesAsync(new ListVectorIndexesOptions { Prefix = "docs-", PageSize = 50, NextPageToken = "docs-v1" });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
 

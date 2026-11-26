@@ -1,4 +1,4 @@
-using Supabase.Storage.VectorBuckets.Common;
+using Supabase.Storage.Common;
 
 namespace Supabase.Storage.VectorBuckets.ListIndexes;
 
@@ -12,8 +12,8 @@ public sealed record ListVectorIndexesOptions
     public string? Prefix { get; init; }
 
     /// <summary>The maximum number of indexes on the page. The service accepts 1 to 500 and defaults to 500.</summary>
-    public int? MaxResults { get; init; }
+    public int? PageSize { get; init; }
 
-    /// <summary>The <see cref="VectorListPage{TItem}.NextToken"/> of the previous page, to read the page after it.</summary>
-    public string? NextToken { get; init; }
+    /// <summary>The <see cref="Page{T}.NextPageToken"/> of the previous page, to read the page after it.</summary>
+    public string? NextPageToken { get; init; }
 }

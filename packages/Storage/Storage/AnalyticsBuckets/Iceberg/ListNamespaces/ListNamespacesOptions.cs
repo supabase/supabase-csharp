@@ -1,4 +1,5 @@
 using Supabase.Storage.AnalyticsBuckets.Iceberg.Common;
+using Supabase.Storage.Common;
 
 namespace Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces;
 
@@ -14,6 +15,6 @@ public sealed record ListNamespacesOptions
     /// <summary>The maximum number of namespaces to return in one page.</summary>
     public int? PageSize { get; init; }
 
-    /// <summary>The <see cref="IcebergNamespacePage.NextPageToken"/> of the previous page, to read the next one.</summary>
-    public string? PageToken { get; init; }
+    /// <summary>The <see cref="Page{T}.NextPageToken"/> of the previous page, to read the next one.</summary>
+    public string? NextPageToken { get; init; }
 }

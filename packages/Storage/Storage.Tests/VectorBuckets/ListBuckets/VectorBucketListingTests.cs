@@ -43,22 +43,22 @@ public class VectorBucketListingTests : VectorIndexE2EFixture
         using (new AssertionScope())
         {
             page.Items.Select(bucket => bucket.VectorBucketName).Should().Equal(this.names, "only names starting with the prefix match, sorted by name");
-            page.NextToken.Should().BeNull("every match fits on the default page");
+            page.NextPageToken.Should().BeNull("every match fits on the default page");
             page.Items.Should().OnlyContain(bucket => bucket.CreatedAt.Year >= 2025, "the service reports the creation time");
         }
     }
 
     [TestMethod]
-    public async Task ListVectorBucketsAsync_ShouldPageThroughEveryBucket_GivenMaxResults()
+    public async Task ListVectorBucketsAsync_ShouldPageThroughEveryBucket_GivenAPageSize()
     {
-        var options = new ListVectorBucketsOptions { Prefix = this.prefix, MaxResults = 2 };
+        var options = new ListVectorBucketsOptions { Prefix = this.prefix, PageSize = 2 };
         var first = await this.Storage.Vectors.ListVectorBucketsAsync(options);
-        var last = await this.Storage.Vectors.ListVectorBucketsAsync(options with { NextToken = first.NextToken });
+        var last = await this.Storage.Vectors.ListVectorBucketsAsync(options with { NextPageToken = first.NextPageToken });
         using (new AssertionScope())
         {
             first.Items.Select(bucket => bucket.VectorBucketName).Should().Equal(this.names.Take(2));
             last.Items.Select(bucket => bucket.VectorBucketName).Should().Equal(new[] { this.names[2] }, "the token resumes after the previous page");
-            last.NextToken.Should().BeNull("no bucket remains after the last page");
+            last.NextPageToken.Should().BeNull("no bucket remains after the last page");
         }
     }
 
@@ -70,9 +70,9 @@ public class VectorBucketListingTests : VectorIndexE2EFixture
     }
 
     [TestMethod]
-    public async Task ListVectorBucketsAsync_ShouldThrowInvalidInput_GivenAnOutOfRangeMaxResults()
+    public async Task ListVectorBucketsAsync_ShouldThrowInvalidInput_GivenAnOutOfRangePageSize()
     {
-        var thrown = await FluentActions.Awaiting(() => this.Storage.Vectors.ListVectorBucketsAsync(new ListVectorBucketsOptions { MaxResults = 0 }))
+        var thrown = await FluentActions.Awaiting(() => this.Storage.Vectors.ListVectorBucketsAsync(new ListVectorBucketsOptions { PageSize = 0 }))
             .Should().ThrowAsync<SupabaseStorageException>("the service accepts 1 to 500 results per page");
         using (new AssertionScope())
         {

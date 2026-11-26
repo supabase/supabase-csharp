@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
-using Supabase.Storage.VectorBuckets.Common;
+using Supabase.Storage.Common;
 
 namespace Supabase.Storage.VectorBuckets.ListIndexes;
 
@@ -14,10 +14,10 @@ internal sealed class ListVectorIndexesResponse
     [JsonPropertyName("nextToken")]
     public string? NextToken { get; init; }
 
-    internal VectorListPage<VectorIndexSummary> ToPage() => new()
+    internal Page<VectorIndexSummary> ToPage() => new()
     {
         Items = (this.Indexes ?? Array.Empty<IndexBody>()).Select(index => index.ToSummary()).ToList(),
-        NextToken = this.NextToken,
+        NextPageToken = this.NextToken,
     };
 
     internal sealed class IndexBody

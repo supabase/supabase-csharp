@@ -197,13 +197,6 @@ internal static class Helpers
         authorized["Authorization"] = $"Bearer {accessToken}";
         return authorized;
     }
-
-    /// <summary>
-    /// Percent-encodes each segment of a storage path so a <c>?</c> or <c>#</c> in a key can't start
-    /// a query string or fragment, while <c>/</c> stays literal as the separator.
-    /// </summary>
-    internal static string EncodePath(string path) =>
-        string.Join("/", path.Split('/').Select(Uri.EscapeDataString));
 }
 
 public class GenericResponse

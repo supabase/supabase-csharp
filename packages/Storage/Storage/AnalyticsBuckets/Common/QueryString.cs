@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Supabase.Storage.Common;
+namespace Supabase.Storage.AnalyticsBuckets.Common;
 
 internal static class QueryString
 {

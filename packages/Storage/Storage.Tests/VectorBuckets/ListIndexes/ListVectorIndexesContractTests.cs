@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
 using Supabase.Storage;
 using Supabase.Storage.Exceptions;
-using Supabase.Storage.VectorBuckets.Common;
+using Supabase.Storage.Common;
 using Supabase.Storage.VectorBuckets.ListIndexes;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -61,7 +61,7 @@ public class ListVectorIndexesContractTests
     public async Task ListIndexesAsync_ShouldSendThePrefixAndPaging_GivenOptions()
     {
         this.Respond(200, FirstPageBody);
-        await this.client.Vectors.From("embeddings-prod").ListIndexesAsync(new ListVectorIndexesOptions { Prefix = "docs-", MaxResults = 2, NextToken = "docs-a" });
+        await this.client.Vectors.From("embeddings-prod").ListIndexesAsync(new ListVectorIndexesOptions { Prefix = "docs-", PageSize = 2, NextPageToken = "docs-a" });
         this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Body
             .Should().Be("{\"vectorBucketName\":\"embeddings-prod\",\"maxResults\":2,\"nextToken\":\"docs-a\",\"prefix\":\"docs-\"}", "the ListIndexes schema names them maxResults, nextToken and prefix");
     }
@@ -70,22 +70,22 @@ public class ListVectorIndexesContractTests
     public async Task ListIndexesAsync_ShouldReturnThePage()
     {
         this.Respond(200, FirstPageBody);
-        (await this.client.Vectors.From("embeddings-prod").ListIndexesAsync()).Should().BeEquivalentTo(new VectorListPage<VectorIndexSummary>
+        (await this.client.Vectors.From("embeddings-prod").ListIndexesAsync()).Should().BeEquivalentTo(new Page<VectorIndexSummary>
         {
             Items = new[]
             {
                 new VectorIndexSummary { IndexName = "docs-v1", CreatedAt = DateTimeOffset.FromUnixTimeSeconds(FirstCreationTime) },
                 new VectorIndexSummary { IndexName = "docs-v2", CreatedAt = DateTimeOffset.FromUnixTimeSeconds(SecondCreationTime) },
             },
-            NextToken = "docs-v2",
+            NextPageToken = "docs-v2",
         }, options => options.WithStrictOrdering(), "the service lists indexes by name with creation times in Unix seconds and a token while more remain");
     }
 
     [TestMethod]
-    public async Task ListIndexesAsync_ShouldReturnNoNextToken_GivenTheLastPage()
+    public async Task ListIndexesAsync_ShouldReturnNoNextPageToken_GivenTheLastPage()
     {
         this.Respond(200, $"{{\"indexes\":[{{\"indexName\":\"docs-v3\",\"vectorBucketName\":\"embeddings-prod\",\"creationTime\":{FirstCreationTime}}}]}}");
-        (await this.client.Vectors.From("embeddings-prod").ListIndexesAsync()).NextToken
+        (await this.client.Vectors.From("embeddings-prod").ListIndexesAsync()).NextPageToken
             .Should().BeNull("the service omits the token when no index remains");
     }
 
@@ -126,10 +126,10 @@ public class ListVectorIndexesContractTests
     }
 
     [TestMethod]
-    public async Task ListIndexesAsync_ShouldClassifyAsInvalidInput_GivenAnOutOfRangeMaxResults()
+    public async Task ListIndexesAsync_ShouldClassifyAsInvalidInput_GivenAnOutOfRangePageSize()
     {
         this.Respond(400, "{\"statusCode\":\"400\",\"error\":\"Error\",\"message\":\"body/maxResults must be >= 1\",\"code\":\"InvalidRequest\"}");
-        (await FluentActions.Awaiting(() => this.client.Vectors.From("embeddings-prod").ListIndexesAsync(new ListVectorIndexesOptions { MaxResults = 0 }))
+        (await FluentActions.Awaiting(() => this.client.Vectors.From("embeddings-prod").ListIndexesAsync(new ListVectorIndexesOptions { PageSize = 0 }))
             .Should().ThrowAsync<SupabaseStorageException>())
             .Which.Reason.Should().Be(FailureHint.Reason.InvalidInput);
     }

@@ -84,8 +84,31 @@ public class ObservabilityContractTests
             span.GetTagItem("http.request.method").Should().Be("POST");
             span.GetTagItem("http.response.status_code").Should().Be(200);
             span.GetTagItem("storage.transfer.direction").Should().BeNull();
-            this.measurements.Should().Contain(m => m.Name == "supabase.storage.http.request.duration");
         }
+    }
+
+    [TestMethod]
+    public async Task ControlPlaneRequest_ShouldRecordTheStandardHttpClientInstrument()
+    {
+        this.RespondJson($"/storage/v1/object/list/{Bucket}", "POST", 200, "[]");
+        await this.client.From(Bucket).List();
+        this.measurements.Should().ContainSingle().Which.Name.Should().Be("http.client.request.duration",
+            "every Supabase client records the OpenTelemetry HTTP client metric on its own meter, as Postgrest does");
+    }
+
+    [TestMethod]
+    public async Task ControlPlaneRequest_ShouldCarryTheHttpClientAttributes()
+    {
+        this.RespondJson($"/storage/v1/object/list/{Bucket}", "POST", 200, "[]");
+        await this.client.From(Bucket).List();
+        this.measurements.Should().ContainSingle().Which.Tags.Should().BeEquivalentTo(new Dictionary<string, object?>
+        {
+            ["http.request.method"] = "POST",
+            ["server.address"] = "localhost",
+            ["server.port"] = this.server.Port,
+            ["url.scheme"] = "http",
+            ["http.response.status_code"] = 200
+        }, "the metric carries the OpenTelemetry HTTP client attributes and no URL path, which holds bucket and object names");
     }
 
     [TestMethod]
@@ -105,6 +128,22 @@ public class ObservabilityContractTests
             size.Tags["storage.transfer.direction"].Should().Be("download");
             this.measurements.Should().Contain(m => m.Name == "supabase.storage.transfer.duration");
         }
+    }
+
+    [TestMethod]
+    public async Task Download_ShouldCarryTheTransferAttributes()
+    {
+        this.server.Given(Request.Create().WithPath($"/storage/v1/object/{Bucket}/file.txt").UsingGet())
+            .RespondWith(Response.Create().WithStatusCode(200).WithBody("payload"));
+        await this.client.From(Bucket).Download("file.txt", (EventHandler<float>?) null);
+        this.measurements.Single(m => m.Name == "supabase.storage.transfer.duration").Tags.Should().BeEquivalentTo(new Dictionary<string, object?>
+        {
+            ["http.request.method"] = "GET",
+            ["server.address"] = "localhost",
+            ["url.path"] = $"/storage/v1/object/{Bucket}/file.txt",
+            ["storage.transfer.direction"] = "download",
+            ["http.response.status_code"] = 200
+        }, "a transfer is a whole upload or download rather than one HTTP request, so it keeps its own metrics and attributes");
     }
 
     [TestMethod]
