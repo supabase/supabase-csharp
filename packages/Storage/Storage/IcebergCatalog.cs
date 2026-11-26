@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Supabase.Storage.Common;
 using Supabase.Storage.CreateNamespace;
 using Supabase.Storage.CreateTable;
+using Supabase.Storage.DeleteTable;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;
 using Supabase.Storage.ListNamespaces;
@@ -81,6 +82,13 @@ internal sealed class IcebergCatalog : IIcebergCatalog
         RequireArgument(table, nameof(table));
         var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Get, this.ResourceUrl(table.Path), null, this.headers(), cancellationToken).ConfigureAwait(false);
         return response!.ToMetadata();
+    }
+
+    /// <inheritdoc />
+    public Task DeleteTableAsync(IcebergTable table, DeleteTableOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(table, nameof(table));
+        return Helpers.MakeRequestAsync(this.requestClient, this.options, HttpMethod.Delete, DeleteTableQuery.For(this.ResourceUrl(table.Path), options), null, this.headers(), cancellationToken);
     }
 
     private string ResourceUrl(string path) => $"{this.catalogUrl}/{path}";
