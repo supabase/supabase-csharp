@@ -143,4 +143,25 @@ public interface IIcebergCatalog
     /// </example>
     [ImplementedCapability("storage.analytics.create_table")]
     Task<IcebergTableMetadata> CreateTableAsync(IcebergTable table, IcebergSchema schema, CreateTableOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Checks whether an Iceberg table exists, without loading its metadata.
+    /// </summary>
+    /// <param name="table">The table to look for.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>
+    /// True when the table exists. False when the service answers 404, which a missing table, a missing namespace, a
+    /// missing analytics bucket and a service without Iceberg enabled all do: a HEAD response carries no body to tell them apart.
+    /// </returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="table"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">The service refused the call for another reason, for example because the caller is not authorized.</exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var exists = await catalog.TableExistsAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), "events"));
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.table_exists")]
+    Task<bool> TableExistsAsync(IcebergTable table, CancellationToken cancellationToken = default);
 }

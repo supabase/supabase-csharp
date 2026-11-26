@@ -79,4 +79,25 @@ public class IcebergNamespaceTests
     [TestMethod]
     public void ToString_ShouldJoinLevelsWithDots() =>
         IcebergNamespace.Of("sales", "europe").ToString().Should().Be("sales.europe");
+
+    [TestMethod]
+    public void Path_ShouldEscapeAndJoinLevelsWithTheEncodedUnitSeparator() =>
+        IcebergNamespace.Of("a b", "c/d").Path.Should().Be("namespaces/a%20b%1Fc%2Fd", "the Iceberg REST spec joins levels with the 0x1F separator");
+
+    [TestMethod]
+    public void Path_ShouldAcceptLevelsContainingDots() =>
+        IcebergNamespace.Of("a..b").Path.Should().Be("namespaces/a..b");
+
+    [TestMethod]
+    public void Path_ShouldAcceptDotLevelsInAMultiLevelNamespace() =>
+        IcebergNamespace.Of("..", "a").Path.Should().Be("namespaces/..%1Fa", "the joined segment is no longer a relative one");
+
+    [TestMethod]
+    [DataRow(".")]
+    [DataRow("..")]
+    public void Path_ShouldThrowArgumentException_GivenRelativeSegmentNamespace(string level) =>
+        FluentActions.Invoking(() => IcebergNamespace.Of(level).Path)
+            .Should().Throw<ArgumentException>("a dot-segment namespace would reach another route")
+            .WithMessage("A namespace cannot be a relative path segment.*")
+            .Which.ParamName.Should().Be("namespace");
 }
