@@ -75,6 +75,14 @@ internal sealed class IcebergCatalog : IIcebergCatalog
         return this.ResourceExistsAsync(this.ResourceUrl(table.Path), cancellationToken);
     }
 
+    /// <inheritdoc />
+    public async Task<IcebergTableMetadata> LoadTableAsync(IcebergTable table, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(table, nameof(table));
+        var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Get, this.ResourceUrl(table.Path), null, this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToMetadata();
+    }
+
     private string ResourceUrl(string path) => $"{this.catalogUrl}/{path}";
 
     private async Task<bool> ResourceExistsAsync(string url, CancellationToken cancellationToken)
