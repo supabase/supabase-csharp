@@ -143,4 +143,28 @@ public interface IIcebergCatalog
     /// </example>
     [ImplementedCapability("storage.analytics.create_table")]
     Task<IcebergTableMetadata> CreateTableAsync(IcebergTable table, IcebergSchema schema, CreateTableOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Loads the metadata of an Iceberg table: its current schema, its default partition spec and its properties.
+    /// </summary>
+    /// <param name="table">The table to load.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The metadata of the table, as the catalog stores it.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="table"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the table, its namespace or its bucket does not exist
+    /// (status 404, <c>Code</c> <c>NoSuchTableException</c>, <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>)
+    /// or the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var metadata = await catalog.LoadTableAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), "events"));
+    /// foreach (var column in metadata.CurrentSchema.Fields)
+    ///     Console.WriteLine($"{column.Name}: {column.Type}");
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.load_table")]
+    Task<IcebergTableMetadata> LoadTableAsync(IcebergTable table, CancellationToken cancellationToken = default);
 }
