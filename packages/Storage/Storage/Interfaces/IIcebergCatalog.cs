@@ -146,6 +146,51 @@ public interface IIcebergCatalog
     Task<IcebergTableMetadata> CreateTableAsync(IcebergTable table, IcebergSchema schema, CreateTableOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Checks whether an Iceberg table exists, without loading its metadata.
+    /// </summary>
+    /// <param name="table">The table to look for.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>
+    /// True when the table exists. False when the service answers 404, which a missing table, a missing namespace, a
+    /// missing analytics bucket and a service without Iceberg enabled all do: a HEAD response carries no body to tell them apart.
+    /// </returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="table"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">The service refused the call for another reason, for example because the caller is not authorized.</exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var exists = await catalog.TableExistsAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), "events"));
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.table_exists")]
+    Task<bool> TableExistsAsync(IcebergTable table, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Loads the metadata of an Iceberg table: its current schema, its default partition spec and its properties.
+    /// </summary>
+    /// <param name="table">The table to load.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The metadata of the table, as the catalog stores it.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="table"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the table, its namespace or its bucket does not exist
+    /// (status 404, <c>Code</c> <c>NoSuchTableException</c>, <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>)
+    /// or the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var metadata = await catalog.LoadTableAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), "events"));
+    /// foreach (var column in metadata.CurrentSchema.Fields)
+    ///     Console.WriteLine($"{column.Name}: {column.Type}");
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.load_table")]
+    Task<IcebergTableMetadata> LoadTableAsync(IcebergTable table, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Lists the tables of a namespace, one page at a time. Storage applies the page size as a limit and ignores the
     /// page token today: it returns the first tables in creation order, without a next-page token.
     /// </summary>
