@@ -29,6 +29,6 @@ internal sealed class ListTablesResponse
         public string Name { get; set; } = null!;
 
         internal IcebergTable ToTable(IcebergNamespace listed) =>
-            IcebergTable.Of(this.Namespace is { Length: > 0 } levels ? IcebergNamespace.Of(levels) : listed, this.Name);
+            (this.Namespace is { Length: > 0 } levels ? IcebergNamespace.Of(levels) : listed).Table(this.Name);
     }
 }
