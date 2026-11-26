@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -53,8 +52,6 @@ internal class ProgressableStreamContent : HttpContent, IProgressableStreamConte
 
     protected override async Task SerializeToStreamAsync(Stream stream, TransportContext context)
     {
-        Contract.Assert(stream != null);
-
         var buffer = new byte[this.bufferSize];
         decimal size = this.content.Length;
         decimal uploaded = 0;

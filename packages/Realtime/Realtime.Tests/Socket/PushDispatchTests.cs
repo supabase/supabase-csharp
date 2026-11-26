@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -5,6 +7,7 @@ using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Realtime.Tests.Support;
 using Supabase.Realtime;
+using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Socket;
 
 namespace Realtime.Tests.Socket;
@@ -54,17 +57,33 @@ public class PushDispatchTests
     }
 
     [TestMethod]
-    public async Task Push_ShouldNotThrow_GivenAnEncoderThatFails()
+    public async Task Push_ShouldLogAndNotThrow_GivenAnEncoderThatFails()
     {
+        var failure = new JsonException("boom");
         var client = new FakeWebsocketClient { OpenOnStart = true };
         var socket = new RealtimeSocket("ws://localhost:4000/socket", new ClientOptions
         {
             WebSocketFactory = new FakeWebSocketFactory(client),
-            Encode = (_, _) => throw new JsonException("boom"),
+            Encode = (_, _) => throw failure,
         });
         await socket.Connect();
+        var logged = new List<(string Message, Exception? Error)>();
+        IRealtimeDebugger.DebugEventHandler handler = (_, message, error) => { lock (logged) logged.Add((message, error)); };
+        Debugger.Instance.AddDebugHandler(handler);
 
-        socket.Invoking(s => s.Push(Request("bad"))).Should().NotThrow("a failed encode was never surfaced to the caller");
+        try
+        {
+            socket.Invoking(s => s.Push(Request("bad"))).Should().NotThrow("a failed encode was never surfaced to the caller");
+        }
+        finally
+        {
+            Debugger.Instance.RemoveDebugHandler(handler);
+        }
+
+        lock (logged)
+            logged.Should().ContainSingle(l => l.Message.StartsWith("Socket Push failed") && l.Message.Contains("event: bad"), "the failure is logged instead of thrown")
+                .Which.Should().Match<(string Message, Exception? Error)>(l => l.Message.Contains("topic: realtime:test") && ReferenceEquals(l.Error, failure),
+                    "the log names the topic and event and carries the encoder exception");
     }
 
     private static async Task<(RealtimeSocket Socket, FakeWebsocketClient Client)> Connected()
