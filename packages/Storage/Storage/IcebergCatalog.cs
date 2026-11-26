@@ -10,6 +10,8 @@ using Supabase.Storage.DeleteTable;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;
 using Supabase.Storage.ListNamespaces;
+using Supabase.Storage.ListTables;
+using Supabase.Storage.UpdateTable;
 
 namespace Supabase.Storage;
 
@@ -65,7 +67,7 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     {
         RequireArgument(table, nameof(table));
         RequireArgument(schema, nameof(schema));
-        var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Post, this.ResourceUrl($"{table.Namespace.Path}/tables"), CreateTableBody.For(table, schema, options), this.headers(), cancellationToken).ConfigureAwait(false);
+        var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Post, this.ResourceUrl(table.CollectionPath), CreateTableBody.For(table, schema, options), this.headers(), cancellationToken).ConfigureAwait(false);
         return response!.ToMetadata();
     }
 
@@ -89,6 +91,24 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     {
         RequireArgument(table, nameof(table));
         return Helpers.MakeRequestAsync(this.requestClient, this.options, HttpMethod.Delete, DeleteTableQuery.For(this.ResourceUrl(table.Path), options), null, this.headers(), cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<IcebergTablePage> ListTablesAsync(IcebergNamespace @namespace, ListTablesOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(@namespace, nameof(@namespace));
+        var url = ListTablesQuery.For(this.ResourceUrl(@namespace.TablesPath), options);
+        var response = await Helpers.MakeRequestAsync<ListTablesResponse>(this.requestClient, this.options, HttpMethod.Get, url, null, this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToPage(@namespace);
+    }
+
+    /// <inheritdoc />
+    public async Task<IcebergTableMetadata> UpdateTableAsync(IcebergTable table, IcebergTableChanges changes, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(table, nameof(table));
+        RequireArgument(changes, nameof(changes));
+        var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Post, this.ResourceUrl(table.Path), UpdateTableBody.For(changes), this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToMetadata();
     }
 
     private string ResourceUrl(string path) => $"{this.catalogUrl}/{path}";

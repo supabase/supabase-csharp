@@ -15,7 +15,7 @@ run INCOMPLETE rather than green.
 ```sh
 ./scripts/quality-gate/gate.sh packages          # full gate over the solution
 ./scripts/quality-gate/gate.sh packages/Gotrue   # one package
-./scripts/quality-gate/gate.sh . --fast          # inner loop only (fast red/green cycle)
+./scripts/quality-gate/gate.sh . --fast          # inner loop + public-API declaration (fast red/green cycle)
 ./scripts/quality-gate/gate.sh --help
 ```
 
@@ -37,7 +37,7 @@ Requirements: `dotnet`, `jq`, and `git`. For the E2E stage, a running Supabase s
 | 2b | Coverage (line)            | block  | Line coverage of the hermetic (unit+contract) run must not drop below baseline. Full-suite coverage is shown for info, not gated.                     |
 | 3  | Mutation (new survivors)   | block² | Reads a Stryker report and FAILs on a surviving mutant **on a changed line**. See [Mutation](#mutation-testing).                                      |
 | 4  | Dependency vulnerabilities | signal | `dotnet list package --vulnerable`. Reported, never blocks — a vuln may have no fix available.                                                        |
-| 5a | Public API declared        | block  | Committed `PublicAPI.*.txt` must match the compiled public surface.                                                                                   |
+| 5a | Public API declared        | block  | Committed `PublicAPI.*.txt` must match the compiled public surface. Runs in `--fast` too: it costs seconds.                                           |
 | 5  | Public API diff            | signal | Flags added/removed public members; a **removal** is a breaking change needing sign-off.                                                              |
 | 7  | E2E / acceptance           | block  | Runs as part of stage 2 in full mode (no separate row).                                                                                               |
 
@@ -49,7 +49,7 @@ Requirements: `dotnet`, `jq`, and `git`. For the E2E stage, a running Supabase s
 | Flag                   | Effect                                                                                                                                                    |
 |------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | *(none)*               | Full gate.                                                                                                                                                |
-| `--fast`               | Inner loop only (build + format + unit/contract). No coverage, E2E, scan, or API checks. Verdict is PARTIAL on success — it's a subset, not the full bar. |
+| `--fast`               | Inner loop (build + format + unit/contract) and the Public API declared check. No coverage, E2E, scan or API diff. PARTIAL on success — not the full bar. |
 | `--mutation`           | Evaluate a Stryker report only. Does not build or run Stryker.                                                                                            |
 | `--bypass-format`      | Format reports as a signal, not a blocker, for this run.                                                                                                  |
 | `--overwrite-baseline` | Persist improvements (warnings down, coverage up) to `.gate-baseline.json`. Without it the gate is **read-only** and never edits the file.                |

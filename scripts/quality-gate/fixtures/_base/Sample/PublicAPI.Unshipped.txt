@@ -1,0 +1,3 @@
+#nullable enable
+Sample.Widget
+static Sample.Widget.Add(int a, int b) -> int

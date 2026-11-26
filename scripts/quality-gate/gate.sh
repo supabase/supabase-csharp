@@ -3,7 +3,7 @@
 # gate.sh — the Supabase C# SDK quality gauntlet (QUALITY_RUBRIC §4), as a program.
 #
 #   gate.sh [dir]                full gate — build, tests, security, public API, E2E
-#   gate.sh [dir] --fast         inner loop only — the agent's red/green cycle
+#   gate.sh [dir] --fast         inner loop + public-API declaration — the agent's red/green cycle
 #   gate.sh [dir] --mutation     evaluate a Stryker report (a separate CI job produces
 #                                it; not run here). Opt-in — off the default/PR path.
 #   gate.sh [dir] --bypass-format  format + naming reports as a signal, not a
@@ -189,12 +189,15 @@ else
     add 2  "Inner loop (Unit + Contract)" block "" SKIP "not run — build failed" ""
   fi
 
+  # The sync check compiles (dotnet format runs the analyzers), so a failed build
+  # makes it impossible, not failing — skip it causally, as with format and tests.
+  # It runs in --fast too: it costs seconds on a warm build, and an undeclared
+  # public member that only CI reports is found after the push instead of before.
+  if [[ $BUILD_OK -eq 1 ]]; then stage_api_sync
+  else add 5a "Public API declared" block "" SKIP "not run — build failed" ""; fi
+
   if [[ "$MODE" != "fast" ]]; then
     stage_security
-    # The sync check compiles (dotnet format runs the analyzers), so a failed build
-    # makes it impossible, not failing — skip it causally, as with format and tests.
-    if [[ $BUILD_OK -eq 1 ]]; then stage_api_sync
-    else add 5a "Public API declared" block "" SKIP "not run — build failed" ""; fi
     stage_api_diff
 
     if [[ $BUILD_OK -eq 0 ]]; then

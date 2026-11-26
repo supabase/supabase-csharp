@@ -30,7 +30,7 @@ namespace Storage.Tests.CreateTable;
 public class CreateTableContractTests
 {
     private const string TablesPath = "/storage/v1/iceberg/v1/analytics-data/namespaces/sales/tables";
-    private static readonly IcebergTable Events = IcebergTable.Of(IcebergNamespace.Of("sales"), "events");
+    private static readonly IcebergTable Events = IcebergNamespace.Of("sales").Table("events");
     private static readonly IcebergSchema Schema = new()
     {
         Fields = new[] { new IcebergField { Id = 1, Name = "id", Type = IcebergPrimitiveType.Long, Required = true } },
@@ -72,7 +72,7 @@ public class CreateTableContractTests
     {
         this.server.Given(Request.Create().WithPath("/storage/v1/iceberg/v1/*").UsingPost())
             .RespondWith(Response.Create().WithStatusCode(200).WithBody(Fixture("TableCreated.json")));
-        await this.Catalog().CreateTableAsync(IcebergTable.Of(IcebergNamespace.Of("sales", "europe"), "events"), Schema);
+        await this.Catalog().CreateTableAsync(IcebergNamespace.Of("sales", "europe").Table("events"), Schema);
         this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Url
             .Should().EndWith("/namespaces/sales%1Feurope/tables", "the Iceberg REST spec joins levels with the 0x1F separator");
     }
@@ -230,7 +230,7 @@ public class CreateTableContractTests
     public async Task CreateTableAsync_ShouldThrowInvalidInput_GivenInvalidName()
     {
         this.Respond(400, Envelope("Resource name must not contain hyphens (-) or periods (.)", "InvalidParameter", 400));
-        var act = () => this.Catalog().CreateTableAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), "my-events"), Schema);
+        var act = () => this.Catalog().CreateTableAsync(IcebergNamespace.Of("sales").Table("my-events"), Schema);
         var exception = (await act.Should().ThrowAsync<SupabaseStorageException>()).Which;
         using (new AssertionScope())
         {

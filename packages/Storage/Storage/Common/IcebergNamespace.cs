@@ -39,6 +39,20 @@ public sealed record IcebergNamespace
         return new IcebergNamespace(Array.AsReadOnly(levels.ToArray()));
     }
 
+    /// <summary>
+    /// Builds the identifier of a table held by this namespace. The service validates the name.
+    /// </summary>
+    /// <param name="name">The name of the table within this namespace.</param>
+    /// <returns>The identifier of the table.</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="name"/> is null.</exception>
+    /// <example>
+    /// <code>
+    /// var events = IcebergNamespace.Of("sales").Table("events");
+    /// </code>
+    /// </example>
+    public IcebergTable Table(string name) =>
+        new(this, name ?? throw new ArgumentNullException(nameof(name)));
+
     /// <inheritdoc />
     public bool Equals(IcebergNamespace? other) =>
         other is not null && this.Levels.SequenceEqual(other.Levels);
@@ -53,6 +67,8 @@ public sealed record IcebergNamespace
     internal string Joined() => string.Join(LevelSeparator.ToString(), this.Levels);
 
     internal string Path => $"namespaces/{PathSegment.Escape(this.Joined(), "A namespace", "namespace")}";
+
+    internal string TablesPath => $"{this.Path}/tables";
 
     private static void RejectMissing(string[]? levels)
     {
