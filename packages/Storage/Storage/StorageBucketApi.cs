@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Supabase.Core;
 using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
+using Supabase.Storage.Common;
 using Supabase.Storage.DeleteBucketLifecycle;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Extensions;
@@ -177,7 +178,7 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
         CancellationToken cancellationToken = default
     )
     {
-        var url = options.ToPurgeUrl($"{this.Url}/cdn/{Helpers.EncodePath(id)}");
+        var url = options.ToPurgeUrl($"{this.Url}/cdn/{PathSegment.EscapeObjectPath(id, nameof(id))}");
         return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
     }
 

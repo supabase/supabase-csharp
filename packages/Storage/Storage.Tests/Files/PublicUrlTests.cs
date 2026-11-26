@@ -45,26 +45,25 @@ public class PublicUrlTests
     }
 
     [TestMethod]
-    public void GetPublicUrl_ShouldEncodeEachSegment_GivenAKeyWithUrlDelimiters()
-    {
-        var plain = Bucket().GetPublicUrl("folder/a?b#c.png", null);
-        var transformed = Bucket().GetPublicUrl("folder/a?b#c.png", new TransformOptions { Width = 100 });
-
-        new Uri(plain).AbsolutePath.Should().EndWith("/object/public/bucket/folder/a%3Fb%23c.png");
-        new Uri(transformed).AbsolutePath.Should().EndWith("/render/image/public/bucket/folder/a%3Fb%23c.png");
-    }
+    public void GetPublicUrl_ShouldEncodeEachSegment_GivenAKeyWithUrlDelimiters() =>
+        new Uri(Bucket().GetPublicUrl("folder/a?b#c.png", null)).AbsolutePath.Should().EndWith("/object/public/bucket/folder/a%3Fb%23c.png");
 
     [TestMethod]
-    [DataRow("../other/a.png")]
-    [DataRow("folder/./a.png")]
-    public void GetPublicUrl_ShouldThrow_GivenAKeyWithADotSegment(string key)
-    {
-        var plain = () => Bucket().GetPublicUrl(key, null);
-        var transformed = () => Bucket().GetPublicUrl(key, new TransformOptions { Width = 100 });
+    public void GetPublicUrl_ShouldEncodeEachSegment_GivenAKeyWithUrlDelimitersAndATransform() =>
+        new Uri(Bucket().GetPublicUrl("folder/a?b#c.png", new TransformOptions { Width = 100 })).AbsolutePath
+            .Should().EndWith("/render/image/public/bucket/folder/a%3Fb%23c.png");
 
-        plain.Should().Throw<ArgumentException>().WithMessage("*'.' or '..' segment*");
-        transformed.Should().Throw<ArgumentException>();
-    }
+    [TestMethod]
+    public void GetPublicUrl_ShouldResolveInsideTheBucket_GivenADotSegmentThatStaysInIt() =>
+        new Uri(Bucket().GetPublicUrl("a/../b", null)).AbsolutePath.Should().EndWith("/object/public/bucket/b");
+
+    [TestMethod]
+    public void GetPublicUrl_ShouldThrow_GivenAKeyClimbingAboveItsBucket() =>
+        FluentActions.Invoking(() => Bucket().GetPublicUrl("../b", null)).Should().Throw<ArgumentException>().WithParameterName("path");
+
+    [TestMethod]
+    public void GetPublicUrl_ShouldThrow_GivenAKeyClimbingAboveItsBucketAndATransform() =>
+        FluentActions.Invoking(() => Bucket().GetPublicUrl("../b", new TransformOptions { Width = 100 })).Should().Throw<ArgumentException>();
 
     [TestMethod]
     public void GetPublicUrl_ShouldAppendDownloadName_GivenDownloadOptions()
