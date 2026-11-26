@@ -18,7 +18,8 @@ internal sealed class HttpBroadcaster
 {
     private const string TopicPrefix = "realtime:";
 
-    private static readonly HttpClient Client = new();
+    // Built on first use, not at type load, so a host that never sends over HTTP never constructs one.
+    private static readonly Lazy<HttpClient> Client = new(() => new HttpClient(), LazyThreadSafetyMode.ExecutionAndPublication);
 
     private readonly string endpoint;
     private readonly ClientOptions options;
@@ -41,7 +42,7 @@ internal sealed class HttpBroadcaster
             request.Headers.TryAddWithoutValidation(header.Key, header.Value);
         using var timeoutCts = this.options.TimeProvider.CreateCancellationTokenSource(this.options.Timeout);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
-        using var response = await Client.SendAsync(request, linkedCts.Token).ConfigureAwait(false);
+        using var response = await Client.Value.SendAsync(request, linkedCts.Token).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
             throw new RealtimeException(await response.Content.ReadAsStringAsync()) { StatusCode = (int) response.StatusCode };
     }

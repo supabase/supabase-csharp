@@ -98,8 +98,13 @@ internal sealed class FakeWebsocketClient : IWebsocketClient
     private readonly Dictionary<string, int> sentFrameCounts = new();
     private bool speaksArrays;
 
+    /// <summary>Every text frame sent, in order.</summary>
+    public List<string> Sent { get; } = new();
+
     public bool Send(string message)
     {
+        lock (this.Sent)
+            this.Sent.Add(message);
         this.FirstSend.TrySetResult();
         this.speaksArrays = JsonNode.Parse(message) is JsonArray;
         var frame = AsObject(message);

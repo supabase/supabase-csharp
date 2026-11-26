@@ -88,7 +88,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private readonly object heartbeatLock = new();
     private readonly Stopwatch heartbeatStopwatch = new();
 
-    private readonly List<Task> buffer = new();
+    private readonly List<Action> buffer = new();
     private bool isReconnecting;
     private bool isOpen;
     private bool disconnectRequested;
@@ -304,12 +304,24 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         Debugger.Instance.Log(this,
             $"Socket Push [topic: {data.Topic}, event: {data.Event}, ref: {data.Ref}]:\n\t{JsonSerializer.Serialize(data.Payload, new JsonSerializerOptions { WriteIndented = true })}");
 
-        var task = new Task(() => this.Write(data));
+        void Send() => this.EncodeAndSend(data);
 
         if (this.connection.IsRunning)
-            task.Start();
+            Send();
         else
-            this.buffer.Add(task);
+            this.buffer.Add(Send);
+    }
+
+    private void EncodeAndSend(SocketRequest data)
+    {
+        try
+        {
+            this.Write(data);
+        }
+        catch (Exception e)
+        {
+            Debugger.Instance.Log(this, $"Socket Push failed [topic: {data.Topic}, event: {data.Event}]", e);
+        }
     }
 
     private void Write(SocketRequest data)
@@ -657,9 +669,9 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
         Debugger.Instance.Log(this,
             $"Socket Flushing Buffer: Connection has been reestablished and socket is sending {this.buffer.Count} messages");
-        foreach (var item in this.buffer)
+        foreach (var send in this.buffer)
         {
-            item.Start();
+            send();
         }
 
         this.buffer.Clear();

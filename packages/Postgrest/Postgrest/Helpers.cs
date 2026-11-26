@@ -26,7 +26,7 @@ namespace Supabase.Postgrest;
 
 internal static class Helpers
 {
-    private static readonly HttpClient Client = new HttpClient();
+    private static readonly FallbackHttpClient Client = new(() => new HttpClient());
 
     // One client per proxy object. It is freed when the proxy is.
     private static readonly ConditionalWeakTable<IWebProxy, HttpClient> ProxyClients = new();
@@ -152,7 +152,7 @@ internal static class Helpers
 
         try
         {
-            using var response = await RetryExecutor.SendAsync(httpClient ?? Client, CreateRequest, clientOptions.Retry, clientOptions.TracePropagation, clientOptions.Logger, clientOptions.TimeProvider, linkedCts.Token).ConfigureAwait(false);
+            using var response = await RetryExecutor.SendAsync(Client.Or(httpClient), CreateRequest, clientOptions.Retry, clientOptions.TracePropagation, clientOptions.Logger, clientOptions.TimeProvider, linkedCts.Token).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);
 

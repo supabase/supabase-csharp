@@ -41,7 +41,7 @@ public static class Helpers
         Converters = { new Serialization.ObjectToInferredTypesConverter() },
     };
 
-    private static readonly HttpClient Client = new HttpClient();
+    private static readonly FallbackHttpClient Client = new(() => new HttpClient());
 
     // One client per proxy, freed with it.
     private static readonly ConditionalWeakTable<IWebProxy, HttpClient> ProxyClients = new();
@@ -72,7 +72,7 @@ public static class Helpers
 
     /// <summary>
     /// Generates a PKCE SHA256 code challenge given a nonce (code verifier)
-    /// 
+    ///
     /// Paired with <see cref="GenerateNonce"/>
     ///
     /// Sourced from: https://stackoverflow.com/a/65220376/3629438
@@ -250,7 +250,7 @@ public static class Helpers
 
         try
         {
-            using var response = await RetryExecutor.SendAsync(httpClient ?? Client, () => BuildRequestMessage(method, uri, data, headers),
+            using var response = await RetryExecutor.SendAsync(Client.Or(httpClient), () => BuildRequestMessage(method, uri, data, headers),
                 retry ?? new RetryOptions(), tracePropagation, logger, timeProvider ?? TimeProvider.System, cancellationToken).ConfigureAwait(false);
             statusCode = (int) response.StatusCode;
             activity.SetHttpResponseTags(statusCode.Value);

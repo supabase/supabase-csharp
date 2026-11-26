@@ -6,88 +6,83 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Supabase.Storage.Interfaces;
 
-namespace Supabase.Storage.Extensions
+namespace Supabase.Storage.Extensions;
+
+internal class ProgressableStreamContent : HttpContent, IProgressableStreamContent
 {
-	internal class ProgressableStreamContent : HttpContent, IProgressableStreamContent
-	{
-		private const int defaultBufferSize = 4096;
+    private const int DefaultBufferSize = 4096;
 
-		private Stream content;
-		private int bufferSize;
+    private Stream content;
+    private int bufferSize;
 
-		public EventHandler<UploadState>? StateChanged;
-		public IProgress<float>? Progress { get; private set; }
+    public EventHandler<UploadState>? StateChanged;
+    public IProgress<float>? Progress { get; private set; }
 
-		public enum UploadState
-		{
-			PendingUpload,
-			InProgress,
-			PendingResponse,
-			Complete
-		}
+    public enum UploadState
+    {
+        PendingUpload,
+        InProgress,
+        PendingResponse,
+        Complete
+    }
 
-		public ProgressableStreamContent(Stream content) : this(content, defaultBufferSize) { }
+    public ProgressableStreamContent(Stream content) : this(content, DefaultBufferSize) { }
 
-		public ProgressableStreamContent(Stream content, int bufferSize, Progress<float>? progress = null)
-		{
-			if (content == null)
-			{
-				throw new ArgumentNullException("content");
-			}
+    public ProgressableStreamContent(Stream content, int bufferSize, IProgress<float>? progress = null)
+    {
+        if (content == null)
+        {
+            throw new ArgumentNullException("content");
+        }
 
-			if (bufferSize <= 0)
-			{
-				throw new ArgumentOutOfRangeException("bufferSize");
-			}
+        if (bufferSize <= 0)
+        {
+            throw new ArgumentOutOfRangeException("bufferSize");
+        }
 
-			if (progress == null)
-			{
-				progress = new Progress<float>();
-			}
+        if (progress == null)
+        {
+            progress = new Progress<float>();
+        }
 
-			this.content = content;
-			this.bufferSize = bufferSize;
+        this.content = content;
+        this.bufferSize = bufferSize;
 
-			Progress = progress;
-		}
+        this.Progress = progress;
+    }
 
-		protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
-		{
-			Contract.Assert(stream != null);
+    protected override async Task SerializeToStreamAsync(Stream stream, TransportContext context)
+    {
+        Contract.Assert(stream != null);
 
-			return Task.Run(() =>
-			{
-				var buffer = new byte[bufferSize];
-				decimal size = content.Length;
-				decimal uploaded = 0;
+        var buffer = new byte[this.bufferSize];
+        decimal size = this.content.Length;
+        decimal uploaded = 0;
 
-				StateChanged?.Invoke(this, UploadState.PendingUpload);
+        this.StateChanged?.Invoke(this, UploadState.PendingUpload);
 
-				using (content)
-				{
-					while (true)
-					{
-						var length = content.Read(buffer, 0, buffer.Length);
-						if (length <= 0) break;
+        using (this.content)
+        {
+            int length;
+            while ((length = await this.content.ReadAsync(buffer, 0, buffer.Length).ConfigureAwait(false)) > 0)
+            {
+                uploaded += length;
+                this.Progress?.Report(PercentOf(uploaded, size));
 
-						uploaded += length;
-						float currentProgress = (float)((uploaded / size) * 100);
-						Progress?.Report(currentProgress);
+                await stream!.WriteAsync(buffer, 0, length).ConfigureAwait(false);
 
-						stream!.Write(buffer, 0, length);
+                this.StateChanged?.Invoke(this, UploadState.InProgress);
+            }
+        }
 
-						StateChanged?.Invoke(this, UploadState.InProgress);
-					}
-				}
+        this.StateChanged?.Invoke(this, UploadState.PendingResponse);
+    }
 
-				StateChanged?.Invoke(this, UploadState.PendingResponse);
-			});
-		}
+    private static float PercentOf(decimal uploaded, decimal size) => (float) ((uploaded / size) * 100);
 
-		protected override bool TryComputeLength(out long length)
-		{
-			length = content.Length;
-			return length > 0;
-		}
-	}
+    protected override bool TryComputeLength(out long length)
+    {
+        length = this.content.Length;
+        return length > 0;
+    }
 }
