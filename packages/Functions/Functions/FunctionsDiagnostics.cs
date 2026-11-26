@@ -2,7 +2,7 @@ namespace Supabase.Functions;
 
 /// <summary>
 /// Names of the diagnostic sources the Functions client emits to. Pass these when wiring up
-/// OpenTelemetry so you don't have to hardcode (case-sensitive) source names:
+/// OpenTelemetry rather than repeating the name as a string literal:
 /// <c>TracerProviderBuilder.AddSource(FunctionsDiagnostics.SourceName)</c> and
 /// <c>MeterProviderBuilder.AddMeter(FunctionsDiagnostics.SourceName)</c>.
 /// </summary>

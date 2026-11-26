@@ -27,8 +27,7 @@ internal static class GotrueInstrumentation
     private static readonly Meter Meter =
         Instrumentation.CreateMeter(typeof(GotrueInstrumentation).Assembly, GotrueDiagnostics.SourceName);
 
-    private static readonly Histogram<double> RequestDuration = Meter.CreateHistogram<double>(
-        "supabase.gotrue.http.request.duration", "s", "Duration of HTTP requests sent by the GoTrue client.");
+    private static readonly HttpClientRequestDuration RequestDuration = HttpClientRequestDuration.On(Meter);
 
     /// <summary>
     ///     Starts the client span for an outgoing HTTP request, tagged per OpenTelemetry HTTP
@@ -43,25 +42,9 @@ internal static class GotrueInstrumentation
     /// </summary>
     internal static void RecordRequest(HttpMethod method, Uri uri, int? statusCode, string? errorType, long startTimestamp)
     {
-        if (!RequestDuration.Enabled)
-            return;
-
-        var tags = new TagList
-        {
-            { "http.request.method", method.Method },
-            { "server.address", uri.Host },
-            { "url.path", uri.AbsolutePath }
-        };
-
-        if (statusCode.HasValue)
-            tags.Add("http.response.status_code", statusCode.Value);
-
-        if (errorType != null)
-            tags.Add("error.type", errorType);
-
-        RequestDuration.Record(GetElapsedSeconds(startTimestamp), tags);
+        if (RequestDuration.Enabled)
+            RequestDuration.Record(startTimestamp, HttpClientRequestDuration.TagsOf(method, uri, statusCode, errorType));
     }
-    private static double GetElapsedSeconds(long startTimestamp) => (Stopwatch.GetTimestamp() - startTimestamp) / (double) Stopwatch.Frequency;
 
     /// <summary>Names of the domain spans emitted for the public GoTrue operations.</summary>
     internal static class Spans

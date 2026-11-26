@@ -141,31 +141,45 @@ public class ObservabilityContractTests
     }
 
     [TestMethod]
-    public async Task InvokeDuration_ShouldBeNamedAndMeasuredInSeconds()
+    public async Task InvokeDuration_ShouldBeTheStandardHttpClientInstrument()
     {
         this.MockInvokeOk();
         await this.Invoke();
-        using (new AssertionScope())
-        {
-            this.durationInstrument!.Name.Should().Be("supabase.functions.invoke.duration");
-            this.durationInstrument!.Unit.Should().Be("s");
-        }
+        this.durationInstrument!.Name.Should().Be("http.client.request.duration",
+            "every Supabase client records the OpenTelemetry HTTP client metric on its own meter, as Postgrest does");
     }
 
     [TestMethod]
-    public async Task InvokeDuration_ShouldTagRequestDimensions()
+    public async Task InvokeDuration_ShouldMeasureInSeconds()
     {
         this.MockInvokeOk();
         await this.Invoke();
-        var dimensions = this.measurements.Should().ContainSingle().Which.Value;
-        using (new AssertionScope())
+        this.durationInstrument!.Unit.Should().Be("s", "OpenTelemetry measures HTTP client durations in seconds");
+    }
+
+    [TestMethod]
+    public async Task InvokeDuration_ShouldBeDescribed()
+    {
+        this.MockInvokeOk();
+        await this.Invoke();
+        this.durationInstrument!.Description.Should().Be("Duration of HTTP client requests.",
+            "the instrument shares the description of the OpenTelemetry HTTP client metric");
+    }
+
+    [TestMethod]
+    public async Task InvokeDuration_ShouldCarryTheHttpClientAndFunctionAttributes()
+    {
+        this.MockInvokeOk();
+        await this.Invoke();
+        this.measurements.Should().ContainSingle().Which.Value.Should().BeEquivalentTo(new Dictionary<string, object?>
         {
-            dimensions["http.request.method"].Should().Be("POST");
-            dimensions["http.response.status_code"].Should().Be(200);
-            dimensions["server.address"].Should().Be(new System.Uri(this.server.Url!).Host);
-            dimensions["url.path"].Should().Be($"/functions/v1/{FunctionName}");
-            dimensions["faas.invoked_name"].Should().Be(FunctionName);
-        }
+            ["http.request.method"] = "POST",
+            ["server.address"] = "localhost",
+            ["server.port"] = this.server.Port,
+            ["url.scheme"] = "http",
+            ["http.response.status_code"] = 200,
+            ["faas.invoked_name"] = FunctionName
+        }, "the metric carries the OpenTelemetry HTTP client attributes and the invoked function, and no URL path");
     }
 
     [TestMethod]

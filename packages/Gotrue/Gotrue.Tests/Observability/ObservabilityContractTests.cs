@@ -322,15 +322,34 @@ public class ObservabilityContractTests
         var measurement = this.measurements.Should().ContainSingle().Which;
         using (new AssertionScope())
         {
-            measurement.Instrument.Should().Be("supabase.gotrue.http.request.duration");
             measurement.Unit.Should().Be("s", "the histogram records a duration in seconds");
             measurement.Value.Should().BeGreaterThan(0);
-            measurement.Tags.Should().Contain("http.request.method", "POST");
-            measurement.Tags.Should().Contain("server.address", new Uri(this.server.Url).Host);
-            measurement.Tags.Should().Contain("http.response.status_code", 200);
-            measurement.Tags.Should().Contain("url.path", "/token");
-            measurement.Tags.Should().NotContainKey("error.type", "a successful request carries no error tag");
         }
+    }
+
+    [TestMethod]
+    public async Task RequestDurationHistogram_ShouldBeTheStandardHttpClientInstrument()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        this.measurements.Should().ContainSingle().Which.Instrument.Should().Be("http.client.request.duration",
+            "every Supabase client records the OpenTelemetry HTTP client metric on its own meter, as Postgrest does");
+    }
+
+    [TestMethod]
+    public async Task RequestDurationHistogram_ShouldCarryTheHttpClientAttributes()
+    {
+        this.MockTokenSuccess();
+        await this.Refresh();
+        var serverUri = new Uri(this.server.Url);
+        this.measurements.Should().ContainSingle().Which.Tags.Should().BeEquivalentTo(new Dictionary<string, object?>
+        {
+            ["http.request.method"] = "POST",
+            ["server.address"] = serverUri.Host,
+            ["server.port"] = serverUri.Port,
+            ["url.scheme"] = serverUri.Scheme,
+            ["http.response.status_code"] = 200,
+        }, "the metric carries the OpenTelemetry HTTP client attributes and no URL path, which holds user and factor ids");
     }
 
     [TestMethod]

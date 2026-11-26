@@ -193,8 +193,8 @@ Once subscribed you get:
 - A span per public operation (`gotrue.sign_in`, `gotrue.refresh_token`, …) with a child client span
   for the underlying HTTP call following OpenTelemetry HTTP conventions (method, status code, and a
   sanitized URL — the query string, which carries grant types and API keys, is never recorded).
-- A `supabase.gotrue.http.request.duration` histogram (seconds), tagged with method, host, path, and
-  status code.
+- The standard `http.client.request.duration` histogram (seconds) on the `supabase.gotrue` meter,
+  tagged with method, server address and port, scheme, status code and error type. It carries no URL.
 
 If you are not using the OpenTelemetry SDK, a raw listener works too:
 

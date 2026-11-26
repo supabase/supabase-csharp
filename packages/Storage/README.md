@@ -126,7 +126,9 @@ Once subscribed you get:
   `storage.transfer.direction` tag (`upload` / `download`). The resumable (TUS) upload is reported as
   a single operation span covering the whole transfer, rather than one span per underlying chunk
   request.
-- `supabase.storage.http.request.duration` (seconds) for control-plane requests.
+- The standard `http.client.request.duration` histogram (seconds) on the `supabase.storage` meter for
+  control-plane requests, tagged with method, server address and port, scheme, status code and error
+  type. It carries no URL.
 - `supabase.storage.transfer.duration` (seconds) and `supabase.storage.transfer.size` (bytes) for
   uploads and downloads, tagged by direction — because a duration alone does not describe a file
   transfer.

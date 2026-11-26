@@ -31,6 +31,14 @@ public static class Instrumentation
     public static Meter CreateMeter(Assembly assembly, string name) => new(name, GetVersion(assembly));
 
     /// <summary>
+    /// The seconds elapsed since a <see cref="Stopwatch.GetTimestamp"/> value, the unit of every duration
+    /// histogram.
+    /// </summary>
+    /// <param name="startTimestamp">The <see cref="Stopwatch.GetTimestamp"/> value captured at the start.</param>
+    internal static double SecondsSince(long startTimestamp) =>
+        (Stopwatch.GetTimestamp() - startTimestamp) / (double) Stopwatch.Frequency;
+
+    /// <summary>
     /// Resolves the version of an assembly, preferring the informational (package) version
     /// with any build metadata (<c>+sha</c>) stripped.
     /// </summary>
