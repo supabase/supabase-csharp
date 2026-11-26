@@ -1,11 +1,12 @@
 {
-  "description": "Production code does not compile. Build must FAIL, and format + tests must SKIP causally (not PASS) because a failed build makes them impossible. This is the core invariant: a check that could not run must never read as passed.",
+  "description": "Production code does not compile. Build must FAIL, and format + tests must SKIP causally (not PASS) because a failed build makes them impossible. This is the core invariant: a check that could not run must never read as passed. The Public API check compiles too, so it must SKIP for the same reason.",
   "mode": "--fast",
   "exit": 1,
   "verdict": "FAIL",
   "stages": [
     { "id": "1a", "status": "FAIL" },
     { "id": "1b", "status": "SKIP" },
-    { "id": "2",  "status": "SKIP" }
+    { "id": "2",  "status": "SKIP" },
+    { "id": "5a", "status": "SKIP", "detailContains": "build failed" }
   ]
 }

@@ -66,7 +66,7 @@ print_verdict() {  # print_verdict <verdict> <exitCode>
   echo
   case "$1" in
     PASS)       echo "${GRN}${BLD}GATE: PASS${OFF} (exit 0) — blocking stages green; signal stages are the maintainer's call." ;;
-    PARTIAL)    echo "${YEL}${BLD}GATE: PARTIAL${OFF} (exit 0) — inner loop only. Re-run without --fast before a PR." ;;
+    PARTIAL)    echo "${YEL}${BLD}GATE: PARTIAL${OFF} (exit 0) — fast mode, a subset of the gate. Re-run without --fast before a PR." ;;
     INCOMPLETE) echo "${YEL}${BLD}GATE: INCOMPLETE${OFF} (exit 2) — a blocking stage could not run. Unverified ≠ verified." ;;
     FAIL)       echo "${RED}${BLD}GATE: FAIL${OFF} (exit 1) — fix the cause, not the check: no #pragma disable, no"
                 echo "severity downgrade, no re-categorising to dodge the filter, no deleting a red test." ;;

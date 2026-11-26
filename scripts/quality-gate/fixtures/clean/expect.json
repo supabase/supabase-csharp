@@ -1,11 +1,12 @@
 {
-  "description": "A well-formed package: builds, no warnings, formatted, tests green.",
+  "description": "A well-formed package: builds, no warnings, formatted, tests green. Its declared public surface matches the compiled one, so the Public API stage runs in --fast and passes.",
   "mode": "--fast",
   "exit": 0,
   "verdict": "PARTIAL",
   "stages": [
     { "id": "1a", "status": "PASS" },
     { "id": "1b", "status": "PASS" },
-    { "id": "2",  "status": "PASS" }
+    { "id": "2",  "status": "PASS" },
+    { "id": "5a", "status": "PASS" }
   ]
 }

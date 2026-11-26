@@ -1,0 +1,12 @@
+{
+  "description": "A new public type is added but not declared in PublicAPI.Unshipped.txt — the miss that reached CI on a real PR because --fast skipped the check. Build, format and tests are green (RS0016 is a suggestion, so the build stays at baseline), and the Public API stage must FAIL in --fast. Guards that the inner loop, not CI, is where undeclared surface is first reported.",
+  "mode": "--fast",
+  "exit": 1,
+  "verdict": "FAIL",
+  "stages": [
+    { "id": "1a", "status": "PASS" },
+    { "id": "1b", "status": "PASS" },
+    { "id": "2",  "status": "PASS" },
+    { "id": "5a", "status": "FAIL", "detailContains": "undeclared" }
+  ]
+}
