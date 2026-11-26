@@ -162,7 +162,6 @@ static Supabase.Storage.Common.IcebergSchema.operator !=(Supabase.Storage.Common
 static Supabase.Storage.Common.IcebergSchema.operator ==(Supabase.Storage.Common.IcebergSchema? left, Supabase.Storage.Common.IcebergSchema? right) -> bool
 static Supabase.Storage.Common.IcebergStructType.operator !=(Supabase.Storage.Common.IcebergStructType? left, Supabase.Storage.Common.IcebergStructType? right) -> bool
 static Supabase.Storage.Common.IcebergStructType.operator ==(Supabase.Storage.Common.IcebergStructType? left, Supabase.Storage.Common.IcebergStructType? right) -> bool
-static Supabase.Storage.Common.IcebergTable.Of(Supabase.Storage.Common.IcebergNamespace! namespace, string! name) -> Supabase.Storage.Common.IcebergTable!
 static Supabase.Storage.Common.IcebergTable.operator !=(Supabase.Storage.Common.IcebergTable? left, Supabase.Storage.Common.IcebergTable? right) -> bool
 static Supabase.Storage.Common.IcebergTable.operator ==(Supabase.Storage.Common.IcebergTable? left, Supabase.Storage.Common.IcebergTable? right) -> bool
 static Supabase.Storage.Common.IcebergTableMetadata.operator !=(Supabase.Storage.Common.IcebergTableMetadata? left, Supabase.Storage.Common.IcebergTableMetadata? right) -> bool
@@ -291,6 +290,7 @@ Supabase.Storage.Common.IcebergMapType.ValueId.get -> int
 Supabase.Storage.Common.IcebergMapType.ValueId.init -> void
 Supabase.Storage.Common.IcebergMapType.ValueRequired.get -> bool
 Supabase.Storage.Common.IcebergMapType.ValueRequired.init -> void
+Supabase.Storage.Common.IcebergNamespace.Table(string! name) -> Supabase.Storage.Common.IcebergTable!
 Supabase.Storage.Common.IcebergPartitionField
 Supabase.Storage.Common.IcebergPartitionField.<Clone>$() -> Supabase.Storage.Common.IcebergPartitionField!
 Supabase.Storage.Common.IcebergPartitionField.Equals(Supabase.Storage.Common.IcebergPartitionField? other) -> bool
