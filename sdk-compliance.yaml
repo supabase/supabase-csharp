@@ -1005,6 +1005,10 @@ features:
     status: implemented
     symbols:
       - IIcebergCatalog.DeleteNamespaceAsync
+  storage.analytics.load_namespace_metadata:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.LoadNamespaceAsync
   storage.analytics.namespace_exists:
     status: implemented
     symbols:
