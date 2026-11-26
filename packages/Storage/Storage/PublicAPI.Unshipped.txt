@@ -1,729 +1,729 @@
 #nullable enable
-abstract Supabase.Storage.Common.IcebergType.<Clone>$() -> Supabase.Storage.Common.IcebergType!
-override sealed Supabase.Storage.Common.IcebergListType.Equals(Supabase.Storage.Common.IcebergType? other) -> bool
-override sealed Supabase.Storage.Common.IcebergMapType.Equals(Supabase.Storage.Common.IcebergType? other) -> bool
-override sealed Supabase.Storage.Common.IcebergPrimitiveType.Equals(Supabase.Storage.Common.IcebergType? other) -> bool
-override sealed Supabase.Storage.Common.IcebergStructType.Equals(Supabase.Storage.Common.IcebergType? other) -> bool
-override Supabase.Storage.Common.AnalyticsBucket.Equals(object? obj) -> bool
-override Supabase.Storage.Common.AnalyticsBucket.GetHashCode() -> int
-override Supabase.Storage.Common.AnalyticsBucket.ToString() -> string!
-override Supabase.Storage.Common.BucketLifecycle.Equals(object? obj) -> bool
-override Supabase.Storage.Common.BucketLifecycle.GetHashCode() -> int
-override Supabase.Storage.Common.BucketLifecycle.ToString() -> string!
-override Supabase.Storage.Common.IcebergField.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergField.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergField.ToString() -> string!
-override Supabase.Storage.Common.IcebergListType.<Clone>$() -> Supabase.Storage.Common.IcebergType!
-override Supabase.Storage.Common.IcebergListType.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergListType.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergListType.ToString() -> string!
-override Supabase.Storage.Common.IcebergMapType.<Clone>$() -> Supabase.Storage.Common.IcebergType!
-override Supabase.Storage.Common.IcebergMapType.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergMapType.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergMapType.ToString() -> string!
-override Supabase.Storage.Common.IcebergPartitionField.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergPartitionField.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergPartitionField.ToString() -> string!
-override Supabase.Storage.Common.IcebergPartitionSpec.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergPartitionSpec.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergPartitionSpec.ToString() -> string!
-override Supabase.Storage.Common.IcebergPrimitiveType.<Clone>$() -> Supabase.Storage.Common.IcebergType!
-override Supabase.Storage.Common.IcebergPrimitiveType.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergPrimitiveType.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergPrimitiveType.ToString() -> string!
-override Supabase.Storage.Common.IcebergSchema.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergSchema.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergSchema.ToString() -> string!
-override Supabase.Storage.Common.IcebergStructType.<Clone>$() -> Supabase.Storage.Common.IcebergType!
-override Supabase.Storage.Common.IcebergStructType.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergStructType.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergStructType.ToString() -> string!
-override Supabase.Storage.Common.IcebergTable.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergTable.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergTable.ToString() -> string!
-override Supabase.Storage.Common.IcebergTableMetadata.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergTableMetadata.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergTableMetadata.ToString() -> string!
-override Supabase.Storage.Common.IcebergTransform.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergTransform.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergTransform.ToString() -> string!
-override Supabase.Storage.Common.IcebergType.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergType.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergType.ToString() -> string!
-override Supabase.Storage.Common.LifecycleRule.Equals(object? obj) -> bool
-override Supabase.Storage.Common.LifecycleRule.GetHashCode() -> int
-override Supabase.Storage.Common.LifecycleRule.ToString() -> string!
-override Supabase.Storage.Common.LifecycleRuleStatus.Equals(object? obj) -> bool
-override Supabase.Storage.Common.LifecycleRuleStatus.GetHashCode() -> int
-override Supabase.Storage.Common.LifecycleRuleStatus.ToString() -> string!
-override Supabase.Storage.Common.NoncurrentVersionExpiration.Equals(object? obj) -> bool
-override Supabase.Storage.Common.NoncurrentVersionExpiration.GetHashCode() -> int
-override Supabase.Storage.Common.NoncurrentVersionExpiration.ToString() -> string!
-override Supabase.Storage.Common.StoredVector.Equals(object? obj) -> bool
-override Supabase.Storage.Common.StoredVector.GetHashCode() -> int
-override Supabase.Storage.Common.StoredVector.ToString() -> string!
-override Supabase.Storage.Common.VectorDataType.Equals(object? obj) -> bool
-override Supabase.Storage.Common.VectorDataType.GetHashCode() -> int
-override Supabase.Storage.Common.VectorDataType.ToString() -> string!
-override Supabase.Storage.Common.VectorDistanceMetric.Equals(object? obj) -> bool
-override Supabase.Storage.Common.VectorDistanceMetric.GetHashCode() -> int
-override Supabase.Storage.Common.VectorDistanceMetric.ToString() -> string!
-override Supabase.Storage.Common.VectorListPage<TItem>.Equals(object? obj) -> bool
-override Supabase.Storage.Common.VectorListPage<TItem>.GetHashCode() -> int
-override Supabase.Storage.Common.VectorListPage<TItem>.ToString() -> string!
-override Supabase.Storage.CreateNamespace.CreateNamespaceOptions.Equals(object? obj) -> bool
-override Supabase.Storage.CreateNamespace.CreateNamespaceOptions.GetHashCode() -> int
-override Supabase.Storage.CreateNamespace.CreateNamespaceOptions.ToString() -> string!
-override Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.Equals(object? obj) -> bool
-override Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.GetHashCode() -> int
-override Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.ToString() -> string!
-override Supabase.Storage.CreateTable.CreateTableOptions.Equals(object? obj) -> bool
-override Supabase.Storage.CreateTable.CreateTableOptions.GetHashCode() -> int
-override Supabase.Storage.CreateTable.CreateTableOptions.ToString() -> string!
-override Supabase.Storage.DeleteTable.DeleteTableOptions.Equals(object? obj) -> bool
-override Supabase.Storage.DeleteTable.DeleteTableOptions.GetHashCode() -> int
-override Supabase.Storage.DeleteTable.DeleteTableOptions.ToString() -> string!
-override Supabase.Storage.GetVectorIndex.VectorIndexDetails.Equals(object? obj) -> bool
-override Supabase.Storage.GetVectorIndex.VectorIndexDetails.GetHashCode() -> int
-override Supabase.Storage.GetVectorIndex.VectorIndexDetails.ToString() -> string!
-override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Equals(object? obj) -> bool
-override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.GetHashCode() -> int
-override Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.ToString() -> string!
-override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Equals(object? obj) -> bool
-override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.GetHashCode() -> int
-override Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.ToString() -> string!
-override Supabase.Storage.ListNamespaces.IcebergNamespacePage.Equals(object? obj) -> bool
-override Supabase.Storage.ListNamespaces.IcebergNamespacePage.GetHashCode() -> int
-override Supabase.Storage.ListNamespaces.IcebergNamespacePage.ToString() -> string!
-override Supabase.Storage.ListNamespaces.ListNamespacesOptions.Equals(object? obj) -> bool
-override Supabase.Storage.ListNamespaces.ListNamespacesOptions.GetHashCode() -> int
-override Supabase.Storage.ListNamespaces.ListNamespacesOptions.ToString() -> string!
-override Supabase.Storage.ListTables.IcebergTablePage.Equals(object? obj) -> bool
-override Supabase.Storage.ListTables.IcebergTablePage.GetHashCode() -> int
-override Supabase.Storage.ListTables.IcebergTablePage.ToString() -> string!
-override Supabase.Storage.ListTables.ListTablesOptions.Equals(object? obj) -> bool
-override Supabase.Storage.ListTables.ListTablesOptions.GetHashCode() -> int
-override Supabase.Storage.ListTables.ListTablesOptions.ToString() -> string!
-override Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.Equals(object? obj) -> bool
-override Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.GetHashCode() -> int
-override Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.ToString() -> string!
-override Supabase.Storage.ListVectorBuckets.VectorBucketSummary.Equals(object? obj) -> bool
-override Supabase.Storage.ListVectorBuckets.VectorBucketSummary.GetHashCode() -> int
-override Supabase.Storage.ListVectorBuckets.VectorBucketSummary.ToString() -> string!
-override Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.Equals(object? obj) -> bool
-override Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.GetHashCode() -> int
-override Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.ToString() -> string!
-override Supabase.Storage.ListVectorIndexes.VectorIndexSummary.Equals(object? obj) -> bool
-override Supabase.Storage.ListVectorIndexes.VectorIndexSummary.GetHashCode() -> int
-override Supabase.Storage.ListVectorIndexes.VectorIndexSummary.ToString() -> string!
-override Supabase.Storage.ListVectors.ListVectorsOptions.Equals(object? obj) -> bool
-override Supabase.Storage.ListVectors.ListVectorsOptions.GetHashCode() -> int
-override Supabase.Storage.ListVectors.ListVectorsOptions.ToString() -> string!
-override Supabase.Storage.ListVectors.VectorSegment.Equals(object? obj) -> bool
-override Supabase.Storage.ListVectors.VectorSegment.GetHashCode() -> int
-override Supabase.Storage.ListVectors.VectorSegment.ToString() -> string!
-override Supabase.Storage.Common.IcebergNamespace.Equals(object? obj) -> bool
-override Supabase.Storage.Common.IcebergNamespace.GetHashCode() -> int
-override Supabase.Storage.Common.IcebergNamespace.ToString() -> string!
-override Supabase.Storage.PutVectors.NewVector.Equals(object? obj) -> bool
-override Supabase.Storage.PutVectors.NewVector.GetHashCode() -> int
-override Supabase.Storage.PutVectors.NewVector.ToString() -> string!
-override Supabase.Storage.QueryVectors.QueryVectorsOptions.Equals(object? obj) -> bool
-override Supabase.Storage.QueryVectors.QueryVectorsOptions.GetHashCode() -> int
-override Supabase.Storage.QueryVectors.QueryVectorsOptions.ToString() -> string!
-override Supabase.Storage.QueryVectors.VectorMatch.Equals(object? obj) -> bool
-override Supabase.Storage.QueryVectors.VectorMatch.GetHashCode() -> int
-override Supabase.Storage.QueryVectors.VectorMatch.ToString() -> string!
-override Supabase.Storage.QueryVectors.VectorQueryResult.Equals(object? obj) -> bool
-override Supabase.Storage.QueryVectors.VectorQueryResult.GetHashCode() -> int
-override Supabase.Storage.QueryVectors.VectorQueryResult.ToString() -> string!
-override Supabase.Storage.UpdateTable.IcebergTableChanges.Equals(object? obj) -> bool
-override Supabase.Storage.UpdateTable.IcebergTableChanges.GetHashCode() -> int
-override Supabase.Storage.UpdateTable.IcebergTableChanges.ToString() -> string!
-static Supabase.Storage.Common.AnalyticsBucket.operator !=(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
-static Supabase.Storage.Common.AnalyticsBucket.operator ==(Supabase.Storage.Common.AnalyticsBucket? left, Supabase.Storage.Common.AnalyticsBucket? right) -> bool
-static Supabase.Storage.Common.BucketLifecycle.operator !=(Supabase.Storage.Common.BucketLifecycle? left, Supabase.Storage.Common.BucketLifecycle? right) -> bool
-static Supabase.Storage.Common.BucketLifecycle.operator ==(Supabase.Storage.Common.BucketLifecycle? left, Supabase.Storage.Common.BucketLifecycle? right) -> bool
-static Supabase.Storage.Common.IcebergField.operator !=(Supabase.Storage.Common.IcebergField? left, Supabase.Storage.Common.IcebergField? right) -> bool
-static Supabase.Storage.Common.IcebergField.operator ==(Supabase.Storage.Common.IcebergField? left, Supabase.Storage.Common.IcebergField? right) -> bool
-static Supabase.Storage.Common.IcebergListType.operator !=(Supabase.Storage.Common.IcebergListType? left, Supabase.Storage.Common.IcebergListType? right) -> bool
-static Supabase.Storage.Common.IcebergListType.operator ==(Supabase.Storage.Common.IcebergListType? left, Supabase.Storage.Common.IcebergListType? right) -> bool
-static Supabase.Storage.Common.IcebergMapType.operator !=(Supabase.Storage.Common.IcebergMapType? left, Supabase.Storage.Common.IcebergMapType? right) -> bool
-static Supabase.Storage.Common.IcebergMapType.operator ==(Supabase.Storage.Common.IcebergMapType? left, Supabase.Storage.Common.IcebergMapType? right) -> bool
-static Supabase.Storage.Common.IcebergPartitionField.operator !=(Supabase.Storage.Common.IcebergPartitionField? left, Supabase.Storage.Common.IcebergPartitionField? right) -> bool
-static Supabase.Storage.Common.IcebergPartitionField.operator ==(Supabase.Storage.Common.IcebergPartitionField? left, Supabase.Storage.Common.IcebergPartitionField? right) -> bool
-static Supabase.Storage.Common.IcebergPartitionSpec.operator !=(Supabase.Storage.Common.IcebergPartitionSpec? left, Supabase.Storage.Common.IcebergPartitionSpec? right) -> bool
-static Supabase.Storage.Common.IcebergPartitionSpec.operator ==(Supabase.Storage.Common.IcebergPartitionSpec? left, Supabase.Storage.Common.IcebergPartitionSpec? right) -> bool
-static Supabase.Storage.Common.IcebergPrimitiveType.Binary.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Boolean.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Date.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Decimal(int precision, int scale) -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Double.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Fixed(int length) -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Float.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Int.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Long.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.operator !=(Supabase.Storage.Common.IcebergPrimitiveType? left, Supabase.Storage.Common.IcebergPrimitiveType? right) -> bool
-static Supabase.Storage.Common.IcebergPrimitiveType.operator ==(Supabase.Storage.Common.IcebergPrimitiveType? left, Supabase.Storage.Common.IcebergPrimitiveType? right) -> bool
-static Supabase.Storage.Common.IcebergPrimitiveType.String.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Time.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Timestamp.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.TimestampTz.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergPrimitiveType.Uuid.get -> Supabase.Storage.Common.IcebergPrimitiveType!
-static Supabase.Storage.Common.IcebergSchema.operator !=(Supabase.Storage.Common.IcebergSchema? left, Supabase.Storage.Common.IcebergSchema? right) -> bool
-static Supabase.Storage.Common.IcebergSchema.operator ==(Supabase.Storage.Common.IcebergSchema? left, Supabase.Storage.Common.IcebergSchema? right) -> bool
-static Supabase.Storage.Common.IcebergStructType.operator !=(Supabase.Storage.Common.IcebergStructType? left, Supabase.Storage.Common.IcebergStructType? right) -> bool
-static Supabase.Storage.Common.IcebergStructType.operator ==(Supabase.Storage.Common.IcebergStructType? left, Supabase.Storage.Common.IcebergStructType? right) -> bool
-static Supabase.Storage.Common.IcebergTable.operator !=(Supabase.Storage.Common.IcebergTable? left, Supabase.Storage.Common.IcebergTable? right) -> bool
-static Supabase.Storage.Common.IcebergTable.operator ==(Supabase.Storage.Common.IcebergTable? left, Supabase.Storage.Common.IcebergTable? right) -> bool
-static Supabase.Storage.Common.IcebergTableMetadata.operator !=(Supabase.Storage.Common.IcebergTableMetadata? left, Supabase.Storage.Common.IcebergTableMetadata? right) -> bool
-static Supabase.Storage.Common.IcebergTableMetadata.operator ==(Supabase.Storage.Common.IcebergTableMetadata? left, Supabase.Storage.Common.IcebergTableMetadata? right) -> bool
-static Supabase.Storage.Common.IcebergTransform.Bucket(int count) -> Supabase.Storage.Common.IcebergTransform!
-static Supabase.Storage.Common.IcebergTransform.Day.get -> Supabase.Storage.Common.IcebergTransform!
-static Supabase.Storage.Common.IcebergTransform.Hour.get -> Supabase.Storage.Common.IcebergTransform!
-static Supabase.Storage.Common.IcebergTransform.Identity.get -> Supabase.Storage.Common.IcebergTransform!
-static Supabase.Storage.Common.IcebergTransform.Month.get -> Supabase.Storage.Common.IcebergTransform!
-static Supabase.Storage.Common.IcebergTransform.operator !=(Supabase.Storage.Common.IcebergTransform? left, Supabase.Storage.Common.IcebergTransform? right) -> bool
-static Supabase.Storage.Common.IcebergTransform.operator ==(Supabase.Storage.Common.IcebergTransform? left, Supabase.Storage.Common.IcebergTransform? right) -> bool
-static Supabase.Storage.Common.IcebergTransform.Truncate(int width) -> Supabase.Storage.Common.IcebergTransform!
-static Supabase.Storage.Common.IcebergTransform.Void.get -> Supabase.Storage.Common.IcebergTransform!
-static Supabase.Storage.Common.IcebergTransform.Year.get -> Supabase.Storage.Common.IcebergTransform!
-static Supabase.Storage.Common.IcebergType.operator !=(Supabase.Storage.Common.IcebergType? left, Supabase.Storage.Common.IcebergType? right) -> bool
-static Supabase.Storage.Common.IcebergType.operator ==(Supabase.Storage.Common.IcebergType? left, Supabase.Storage.Common.IcebergType? right) -> bool
-static Supabase.Storage.Common.LifecycleRule.operator !=(Supabase.Storage.Common.LifecycleRule? left, Supabase.Storage.Common.LifecycleRule? right) -> bool
-static Supabase.Storage.Common.LifecycleRule.operator ==(Supabase.Storage.Common.LifecycleRule? left, Supabase.Storage.Common.LifecycleRule? right) -> bool
-static Supabase.Storage.Common.LifecycleRuleStatus.Disabled.get -> Supabase.Storage.Common.LifecycleRuleStatus!
-static Supabase.Storage.Common.LifecycleRuleStatus.Enabled.get -> Supabase.Storage.Common.LifecycleRuleStatus!
-static Supabase.Storage.Common.LifecycleRuleStatus.operator !=(Supabase.Storage.Common.LifecycleRuleStatus? left, Supabase.Storage.Common.LifecycleRuleStatus? right) -> bool
-static Supabase.Storage.Common.LifecycleRuleStatus.operator ==(Supabase.Storage.Common.LifecycleRuleStatus? left, Supabase.Storage.Common.LifecycleRuleStatus? right) -> bool
-static Supabase.Storage.Common.NoncurrentVersionExpiration.operator !=(Supabase.Storage.Common.NoncurrentVersionExpiration? left, Supabase.Storage.Common.NoncurrentVersionExpiration? right) -> bool
-static Supabase.Storage.Common.NoncurrentVersionExpiration.operator ==(Supabase.Storage.Common.NoncurrentVersionExpiration? left, Supabase.Storage.Common.NoncurrentVersionExpiration? right) -> bool
-static Supabase.Storage.Common.StoredVector.operator !=(Supabase.Storage.Common.StoredVector? left, Supabase.Storage.Common.StoredVector? right) -> bool
-static Supabase.Storage.Common.StoredVector.operator ==(Supabase.Storage.Common.StoredVector? left, Supabase.Storage.Common.StoredVector? right) -> bool
-static Supabase.Storage.Common.VectorDataType.Float32.get -> Supabase.Storage.Common.VectorDataType!
-static Supabase.Storage.Common.VectorDataType.operator !=(Supabase.Storage.Common.VectorDataType? left, Supabase.Storage.Common.VectorDataType? right) -> bool
-static Supabase.Storage.Common.VectorDataType.operator ==(Supabase.Storage.Common.VectorDataType? left, Supabase.Storage.Common.VectorDataType? right) -> bool
-static Supabase.Storage.Common.VectorDistanceMetric.Cosine.get -> Supabase.Storage.Common.VectorDistanceMetric!
-static Supabase.Storage.Common.VectorDistanceMetric.Euclidean.get -> Supabase.Storage.Common.VectorDistanceMetric!
-static Supabase.Storage.Common.VectorDistanceMetric.operator !=(Supabase.Storage.Common.VectorDistanceMetric? left, Supabase.Storage.Common.VectorDistanceMetric? right) -> bool
-static Supabase.Storage.Common.VectorDistanceMetric.operator ==(Supabase.Storage.Common.VectorDistanceMetric? left, Supabase.Storage.Common.VectorDistanceMetric? right) -> bool
-static Supabase.Storage.Common.VectorListPage<TItem>.operator !=(Supabase.Storage.Common.VectorListPage<TItem>? left, Supabase.Storage.Common.VectorListPage<TItem>? right) -> bool
-static Supabase.Storage.Common.VectorListPage<TItem>.operator ==(Supabase.Storage.Common.VectorListPage<TItem>? left, Supabase.Storage.Common.VectorListPage<TItem>? right) -> bool
-static Supabase.Storage.CreateNamespace.CreateNamespaceOptions.operator !=(Supabase.Storage.CreateNamespace.CreateNamespaceOptions? left, Supabase.Storage.CreateNamespace.CreateNamespaceOptions? right) -> bool
-static Supabase.Storage.CreateNamespace.CreateNamespaceOptions.operator ==(Supabase.Storage.CreateNamespace.CreateNamespaceOptions? left, Supabase.Storage.CreateNamespace.CreateNamespaceOptions? right) -> bool
-static Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.operator !=(Supabase.Storage.CreateNamespace.IcebergNamespaceDetails? left, Supabase.Storage.CreateNamespace.IcebergNamespaceDetails? right) -> bool
-static Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.operator ==(Supabase.Storage.CreateNamespace.IcebergNamespaceDetails? left, Supabase.Storage.CreateNamespace.IcebergNamespaceDetails? right) -> bool
-static Supabase.Storage.CreateTable.CreateTableOptions.operator !=(Supabase.Storage.CreateTable.CreateTableOptions? left, Supabase.Storage.CreateTable.CreateTableOptions? right) -> bool
-static Supabase.Storage.CreateTable.CreateTableOptions.operator ==(Supabase.Storage.CreateTable.CreateTableOptions? left, Supabase.Storage.CreateTable.CreateTableOptions? right) -> bool
-static Supabase.Storage.DeleteTable.DeleteTableOptions.operator !=(Supabase.Storage.DeleteTable.DeleteTableOptions? left, Supabase.Storage.DeleteTable.DeleteTableOptions? right) -> bool
-static Supabase.Storage.DeleteTable.DeleteTableOptions.operator ==(Supabase.Storage.DeleteTable.DeleteTableOptions? left, Supabase.Storage.DeleteTable.DeleteTableOptions? right) -> bool
-static Supabase.Storage.GetVectorIndex.VectorIndexDetails.operator !=(Supabase.Storage.GetVectorIndex.VectorIndexDetails? left, Supabase.Storage.GetVectorIndex.VectorIndexDetails? right) -> bool
-static Supabase.Storage.GetVectorIndex.VectorIndexDetails.operator ==(Supabase.Storage.GetVectorIndex.VectorIndexDetails? left, Supabase.Storage.GetVectorIndex.VectorIndexDetails? right) -> bool
-static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator !=(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? left, Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? right) -> bool
-static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator ==(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? left, Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? right) -> bool
-static Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.operator !=(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? right) -> bool
-static Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.operator ==(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? right) -> bool
-static Supabase.Storage.ListNamespaces.IcebergNamespacePage.operator !=(Supabase.Storage.ListNamespaces.IcebergNamespacePage? left, Supabase.Storage.ListNamespaces.IcebergNamespacePage? right) -> bool
-static Supabase.Storage.ListNamespaces.IcebergNamespacePage.operator ==(Supabase.Storage.ListNamespaces.IcebergNamespacePage? left, Supabase.Storage.ListNamespaces.IcebergNamespacePage? right) -> bool
-static Supabase.Storage.ListNamespaces.ListNamespacesOptions.operator !=(Supabase.Storage.ListNamespaces.ListNamespacesOptions? left, Supabase.Storage.ListNamespaces.ListNamespacesOptions? right) -> bool
-static Supabase.Storage.ListNamespaces.ListNamespacesOptions.operator ==(Supabase.Storage.ListNamespaces.ListNamespacesOptions? left, Supabase.Storage.ListNamespaces.ListNamespacesOptions? right) -> bool
-static Supabase.Storage.ListTables.IcebergTablePage.operator !=(Supabase.Storage.ListTables.IcebergTablePage? left, Supabase.Storage.ListTables.IcebergTablePage? right) -> bool
-static Supabase.Storage.ListTables.IcebergTablePage.operator ==(Supabase.Storage.ListTables.IcebergTablePage? left, Supabase.Storage.ListTables.IcebergTablePage? right) -> bool
-static Supabase.Storage.ListTables.ListTablesOptions.operator !=(Supabase.Storage.ListTables.ListTablesOptions? left, Supabase.Storage.ListTables.ListTablesOptions? right) -> bool
-static Supabase.Storage.ListTables.ListTablesOptions.operator ==(Supabase.Storage.ListTables.ListTablesOptions? left, Supabase.Storage.ListTables.ListTablesOptions? right) -> bool
-static Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.operator !=(Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? left, Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? right) -> bool
-static Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.operator ==(Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? left, Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? right) -> bool
-static Supabase.Storage.ListVectorBuckets.VectorBucketSummary.operator !=(Supabase.Storage.ListVectorBuckets.VectorBucketSummary? left, Supabase.Storage.ListVectorBuckets.VectorBucketSummary? right) -> bool
-static Supabase.Storage.ListVectorBuckets.VectorBucketSummary.operator ==(Supabase.Storage.ListVectorBuckets.VectorBucketSummary? left, Supabase.Storage.ListVectorBuckets.VectorBucketSummary? right) -> bool
-static Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.operator !=(Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? left, Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? right) -> bool
-static Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.operator ==(Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? left, Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? right) -> bool
-static Supabase.Storage.ListVectorIndexes.VectorIndexSummary.operator !=(Supabase.Storage.ListVectorIndexes.VectorIndexSummary? left, Supabase.Storage.ListVectorIndexes.VectorIndexSummary? right) -> bool
-static Supabase.Storage.ListVectorIndexes.VectorIndexSummary.operator ==(Supabase.Storage.ListVectorIndexes.VectorIndexSummary? left, Supabase.Storage.ListVectorIndexes.VectorIndexSummary? right) -> bool
-static Supabase.Storage.ListVectors.ListVectorsOptions.operator !=(Supabase.Storage.ListVectors.ListVectorsOptions? left, Supabase.Storage.ListVectors.ListVectorsOptions? right) -> bool
-static Supabase.Storage.ListVectors.ListVectorsOptions.operator ==(Supabase.Storage.ListVectors.ListVectorsOptions? left, Supabase.Storage.ListVectors.ListVectorsOptions? right) -> bool
-static Supabase.Storage.ListVectors.VectorSegment.operator !=(Supabase.Storage.ListVectors.VectorSegment? left, Supabase.Storage.ListVectors.VectorSegment? right) -> bool
-static Supabase.Storage.ListVectors.VectorSegment.operator ==(Supabase.Storage.ListVectors.VectorSegment? left, Supabase.Storage.ListVectors.VectorSegment? right) -> bool
-static Supabase.Storage.Common.IcebergNamespace.Of(params string![]! levels) -> Supabase.Storage.Common.IcebergNamespace!
-static Supabase.Storage.Common.IcebergNamespace.operator !=(Supabase.Storage.Common.IcebergNamespace? left, Supabase.Storage.Common.IcebergNamespace? right) -> bool
-static Supabase.Storage.Common.IcebergNamespace.operator ==(Supabase.Storage.Common.IcebergNamespace? left, Supabase.Storage.Common.IcebergNamespace? right) -> bool
-static Supabase.Storage.PutVectors.NewVector.operator !=(Supabase.Storage.PutVectors.NewVector? left, Supabase.Storage.PutVectors.NewVector? right) -> bool
-static Supabase.Storage.PutVectors.NewVector.operator ==(Supabase.Storage.PutVectors.NewVector? left, Supabase.Storage.PutVectors.NewVector? right) -> bool
-static Supabase.Storage.QueryVectors.QueryVectorsOptions.operator !=(Supabase.Storage.QueryVectors.QueryVectorsOptions? left, Supabase.Storage.QueryVectors.QueryVectorsOptions? right) -> bool
-static Supabase.Storage.QueryVectors.QueryVectorsOptions.operator ==(Supabase.Storage.QueryVectors.QueryVectorsOptions? left, Supabase.Storage.QueryVectors.QueryVectorsOptions? right) -> bool
-static Supabase.Storage.QueryVectors.VectorMatch.operator !=(Supabase.Storage.QueryVectors.VectorMatch? left, Supabase.Storage.QueryVectors.VectorMatch? right) -> bool
-static Supabase.Storage.QueryVectors.VectorMatch.operator ==(Supabase.Storage.QueryVectors.VectorMatch? left, Supabase.Storage.QueryVectors.VectorMatch? right) -> bool
-static Supabase.Storage.QueryVectors.VectorQueryResult.operator !=(Supabase.Storage.QueryVectors.VectorQueryResult? left, Supabase.Storage.QueryVectors.VectorQueryResult? right) -> bool
-static Supabase.Storage.QueryVectors.VectorQueryResult.operator ==(Supabase.Storage.QueryVectors.VectorQueryResult? left, Supabase.Storage.QueryVectors.VectorQueryResult? right) -> bool
-static Supabase.Storage.UpdateTable.IcebergTableChanges.operator !=(Supabase.Storage.UpdateTable.IcebergTableChanges? left, Supabase.Storage.UpdateTable.IcebergTableChanges? right) -> bool
-static Supabase.Storage.UpdateTable.IcebergTableChanges.operator ==(Supabase.Storage.UpdateTable.IcebergTableChanges? left, Supabase.Storage.UpdateTable.IcebergTableChanges? right) -> bool
-Supabase.Storage.Client.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
-Supabase.Storage.Client.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
-Supabase.Storage.Common.AnalyticsBucket
-Supabase.Storage.Common.AnalyticsBucket.<Clone>$() -> Supabase.Storage.Common.AnalyticsBucket!
-Supabase.Storage.Common.AnalyticsBucket.AnalyticsBucket() -> void
-Supabase.Storage.Common.AnalyticsBucket.CreatedAt.get -> System.DateTimeOffset
-Supabase.Storage.Common.AnalyticsBucket.CreatedAt.init -> void
-Supabase.Storage.Common.AnalyticsBucket.Equals(Supabase.Storage.Common.AnalyticsBucket? other) -> bool
-Supabase.Storage.Common.AnalyticsBucket.Name.get -> string!
-Supabase.Storage.Common.AnalyticsBucket.Name.init -> void
-Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.get -> System.DateTimeOffset
-Supabase.Storage.Common.AnalyticsBucket.UpdatedAt.init -> void
-Supabase.Storage.Common.BucketLifecycle
-Supabase.Storage.Common.BucketLifecycle.<Clone>$() -> Supabase.Storage.Common.BucketLifecycle!
-Supabase.Storage.Common.BucketLifecycle.BucketLifecycle() -> void
-Supabase.Storage.Common.BucketLifecycle.Equals(Supabase.Storage.Common.BucketLifecycle? other) -> bool
-Supabase.Storage.Common.BucketLifecycle.Rules.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.LifecycleRule!>!
-Supabase.Storage.Common.BucketLifecycle.Rules.init -> void
-Supabase.Storage.Common.IcebergField
-Supabase.Storage.Common.IcebergField.<Clone>$() -> Supabase.Storage.Common.IcebergField!
-Supabase.Storage.Common.IcebergField.Doc.get -> string?
-Supabase.Storage.Common.IcebergField.Doc.init -> void
-Supabase.Storage.Common.IcebergField.Equals(Supabase.Storage.Common.IcebergField? other) -> bool
-Supabase.Storage.Common.IcebergField.IcebergField() -> void
-Supabase.Storage.Common.IcebergField.Id.get -> int
-Supabase.Storage.Common.IcebergField.Id.init -> void
-Supabase.Storage.Common.IcebergField.Name.get -> string!
-Supabase.Storage.Common.IcebergField.Name.init -> void
-Supabase.Storage.Common.IcebergField.Required.get -> bool
-Supabase.Storage.Common.IcebergField.Required.init -> void
-Supabase.Storage.Common.IcebergField.Type.get -> Supabase.Storage.Common.IcebergType!
-Supabase.Storage.Common.IcebergField.Type.init -> void
-Supabase.Storage.Common.IcebergListType
-Supabase.Storage.Common.IcebergListType.Element.get -> Supabase.Storage.Common.IcebergType!
-Supabase.Storage.Common.IcebergListType.Element.init -> void
-Supabase.Storage.Common.IcebergListType.ElementId.get -> int
-Supabase.Storage.Common.IcebergListType.ElementId.init -> void
-Supabase.Storage.Common.IcebergListType.ElementRequired.get -> bool
-Supabase.Storage.Common.IcebergListType.ElementRequired.init -> void
-Supabase.Storage.Common.IcebergListType.Equals(Supabase.Storage.Common.IcebergListType? other) -> bool
-Supabase.Storage.Common.IcebergListType.IcebergListType() -> void
-Supabase.Storage.Common.IcebergMapType
-Supabase.Storage.Common.IcebergMapType.Equals(Supabase.Storage.Common.IcebergMapType? other) -> bool
-Supabase.Storage.Common.IcebergMapType.IcebergMapType() -> void
-Supabase.Storage.Common.IcebergMapType.Key.get -> Supabase.Storage.Common.IcebergType!
-Supabase.Storage.Common.IcebergMapType.Key.init -> void
-Supabase.Storage.Common.IcebergMapType.KeyId.get -> int
-Supabase.Storage.Common.IcebergMapType.KeyId.init -> void
-Supabase.Storage.Common.IcebergMapType.Value.get -> Supabase.Storage.Common.IcebergType!
-Supabase.Storage.Common.IcebergMapType.Value.init -> void
-Supabase.Storage.Common.IcebergMapType.ValueId.get -> int
-Supabase.Storage.Common.IcebergMapType.ValueId.init -> void
-Supabase.Storage.Common.IcebergMapType.ValueRequired.get -> bool
-Supabase.Storage.Common.IcebergMapType.ValueRequired.init -> void
-Supabase.Storage.Common.IcebergNamespace.Table(string! name) -> Supabase.Storage.Common.IcebergTable!
-Supabase.Storage.Common.IcebergPartitionField
-Supabase.Storage.Common.IcebergPartitionField.<Clone>$() -> Supabase.Storage.Common.IcebergPartitionField!
-Supabase.Storage.Common.IcebergPartitionField.Equals(Supabase.Storage.Common.IcebergPartitionField? other) -> bool
-Supabase.Storage.Common.IcebergPartitionField.FieldId.get -> int?
-Supabase.Storage.Common.IcebergPartitionField.FieldId.init -> void
-Supabase.Storage.Common.IcebergPartitionField.IcebergPartitionField() -> void
-Supabase.Storage.Common.IcebergPartitionField.Name.get -> string!
-Supabase.Storage.Common.IcebergPartitionField.Name.init -> void
-Supabase.Storage.Common.IcebergPartitionField.SourceId.get -> int
-Supabase.Storage.Common.IcebergPartitionField.SourceId.init -> void
-Supabase.Storage.Common.IcebergPartitionField.Transform.get -> Supabase.Storage.Common.IcebergTransform!
-Supabase.Storage.Common.IcebergPartitionField.Transform.init -> void
-Supabase.Storage.Common.IcebergPartitionSpec
-Supabase.Storage.Common.IcebergPartitionSpec.<Clone>$() -> Supabase.Storage.Common.IcebergPartitionSpec!
-Supabase.Storage.Common.IcebergPartitionSpec.Equals(Supabase.Storage.Common.IcebergPartitionSpec? other) -> bool
-Supabase.Storage.Common.IcebergPartitionSpec.Fields.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.IcebergPartitionField!>!
-Supabase.Storage.Common.IcebergPartitionSpec.Fields.init -> void
-Supabase.Storage.Common.IcebergPartitionSpec.IcebergPartitionSpec() -> void
-Supabase.Storage.Common.IcebergPartitionSpec.SpecId.get -> int?
-Supabase.Storage.Common.IcebergPartitionSpec.SpecId.init -> void
-Supabase.Storage.Common.IcebergPrimitiveType
-Supabase.Storage.Common.IcebergPrimitiveType.Equals(Supabase.Storage.Common.IcebergPrimitiveType? other) -> bool
-Supabase.Storage.Common.IcebergSchema
-Supabase.Storage.Common.IcebergSchema.<Clone>$() -> Supabase.Storage.Common.IcebergSchema!
-Supabase.Storage.Common.IcebergSchema.Equals(Supabase.Storage.Common.IcebergSchema? other) -> bool
-Supabase.Storage.Common.IcebergSchema.Fields.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.IcebergField!>!
-Supabase.Storage.Common.IcebergSchema.Fields.init -> void
-Supabase.Storage.Common.IcebergSchema.IcebergSchema() -> void
-Supabase.Storage.Common.IcebergSchema.SchemaId.get -> int?
-Supabase.Storage.Common.IcebergSchema.SchemaId.init -> void
-Supabase.Storage.Common.IcebergStructType
-Supabase.Storage.Common.IcebergStructType.Equals(Supabase.Storage.Common.IcebergStructType? other) -> bool
-Supabase.Storage.Common.IcebergStructType.Fields.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.IcebergField!>!
-Supabase.Storage.Common.IcebergStructType.Fields.init -> void
-Supabase.Storage.Common.IcebergStructType.IcebergStructType() -> void
-Supabase.Storage.Common.IcebergTable
-Supabase.Storage.Common.IcebergTable.<Clone>$() -> Supabase.Storage.Common.IcebergTable!
-Supabase.Storage.Common.IcebergTable.Equals(Supabase.Storage.Common.IcebergTable? other) -> bool
-Supabase.Storage.Common.IcebergTable.Name.get -> string!
-Supabase.Storage.Common.IcebergTable.Namespace.get -> Supabase.Storage.Common.IcebergNamespace!
-Supabase.Storage.Common.IcebergTableMetadata
-Supabase.Storage.Common.IcebergTableMetadata.<Clone>$() -> Supabase.Storage.Common.IcebergTableMetadata!
-Supabase.Storage.Common.IcebergTableMetadata.CurrentSchema.get -> Supabase.Storage.Common.IcebergSchema!
-Supabase.Storage.Common.IcebergTableMetadata.CurrentSchema.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.DefaultPartitionSpec.get -> Supabase.Storage.Common.IcebergPartitionSpec!
-Supabase.Storage.Common.IcebergTableMetadata.DefaultPartitionSpec.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.Equals(Supabase.Storage.Common.IcebergTableMetadata? other) -> bool
-Supabase.Storage.Common.IcebergTableMetadata.FormatVersion.get -> int
-Supabase.Storage.Common.IcebergTableMetadata.FormatVersion.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.IcebergTableMetadata() -> void
-Supabase.Storage.Common.IcebergTableMetadata.LastColumnId.get -> int
-Supabase.Storage.Common.IcebergTableMetadata.LastColumnId.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.LastPartitionId.get -> int
-Supabase.Storage.Common.IcebergTableMetadata.LastPartitionId.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.LastUpdatedAt.get -> System.DateTimeOffset
-Supabase.Storage.Common.IcebergTableMetadata.LastUpdatedAt.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.Location.get -> string!
-Supabase.Storage.Common.IcebergTableMetadata.Location.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.MetadataLocation.get -> string?
-Supabase.Storage.Common.IcebergTableMetadata.MetadataLocation.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
-Supabase.Storage.Common.IcebergTableMetadata.Properties.init -> void
-Supabase.Storage.Common.IcebergTableMetadata.TableUuid.get -> System.Guid
-Supabase.Storage.Common.IcebergTableMetadata.TableUuid.init -> void
-Supabase.Storage.Common.IcebergTransform
-Supabase.Storage.Common.IcebergTransform.<Clone>$() -> Supabase.Storage.Common.IcebergTransform!
-Supabase.Storage.Common.IcebergTransform.Equals(Supabase.Storage.Common.IcebergTransform? other) -> bool
-Supabase.Storage.Common.IcebergType
-Supabase.Storage.Common.IcebergType.IcebergType(Supabase.Storage.Common.IcebergType! original) -> void
-Supabase.Storage.Common.LifecycleRule
-Supabase.Storage.Common.LifecycleRule.<Clone>$() -> Supabase.Storage.Common.LifecycleRule!
-Supabase.Storage.Common.LifecycleRule.Equals(Supabase.Storage.Common.LifecycleRule? other) -> bool
-Supabase.Storage.Common.LifecycleRule.Id.get -> string?
-Supabase.Storage.Common.LifecycleRule.Id.init -> void
-Supabase.Storage.Common.LifecycleRule.LifecycleRule() -> void
-Supabase.Storage.Common.LifecycleRule.NoncurrentVersionExpiration.get -> Supabase.Storage.Common.NoncurrentVersionExpiration?
-Supabase.Storage.Common.LifecycleRule.NoncurrentVersionExpiration.init -> void
-Supabase.Storage.Common.LifecycleRule.Status.get -> Supabase.Storage.Common.LifecycleRuleStatus!
-Supabase.Storage.Common.LifecycleRule.Status.init -> void
-Supabase.Storage.Common.LifecycleRuleStatus
-Supabase.Storage.Common.LifecycleRuleStatus.<Clone>$() -> Supabase.Storage.Common.LifecycleRuleStatus!
-Supabase.Storage.Common.LifecycleRuleStatus.Equals(Supabase.Storage.Common.LifecycleRuleStatus? other) -> bool
-Supabase.Storage.Common.NoncurrentVersionExpiration
-Supabase.Storage.Common.NoncurrentVersionExpiration.<Clone>$() -> Supabase.Storage.Common.NoncurrentVersionExpiration!
-Supabase.Storage.Common.NoncurrentVersionExpiration.Equals(Supabase.Storage.Common.NoncurrentVersionExpiration? other) -> bool
-Supabase.Storage.Common.NoncurrentVersionExpiration.NewerNoncurrentVersions.get -> int?
-Supabase.Storage.Common.NoncurrentVersionExpiration.NewerNoncurrentVersions.init -> void
-Supabase.Storage.Common.NoncurrentVersionExpiration.NoncurrentDays.get -> int
-Supabase.Storage.Common.NoncurrentVersionExpiration.NoncurrentDays.init -> void
-Supabase.Storage.Common.NoncurrentVersionExpiration.NoncurrentVersionExpiration() -> void
-Supabase.Storage.Common.StoredVector
-Supabase.Storage.Common.StoredVector.<Clone>$() -> Supabase.Storage.Common.StoredVector!
-Supabase.Storage.Common.StoredVector.Data.get -> Supabase.Storage.Common.VectorData?
-Supabase.Storage.Common.StoredVector.Data.init -> void
-Supabase.Storage.Common.StoredVector.Equals(Supabase.Storage.Common.StoredVector? other) -> bool
-Supabase.Storage.Common.StoredVector.Key.get -> string!
-Supabase.Storage.Common.StoredVector.Key.init -> void
-Supabase.Storage.Common.StoredVector.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
-Supabase.Storage.Common.StoredVector.Metadata.init -> void
-Supabase.Storage.Common.StoredVector.StoredVector() -> void
-Supabase.Storage.Common.VectorContent
-Supabase.Storage.Common.VectorContent.Data = 1 -> Supabase.Storage.Common.VectorContent
-Supabase.Storage.Common.VectorContent.Metadata = 2 -> Supabase.Storage.Common.VectorContent
-Supabase.Storage.Common.VectorContent.None = 0 -> Supabase.Storage.Common.VectorContent
-Supabase.Storage.Common.VectorDataType
-Supabase.Storage.Common.VectorDataType.<Clone>$() -> Supabase.Storage.Common.VectorDataType!
-Supabase.Storage.Common.VectorDataType.Equals(Supabase.Storage.Common.VectorDataType? other) -> bool
-Supabase.Storage.Common.VectorDistanceMetric
-Supabase.Storage.Common.VectorDistanceMetric.<Clone>$() -> Supabase.Storage.Common.VectorDistanceMetric!
-Supabase.Storage.Common.VectorDistanceMetric.Equals(Supabase.Storage.Common.VectorDistanceMetric? other) -> bool
-Supabase.Storage.Common.VectorListPage<TItem>
-Supabase.Storage.Common.VectorListPage<TItem>.<Clone>$() -> Supabase.Storage.Common.VectorListPage<TItem>!
-Supabase.Storage.Common.VectorListPage<TItem>.Equals(Supabase.Storage.Common.VectorListPage<TItem>? other) -> bool
-Supabase.Storage.Common.VectorListPage<TItem>.Items.get -> System.Collections.Generic.IReadOnlyList<TItem>!
-Supabase.Storage.Common.VectorListPage<TItem>.Items.init -> void
-Supabase.Storage.Common.VectorListPage<TItem>.NextToken.get -> string?
-Supabase.Storage.Common.VectorListPage<TItem>.NextToken.init -> void
-Supabase.Storage.Common.VectorListPage<TItem>.VectorListPage() -> void
-Supabase.Storage.CreateNamespace.CreateNamespaceOptions
-Supabase.Storage.CreateNamespace.CreateNamespaceOptions.<Clone>$() -> Supabase.Storage.CreateNamespace.CreateNamespaceOptions!
-Supabase.Storage.CreateNamespace.CreateNamespaceOptions.CreateNamespaceOptions() -> void
-Supabase.Storage.CreateNamespace.CreateNamespaceOptions.Equals(Supabase.Storage.CreateNamespace.CreateNamespaceOptions? other) -> bool
-Supabase.Storage.CreateNamespace.CreateNamespaceOptions.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
-Supabase.Storage.CreateNamespace.CreateNamespaceOptions.Properties.init -> void
-Supabase.Storage.CreateNamespace.IcebergNamespaceDetails
-Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.<Clone>$() -> Supabase.Storage.CreateNamespace.IcebergNamespaceDetails!
-Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.Equals(Supabase.Storage.CreateNamespace.IcebergNamespaceDetails? other) -> bool
-Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.IcebergNamespaceDetails() -> void
-Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.Namespace.get -> Supabase.Storage.Common.IcebergNamespace!
-Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.Namespace.init -> void
-Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
-Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.Properties.init -> void
-Supabase.Storage.CreateTable.CreateTableOptions
-Supabase.Storage.CreateTable.CreateTableOptions.<Clone>$() -> Supabase.Storage.CreateTable.CreateTableOptions!
-Supabase.Storage.CreateTable.CreateTableOptions.CreateTableOptions() -> void
-Supabase.Storage.CreateTable.CreateTableOptions.Equals(Supabase.Storage.CreateTable.CreateTableOptions? other) -> bool
-Supabase.Storage.CreateTable.CreateTableOptions.PartitionSpec.get -> Supabase.Storage.Common.IcebergPartitionSpec?
-Supabase.Storage.CreateTable.CreateTableOptions.PartitionSpec.init -> void
-Supabase.Storage.CreateTable.CreateTableOptions.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
-Supabase.Storage.CreateTable.CreateTableOptions.Properties.init -> void
-Supabase.Storage.CreateVectorIndex.NewVectorIndex
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.Equals(Supabase.Storage.CreateVectorIndex.NewVectorIndex? other) -> bool
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.<Clone>$() -> Supabase.Storage.CreateVectorIndex.NewVectorIndex!
-static Supabase.Storage.CreateVectorIndex.NewVectorIndex.operator ==(Supabase.Storage.CreateVectorIndex.NewVectorIndex? left, Supabase.Storage.CreateVectorIndex.NewVectorIndex? right) -> bool
-static Supabase.Storage.CreateVectorIndex.NewVectorIndex.operator !=(Supabase.Storage.CreateVectorIndex.NewVectorIndex? left, Supabase.Storage.CreateVectorIndex.NewVectorIndex? right) -> bool
-override Supabase.Storage.CreateVectorIndex.NewVectorIndex.ToString() -> string!
-override Supabase.Storage.CreateVectorIndex.NewVectorIndex.GetHashCode() -> int
-override Supabase.Storage.CreateVectorIndex.NewVectorIndex.Equals(object? obj) -> bool
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.DataType.get -> Supabase.Storage.Common.VectorDataType!
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.DataType.init -> void
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.Dimension.get -> int
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.Dimension.init -> void
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.DistanceMetric.get -> Supabase.Storage.Common.VectorDistanceMetric!
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.DistanceMetric.init -> void
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.IndexName.get -> string!
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.IndexName.init -> void
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.NewVectorIndex() -> void
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.NonFilterableMetadataKeys.get -> System.Collections.Generic.IReadOnlyList<string!>?
-Supabase.Storage.CreateVectorIndex.NewVectorIndex.NonFilterableMetadataKeys.init -> void
-Supabase.Storage.DeleteTable.DeleteTableOptions
-Supabase.Storage.DeleteTable.DeleteTableOptions.<Clone>$() -> Supabase.Storage.DeleteTable.DeleteTableOptions!
-Supabase.Storage.DeleteTable.DeleteTableOptions.DeleteTableOptions() -> void
-Supabase.Storage.DeleteTable.DeleteTableOptions.Equals(Supabase.Storage.DeleteTable.DeleteTableOptions? other) -> bool
-Supabase.Storage.DeleteTable.DeleteTableOptions.Purge.get -> bool?
-Supabase.Storage.DeleteTable.DeleteTableOptions.Purge.init -> void
-Supabase.Storage.GetVectorIndex.VectorIndexDetails
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.<Clone>$() -> Supabase.Storage.GetVectorIndex.VectorIndexDetails!
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.CreatedAt.get -> System.DateTimeOffset
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.CreatedAt.init -> void
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.DataType.get -> Supabase.Storage.Common.VectorDataType!
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.DataType.init -> void
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.Dimension.get -> int
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.Dimension.init -> void
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.DistanceMetric.get -> Supabase.Storage.Common.VectorDistanceMetric!
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.DistanceMetric.init -> void
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.Equals(Supabase.Storage.GetVectorIndex.VectorIndexDetails? other) -> bool
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.IndexName.get -> string!
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.IndexName.init -> void
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.NonFilterableMetadataKeys.get -> System.Collections.Generic.IReadOnlyList<string!>!
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.NonFilterableMetadataKeys.init -> void
-Supabase.Storage.GetVectorIndex.VectorIndexDetails.VectorIndexDetails() -> void
-Supabase.Storage.Interfaces.IIcebergCatalog
-Supabase.Storage.Interfaces.IIcebergCatalog.CreateNamespaceAsync(Supabase.Storage.Common.IcebergNamespace! namespace, Supabase.Storage.CreateNamespace.CreateNamespaceOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.CreateNamespace.IcebergNamespaceDetails!>!
-Supabase.Storage.Interfaces.IIcebergCatalog.CreateTableAsync(Supabase.Storage.Common.IcebergTable! table, Supabase.Storage.Common.IcebergSchema! schema, Supabase.Storage.CreateTable.CreateTableOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.IcebergTableMetadata!>!
-Supabase.Storage.Interfaces.IIcebergCatalog.DeleteNamespaceAsync(Supabase.Storage.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IIcebergCatalog.DeleteTableAsync(Supabase.Storage.Common.IcebergTable! table, Supabase.Storage.DeleteTable.DeleteTableOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IIcebergCatalog.ListNamespacesAsync(Supabase.Storage.ListNamespaces.ListNamespacesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.ListNamespaces.IcebergNamespacePage!>!
-Supabase.Storage.Interfaces.IIcebergCatalog.ListTablesAsync(Supabase.Storage.Common.IcebergNamespace! namespace, Supabase.Storage.ListTables.ListTablesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.ListTables.IcebergTablePage!>!
-Supabase.Storage.Interfaces.IIcebergCatalog.LoadTableAsync(Supabase.Storage.Common.IcebergTable! table, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.IcebergTableMetadata!>!
-Supabase.Storage.Interfaces.IIcebergCatalog.NamespaceExistsAsync(Supabase.Storage.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
-Supabase.Storage.Interfaces.IIcebergCatalog.TableExistsAsync(Supabase.Storage.Common.IcebergTable! table, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
-Supabase.Storage.Interfaces.IIcebergCatalog.UpdateTableAsync(Supabase.Storage.Common.IcebergTable! table, Supabase.Storage.UpdateTable.IcebergTableChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.IcebergTableMetadata!>!
-Supabase.Storage.Interfaces.IStorageAnalyticsApi
-Supabase.Storage.Interfaces.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.AnalyticsBucket!>!
-Supabase.Storage.Interfaces.IStorageAnalyticsApi.DeleteBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IStorageAnalyticsApi.From(string! bucketName) -> Supabase.Storage.Interfaces.IIcebergCatalog!
-Supabase.Storage.Interfaces.IStorageAnalyticsApi.ListBucketsAsync(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.AnalyticsBucket!>!>!
+abstract Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+override sealed Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? other) -> bool
+override sealed Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? other) -> bool
+override sealed Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? other) -> bool
+override sealed Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? other) -> bool
+override Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.ToString() -> string!
+override Supabase.Storage.FileBuckets.Common.BucketLifecycle.Equals(object? obj) -> bool
+override Supabase.Storage.FileBuckets.Common.BucketLifecycle.GetHashCode() -> int
+override Supabase.Storage.FileBuckets.Common.BucketLifecycle.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.ToString() -> string!
+override Supabase.Storage.FileBuckets.Common.LifecycleRule.Equals(object? obj) -> bool
+override Supabase.Storage.FileBuckets.Common.LifecycleRule.GetHashCode() -> int
+override Supabase.Storage.FileBuckets.Common.LifecycleRule.ToString() -> string!
+override Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.Equals(object? obj) -> bool
+override Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.GetHashCode() -> int
+override Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.ToString() -> string!
+override Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.Equals(object? obj) -> bool
+override Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.GetHashCode() -> int
+override Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.ToString() -> string!
+override Supabase.Storage.VectorBuckets.Common.StoredVector.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.Common.StoredVector.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.Common.StoredVector.ToString() -> string!
+override Supabase.Storage.VectorBuckets.Common.VectorDataType.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.Common.VectorDataType.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.Common.VectorDataType.ToString() -> string!
+override Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.ToString() -> string!
+override Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.ToString() -> string!
+override Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.ToString() -> string!
+override Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.ToString() -> string!
+override Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.ToString() -> string!
+override Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.ToString() -> string!
+override Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.ToString() -> string!
+override Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.ToString() -> string!
+override Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.ToString() -> string!
+override Supabase.Storage.VectorBuckets.PutVectors.NewVector.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.PutVectors.NewVector.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.PutVectors.NewVector.ToString() -> string!
+override Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.ToString() -> string!
+override Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.ToString() -> string!
+override Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.ToString() -> string!
+static Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.operator !=(Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? left, Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.operator ==(Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? left, Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? right) -> bool
+static Supabase.Storage.FileBuckets.Common.BucketLifecycle.operator !=(Supabase.Storage.FileBuckets.Common.BucketLifecycle? left, Supabase.Storage.FileBuckets.Common.BucketLifecycle? right) -> bool
+static Supabase.Storage.FileBuckets.Common.BucketLifecycle.operator ==(Supabase.Storage.FileBuckets.Common.BucketLifecycle? left, Supabase.Storage.FileBuckets.Common.BucketLifecycle? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Binary.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Boolean.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Date.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Decimal(int precision, int scale) -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Double.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Fixed(int length) -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Float.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Int.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Long.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.String.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Time.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Timestamp.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.TimestampTz.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Uuid.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Bucket(int count) -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Day.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Hour.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Identity.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Month.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Truncate(int width) -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Void.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Year.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? right) -> bool
+static Supabase.Storage.FileBuckets.Common.LifecycleRule.operator !=(Supabase.Storage.FileBuckets.Common.LifecycleRule? left, Supabase.Storage.FileBuckets.Common.LifecycleRule? right) -> bool
+static Supabase.Storage.FileBuckets.Common.LifecycleRule.operator ==(Supabase.Storage.FileBuckets.Common.LifecycleRule? left, Supabase.Storage.FileBuckets.Common.LifecycleRule? right) -> bool
+static Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.Disabled.get -> Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus!
+static Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.Enabled.get -> Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus!
+static Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.operator !=(Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus? left, Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus? right) -> bool
+static Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.operator ==(Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus? left, Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus? right) -> bool
+static Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.operator !=(Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration? left, Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration? right) -> bool
+static Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.operator ==(Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration? left, Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.StoredVector.operator !=(Supabase.Storage.VectorBuckets.Common.StoredVector? left, Supabase.Storage.VectorBuckets.Common.StoredVector? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.StoredVector.operator ==(Supabase.Storage.VectorBuckets.Common.StoredVector? left, Supabase.Storage.VectorBuckets.Common.StoredVector? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.VectorDataType.Float32.get -> Supabase.Storage.VectorBuckets.Common.VectorDataType!
+static Supabase.Storage.VectorBuckets.Common.VectorDataType.operator !=(Supabase.Storage.VectorBuckets.Common.VectorDataType? left, Supabase.Storage.VectorBuckets.Common.VectorDataType? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.VectorDataType.operator ==(Supabase.Storage.VectorBuckets.Common.VectorDataType? left, Supabase.Storage.VectorBuckets.Common.VectorDataType? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.Cosine.get -> Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric!
+static Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.Euclidean.get -> Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric!
+static Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.operator !=(Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric? left, Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.operator ==(Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric? left, Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.operator !=(Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>? left, Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.operator ==(Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>? left, Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.operator !=(Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? left, Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? right) -> bool
+static Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.operator ==(Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? left, Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.operator !=(Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort? left, Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.operator ==(Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort? left, Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.operator !=(Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.operator ==(Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions? left, Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage? left, Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage? left, Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage? left, Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage? left, Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.operator !=(Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions? left, Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.operator ==(Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions? left, Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.operator !=(Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary? left, Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary? right) -> bool
+static Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.operator ==(Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary? left, Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary? right) -> bool
+static Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.operator !=(Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions? left, Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.operator ==(Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions? left, Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.operator !=(Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary? left, Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary? right) -> bool
+static Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.operator ==(Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary? left, Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary? right) -> bool
+static Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.operator !=(Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions? left, Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.operator ==(Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions? left, Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.operator !=(Supabase.Storage.VectorBuckets.ListVectors.VectorSegment? left, Supabase.Storage.VectorBuckets.ListVectors.VectorSegment? right) -> bool
+static Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.operator ==(Supabase.Storage.VectorBuckets.ListVectors.VectorSegment? left, Supabase.Storage.VectorBuckets.ListVectors.VectorSegment? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.Of(params string![]! levels) -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace!
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace? right) -> bool
+static Supabase.Storage.VectorBuckets.PutVectors.NewVector.operator !=(Supabase.Storage.VectorBuckets.PutVectors.NewVector? left, Supabase.Storage.VectorBuckets.PutVectors.NewVector? right) -> bool
+static Supabase.Storage.VectorBuckets.PutVectors.NewVector.operator ==(Supabase.Storage.VectorBuckets.PutVectors.NewVector? left, Supabase.Storage.VectorBuckets.PutVectors.NewVector? right) -> bool
+static Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.operator !=(Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions? left, Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.operator ==(Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions? left, Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.operator !=(Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch? left, Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch? right) -> bool
+static Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.operator ==(Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch? left, Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch? right) -> bool
+static Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.operator !=(Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult? left, Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult? right) -> bool
+static Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.operator ==(Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult? left, Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? left, Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? left, Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? right) -> bool
+Supabase.Storage.Client.Analytics.get -> Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi!
+Supabase.Storage.Client.Vectors.get -> Supabase.Storage.VectorBuckets.IStorageVectorBucketApi!
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket!
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.AnalyticsBucket() -> void
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.CreatedAt.get -> System.DateTimeOffset
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.CreatedAt.init -> void
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.Equals(Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.Name.get -> string!
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.Name.init -> void
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.UpdatedAt.get -> System.DateTimeOffset
+Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.UpdatedAt.init -> void
+Supabase.Storage.FileBuckets.Common.BucketLifecycle
+Supabase.Storage.FileBuckets.Common.BucketLifecycle.<Clone>$() -> Supabase.Storage.FileBuckets.Common.BucketLifecycle!
+Supabase.Storage.FileBuckets.Common.BucketLifecycle.BucketLifecycle() -> void
+Supabase.Storage.FileBuckets.Common.BucketLifecycle.Equals(Supabase.Storage.FileBuckets.Common.BucketLifecycle? other) -> bool
+Supabase.Storage.FileBuckets.Common.BucketLifecycle.Rules.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.FileBuckets.Common.LifecycleRule!>!
+Supabase.Storage.FileBuckets.Common.BucketLifecycle.Rules.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Doc.get -> string?
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Doc.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.IcebergField() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Id.get -> int
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Id.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Name.get -> string!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Name.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Required.get -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Required.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Type.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.Type.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.Element.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.Element.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.ElementId.get -> int
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.ElementId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.ElementRequired.get -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.ElementRequired.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergListType.IcebergListType() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.IcebergMapType() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.Key.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.Key.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.KeyId.get -> int
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.KeyId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.Value.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.Value.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.ValueId.get -> int
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.ValueId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.ValueRequired.get -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergMapType.ValueRequired.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.Table(string! name) -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.FieldId.get -> int?
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.FieldId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.IcebergPartitionField() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.Name.get -> string!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.Name.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.SourceId.get -> int
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.SourceId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.Transform.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField.Transform.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.Fields.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionField!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.Fields.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.IcebergPartitionSpec() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.SpecId.get -> int?
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.SpecId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.Fields.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.Fields.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.IcebergSchema() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.SchemaId.get -> int?
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.SchemaId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.Fields.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.Fields.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.IcebergStructType() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.Name.get -> string!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable.Namespace.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.CurrentSchema.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.CurrentSchema.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.DefaultPartitionSpec.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.DefaultPartitionSpec.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.FormatVersion.get -> int
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.FormatVersion.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.IcebergTableMetadata() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.LastColumnId.get -> int
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.LastColumnId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.LastPartitionId.get -> int
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.LastPartitionId.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.LastUpdatedAt.get -> System.DateTimeOffset
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.LastUpdatedAt.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.Location.get -> string!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.Location.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.MetadataLocation.get -> string?
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.MetadataLocation.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.Properties.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.TableUuid.get -> System.Guid
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata.TableUuid.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.IcebergType(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType! original) -> void
+Supabase.Storage.FileBuckets.Common.LifecycleRule
+Supabase.Storage.FileBuckets.Common.LifecycleRule.<Clone>$() -> Supabase.Storage.FileBuckets.Common.LifecycleRule!
+Supabase.Storage.FileBuckets.Common.LifecycleRule.Equals(Supabase.Storage.FileBuckets.Common.LifecycleRule? other) -> bool
+Supabase.Storage.FileBuckets.Common.LifecycleRule.Id.get -> string?
+Supabase.Storage.FileBuckets.Common.LifecycleRule.Id.init -> void
+Supabase.Storage.FileBuckets.Common.LifecycleRule.LifecycleRule() -> void
+Supabase.Storage.FileBuckets.Common.LifecycleRule.NoncurrentVersionExpiration.get -> Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration?
+Supabase.Storage.FileBuckets.Common.LifecycleRule.NoncurrentVersionExpiration.init -> void
+Supabase.Storage.FileBuckets.Common.LifecycleRule.Status.get -> Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus!
+Supabase.Storage.FileBuckets.Common.LifecycleRule.Status.init -> void
+Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus
+Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.<Clone>$() -> Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus!
+Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.Equals(Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus? other) -> bool
+Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration
+Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.<Clone>$() -> Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration!
+Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.Equals(Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration? other) -> bool
+Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NewerNoncurrentVersions.get -> int?
+Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NewerNoncurrentVersions.init -> void
+Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentDays.get -> int
+Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentDays.init -> void
+Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentVersionExpiration() -> void
+Supabase.Storage.VectorBuckets.Common.StoredVector
+Supabase.Storage.VectorBuckets.Common.StoredVector.<Clone>$() -> Supabase.Storage.VectorBuckets.Common.StoredVector!
+Supabase.Storage.VectorBuckets.Common.StoredVector.Data.get -> Supabase.Storage.VectorBuckets.Common.VectorData?
+Supabase.Storage.VectorBuckets.Common.StoredVector.Data.init -> void
+Supabase.Storage.VectorBuckets.Common.StoredVector.Equals(Supabase.Storage.VectorBuckets.Common.StoredVector? other) -> bool
+Supabase.Storage.VectorBuckets.Common.StoredVector.Key.get -> string!
+Supabase.Storage.VectorBuckets.Common.StoredVector.Key.init -> void
+Supabase.Storage.VectorBuckets.Common.StoredVector.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
+Supabase.Storage.VectorBuckets.Common.StoredVector.Metadata.init -> void
+Supabase.Storage.VectorBuckets.Common.StoredVector.StoredVector() -> void
+Supabase.Storage.VectorBuckets.Common.VectorContent
+Supabase.Storage.VectorBuckets.Common.VectorContent.Data = 1 -> Supabase.Storage.VectorBuckets.Common.VectorContent
+Supabase.Storage.VectorBuckets.Common.VectorContent.Metadata = 2 -> Supabase.Storage.VectorBuckets.Common.VectorContent
+Supabase.Storage.VectorBuckets.Common.VectorContent.None = 0 -> Supabase.Storage.VectorBuckets.Common.VectorContent
+Supabase.Storage.VectorBuckets.Common.VectorDataType
+Supabase.Storage.VectorBuckets.Common.VectorDataType.<Clone>$() -> Supabase.Storage.VectorBuckets.Common.VectorDataType!
+Supabase.Storage.VectorBuckets.Common.VectorDataType.Equals(Supabase.Storage.VectorBuckets.Common.VectorDataType? other) -> bool
+Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric
+Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.<Clone>$() -> Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric!
+Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric.Equals(Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric? other) -> bool
+Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>
+Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.<Clone>$() -> Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>!
+Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.Equals(Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>? other) -> bool
+Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.Items.get -> System.Collections.Generic.IReadOnlyList<TItem>!
+Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.Items.init -> void
+Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.NextToken.get -> string?
+Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.NextToken.init -> void
+Supabase.Storage.VectorBuckets.Common.VectorListPage<TItem>.VectorListPage() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions!
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.CreateNamespaceOptions() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.Properties.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails!
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.IcebergNamespaceDetails() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Namespace.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace!
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Namespace.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Properties.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions!
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.CreateTableOptions() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.PartitionSpec.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec?
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.PartitionSpec.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.Properties.init -> void
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.Equals(Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex? other) -> bool
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.<Clone>$() -> Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex!
+static Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.operator ==(Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex? left, Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex? right) -> bool
+static Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.operator !=(Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex? left, Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex? right) -> bool
+override Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.ToString() -> string!
+override Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.Equals(object? obj) -> bool
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.DataType.get -> Supabase.Storage.VectorBuckets.Common.VectorDataType!
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.DataType.init -> void
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.Dimension.get -> int
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.Dimension.init -> void
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.DistanceMetric.get -> Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric!
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.DistanceMetric.init -> void
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.IndexName.get -> string!
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.IndexName.init -> void
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.NewVectorIndex() -> void
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.NonFilterableMetadataKeys.get -> System.Collections.Generic.IReadOnlyList<string!>?
+Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex.NonFilterableMetadataKeys.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions
+Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions!
+Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.DeleteTableOptions() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.Purge.get -> bool?
+Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.Purge.init -> void
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.<Clone>$() -> Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails!
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.CreatedAt.get -> System.DateTimeOffset
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.CreatedAt.init -> void
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.DataType.get -> Supabase.Storage.VectorBuckets.Common.VectorDataType!
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.DataType.init -> void
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.Dimension.get -> int
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.Dimension.init -> void
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.DistanceMetric.get -> Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric!
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.DistanceMetric.init -> void
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.Equals(Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? other) -> bool
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.IndexName.get -> string!
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.IndexName.init -> void
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.NonFilterableMetadataKeys.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.NonFilterableMetadataKeys.init -> void
+Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.VectorIndexDetails() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.CreateNamespaceAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.CreateTableAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable! table, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema! schema, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.DeleteNamespaceAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.DeleteTableAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable! table, Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.ListNamespacesAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.ListTablesAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.LoadTableAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable! table, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.NamespaceExistsAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.TableExistsAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable! table, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.UpdateTableAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable! table, Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges! changes, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata!>!
+Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi
+Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi.CreateBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket!>!
+Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi.DeleteBucketAsync(string! name, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi.From(string! bucketName) -> Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog!
+Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi.ListBucketsAsync(Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket!>!>!
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
-Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.UpdateBucketLifecycleAsync(string! id, Supabase.Storage.Common.BucketLifecycle! lifecycle, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
-Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
-Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
-Supabase.Storage.Interfaces.IStorageVectorBucketApi
-Supabase.Storage.Interfaces.IStorageVectorBucketApi.CreateVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IStorageVectorBucketApi.DeleteVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IStorageVectorBucketApi.From(string! vectorBucketName) -> Supabase.Storage.Interfaces.IVectorBucket!
-Supabase.Storage.Interfaces.IStorageVectorBucketApi.ListVectorBucketsAsync(Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.VectorListPage<Supabase.Storage.ListVectorBuckets.VectorBucketSummary!>!>!
-Supabase.Storage.Interfaces.IVectorBucket
-Supabase.Storage.Interfaces.IVectorBucket.CreateIndexAsync(Supabase.Storage.CreateVectorIndex.NewVectorIndex! index, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IVectorBucket.DeleteIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.FileBuckets.Common.BucketLifecycle!>!
+Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.UpdateBucketLifecycleAsync(string! id, Supabase.Storage.FileBuckets.Common.BucketLifecycle! lifecycle, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.FileBuckets.Common.BucketLifecycle!>!
+Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi!
+Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.VectorBuckets.IStorageVectorBucketApi!
+Supabase.Storage.VectorBuckets.IStorageVectorBucketApi
+Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.CreateVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.DeleteVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.From(string! vectorBucketName) -> Supabase.Storage.VectorBuckets.IVectorBucket!
+Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.ListVectorBucketsAsync(Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.VectorBuckets.Common.VectorListPage<Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary!>!>!
+Supabase.Storage.VectorBuckets.IVectorBucket
+Supabase.Storage.VectorBuckets.IVectorBucket.CreateIndexAsync(Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex! index, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.VectorBuckets.IVectorBucket.DeleteIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 *REMOVED*const Supabase.Storage.StorageDiagnostics.SourceName = "Supabase.Storage" -> string!
 const Supabase.Storage.StorageDiagnostics.SourceName = "supabase.storage" -> string!
 Supabase.Storage.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Storage.ClientOptions.TimeProvider.set -> void
-Supabase.Storage.Interfaces.IVectorBucket.GetIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.GetVectorIndex.VectorIndexDetails!>!
-Supabase.Storage.Interfaces.IVectorBucket.Index(string! indexName) -> Supabase.Storage.Interfaces.IVectorIndex!
-Supabase.Storage.Interfaces.IVectorBucket.ListIndexesAsync(Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.VectorListPage<Supabase.Storage.ListVectorIndexes.VectorIndexSummary!>!>!
-Supabase.Storage.Interfaces.IVectorIndex
-Supabase.Storage.Interfaces.IVectorIndex.DeleteVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IVectorIndex.GetVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, Supabase.Storage.Common.VectorContent include = Supabase.Storage.Common.VectorContent.None, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.StoredVector!>!>!
-Supabase.Storage.Interfaces.IVectorIndex.ListVectorsAsync(Supabase.Storage.ListVectors.ListVectorsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.VectorListPage<Supabase.Storage.Common.StoredVector!>!>!
-Supabase.Storage.Interfaces.IVectorIndex.PutVectorsAsync(System.Collections.Generic.IReadOnlyCollection<Supabase.Storage.PutVectors.NewVector!>! vectors, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-Supabase.Storage.Interfaces.IVectorIndex.QueryVectorsAsync(System.Collections.Generic.IReadOnlyList<float>! queryVector, int topK, Supabase.Storage.QueryVectors.QueryVectorsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.QueryVectors.VectorQueryResult!>!
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.<Clone>$() -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort!
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.AnalyticsBucketSort(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn Column, System.ComponentModel.ListSortDirection Direction = System.ComponentModel.ListSortDirection.Ascending) -> void
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Column.get -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Column.init -> void
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Deconstruct(out Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn Column, out System.ComponentModel.ListSortDirection Direction) -> void
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Direction.get -> System.ComponentModel.ListSortDirection
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Direction.init -> void
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.Equals(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? other) -> bool
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn.CreatedAt = 1 -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn.Name = 0 -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
-Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn.UpdatedAt = 2 -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSortColumn
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.<Clone>$() -> Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions!
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Equals(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? other) -> bool
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Limit.get -> int?
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Limit.init -> void
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.ListAnalyticsBucketsOptions() -> void
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Offset.get -> int?
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Offset.init -> void
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Search.get -> string?
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Search.init -> void
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Sort.get -> Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort?
-Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions.Sort.init -> void
-Supabase.Storage.ListNamespaces.IcebergNamespacePage
-Supabase.Storage.ListNamespaces.IcebergNamespacePage.<Clone>$() -> Supabase.Storage.ListNamespaces.IcebergNamespacePage!
-Supabase.Storage.ListNamespaces.IcebergNamespacePage.Equals(Supabase.Storage.ListNamespaces.IcebergNamespacePage? other) -> bool
-Supabase.Storage.ListNamespaces.IcebergNamespacePage.IcebergNamespacePage() -> void
-Supabase.Storage.ListNamespaces.IcebergNamespacePage.Namespaces.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.IcebergNamespace!>!
-Supabase.Storage.ListNamespaces.IcebergNamespacePage.Namespaces.init -> void
-Supabase.Storage.ListNamespaces.IcebergNamespacePage.NextPageToken.get -> string?
-Supabase.Storage.ListNamespaces.IcebergNamespacePage.NextPageToken.init -> void
-Supabase.Storage.ListNamespaces.ListNamespacesOptions
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.<Clone>$() -> Supabase.Storage.ListNamespaces.ListNamespacesOptions!
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.Equals(Supabase.Storage.ListNamespaces.ListNamespacesOptions? other) -> bool
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.ListNamespacesOptions() -> void
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.PageSize.get -> int?
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.PageSize.init -> void
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.PageToken.get -> string?
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.PageToken.init -> void
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.Parent.get -> Supabase.Storage.Common.IcebergNamespace?
-Supabase.Storage.ListNamespaces.ListNamespacesOptions.Parent.init -> void
-Supabase.Storage.ListTables.IcebergTablePage
-Supabase.Storage.ListTables.IcebergTablePage.<Clone>$() -> Supabase.Storage.ListTables.IcebergTablePage!
-Supabase.Storage.ListTables.IcebergTablePage.Equals(Supabase.Storage.ListTables.IcebergTablePage? other) -> bool
-Supabase.Storage.ListTables.IcebergTablePage.IcebergTablePage() -> void
-Supabase.Storage.ListTables.IcebergTablePage.NextPageToken.get -> string?
-Supabase.Storage.ListTables.IcebergTablePage.NextPageToken.init -> void
-Supabase.Storage.ListTables.IcebergTablePage.Tables.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.IcebergTable!>!
-Supabase.Storage.ListTables.IcebergTablePage.Tables.init -> void
-Supabase.Storage.ListTables.ListTablesOptions
-Supabase.Storage.ListTables.ListTablesOptions.<Clone>$() -> Supabase.Storage.ListTables.ListTablesOptions!
-Supabase.Storage.ListTables.ListTablesOptions.Equals(Supabase.Storage.ListTables.ListTablesOptions? other) -> bool
-Supabase.Storage.ListTables.ListTablesOptions.ListTablesOptions() -> void
-Supabase.Storage.ListTables.ListTablesOptions.PageSize.get -> int?
-Supabase.Storage.ListTables.ListTablesOptions.PageSize.init -> void
-Supabase.Storage.ListTables.ListTablesOptions.PageToken.get -> string?
-Supabase.Storage.ListTables.ListTablesOptions.PageToken.init -> void
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.<Clone>$() -> Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions!
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.Equals(Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions? other) -> bool
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.ListVectorBucketsOptions() -> void
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.MaxResults.get -> int?
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.MaxResults.init -> void
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.NextToken.get -> string?
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.NextToken.init -> void
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.Prefix.get -> string?
-Supabase.Storage.ListVectorBuckets.ListVectorBucketsOptions.Prefix.init -> void
-Supabase.Storage.ListVectorBuckets.VectorBucketSummary
-Supabase.Storage.ListVectorBuckets.VectorBucketSummary.<Clone>$() -> Supabase.Storage.ListVectorBuckets.VectorBucketSummary!
-Supabase.Storage.ListVectorBuckets.VectorBucketSummary.CreatedAt.get -> System.DateTimeOffset
-Supabase.Storage.ListVectorBuckets.VectorBucketSummary.CreatedAt.init -> void
-Supabase.Storage.ListVectorBuckets.VectorBucketSummary.Equals(Supabase.Storage.ListVectorBuckets.VectorBucketSummary? other) -> bool
-Supabase.Storage.ListVectorBuckets.VectorBucketSummary.VectorBucketName.get -> string!
-Supabase.Storage.ListVectorBuckets.VectorBucketSummary.VectorBucketName.init -> void
-Supabase.Storage.ListVectorBuckets.VectorBucketSummary.VectorBucketSummary() -> void
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.<Clone>$() -> Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions!
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.Equals(Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions? other) -> bool
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.ListVectorIndexesOptions() -> void
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.MaxResults.get -> int?
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.MaxResults.init -> void
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.NextToken.get -> string?
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.NextToken.init -> void
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.Prefix.get -> string?
-Supabase.Storage.ListVectorIndexes.ListVectorIndexesOptions.Prefix.init -> void
-Supabase.Storage.ListVectorIndexes.VectorIndexSummary
-Supabase.Storage.ListVectorIndexes.VectorIndexSummary.<Clone>$() -> Supabase.Storage.ListVectorIndexes.VectorIndexSummary!
-Supabase.Storage.ListVectorIndexes.VectorIndexSummary.CreatedAt.get -> System.DateTimeOffset
-Supabase.Storage.ListVectorIndexes.VectorIndexSummary.CreatedAt.init -> void
-Supabase.Storage.ListVectorIndexes.VectorIndexSummary.Equals(Supabase.Storage.ListVectorIndexes.VectorIndexSummary? other) -> bool
-Supabase.Storage.ListVectorIndexes.VectorIndexSummary.IndexName.get -> string!
-Supabase.Storage.ListVectorIndexes.VectorIndexSummary.IndexName.init -> void
-Supabase.Storage.ListVectorIndexes.VectorIndexSummary.VectorIndexSummary() -> void
-Supabase.Storage.ListVectors.ListVectorsOptions
-Supabase.Storage.ListVectors.ListVectorsOptions.<Clone>$() -> Supabase.Storage.ListVectors.ListVectorsOptions!
-Supabase.Storage.ListVectors.ListVectorsOptions.Equals(Supabase.Storage.ListVectors.ListVectorsOptions? other) -> bool
-Supabase.Storage.ListVectors.ListVectorsOptions.Include.get -> Supabase.Storage.Common.VectorContent
-Supabase.Storage.ListVectors.ListVectorsOptions.Include.init -> void
-Supabase.Storage.ListVectors.ListVectorsOptions.ListVectorsOptions() -> void
-Supabase.Storage.ListVectors.ListVectorsOptions.MaxResults.get -> int?
-Supabase.Storage.ListVectors.ListVectorsOptions.MaxResults.init -> void
-Supabase.Storage.ListVectors.ListVectorsOptions.NextToken.get -> string?
-Supabase.Storage.ListVectors.ListVectorsOptions.NextToken.init -> void
-Supabase.Storage.ListVectors.ListVectorsOptions.Segment.get -> Supabase.Storage.ListVectors.VectorSegment?
-Supabase.Storage.ListVectors.ListVectorsOptions.Segment.init -> void
-Supabase.Storage.ListVectors.VectorSegment
-Supabase.Storage.ListVectors.VectorSegment.<Clone>$() -> Supabase.Storage.ListVectors.VectorSegment!
-Supabase.Storage.ListVectors.VectorSegment.Count.get -> int
-Supabase.Storage.ListVectors.VectorSegment.Count.init -> void
-Supabase.Storage.ListVectors.VectorSegment.Deconstruct(out int Index, out int Count) -> void
-Supabase.Storage.ListVectors.VectorSegment.Equals(Supabase.Storage.ListVectors.VectorSegment? other) -> bool
-Supabase.Storage.ListVectors.VectorSegment.Index.get -> int
-Supabase.Storage.ListVectors.VectorSegment.Index.init -> void
-Supabase.Storage.ListVectors.VectorSegment.VectorSegment(int Index, int Count) -> void
-Supabase.Storage.Common.IcebergNamespace
-Supabase.Storage.Common.IcebergNamespace.<Clone>$() -> Supabase.Storage.Common.IcebergNamespace!
-Supabase.Storage.Common.IcebergNamespace.Equals(Supabase.Storage.Common.IcebergNamespace? other) -> bool
-Supabase.Storage.Common.IcebergNamespace.Levels.get -> System.Collections.Generic.IReadOnlyList<string!>!
-Supabase.Storage.PutVectors.NewVector
-Supabase.Storage.PutVectors.NewVector.<Clone>$() -> Supabase.Storage.PutVectors.NewVector!
-Supabase.Storage.PutVectors.NewVector.Data.get -> System.Collections.Generic.IReadOnlyList<float>!
-Supabase.Storage.PutVectors.NewVector.Data.init -> void
-Supabase.Storage.PutVectors.NewVector.Equals(Supabase.Storage.PutVectors.NewVector? other) -> bool
-Supabase.Storage.PutVectors.NewVector.Key.get -> string!
-Supabase.Storage.PutVectors.NewVector.Key.init -> void
-Supabase.Storage.PutVectors.NewVector.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
-Supabase.Storage.PutVectors.NewVector.Metadata.init -> void
-Supabase.Storage.PutVectors.NewVector.NewVector() -> void
-Supabase.Storage.QueryVectors.QueryVectorsOptions
-Supabase.Storage.QueryVectors.QueryVectorsOptions.<Clone>$() -> Supabase.Storage.QueryVectors.QueryVectorsOptions!
-Supabase.Storage.QueryVectors.QueryVectorsOptions.Equals(Supabase.Storage.QueryVectors.QueryVectorsOptions? other) -> bool
-Supabase.Storage.QueryVectors.QueryVectorsOptions.Filter.get -> System.Text.Json.JsonElement?
-Supabase.Storage.QueryVectors.QueryVectorsOptions.Filter.init -> void
-Supabase.Storage.QueryVectors.QueryVectorsOptions.Include.get -> Supabase.Storage.QueryVectors.VectorMatchContent
-Supabase.Storage.QueryVectors.QueryVectorsOptions.Include.init -> void
-Supabase.Storage.QueryVectors.QueryVectorsOptions.NextToken.get -> string?
-Supabase.Storage.QueryVectors.QueryVectorsOptions.NextToken.init -> void
-Supabase.Storage.QueryVectors.QueryVectorsOptions.QueryVectorsOptions() -> void
-Supabase.Storage.QueryVectors.VectorMatch
-Supabase.Storage.QueryVectors.VectorMatch.<Clone>$() -> Supabase.Storage.QueryVectors.VectorMatch!
-Supabase.Storage.QueryVectors.VectorMatch.Distance.get -> float?
-Supabase.Storage.QueryVectors.VectorMatch.Distance.init -> void
-Supabase.Storage.QueryVectors.VectorMatch.Equals(Supabase.Storage.QueryVectors.VectorMatch? other) -> bool
-Supabase.Storage.QueryVectors.VectorMatch.Key.get -> string!
-Supabase.Storage.QueryVectors.VectorMatch.Key.init -> void
-Supabase.Storage.QueryVectors.VectorMatch.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
-Supabase.Storage.QueryVectors.VectorMatch.Metadata.init -> void
-Supabase.Storage.QueryVectors.VectorMatch.VectorMatch() -> void
-Supabase.Storage.QueryVectors.VectorMatchContent
-Supabase.Storage.QueryVectors.VectorMatchContent.Distance = 1 -> Supabase.Storage.QueryVectors.VectorMatchContent
-Supabase.Storage.QueryVectors.VectorMatchContent.Metadata = 2 -> Supabase.Storage.QueryVectors.VectorMatchContent
-Supabase.Storage.QueryVectors.VectorMatchContent.None = 0 -> Supabase.Storage.QueryVectors.VectorMatchContent
-Supabase.Storage.QueryVectors.VectorQueryResult
-Supabase.Storage.QueryVectors.VectorQueryResult.<Clone>$() -> Supabase.Storage.QueryVectors.VectorQueryResult!
-Supabase.Storage.QueryVectors.VectorQueryResult.DistanceMetric.get -> Supabase.Storage.Common.VectorDistanceMetric?
-Supabase.Storage.QueryVectors.VectorQueryResult.DistanceMetric.init -> void
-Supabase.Storage.QueryVectors.VectorQueryResult.Equals(Supabase.Storage.QueryVectors.VectorQueryResult? other) -> bool
-Supabase.Storage.QueryVectors.VectorQueryResult.Matches.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.QueryVectors.VectorMatch!>!
-Supabase.Storage.QueryVectors.VectorQueryResult.Matches.init -> void
-Supabase.Storage.QueryVectors.VectorQueryResult.NextToken.get -> string?
-Supabase.Storage.QueryVectors.VectorQueryResult.NextToken.init -> void
-Supabase.Storage.QueryVectors.VectorQueryResult.VectorQueryResult() -> void
+Supabase.Storage.VectorBuckets.IVectorBucket.GetIndexAsync(string! indexName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails!>!
+Supabase.Storage.VectorBuckets.IVectorBucket.Index(string! indexName) -> Supabase.Storage.VectorBuckets.IVectorIndex!
+Supabase.Storage.VectorBuckets.IVectorBucket.ListIndexesAsync(Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.VectorBuckets.Common.VectorListPage<Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary!>!>!
+Supabase.Storage.VectorBuckets.IVectorIndex
+Supabase.Storage.VectorBuckets.IVectorIndex.DeleteVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.VectorBuckets.IVectorIndex.GetVectorsAsync(System.Collections.Generic.IReadOnlyCollection<string!>! keys, Supabase.Storage.VectorBuckets.Common.VectorContent include = Supabase.Storage.VectorBuckets.Common.VectorContent.None, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.VectorBuckets.Common.StoredVector!>!>!
+Supabase.Storage.VectorBuckets.IVectorIndex.ListVectorsAsync(Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.VectorBuckets.Common.VectorListPage<Supabase.Storage.VectorBuckets.Common.StoredVector!>!>!
+Supabase.Storage.VectorBuckets.IVectorIndex.PutVectorsAsync(System.Collections.Generic.IReadOnlyCollection<Supabase.Storage.VectorBuckets.PutVectors.NewVector!>! vectors, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.VectorBuckets.IVectorIndex.QueryVectorsAsync(System.Collections.Generic.IReadOnlyList<float>! queryVector, int topK, Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult!>!
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort!
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.AnalyticsBucketSort(Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn Column, System.ComponentModel.ListSortDirection Direction = System.ComponentModel.ListSortDirection.Ascending) -> void
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.Column.get -> Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.Column.init -> void
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.Deconstruct(out Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn Column, out System.ComponentModel.ListSortDirection Direction) -> void
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.Direction.get -> System.ComponentModel.ListSortDirection
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.Direction.init -> void
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.Equals(Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort? other) -> bool
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn.CreatedAt = 1 -> Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn.Name = 0 -> Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn.UpdatedAt = 2 -> Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSortColumn
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions!
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Equals(Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions? other) -> bool
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Limit.get -> int?
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Limit.init -> void
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.ListAnalyticsBucketsOptions() -> void
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Offset.get -> int?
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Offset.init -> void
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Search.get -> string?
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Search.init -> void
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Sort.get -> Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort?
+Supabase.Storage.AnalyticsBuckets.ListBuckets.ListAnalyticsBucketsOptions.Sort.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage!
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.IcebergNamespacePage() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.Namespaces.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.Namespaces.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.NextPageToken.get -> string?
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.IcebergNamespacePage.NextPageToken.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions!
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.ListNamespacesOptions() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.PageSize.get -> int?
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.PageSize.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.PageToken.get -> string?
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.PageToken.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.Parent.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace?
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListNamespaces.ListNamespacesOptions.Parent.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage!
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.IcebergTablePage() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.NextPageToken.get -> string?
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.NextPageToken.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.Tables.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.IcebergTablePage.Tables.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions!
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.ListTablesOptions() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.PageSize.get -> int?
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.PageSize.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.PageToken.get -> string?
+Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables.ListTablesOptions.PageToken.init -> void
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.<Clone>$() -> Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions!
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.Equals(Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions? other) -> bool
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.ListVectorBucketsOptions() -> void
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.MaxResults.get -> int?
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.MaxResults.init -> void
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.NextToken.get -> string?
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.NextToken.init -> void
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.Prefix.get -> string?
+Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions.Prefix.init -> void
+Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary
+Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.<Clone>$() -> Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary!
+Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.CreatedAt.get -> System.DateTimeOffset
+Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.CreatedAt.init -> void
+Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.Equals(Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary? other) -> bool
+Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.VectorBucketName.get -> string!
+Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.VectorBucketName.init -> void
+Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary.VectorBucketSummary() -> void
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.<Clone>$() -> Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions!
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.Equals(Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions? other) -> bool
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.ListVectorIndexesOptions() -> void
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.MaxResults.get -> int?
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.MaxResults.init -> void
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.NextToken.get -> string?
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.NextToken.init -> void
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.Prefix.get -> string?
+Supabase.Storage.VectorBuckets.ListIndexes.ListVectorIndexesOptions.Prefix.init -> void
+Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary
+Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.<Clone>$() -> Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary!
+Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.CreatedAt.get -> System.DateTimeOffset
+Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.CreatedAt.init -> void
+Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.Equals(Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary? other) -> bool
+Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.IndexName.get -> string!
+Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.IndexName.init -> void
+Supabase.Storage.VectorBuckets.ListIndexes.VectorIndexSummary.VectorIndexSummary() -> void
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.<Clone>$() -> Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions!
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.Equals(Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions? other) -> bool
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.Include.get -> Supabase.Storage.VectorBuckets.Common.VectorContent
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.Include.init -> void
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.ListVectorsOptions() -> void
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.MaxResults.get -> int?
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.MaxResults.init -> void
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.NextToken.get -> string?
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.NextToken.init -> void
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.Segment.get -> Supabase.Storage.VectorBuckets.ListVectors.VectorSegment?
+Supabase.Storage.VectorBuckets.ListVectors.ListVectorsOptions.Segment.init -> void
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.<Clone>$() -> Supabase.Storage.VectorBuckets.ListVectors.VectorSegment!
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.Count.get -> int
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.Count.init -> void
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.Deconstruct(out int Index, out int Count) -> void
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.Equals(Supabase.Storage.VectorBuckets.ListVectors.VectorSegment? other) -> bool
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.Index.get -> int
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.Index.init -> void
+Supabase.Storage.VectorBuckets.ListVectors.VectorSegment.VectorSegment(int Index, int Count) -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace.Levels.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Supabase.Storage.VectorBuckets.PutVectors.NewVector
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.<Clone>$() -> Supabase.Storage.VectorBuckets.PutVectors.NewVector!
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.Data.get -> System.Collections.Generic.IReadOnlyList<float>!
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.Data.init -> void
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.Equals(Supabase.Storage.VectorBuckets.PutVectors.NewVector? other) -> bool
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.Key.get -> string!
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.Key.init -> void
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.Metadata.init -> void
+Supabase.Storage.VectorBuckets.PutVectors.NewVector.NewVector() -> void
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.<Clone>$() -> Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions!
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.Equals(Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions? other) -> bool
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.Filter.get -> System.Text.Json.JsonElement?
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.Filter.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.Include.get -> Supabase.Storage.VectorBuckets.QueryVectors.VectorMatchContent
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.Include.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.NextToken.get -> string?
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.NextToken.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.QueryVectorsOptions.QueryVectorsOptions() -> void
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.<Clone>$() -> Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch!
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.Distance.get -> float?
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.Distance.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.Equals(Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch? other) -> bool
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.Key.get -> string!
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.Key.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.Metadata.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Text.Json.JsonElement>?
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.Metadata.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch.VectorMatch() -> void
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatchContent
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatchContent.Distance = 1 -> Supabase.Storage.VectorBuckets.QueryVectors.VectorMatchContent
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatchContent.Metadata = 2 -> Supabase.Storage.VectorBuckets.QueryVectors.VectorMatchContent
+Supabase.Storage.VectorBuckets.QueryVectors.VectorMatchContent.None = 0 -> Supabase.Storage.VectorBuckets.QueryVectors.VectorMatchContent
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.<Clone>$() -> Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult!
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.DistanceMetric.get -> Supabase.Storage.VectorBuckets.Common.VectorDistanceMetric?
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.DistanceMetric.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.Equals(Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult? other) -> bool
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.Matches.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.VectorBuckets.QueryVectors.VectorMatch!>!
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.Matches.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.NextToken.get -> string?
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.NextToken.init -> void
+Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.VectorQueryResult() -> void
 Supabase.Storage.StorageBucketApi.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
-override Supabase.Storage.Common.VectorData.Equals(object? obj) -> bool
-override Supabase.Storage.Common.VectorData.GetHashCode() -> int
-override Supabase.Storage.Common.VectorData.ToString() -> string!
-static Supabase.Storage.Common.VectorData.operator !=(Supabase.Storage.Common.VectorData? left, Supabase.Storage.Common.VectorData? right) -> bool
-static Supabase.Storage.Common.VectorData.operator ==(Supabase.Storage.Common.VectorData? left, Supabase.Storage.Common.VectorData? right) -> bool
-Supabase.Storage.Common.VectorData
-Supabase.Storage.Common.VectorData.<Clone>$() -> Supabase.Storage.Common.VectorData!
-Supabase.Storage.Common.VectorData.DataType.get -> Supabase.Storage.Common.VectorDataType!
-Supabase.Storage.Common.VectorData.DataType.init -> void
-Supabase.Storage.Common.VectorData.Equals(Supabase.Storage.Common.VectorData? other) -> bool
-Supabase.Storage.Common.VectorData.Float32.get -> System.Collections.Generic.IReadOnlyList<float>?
-Supabase.Storage.Common.VectorData.Float32.init -> void
-Supabase.Storage.Common.VectorData.VectorData() -> void
-Supabase.Storage.StorageBucketApi.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
-Supabase.Storage.StorageBucketApi.UpdateBucketLifecycleAsync(string! id, Supabase.Storage.Common.BucketLifecycle! lifecycle, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
-Supabase.Storage.UpdateTable.IcebergTableChanges
-Supabase.Storage.UpdateTable.IcebergTableChanges.<Clone>$() -> Supabase.Storage.UpdateTable.IcebergTableChanges!
-Supabase.Storage.UpdateTable.IcebergTableChanges.BasedOn.get -> Supabase.Storage.Common.IcebergTableMetadata?
-Supabase.Storage.UpdateTable.IcebergTableChanges.BasedOn.init -> void
-Supabase.Storage.UpdateTable.IcebergTableChanges.Equals(Supabase.Storage.UpdateTable.IcebergTableChanges? other) -> bool
-Supabase.Storage.UpdateTable.IcebergTableChanges.IcebergTableChanges() -> void
-Supabase.Storage.UpdateTable.IcebergTableChanges.PartitionSpec.get -> Supabase.Storage.Common.IcebergPartitionSpec?
-Supabase.Storage.UpdateTable.IcebergTableChanges.PartitionSpec.init -> void
-Supabase.Storage.UpdateTable.IcebergTableChanges.Schema.get -> Supabase.Storage.Common.IcebergSchema?
-Supabase.Storage.UpdateTable.IcebergTableChanges.Schema.init -> void
-virtual Supabase.Storage.Common.IcebergType.EqualityContract.get -> System.Type!
-virtual Supabase.Storage.Common.IcebergType.Equals(Supabase.Storage.Common.IcebergType? other) -> bool
-virtual Supabase.Storage.Common.IcebergType.PrintMembers(System.Text.StringBuilder! builder) -> bool
+override Supabase.Storage.VectorBuckets.Common.VectorData.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.Common.VectorData.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.Common.VectorData.ToString() -> string!
+static Supabase.Storage.VectorBuckets.Common.VectorData.operator !=(Supabase.Storage.VectorBuckets.Common.VectorData? left, Supabase.Storage.VectorBuckets.Common.VectorData? right) -> bool
+static Supabase.Storage.VectorBuckets.Common.VectorData.operator ==(Supabase.Storage.VectorBuckets.Common.VectorData? left, Supabase.Storage.VectorBuckets.Common.VectorData? right) -> bool
+Supabase.Storage.VectorBuckets.Common.VectorData
+Supabase.Storage.VectorBuckets.Common.VectorData.<Clone>$() -> Supabase.Storage.VectorBuckets.Common.VectorData!
+Supabase.Storage.VectorBuckets.Common.VectorData.DataType.get -> Supabase.Storage.VectorBuckets.Common.VectorDataType!
+Supabase.Storage.VectorBuckets.Common.VectorData.DataType.init -> void
+Supabase.Storage.VectorBuckets.Common.VectorData.Equals(Supabase.Storage.VectorBuckets.Common.VectorData? other) -> bool
+Supabase.Storage.VectorBuckets.Common.VectorData.Float32.get -> System.Collections.Generic.IReadOnlyList<float>?
+Supabase.Storage.VectorBuckets.Common.VectorData.Float32.init -> void
+Supabase.Storage.VectorBuckets.Common.VectorData.VectorData() -> void
+Supabase.Storage.StorageBucketApi.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.FileBuckets.Common.BucketLifecycle!>!
+Supabase.Storage.StorageBucketApi.UpdateBucketLifecycleAsync(string! id, Supabase.Storage.FileBuckets.Common.BucketLifecycle! lifecycle, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.FileBuckets.Common.BucketLifecycle!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges!
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.BasedOn.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata?
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.BasedOn.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.IcebergTableChanges() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.PartitionSpec.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec?
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.PartitionSpec.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.Schema.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema?
+Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.Schema.init -> void
+virtual Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.EqualityContract.get -> System.Type!
+virtual Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? other) -> bool
+virtual Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.PrintMembers(System.Text.StringBuilder! builder) -> bool

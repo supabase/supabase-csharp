@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Supabase.Core.Attributes;
+using Supabase.Storage.AnalyticsBuckets;
 using Supabase.Storage.Interfaces;
+using Supabase.Storage.VectorBuckets;
 
 namespace Supabase.Storage;
 

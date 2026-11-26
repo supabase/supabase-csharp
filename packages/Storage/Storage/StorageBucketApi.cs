@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using Supabase.Core;
 using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
-using Supabase.Storage.Common;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Extensions;
-using Supabase.Storage.GetBucketLifecycle;
+using Supabase.Storage.FileBuckets.Common;
+using Supabase.Storage.FileBuckets.GetBucketLifecycle;
+using Supabase.Storage.FileBuckets.UpdateBucketLifecycle;
 using Supabase.Storage.Interfaces;
-using Supabase.Storage.UpdateBucketLifecycle;
 
 namespace Supabase.Storage;
 

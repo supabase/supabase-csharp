@@ -1,0 +1,34 @@
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using Supabase.Storage.VectorBuckets.Common;
+
+namespace Supabase.Storage.VectorBuckets.GetVectors;
+
+internal sealed class GetVectorsBody
+{
+    internal GetVectorsBody(string vectorBucketName, string indexName, IReadOnlyCollection<string> keys, VectorContent include)
+    {
+        this.VectorBucketName = vectorBucketName;
+        this.IndexName = indexName;
+        this.Keys = keys;
+        this.ReturnData = VectorContentRequest.RequestedOrOmitted(include, VectorContent.Data);
+        this.ReturnMetadata = VectorContentRequest.RequestedOrOmitted(include, VectorContent.Metadata);
+    }
+
+    [JsonPropertyName("vectorBucketName")]
+    public string VectorBucketName { get; }
+
+    [JsonPropertyName("indexName")]
+    public string IndexName { get; }
+
+    [JsonPropertyName("keys")]
+    public IReadOnlyCollection<string> Keys { get; }
+
+    [JsonPropertyName("returnData")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? ReturnData { get; }
+
+    [JsonPropertyName("returnMetadata")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? ReturnMetadata { get; }
+}
