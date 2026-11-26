@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Supabase.Storage.Common;
 using Supabase.Storage.CreateNamespace;
 using Supabase.Storage.CreateTable;
+using Supabase.Storage.DeleteTable;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Interfaces;
 using Supabase.Storage.ListNamespaces;
-using Supabase.Storage.DeleteTable;
 
 namespace Supabase.Storage;
 

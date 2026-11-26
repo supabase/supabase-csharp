@@ -4,8 +4,8 @@ using Supabase.Core.Attributes;
 using Supabase.Storage.Common;
 using Supabase.Storage.CreateNamespace;
 using Supabase.Storage.CreateTable;
-using Supabase.Storage.ListNamespaces;
 using Supabase.Storage.DeleteTable;
+using Supabase.Storage.ListNamespaces;
 
 namespace Supabase.Storage.Interfaces;
 
