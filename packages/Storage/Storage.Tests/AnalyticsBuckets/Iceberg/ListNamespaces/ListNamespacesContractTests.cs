@@ -76,7 +76,7 @@ public class ListNamespacesContractTests
         await this.Catalog().ListNamespacesAsync(new ListNamespacesOptions
         {
             Parent = IcebergNamespace.Of("sales", "europe"),
-            PageToken = "a/b",
+            NextPageToken = "a/b",
             PageSize = 10,
         });
         this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Url
@@ -91,7 +91,7 @@ public class ListNamespacesContractTests
         var page = await this.Catalog().ListNamespacesAsync();
         using (new AssertionScope())
         {
-            page.Namespaces.Should().Equal(IcebergNamespace.Of("sales"), IcebergNamespace.Of("ops"));
+            page.Items.Should().Equal(IcebergNamespace.Of("sales"), IcebergNamespace.Of("ops"));
             page.NextPageToken.Should().Be("abc");
         }
     }
@@ -100,7 +100,7 @@ public class ListNamespacesContractTests
     public async Task ListNamespacesAsync_ShouldMapMultiLevelNamespaces()
     {
         this.Respond(200, "{\"namespaces\":[[\"sales\",\"europe\"]]}");
-        (await this.Catalog().ListNamespacesAsync()).Namespaces.Should().Equal(IcebergNamespace.Of("sales", "europe"));
+        (await this.Catalog().ListNamespacesAsync()).Items.Should().Equal(IcebergNamespace.Of("sales", "europe"));
     }
 
     [TestMethod]
@@ -117,7 +117,7 @@ public class ListNamespacesContractTests
         var page = await this.Catalog().ListNamespacesAsync();
         using (new AssertionScope())
         {
-            page.Namespaces.Should().BeEmpty();
+            page.Items.Should().BeEmpty();
             page.NextPageToken.Should().BeNull();
         }
     }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
+using Supabase.Storage.Common;
 using Supabase.Storage.VectorBuckets.Common;
 using Supabase.Storage.VectorBuckets.ListVectors;
 using Supabase.Storage.VectorBuckets.PutVectors;
@@ -62,8 +63,8 @@ public interface IVectorIndex
     Task<IReadOnlyList<StoredVector>> GetVectorsAsync(IReadOnlyCollection<string> keys, VectorContent include = VectorContent.None, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Lists the vectors of this index, one page at a time. Pass the <see cref="VectorListPage{TItem}.NextToken"/> of a
-    /// page back in <see cref="ListVectorsOptions.NextToken"/> to read the next one. Requires a service-role key.
+    /// Lists the vectors of this index, one page at a time. Pass the <see cref="Page{T}.NextPageToken"/> of a
+    /// page back in <see cref="ListVectorsOptions.NextPageToken"/> to read the next one. Requires a service-role key.
     /// To scan a large index in parallel, give each worker its own <see cref="ListVectorsOptions.Segment"/> of the same
     /// count: every vector belongs to exactly one segment, and each worker pages through its segment alone.
     /// </summary>
@@ -78,10 +79,16 @@ public interface IVectorIndex
     /// <example>
     /// <code>
     /// var index = storage.Vectors.From("embeddings-prod").Index("docs-v1");
-    /// var options = new ListVectorsOptions { MaxResults = 100, Include = VectorContent.Metadata };
-    /// var page = await index.ListVectorsAsync(options);
-    /// while (page.NextToken is not null)
-    ///     page = await index.ListVectorsAsync(options with { NextToken = page.NextToken });
+    /// var options = new ListVectorsOptions { PageSize = 100, Include = VectorContent.Metadata };
+    /// Page&lt;StoredVector&gt; page;
+    /// do
+    /// {
+    ///     page = await index.ListVectorsAsync(options);
+    ///     foreach (var vector in page.Items)
+    ///         Console.WriteLine(vector.Key);
+    ///     options = options with { NextPageToken = page.NextPageToken };
+    /// }
+    /// while (page.NextPageToken is not null);
     /// </code>
     /// A full scan split across four parallel workers:
     /// <code>
@@ -91,14 +98,14 @@ public interface IVectorIndex
     /// {
     ///     var keys = new List&lt;string&gt;();
     ///     var options = new ListVectorsOptions { Segment = new VectorSegment(segmentIndex, segmentCount) };
-    ///     VectorListPage&lt;StoredVector&gt; page;
+    ///     Page&lt;StoredVector&gt; page;
     ///     do
     ///     {
     ///         page = await index.ListVectorsAsync(options);
     ///         keys.AddRange(page.Items.Select(vector => vector.Key));
-    ///         options = options with { NextToken = page.NextToken };
+    ///         options = options with { NextPageToken = page.NextPageToken };
     ///     }
-    ///     while (page.NextToken is not null);
+    ///     while (page.NextPageToken is not null);
     ///     return keys;
     /// });
     /// var allKeys = (await Task.WhenAll(scans)).SelectMany(keys => keys);
@@ -106,7 +113,7 @@ public interface IVectorIndex
     /// </example>
     [ImplementedCapability("storage.vector_buckets.list_vectors")]
     [ImplementedCapability("storage.vector_buckets.parallel_scan")]
-    Task<VectorListPage<StoredVector>> ListVectorsAsync(ListVectorsOptions? options = null, CancellationToken cancellationToken = default);
+    Task<Page<StoredVector>> ListVectorsAsync(ListVectorsOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Stores the vectors in this index. A vector whose key is already in use replaces the stored one. Requires a

@@ -1,3 +1,4 @@
+using Supabase.Storage.Common;
 using Supabase.Storage.VectorBuckets.Common;
 
 namespace Supabase.Storage.VectorBuckets.ListVectors;
@@ -9,10 +10,10 @@ namespace Supabase.Storage.VectorBuckets.ListVectors;
 public sealed record ListVectorsOptions
 {
     /// <summary>The maximum number of vectors on the page. The service accepts 1 to 1000.</summary>
-    public int? MaxResults { get; init; }
+    public int? PageSize { get; init; }
 
-    /// <summary>The <see cref="VectorListPage{TItem}.NextToken"/> of the previous page, to read the page after it.</summary>
-    public string? NextToken { get; init; }
+    /// <summary>The <see cref="Page{T}.NextPageToken"/> of the previous page, to read the page after it.</summary>
+    public string? NextPageToken { get; init; }
 
     /// <summary>What to return with each key. With <see cref="VectorContent.None"/>, the service applies its own default.</summary>
     public VectorContent Include { get; init; } = VectorContent.None;

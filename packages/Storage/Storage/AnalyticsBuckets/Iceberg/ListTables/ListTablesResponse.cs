@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text.Json.Serialization;
 using Supabase.Storage.AnalyticsBuckets.Iceberg.Common;
+using Supabase.Storage.Common;
 
 namespace Supabase.Storage.AnalyticsBuckets.Iceberg.ListTables;
 
@@ -13,9 +14,9 @@ internal sealed class ListTablesResponse
     [JsonPropertyName("next-page-token")]
     public string? NextPageToken { get; set; }
 
-    internal IcebergTablePage ToPage(IcebergNamespace listed) => new()
+    internal Page<IcebergTable> ToPage(IcebergNamespace listed) => new()
     {
-        Tables = (this.Identifiers ?? Array.Empty<IdentifierBody>()).Select(identifier => identifier.ToTable(listed)).ToList(),
+        Items = (this.Identifiers ?? Array.Empty<IdentifierBody>()).Select(identifier => identifier.ToTable(listed)).ToList(),
         NextPageToken = this.NextPageToken,
     };
 

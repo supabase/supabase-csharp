@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
-using Supabase.Storage.VectorBuckets.Common;
+using Supabase.Storage.Common;
 using Supabase.Storage.VectorBuckets.CreateIndex;
 using Supabase.Storage.VectorBuckets.GetIndex;
 using Supabase.Storage.VectorBuckets.ListIndexes;
@@ -90,21 +90,26 @@ public interface IVectorBucket
     /// <param name="cancellationToken">Token used to cancel the request.</param>
     /// <returns>A page of indexes, and the token of the next page when there is one.</returns>
     /// <exception cref="Exceptions.SupabaseStorageException">
-    /// The service refused the call, for example because <see cref="ListVectorIndexesOptions.MaxResults"/> is out of
+    /// The service refused the call, for example because <see cref="ListVectorIndexesOptions.PageSize"/> is out of
     /// range (<c>Code</c> <c>InvalidRequest</c>), or its answer could not be read.
     /// </exception>
     /// <example>
     /// <code>
     /// var bucket = storage.Vectors.From("embeddings-prod");
-    /// var page = await bucket.ListIndexesAsync(new ListVectorIndexesOptions { Prefix = "docs-" });
-    /// while (page.NextToken is not null)
+    /// var options = new ListVectorIndexesOptions { Prefix = "docs-", PageSize = 50 };
+    /// Page&lt;VectorIndexSummary&gt; page;
+    /// do
     /// {
-    ///     page = await bucket.ListIndexesAsync(new ListVectorIndexesOptions { Prefix = "docs-", NextToken = page.NextToken });
+    ///     page = await bucket.ListIndexesAsync(options);
+    ///     foreach (var index in page.Items)
+    ///         Console.WriteLine(index.IndexName);
+    ///     options = options with { NextPageToken = page.NextPageToken };
     /// }
+    /// while (page.NextPageToken is not null);
     /// </code>
     /// </example>
     [ImplementedCapability("storage.vector_buckets.list_indexes")]
-    Task<VectorListPage<VectorIndexSummary>> ListIndexesAsync(ListVectorIndexesOptions? options = null, CancellationToken cancellationToken = default);
+    Task<Page<VectorIndexSummary>> ListIndexesAsync(ListVectorIndexesOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes a vector index from this bucket, together with its vectors. Requires a service-role key.

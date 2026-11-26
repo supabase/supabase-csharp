@@ -20,7 +20,7 @@ public class ListVectorBucketsApprovalTests : RequestApprovalFixture
     public async Task ListVectorBucketsRequest_ShouldSerializeToExpectedPayload()
     {
         this.RespondWith(EmptyPage);
-        await this.Client.Vectors.ListVectorBucketsAsync(new ListVectorBucketsOptions { Prefix = "embeddings-", MaxResults = 50, NextToken = "embeddings-v1" });
+        await this.Client.Vectors.ListVectorBucketsAsync(new ListVectorBucketsOptions { Prefix = "embeddings-", PageSize = 50, NextPageToken = "embeddings-v1" });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
 

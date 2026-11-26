@@ -42,7 +42,7 @@ public class ParallelVectorScanContractTests
     {
         this.Respond(200, "{\"vectors\":[]}");
         await Task.WhenAll(Enumerable.Range(0, SegmentCount).Select(segmentIndex => this.Index().ListVectorsAsync(
-            new ListVectorsOptions { Segment = new VectorSegment(segmentIndex, SegmentCount), NextToken = $"token-{segmentIndex}" })));
+            new ListVectorsOptions { Segment = new VectorSegment(segmentIndex, SegmentCount), NextPageToken = $"token-{segmentIndex}" })));
         this.server.LogEntries.Select(entry => entry.RequestMessage!.Body).Should().BeEquivalentTo(
             Enumerable.Range(0, SegmentCount).Select(segmentIndex =>
                 $"{{\"vectorBucketName\":\"embeddings-prod\",\"indexName\":\"docs-v1\",\"nextToken\":\"token-{segmentIndex}\",\"segmentCount\":{SegmentCount},\"segmentIndex\":{segmentIndex}}}"),
