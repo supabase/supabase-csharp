@@ -13,15 +13,15 @@ are relative to the repository root; the script itself is location-independent.
 
 ```
 scripts/quality-gate/gate.sh <package>              # full gate — before a PR
-scripts/quality-gate/gate.sh <package> --fast       # inner loop only
+scripts/quality-gate/gate.sh <package> --fast       # inner loop + public-API declaration
 scripts/quality-gate/gate.sh <package> --mutation   # evaluate a Stryker report
 ```
 
-There are two modes. `--fast` is the inner loop only (build, format, tests) — the
-fast local red/green cycle; the default is the full gate and adds security, the
-public-API check, E2E and a line-coverage baseline. `<package>` is a directory —
-e.g. `packages/Gotrue`, or `packages` for the whole solution. Run with
-`bash <path>` if the executable bit is unset.
+There are two modes. `--fast` is the inner loop (build, format, tests) plus the
+public-API declaration check — the fast local red/green cycle; the default is the
+full gate and adds security, the public-API diff, E2E and a line-coverage
+baseline. `<package>` is a directory — e.g. `packages/Gotrue`, or `packages` for
+the whole solution. Run with `bash <path>` if the executable bit is unset.
 
 **Mutation runs in its own workflow, on every PR.** `mutation.yml` runs Stryker
 `--since:origin/master` on changed packages, then `gate.sh packages --mutation`

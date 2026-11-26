@@ -1,0 +1,11 @@
+{
+  "metadata": {
+    "format-version": 2,
+    "table-uuid": "b734865e-f9a5-4654-8b0b-e15683fcb195",
+    "location": "s3://analytics-data/sales/events",
+    "current-schema-id": 3,
+    "schemas": [ { "type": "struct", "schema-id": 0, "fields": [ { "id": 1, "name": "id", "type": "long", "required": true } ] } ],
+    "default-spec-id": 4,
+    "partition-specs": [ { "spec-id": 0, "fields": [] } ]
+  }
+}

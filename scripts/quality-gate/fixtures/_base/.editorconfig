@@ -5,3 +5,8 @@ indent_style = space
 indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+# Mirrors the repository's .globalconfig: undeclared public surface is the gate's
+# concern (stage 5a), never a build warning that would move the warning baseline.
+dotnet_diagnostic.RS0016.severity = suggestion
+dotnet_diagnostic.RS0017.severity = suggestion

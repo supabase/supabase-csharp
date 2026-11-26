@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Storage;
-using Supabase.Storage.Common;
-using Supabase.Storage.CreateVectorIndex;
 using Supabase.Storage.Exceptions;
-using Supabase.Storage.Interfaces;
-using Supabase.Storage.PutVectors;
+using Supabase.Storage.VectorBuckets;
+using Supabase.Storage.VectorBuckets.Common;
+using Supabase.Storage.VectorBuckets.CreateIndex;
+using Supabase.Storage.VectorBuckets.PutVectors;
 
 namespace Storage.Tests.Support;
 

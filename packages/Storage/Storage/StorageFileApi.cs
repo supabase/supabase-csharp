@@ -945,7 +945,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             headers.Add("x-upsert", options.Upsert.ToString().ToLower());
 
         if (options.Metadata != null)
-            headers.Add("x-metadata", ParseMetadata(options.Metadata));
+            metadata["metadata"] = JsonSerializer.Serialize(options.Metadata, Helpers.SerializerOptions);
 
         options.Headers?.ToList().ForEach(x => headers.Add(x.Key, x.Value));
 

@@ -672,8 +672,8 @@ features:
   realtime.channel.broadcast_persist:
     status: implemented
     symbols:
-      - RealtimeBroadcast.SendAsync
-      - RealtimeChannel.HttpSendAsync
+      - RealtimeBroadcast.SendPersistedAsync
+      - RealtimeChannel.HttpSendPersistedAsync
   realtime.channel.subscribe:
     status: implemented
     symbols:
@@ -911,6 +911,14 @@ features:
     status: implemented
     symbols:
       - StorageBucketApi.PurgeProjectCacheAsync
+  storage.file_buckets.get_bucket_lifecycle:
+    status: implemented
+    symbols:
+      - StorageBucketApi.GetBucketLifecycleAsync
+  storage.file_buckets.update_bucket_lifecycle:
+    status: implemented
+    symbols:
+      - StorageBucketApi.UpdateBucketLifecycleAsync
   storage.file_buckets.delete_bucket_lifecycle:
     status: implemented
     symbols:
@@ -1001,6 +1009,30 @@ features:
     status: implemented
     symbols:
       - IIcebergCatalog.NamespaceExistsAsync
+  storage.analytics.create_table:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.CreateTableAsync
+  storage.analytics.list_tables:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.ListTablesAsync
+  storage.analytics.load_table:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.LoadTableAsync
+  storage.analytics.update_table:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.UpdateTableAsync
+  storage.analytics.delete_table:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.DeleteTableAsync
+  storage.analytics.table_exists:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.TableExistsAsync
   storage.analytics.access_catalog:
     status: implemented
     symbols:

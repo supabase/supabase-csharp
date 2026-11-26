@@ -7,9 +7,11 @@ using Supabase.Core;
 using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
 using Supabase.Storage.Common;
-using Supabase.Storage.DeleteBucketLifecycle;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Extensions;
+using Supabase.Storage.FileBuckets.Common;
+using Supabase.Storage.FileBuckets.GetBucketLifecycle;
+using Supabase.Storage.FileBuckets.UpdateBucketLifecycle;
 using Supabase.Storage.Interfaces;
 
 namespace Supabase.Storage;
@@ -191,4 +193,24 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
     [ImplementedCapability("storage.file_buckets.delete_bucket_lifecycle")]
     public Task DeleteBucketLifecycleAsync(string id, CancellationToken cancellationToken = default) =>
         Helpers.MakeRequestAsync(this.requestClient, this.Options, HttpMethod.Delete, BucketLifecyclePath.For(this.Url, id), null, this.Headers, cancellationToken);
+
+    /// <inheritdoc />
+    [ImplementedCapability("storage.file_buckets.get_bucket_lifecycle")]
+    public async Task<BucketLifecycle> GetBucketLifecycleAsync(string id, CancellationToken cancellationToken = default)
+    {
+        var response = await Helpers.MakeRequestAsync<GetBucketLifecycleResponse>(this.requestClient, this.Options, HttpMethod.Get, BucketLifecyclePath.For(this.Url, id), null, this.Headers, cancellationToken).ConfigureAwait(false)
+            ?? throw new SupabaseStorageException("The storage service returned an empty lifecycle policy.");
+        return response.ToLifecycle();
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("storage.file_buckets.update_bucket_lifecycle")]
+    public async Task<BucketLifecycle> UpdateBucketLifecycleAsync(string id, BucketLifecycle lifecycle, CancellationToken cancellationToken = default)
+    {
+        if (lifecycle is null)
+            throw new ArgumentNullException(nameof(lifecycle));
+        var response = await Helpers.MakeRequestAsync<GetBucketLifecycleResponse>(this.requestClient, this.Options, HttpMethod.Put, BucketLifecyclePath.For(this.Url, id), new UpdateBucketLifecycleBody(lifecycle), this.Headers, cancellationToken).ConfigureAwait(false)
+            ?? throw new SupabaseStorageException("The storage service returned an empty lifecycle policy.");
+        return response.ToLifecycle();
+    }
 }

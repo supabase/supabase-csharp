@@ -30,6 +30,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <None Update="AnalyticsBuckets\Iceberg\CreateTable\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="AnalyticsBuckets\Iceberg\LoadTable\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="AnalyticsBuckets\Iceberg\UpdateTable\Data\*.json" CopyToOutputDirectory="PreserveNewest" />
         <None Update="Assets\supabase-csharp.png">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>

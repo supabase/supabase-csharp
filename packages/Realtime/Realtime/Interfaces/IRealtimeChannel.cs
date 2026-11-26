@@ -248,18 +248,22 @@ public interface IRealtimeChannel
 
     /// <summary>
     /// Broadcasts through the REST API and asks the server to store the message for replay. Needs a private channel.
+    /// The REST API has no acknowledgment: a broadcast the server delivered but did not store, because no policy lets
+    /// the sender store it or storing it failed, still completes.
     /// </summary>
-    /// <exception cref="RealtimeException">The channel is public, or the server rejected the broadcast.</exception>
+    /// <param name="eventName">The event name.</param>
+    /// <param name="payload">The payload: a <c>byte[]</c> is sent as raw binary, anything else as JSON.</param>
+    /// <param name="persistence">How long the server keeps the broadcast.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <exception cref="RealtimeException">The channel is public, or the server rejected the broadcast, for instance a ttl longer than it allows.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="persistence"/> is null.</exception>
     /// <example>
     /// <code>
     /// var channel = client.PrivateChannel("room");
-    /// await channel.HttpSendAsync("chat", new { text = "hi" }, new BroadcastPersistence());
+    /// await channel.HttpSendPersistedAsync("chat", new { text = "hi" }, BroadcastPersistence.For(TimeSpan.FromHours(1)));
     /// </code>
     /// </example>
-    Task HttpSendAsync(string eventName, object payload, BroadcastPersistence persistence);
-
-    /// <inheritdoc cref="HttpSendAsync(string, object, BroadcastPersistence)"/>
-    Task HttpSendAsync(string eventName, object payload, BroadcastPersistence persistence, CancellationToken cancellationToken);
+    Task HttpSendPersistedAsync(string eventName, object payload, BroadcastPersistence persistence, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Register broadcast options, must be called to use <see cref="IRealtimeBroadcast"/>, and prior to <see cref="Subscribe"/>

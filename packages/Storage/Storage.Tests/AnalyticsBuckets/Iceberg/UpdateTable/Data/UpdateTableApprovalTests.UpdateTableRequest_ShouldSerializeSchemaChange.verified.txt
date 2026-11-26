@@ -1,0 +1,1 @@
+﻿{"requirements":[],"updates":[{"action":"add-schema","schema":{"type":"struct","fields":[{"id":1,"name":"id","type":"long","required":true},{"id":3,"name":"country","type":"string","required":false}]}},{"action":"set-current-schema","schema-id":-1}]}
