@@ -36,7 +36,7 @@ public class DiagnosticLoggingWiringTests
             factory.Received(1).CreateLogger("supabase.gotrue");
             factory.Received(1).CreateLogger("supabase.postgrest");
             factory.Received(1).CreateLogger("supabase.functions");
-            factory.Received(1).CreateLogger("Supabase.Realtime");
+            factory.Received(1).CreateLogger("supabase.realtime");
             factory.Received(1).CreateLogger("supabase.storage");
         }
     }

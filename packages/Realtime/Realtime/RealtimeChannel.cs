@@ -308,7 +308,7 @@ public class RealtimeChannel : IRealtimeChannel
     private void NotifyStateChanged(ChannelState state, bool shouldRejoin = true)
     {
         this.State = state;
-        this.Options.ClientOptions.Logger.BackgroundWorkEvent("Supabase.Realtime", $"channel {this.Topic} {state}");
+        this.Options.ClientOptions.Logger.BackgroundWorkEvent(RealtimeLogging.Category, $"channel {this.Topic} {state}");
 
         this.isRejoining = shouldRejoin;
         if (shouldRejoin)

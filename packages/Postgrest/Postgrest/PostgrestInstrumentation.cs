@@ -32,8 +32,7 @@ internal static class PostgrestInstrumentation
     private static readonly Meter Meter =
         Instrumentation.CreateMeter(typeof(PostgrestInstrumentation).Assembly, PostgrestDiagnostics.SourceName);
 
-    private static readonly Histogram<double> RequestDuration = Meter.CreateHistogram<double>(
-        "http.client.request.duration", "s", "Duration of HTTP client requests.");
+    private static readonly HttpClientRequestDuration RequestDuration = HttpClientRequestDuration.On(Meter);
 
     /// <summary>
     /// Maps an HTTP method and the request flags to the logical Postgrest operation name.
@@ -87,14 +86,14 @@ internal static class PostgrestInstrumentation
     /// <param name="startTimestamp">The <see cref="Stopwatch.GetTimestamp"/> value captured before the request.</param>
     internal static void RecordRequest(HttpMethod method, Uri uri, PostgrestCall call, int? statusCode, string? errorType, long startTimestamp)
     {
-        var tags = new TagList
-        {
-            { "http.request.method", method.Method },
-            { "server.address", uri.Host },
-            { "server.port", uri.Port },
-            { "url.scheme", uri.Scheme },
-            { OperationTag, call.Operation }
-        };
+        if (RequestDuration.Enabled)
+            RequestDuration.Record(startTimestamp, RequestTags(method, uri, call, statusCode, errorType));
+    }
+
+    private static TagList RequestTags(HttpMethod method, Uri uri, PostgrestCall call, int? statusCode, string? errorType)
+    {
+        var tags = HttpClientRequestDuration.TagsOf(method, uri, statusCode, errorType);
+        tags.Add(OperationTag, call.Operation);
 
         if (call.Table != null)
             tags.Add(TableTag, call.Table);
@@ -102,15 +101,6 @@ internal static class PostgrestInstrumentation
         if (call.Function != null)
             tags.Add(FunctionTag, call.Function);
 
-        if (statusCode.HasValue)
-            tags.Add("http.response.status_code", statusCode.Value);
-
-        if (errorType != null)
-            tags.Add("error.type", errorType);
-
-        RequestDuration.Record(GetElapsedSeconds(startTimestamp), tags);
+        return tags;
     }
-
-    private static double GetElapsedSeconds(long startTimestamp) =>
-        (Stopwatch.GetTimestamp() - startTimestamp) / (double) Stopwatch.Frequency;
 }

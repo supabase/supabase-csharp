@@ -112,8 +112,9 @@ Once subscribed you get:
   (method, status code, and a sanitized URL — the query string is never recorded, and neither is the
   request body). A `faas.invoked_name` tag carries the invoked function name. A relay error is
   reported as a failed span even when the HTTP status is a success.
-- A `supabase.functions.invoke.duration` histogram (seconds), tagged with method, host, path,
-  function name, and status code.
+- The standard `http.client.request.duration` histogram (seconds) on the `supabase.functions` meter,
+  tagged with method, server address and port, scheme, status code, error type and
+  `faas.invoked_name`. It carries no URL.
 
 If you are not using the OpenTelemetry SDK, a raw listener works too:
 

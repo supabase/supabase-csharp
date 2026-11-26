@@ -221,7 +221,7 @@ public class Client : ISupabaseClient<User, Session, RealtimeSocket, RealtimeCha
             Parameters = { ApiKey = this.supabaseKey },
             PostgrestClient = this.postgrest,
             WebSocketFactory = this.options.WebSocketFactory,
-            Logger = this.options.LoggerFor(SupabaseOptions.RealtimeLoggerCategory),
+            Logger = this.options.LoggerFor(Supabase.Realtime.RealtimeLogging.Category),
             TimeProvider = this.options.TimeProvider,
             RetrieveAccessToken = ThirdPartyAuthorization.RealtimeAccessToken(thirdPartyAccessToken, this.supabaseKey)
         };

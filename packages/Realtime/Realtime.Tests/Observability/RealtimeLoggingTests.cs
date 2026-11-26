@@ -42,7 +42,7 @@ public class RealtimeLoggingTests
     public async Task ConnectAsync_ShouldLogTheConnectionAtDebug()
     {
         await this.ClientOver(new FakeWebsocketClient { OpenOnStart = true }).ConnectAsync();
-        this.Messages().Should().Contain("Supabase.Realtime: connected");
+        this.Messages().Should().Contain("supabase.realtime: connected");
     }
 
     [TestMethod]
@@ -51,7 +51,7 @@ public class RealtimeLoggingTests
         var realtime = this.ClientOver(new FakeWebsocketClient { OpenOnStart = true, AnswerJoins = true });
         await realtime.ConnectAsync();
         await realtime.Channel("room").Subscribe();
-        this.Messages().Should().Contain("Supabase.Realtime: channel realtime:room Joined", "a channel's state change is a lifecycle diagnostic");
+        this.Messages().Should().Contain("supabase.realtime: channel realtime:room Joined", "a channel's state change is a lifecycle diagnostic");
     }
 
     [TestMethod]
@@ -71,9 +71,9 @@ public class RealtimeLoggingTests
         socket.RecoverFromLostConnection();
         using (new AssertionScope())
         {
-            this.Messages().Should().Contain(message => message.StartsWith("Supabase.Realtime: disconnected", StringComparison.Ordinal), "the drop is a lifecycle diagnostic");
-            this.Messages().Should().Contain("Supabase.Realtime: reconnection attempt scheduled", "the next attempt is a lifecycle diagnostic");
-            this.Messages().Should().Contain(message => message.StartsWith("Supabase.Realtime: reconnection ", StringComparison.Ordinal) && !message.EndsWith("scheduled", StringComparison.Ordinal),
+            this.Messages().Should().Contain(message => message.StartsWith("supabase.realtime: disconnected", StringComparison.Ordinal), "the drop is a lifecycle diagnostic");
+            this.Messages().Should().Contain("supabase.realtime: reconnection attempt scheduled", "the next attempt is a lifecycle diagnostic");
+            this.Messages().Should().Contain(message => message.StartsWith("supabase.realtime: reconnection ", StringComparison.Ordinal) && !message.EndsWith("scheduled", StringComparison.Ordinal),
                 "the recovery is a lifecycle diagnostic");
         }
     }
@@ -82,8 +82,8 @@ public class RealtimeLoggingTests
     public async Task Socket_ShouldLogTheHeartbeatTimeoutAtDebug_GivenNoReply()
     {
         await this.ClientOver(new FakeWebsocketClient { OpenOnStart = true }).ConnectAsync();
-        await WaitUntil(() => this.Messages().Contains("Supabase.Realtime: heartbeat timed out, reconnecting"));
-        this.Messages().Should().Contain("Supabase.Realtime: heartbeat timed out, reconnecting");
+        await WaitUntil(() => this.Messages().Contains("supabase.realtime: heartbeat timed out, reconnecting"));
+        this.Messages().Should().Contain("supabase.realtime: heartbeat timed out, reconnecting");
     }
 
     [TestMethod]
@@ -94,7 +94,7 @@ public class RealtimeLoggingTests
             () => ++calls == 1 ? Task.FromResult<string?>("first") : throw new InvalidOperationException("secret-detail")).ConnectAsync();
         await WaitUntil(() => this.capture.Records.Any(record => record.Level == LogLevel.Warning));
         this.capture.Records.First(record => record.Level == LogLevel.Warning).Message.Should()
-            .Be("Supabase.Realtime: Access token refresh on heartbeat failed with InvalidOperationException", "a heartbeat has no caller to throw to");
+            .Be("supabase.realtime: Access token refresh on heartbeat failed with InvalidOperationException", "a heartbeat has no caller to throw to");
     }
 
     private static async Task WaitUntil(Func<bool> condition)

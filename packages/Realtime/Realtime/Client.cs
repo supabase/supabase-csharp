@@ -345,7 +345,7 @@ public class Client : IRealtimeClient<RealtimeSocket, RealtimeChannel>
     {
         var failure = refresh.Exception!.InnerException!;
         Debugger.Instance.Log(this, failure.Message, failure);
-        this.Options.Logger.BackgroundWorkFailed("Supabase.Realtime", "Access token refresh on heartbeat", failure);
+        this.Options.Logger.BackgroundWorkFailed(RealtimeLogging.Category, "Access token refresh on heartbeat", failure);
     }
 
     private async Task RefreshAuthAsync()
