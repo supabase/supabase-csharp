@@ -915,6 +915,10 @@ features:
     status: implemented
     symbols:
       - StorageBucketApi.GetBucketLifecycleAsync
+  storage.file_buckets.update_bucket_lifecycle:
+    status: implemented
+    symbols:
+      - StorageBucketApi.UpdateBucketLifecycleAsync
   storage.file_buckets.delete_bucket_lifecycle:
     status: implemented
     symbols:
