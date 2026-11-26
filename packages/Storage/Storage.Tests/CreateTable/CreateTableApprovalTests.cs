@@ -19,7 +19,7 @@ namespace Storage.Tests.CreateTable;
 [TestCategory("Contract")]
 public class CreateTableApprovalTests : RequestApprovalFixture
 {
-    private static readonly IcebergTable Events = IcebergTable.Of(IcebergNamespace.Of("sales"), "events");
+    private static readonly IcebergTable Events = IcebergNamespace.Of("sales").Table("events");
 
     [TestMethod]
     public async Task CreateTableRequest_ShouldSerializeToExpectedPayload()

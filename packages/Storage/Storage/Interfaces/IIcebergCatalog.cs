@@ -123,7 +123,7 @@ public interface IIcebergCatalog
     /// <example>
     /// <code>
     /// var catalog = storage.Analytics.From("analytics-data");
-    /// var events = IcebergTable.Of(IcebergNamespace.Of("sales"), "events");
+    /// var events = IcebergNamespace.Of("sales").Table("events");
     /// var metadata = await catalog.CreateTableAsync(
     ///     events,
     ///     new IcebergSchema
@@ -161,7 +161,7 @@ public interface IIcebergCatalog
     /// <example>
     /// <code>
     /// var catalog = storage.Analytics.From("analytics-data");
-    /// var exists = await catalog.TableExistsAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), "events"));
+    /// var exists = await catalog.TableExistsAsync(IcebergNamespace.Of("sales").Table("events"));
     /// </code>
     /// </example>
     [ImplementedCapability("storage.analytics.table_exists")]
@@ -183,7 +183,7 @@ public interface IIcebergCatalog
     /// <example>
     /// <code>
     /// var catalog = storage.Analytics.From("analytics-data");
-    /// var metadata = await catalog.LoadTableAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), "events"));
+    /// var metadata = await catalog.LoadTableAsync(IcebergNamespace.Of("sales").Table("events"));
     /// foreach (var column in metadata.CurrentSchema.Fields)
     ///     Console.WriteLine($"{column.Name}: {column.Type}");
     /// </code>
@@ -208,7 +208,7 @@ public interface IIcebergCatalog
     /// <code>
     /// var catalog = storage.Analytics.From("analytics-data");
     /// await catalog.DeleteTableAsync(
-    ///     IcebergTable.Of(IcebergNamespace.Of("sales"), "events"),
+    ///     IcebergNamespace.Of("sales").Table("events"),
     ///     new DeleteTableOptions { Purge = true });
     /// </code>
     /// </example>

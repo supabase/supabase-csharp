@@ -28,7 +28,7 @@ namespace Storage.Tests.LoadTable;
 public class LoadTableContractTests
 {
     private const string TablePath = "/storage/v1/iceberg/v1/analytics-data/namespaces/sales/tables/events";
-    private static readonly IcebergTable Events = IcebergTable.Of(IcebergNamespace.Of("sales"), "events");
+    private static readonly IcebergTable Events = IcebergNamespace.Of("sales").Table("events");
     private WireMockServer server = null!;
     private Client client = null!;
 
@@ -73,7 +73,7 @@ public class LoadTableContractTests
     public async Task LoadTableAsync_ShouldEscapeTheTableNameAsOneSegment()
     {
         this.Respond("/storage/v1/iceberg/v1/*", 200, Fixture("TableLoaded.json"));
-        await this.Catalog().LoadTableAsync(IcebergTable.Of(IcebergNamespace.Of("sales", "europe"), "a/b?c#d"));
+        await this.Catalog().LoadTableAsync(IcebergNamespace.Of("sales", "europe").Table("a/b?c#d"));
         this.server.LogEntries.Should().ContainSingle().Which.RequestMessage!.Url
             .Should().EndWith("/namespaces/sales%1Feurope/tables/a%2Fb%3Fc%23d", "a name must not start a path segment, query or fragment");
     }
