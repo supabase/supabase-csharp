@@ -625,16 +625,16 @@ public class RealtimeChannel : IRealtimeChannel
     /// <summary>
     /// Sends a push and returns the server's reply, or null when the server sends none.
     /// </summary>
-    internal Task<SocketResponse?> SendForReply(ChannelEventName eventName, string? type, object payload, int timeoutMs)
+    internal Task<SocketResponse?> SendForReply(ChannelEventName eventName, string? type, object payload, int timeoutMs, CancellationToken cancellationToken = default)
     {
         var push = this.Push(Core.Helpers.GetMappedToAttr(eventName).Mapping, type, payload, timeoutMs);
-        // The server only sends a `phx_reply` for a `broadcast` push when the channel joined
-        // with `config.broadcast.ack = true`. Without that, no reply will ever arrive, so
-        // waiting for one would hang forever - resolve as soon as the push has been dispatched.
-        return eventName == ChannelEventName.Broadcast && this.BroadcastOptions?.BroadcastAck != true
-            ? Task.FromResult<SocketResponse?>(null)
-            : PushAwaiter.Await(push);
+        return this.ServerReplies(eventName)
+            ? PushAwaiter.ReplyAsync(push, cancellationToken)
+            : Task.FromResult<SocketResponse?>(null);
     }
+
+    private bool ServerReplies(ChannelEventName eventName) =>
+        eventName != ChannelEventName.Broadcast || this.BroadcastOptions?.BroadcastAck == true;
 
     private static async Task<bool> IsOk(Task<SocketResponse?> sending)
     {
@@ -649,12 +649,7 @@ public class RealtimeChannel : IRealtimeChannel
 
     /// <inheritdoc />
     [ImplementedCapability("realtime.channel.broadcast_persist")]
-    public Task HttpSendAsync(string eventName, object payload, BroadcastPersistence persistence) =>
-        this.HttpSendAsync(eventName, payload, persistence, CancellationToken.None);
-
-    /// <inheritdoc />
-    [ImplementedCapability("realtime.channel.broadcast_persist")]
-    public Task HttpSendAsync(string eventName, object payload, BroadcastPersistence persistence, CancellationToken cancellationToken)
+    public Task HttpSendPersistedAsync(string eventName, object payload, BroadcastPersistence persistence, CancellationToken cancellationToken = default)
     {
         this.EnsureCanPersist(persistence);
         return this.Socket.HttpSendAsync(this, eventName, payload, persistence, cancellationToken);
@@ -669,8 +664,8 @@ public class RealtimeChannel : IRealtimeChannel
     }
 
     /// <summary>
-    /// Awaits a reply for a given <see cref="Channel.Push"/>, resolving with the reply, or faulting with a
-    /// <see cref="RealtimeException"/> if the push times out first.
+    /// Awaits a reply for a given <see cref="Channel.Push"/>, resolving with the reply, faulting with a
+    /// <see cref="RealtimeException"/> if the push times out first, or cancelled when the caller cancels first.
     ///
     /// Kept as instance methods (rather than local lambdas referencing each other) so there's no
     /// self/mutually-referencing closure over locals that get assigned after the closure is created.
@@ -689,7 +684,12 @@ public class RealtimeChannel : IRealtimeChannel
                 this.HandleMessageReceived(this.push, reply);
         }
 
-        public static Task<SocketResponse?> Await(Push push) => new PushAwaiter(push).taskCompletion.Task;
+        public static async Task<SocketResponse?> ReplyAsync(Push push, CancellationToken cancellationToken)
+        {
+            var awaiter = new PushAwaiter(push);
+            using var stopWaiting = cancellationToken.Register(() => awaiter.taskCompletion.TrySetCanceled(cancellationToken));
+            return await awaiter.taskCompletion.Task.ConfigureAwait(false);
+        }
 
         private void HandleMessageReceived(IRealtimePush<RealtimeChannel, SocketResponse> sender, SocketResponse message)
         {
