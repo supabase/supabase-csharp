@@ -38,8 +38,10 @@ namespace Storage.Tests.Files
         // defaults the content type, so this is the key a resume looks up.
         private const string CacheKey = "bucket/a.bin/text/plain;charset=UTF-8";
         private const string ResumablePath = "/storage/v1/upload/resumable";
+        private const string CacheSeconds = "1234";
 
         private static readonly byte[] Payload = { 0x1, 0x2, 0x3 };
+        private static readonly string EncodedCacheSeconds = Convert.ToBase64String(Encoding.UTF8.GetBytes(CacheSeconds));
 
         private WireMockServer server = null!;
         private Client client = null!;
@@ -114,9 +116,25 @@ namespace Storage.Tests.Files
             await File.WriteAllBytesAsync(path, Payload);
             await this.client.From(Bucket).UploadOrResume(path, FileName, new FileOptions { Metadata = new Dictionary<string, string> { ["k"] = "v" } });
             File.Delete(path);
-            var uploadMetadata = this.server.LogEntries.Single(entry => entry.RequestMessage!.Method == "POST").RequestMessage!.Headers!["Upload-Metadata"].ToString();
             var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes("""{"k":"v"}"""));
-            uploadMetadata.Should().Contain($",metadata {encoded}", "a resumable upload stores only the metadata sent in Upload-Metadata");
+            this.SentUploadMetadata().Should().Contain($",metadata {encoded}", "a resumable upload stores only the metadata sent in Upload-Metadata");
+        }
+
+        [TestMethod]
+        public async Task UploadOrResume_ShouldSendCacheControlInTheUploadMetadata_GivenLocalFile()
+        {
+            var path = Path.GetTempFileName();
+            await File.WriteAllBytesAsync(path, Payload);
+            await this.client.From(Bucket).UploadOrResume(path, FileName, new FileOptions { CacheControl = CacheSeconds });
+            File.Delete(path);
+            this.SentUploadMetadata().Should().Contain($"cacheControl {EncodedCacheSeconds}", "a resumable upload takes its cache control only from Upload-Metadata");
+        }
+
+        [TestMethod]
+        public async Task UploadOrResume_ShouldSendCacheControlInTheUploadMetadata_GivenBytes()
+        {
+            await this.client.From(Bucket).UploadOrResume(Payload, FileName, new FileOptions { CacheControl = CacheSeconds });
+            this.SentUploadMetadata().Should().Contain($"cacheControl {EncodedCacheSeconds}", "a resumable upload takes its cache control only from Upload-Metadata");
         }
 
         [TestMethod]
@@ -211,5 +229,8 @@ namespace Storage.Tests.Files
             this.server.LogEntries
                 .Where(entry => entry.RequestMessage!.Method == method)
                 .Select(entry => entry.RequestMessage!.Path);
+
+        private string SentUploadMetadata() =>
+            this.server.LogEntries.Single(entry => entry.RequestMessage!.Method == "POST").RequestMessage!.Headers!["Upload-Metadata"].ToString();
     }
 }

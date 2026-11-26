@@ -939,6 +939,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             ["bucketName"] = this.BucketId,
             ["objectName"] = fileName,
             ["contentType"] = options.ContentType,
+            ["cacheControl"] = options.CacheControl,
         };
 
         if (options.Upsert)
@@ -987,6 +988,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             ["bucketName"] = this.BucketId,
             ["objectName"] = fileName,
             ["contentType"] = options.ContentType,
+            ["cacheControl"] = options.CacheControl,
         };
 
         if (options.Upsert)
