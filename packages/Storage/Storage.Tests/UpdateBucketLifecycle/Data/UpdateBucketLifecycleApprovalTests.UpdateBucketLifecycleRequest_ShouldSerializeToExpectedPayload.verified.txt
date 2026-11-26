@@ -1,0 +1,1 @@
+﻿{"rules":[{"id":"keep-two","status":"Enabled","filter":{},"noncurrentVersionExpiration":{"noncurrentDays":30,"newerNoncurrentVersions":2}},{"status":"Disabled","filter":{},"noncurrentVersionExpiration":{"noncurrentDays":7}}]}

@@ -65,5 +65,25 @@ namespace Supabase.Storage.Interfaces
 		/// </code>
 		/// </example>
 		Task<BucketLifecycle> GetBucketLifecycleAsync(string id, CancellationToken cancellationToken = default);
+
+		/// <summary>
+		/// Replaces the lifecycle policy of a bucket and returns it as stored, with the rule ids the service generated.
+		/// </summary>
+		/// <example>
+		/// <code>
+		/// var stored = await storage.UpdateBucketLifecycleAsync("avatars", new BucketLifecycle
+		/// {
+		///     Rules = new[]
+		///     {
+		///         new LifecycleRule
+		///         {
+		///             Status = LifecycleRuleStatus.Enabled,
+		///             NoncurrentVersionExpiration = new NoncurrentVersionExpiration { NoncurrentDays = 30 },
+		///         },
+		///     },
+		/// });
+		/// </code>
+		/// </example>
+		Task<BucketLifecycle> UpdateBucketLifecycleAsync(string id, BucketLifecycle lifecycle, CancellationToken cancellationToken = default);
 	}
 }
