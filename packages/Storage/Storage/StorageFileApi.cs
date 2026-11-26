@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Web;
 using BirdMessenger.Collections;
 using Supabase.Core.Attributes;
+using Supabase.Storage.Common;
 using Supabase.Storage.Exceptions;
 using Supabase.Storage.Extensions;
 using Supabase.Storage.Interfaces;
@@ -155,11 +156,11 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         if (transformOptions is null or { IsEmpty: true })
         {
             var queryParamsString = queryParams.ToString();
-            return $"{this.Url}/object/public/{this.GetFinalPath(path)}?{queryParamsString}";
+            return $"{this.Url}/object/public/{this.EscapeForRequestUrl(path, nameof(path))}?{queryParamsString}";
         }
 
         queryParams.Add(transformOptions.ToQueryCollection());
-        var builder = new UriBuilder($"{this.Url}/render/image/public/{this.GetFinalPath(path)}")
+        var builder = new UriBuilder($"{this.Url}/render/image/public/{this.EscapeForRequestUrl(path, nameof(path))}")
         {
             Query = queryParams.ToString(),
         };
@@ -184,7 +185,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     )
     {
         var body = new Dictionary<string, object?> { { "expiresIn", expiresIn } };
-        var url = $"{this.Url}/object/sign/{this.GetFinalPath(path)}";
+        var url = $"{this.Url}/object/sign/{this.EscapeForRequestUrl(path, nameof(path))}";
 
         if (transformOptions is { IsEmpty: false })
         {
@@ -320,7 +321,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
             this.requestClient,
             this.Options,
             HttpMethod.Get,
-            $"{this.Url}/object/info/{this.BucketId}/{path}",
+            $"{this.Url}/object/info/{this.EscapeForRequestUrl(path, nameof(path))}",
             null,
             this.Headers
         );
@@ -700,8 +701,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     {
         var url =
             transformOptions is { IsEmpty: false }
-                ? $"{this.Url}/render/image/authenticated/{this.GetFinalPath(supabasePath)}"
-                : $"{this.Url}/object/{this.GetFinalPath(supabasePath)}";
+                ? $"{this.Url}/render/image/authenticated/{this.EscapeForRequestUrl(supabasePath, nameof(supabasePath))}"
+                : $"{this.Url}/object/{this.EscapeForRequestUrl(supabasePath, nameof(supabasePath))}";
         return this.DownloadFile(url, localPath, transformOptions, onProgress, cancellationToken, cacheNonce);
     }
 
@@ -743,7 +744,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         string? cacheNonce = null
     )
     {
-        var url = $"{this.Url}/object/{this.GetFinalPath(supabasePath)}";
+        var url = $"{this.Url}/object/{this.EscapeForRequestUrl(supabasePath, nameof(supabasePath))}";
         return this.DownloadBytes(url, transformOptions, onProgress, cancellationToken, cacheNonce);
     }
 
@@ -845,9 +846,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     [ImplementedCapability("storage.file_buckets.create_signed_upload_url")]
     public async Task<UploadSignedUrl> CreateUploadSignedUrl(string supabasePath)
     {
-        var path = this.GetFinalPath(supabasePath);
-
-        var url = $"{this.Url}/object/upload/sign/{path}";
+        var url = $"{this.Url}/object/upload/sign/{this.EscapeForRequestUrl(supabasePath, nameof(supabasePath))}";
         var response = await Helpers.MakeRequestAsync<CreatedUploadSignedUrlResponse>(
             this.requestClient,
             this.Options,
@@ -881,7 +880,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         CancellationToken cancellationToken = default
     )
     {
-        var url = options.ToPurgeUrl($"{this.Url}/cdn/{Helpers.EncodePath(this.GetFinalPath(path))}");
+        var url = options.ToPurgeUrl($"{this.Url}/cdn/{this.EscapeForRequestUrl(path, nameof(path))}");
         return Helpers.MakeRequestAsync<GenericResponse>(this.requestClient, this.Options, HttpMethod.Delete, url, null, this.Headers, cancellationToken);
     }
 
@@ -893,7 +892,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         CancellationToken cancellationToken = default
     )
     {
-        var uri = new Uri($"{this.Url}/object/{this.GetFinalPath(supabasePath)}");
+        var uri = new Uri($"{this.Url}/object/{this.EscapeForRequestUrl(supabasePath, nameof(supabasePath))}");
 
         var headers = new Header();
         headers.Add(await Helpers.AuthorizeAsync(this.Options, this.StorageHeader.Get(), cancellationToken).ConfigureAwait(false));
@@ -1033,7 +1032,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         CancellationToken cancellationToken = default
     )
     {
-        var uri = new Uri($"{this.Url}/object/{this.GetFinalPath(supabasePath)}");
+        var uri = new Uri($"{this.Url}/object/{this.EscapeForRequestUrl(supabasePath, nameof(supabasePath))}");
 
         var headers = new Header();
         headers.Add(await Helpers.AuthorizeAsync(this.Options, this.StorageHeader.Get(), cancellationToken).ConfigureAwait(false));
@@ -1139,5 +1138,7 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     }
 
     private string GetFinalPath(string path) => $"{this.BucketId}/{path}";
+
+    private string EscapeForRequestUrl(string key, string paramName) => PathSegment.EscapeObjectPath(this.GetFinalPath(key), paramName);
 }
 

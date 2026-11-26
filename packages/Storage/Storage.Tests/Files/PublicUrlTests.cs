@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -42,6 +43,27 @@ public class PublicUrlTests
         url.Should().StartWith($"{BaseUrl}/object/public/bucket/a.png").And.NotContain("/render/image/",
             "an empty TransformOptions requests no transform, so it must not route to the render endpoint (issue #37)");
     }
+
+    [TestMethod]
+    public void GetPublicUrl_ShouldEncodeEachSegment_GivenAKeyWithUrlDelimiters() =>
+        new Uri(Bucket().GetPublicUrl("folder/a?b#c.png", null)).AbsolutePath.Should().EndWith("/object/public/bucket/folder/a%3Fb%23c.png");
+
+    [TestMethod]
+    public void GetPublicUrl_ShouldEncodeEachSegment_GivenAKeyWithUrlDelimitersAndATransform() =>
+        new Uri(Bucket().GetPublicUrl("folder/a?b#c.png", new TransformOptions { Width = 100 })).AbsolutePath
+            .Should().EndWith("/render/image/public/bucket/folder/a%3Fb%23c.png");
+
+    [TestMethod]
+    public void GetPublicUrl_ShouldResolveInsideTheBucket_GivenADotSegmentThatStaysInIt() =>
+        new Uri(Bucket().GetPublicUrl("a/../b", null)).AbsolutePath.Should().EndWith("/object/public/bucket/b");
+
+    [TestMethod]
+    public void GetPublicUrl_ShouldThrow_GivenAKeyClimbingAboveItsBucket() =>
+        FluentActions.Invoking(() => Bucket().GetPublicUrl("../b", null)).Should().Throw<ArgumentException>().WithParameterName("path");
+
+    [TestMethod]
+    public void GetPublicUrl_ShouldThrow_GivenAKeyClimbingAboveItsBucketAndATransform() =>
+        FluentActions.Invoking(() => Bucket().GetPublicUrl("../b", new TransformOptions { Width = 100 })).Should().Throw<ArgumentException>();
 
     [TestMethod]
     public void GetPublicUrl_ShouldAppendDownloadName_GivenDownloadOptions()
