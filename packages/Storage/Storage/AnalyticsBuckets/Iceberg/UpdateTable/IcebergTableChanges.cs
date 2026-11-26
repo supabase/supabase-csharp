@@ -25,11 +25,11 @@ public sealed record IcebergTableChanges
     /// </summary>
     public IcebergTableMetadata? BasedOn { get; init; }
 
-    private bool ChangesNothing => this.Schema is null && this.PartitionSpec is null;
+    private bool HasChanges() => this.Schema is not null || this.PartitionSpec is not null;
 
-    internal void RequireAChange(string parameterName)
+    internal void HasChangesOrThrow(string parameterName)
     {
-        if (this.ChangesNothing)
+        if (!this.HasChanges())
             throw new ArgumentException("The changes need a schema, a partition spec or both.", parameterName);
     }
 }
