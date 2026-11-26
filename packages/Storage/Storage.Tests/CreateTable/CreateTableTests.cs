@@ -16,7 +16,7 @@ namespace Storage.Tests.CreateTable;
 [TestCategory("Unit")]
 public class CreateTableTests
 {
-    private static readonly IcebergTable Events = IcebergTable.Of(IcebergNamespace.Of("sales"), "events");
+    private static readonly IcebergTable Events = IcebergNamespace.Of("sales").Table("events");
     private static readonly IcebergSchema Schema = new() { Fields = Array.Empty<IcebergField>() };
     private readonly Client sut = new("http://localhost:1/storage/v1");
 
@@ -34,7 +34,7 @@ public class CreateTableTests
 
     [TestMethod]
     public async Task CreateTableAsync_ShouldThrowArgumentException_GivenRelativeSegmentNamespace() =>
-        await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").CreateTableAsync(IcebergTable.Of(IcebergNamespace.Of(".."), "events"), Schema))
+        await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").CreateTableAsync(IcebergNamespace.Of("..").Table("events"), Schema))
             .Should().ThrowAsync<ArgumentException>("a dot-segment level would reach another route")
             .WithMessage("A namespace cannot be a relative path segment.*");
 

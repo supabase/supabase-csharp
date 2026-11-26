@@ -7,7 +7,8 @@ using Supabase.Storage.Common;
 namespace Storage.Tests.Common;
 
 /// <summary>
-/// Unit tests for building the identifier of a namespace: which levels it refuses and how two identifiers compare.
+/// Unit tests for building the identifier of a namespace and of its tables: which arguments it refuses and how two
+/// identifiers compare. Table names are validated by the service.
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
@@ -100,4 +101,18 @@ public class IcebergNamespaceTests
             .Should().Throw<ArgumentException>("a dot-segment namespace would reach another route")
             .WithMessage("A namespace cannot be a relative path segment.*")
             .Which.ParamName.Should().Be("namespace");
+
+    [TestMethod]
+    public void Table_ShouldKeepNamespaceAndName() =>
+        IcebergNamespace.Of("sales").Table("events").Should().Match<IcebergTable>(table =>
+            table.Namespace == IcebergNamespace.Of("sales") && table.Name == "events");
+
+    [TestMethod]
+    public void Table_ShouldThrowArgumentNullException_GivenNoName() =>
+        FluentActions.Invoking(() => IcebergNamespace.Of("sales").Table(null!))
+            .Should().Throw<ArgumentNullException>().Which.ParamName.Should().Be("name");
+
+    [TestMethod]
+    public void Table_ShouldAcceptBlankName() =>
+        IcebergNamespace.Of("sales").Table(" ").Name.Should().Be(" ", "the service, not the SDK, judges the name");
 }
