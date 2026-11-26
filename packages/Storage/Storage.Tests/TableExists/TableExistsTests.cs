@@ -1,0 +1,43 @@
+using System;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Supabase.Storage;
+using Supabase.Storage.Common;
+
+namespace Storage.Tests.TableExists;
+
+/// <summary>
+/// Unit tests for the checks made before the wire when checking that a table exists: a missing table, and a name that
+/// would change the route.
+/// </summary>
+[TestClass]
+[TestCategory("Unit")]
+public class TableExistsTests
+{
+    private readonly Client sut = new("http://localhost:1/storage/v1");
+
+    [TestMethod]
+    public async Task TableExistsAsync_ShouldThrowArgumentNullException_GivenNoTable() =>
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").TableExistsAsync(null!))
+            .Should().ThrowAsync<ArgumentNullException>("there is no table to look for"))
+            .Which.ParamName.Should().Be("table");
+
+    [TestMethod]
+    [DataRow("")]
+    [DataRow("   ")]
+    public async Task TableExistsAsync_ShouldThrowArgumentException_GivenBlankName(string name) =>
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").TableExistsAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), name)))
+            .Should().ThrowAsync<ArgumentException>("a blank name would reach the route that lists tables")
+            .WithMessage("A table name must be provided.*"))
+            .Which.ParamName.Should().Be("table");
+
+    [TestMethod]
+    [DataRow(".")]
+    [DataRow("..")]
+    public async Task TableExistsAsync_ShouldThrowArgumentException_GivenRelativeSegmentName(string name) =>
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").TableExistsAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), name)))
+            .Should().ThrowAsync<ArgumentException>("a dot-segment name would reach another route")
+            .WithMessage("A table name cannot be a relative path segment.*"))
+            .Which.ParamName.Should().Be("table");
+}

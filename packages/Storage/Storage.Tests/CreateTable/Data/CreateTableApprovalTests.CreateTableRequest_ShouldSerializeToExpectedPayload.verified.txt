@@ -1,0 +1,1 @@
+﻿{"name":"events","schema":{"type":"struct","fields":[{"id":1,"name":"id","type":"long","required":true}]}}

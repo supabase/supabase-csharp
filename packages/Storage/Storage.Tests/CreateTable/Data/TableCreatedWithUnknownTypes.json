@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "format-version": 3,
+    "table-uuid": "b734865e-f9a5-4654-8b0b-e15683fcb195",
+    "location": "s3://analytics-data/sales/events",
+    "current-schema-id": 0,
+    "schemas": [
+      {
+        "type": "struct",
+        "schema-id": 0,
+        "fields": [
+          { "id": 1, "name": "payload", "type": "variant", "required": false },
+          { "id": 2, "name": "shape", "type": { "type": "geometry", "crs": "srid:4326" }, "required": false }
+        ]
+      }
+    ],
+    "default-spec-id": 0,
+    "partition-specs": [ { "spec-id": 0, "fields": [ { "source-id": 1, "field-id": 1000, "name": "payload_zorder", "transform": "zorder" } ] } ]
+  }
+}
