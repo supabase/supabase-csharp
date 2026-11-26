@@ -4,6 +4,7 @@ using Supabase.Core.Attributes;
 using Supabase.Storage.Common;
 using Supabase.Storage.CreateNamespace;
 using Supabase.Storage.CreateTable;
+using Supabase.Storage.DeleteTable;
 using Supabase.Storage.ListNamespaces;
 
 namespace Supabase.Storage.Interfaces;
@@ -143,4 +144,28 @@ public interface IIcebergCatalog
     /// </example>
     [ImplementedCapability("storage.analytics.create_table")]
     Task<IcebergTableMetadata> CreateTableAsync(IcebergTable table, IcebergSchema schema, CreateTableOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes an Iceberg table from its namespace.
+    /// </summary>
+    /// <param name="table">The table to delete.</param>
+    /// <param name="options">Whether to also delete the table's files. When null, the service's default applies.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <exception cref="System.ArgumentNullException"><paramref name="table"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the table, its namespace or its bucket does not exist
+    /// (status 404, <c>Code</c> <c>NoSuchTableException</c>, <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>)
+    /// or the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// await catalog.DeleteTableAsync(
+    ///     IcebergTable.Of(IcebergNamespace.Of("sales"), "events"),
+    ///     new DeleteTableOptions { Purge = true });
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.delete_table")]
+    Task DeleteTableAsync(IcebergTable table, DeleteTableOptions? options = null, CancellationToken cancellationToken = default);
 }

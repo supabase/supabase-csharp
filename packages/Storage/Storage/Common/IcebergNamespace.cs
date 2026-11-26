@@ -52,6 +52,8 @@ public sealed record IcebergNamespace
 
     internal string Joined() => string.Join(LevelSeparator.ToString(), this.Levels);
 
+    internal string Path => $"namespaces/{PathSegment.Escape(this.Joined(), "A namespace", "namespace")}";
+
     private static void RejectMissing(string[]? levels)
     {
         if (levels is null)

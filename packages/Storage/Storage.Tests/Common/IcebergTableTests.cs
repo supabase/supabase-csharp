@@ -43,4 +43,27 @@ public class IcebergTableTests
     [TestMethod]
     public void Equals_ShouldBeFalse_GivenDifferentName() =>
         IcebergTable.Of(IcebergNamespace.Of("sales"), "events").Should().NotBe(IcebergTable.Of(IcebergNamespace.Of("sales"), "orders"));
+
+    [TestMethod]
+    public void Path_ShouldNestTheEscapedNameUnderTheTablesOfItsNamespace() =>
+        IcebergTable.Of(IcebergNamespace.Of("sales", "europe"), "a/b?c#d").Path
+            .Should().Be("namespaces/sales%1Feurope/tables/a%2Fb%3Fc%23d", "a name must not start a path segment, query or fragment");
+
+    [TestMethod]
+    [DataRow("")]
+    [DataRow("   ")]
+    public void Path_ShouldThrowArgumentException_GivenBlankName(string name) =>
+        FluentActions.Invoking(() => IcebergTable.Of(IcebergNamespace.Of("sales"), name).Path)
+            .Should().Throw<ArgumentException>("a blank name would reach the route of the namespace's tables")
+            .WithMessage("A table name must be provided.*")
+            .Which.ParamName.Should().Be("table");
+
+    [TestMethod]
+    [DataRow(".")]
+    [DataRow("..")]
+    public void Path_ShouldThrowArgumentException_GivenRelativeSegmentName(string name) =>
+        FluentActions.Invoking(() => IcebergTable.Of(IcebergNamespace.Of("sales"), name).Path)
+            .Should().Throw<ArgumentException>("a dot-segment name would reach another route")
+            .WithMessage("A table name cannot be a relative path segment.*")
+            .Which.ParamName.Should().Be("table");
 }

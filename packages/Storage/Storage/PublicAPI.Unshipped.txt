@@ -80,6 +80,9 @@ override Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.ToString() -> 
 override Supabase.Storage.CreateTable.CreateTableOptions.Equals(object? obj) -> bool
 override Supabase.Storage.CreateTable.CreateTableOptions.GetHashCode() -> int
 override Supabase.Storage.CreateTable.CreateTableOptions.ToString() -> string!
+override Supabase.Storage.DeleteTable.DeleteTableOptions.Equals(object? obj) -> bool
+override Supabase.Storage.DeleteTable.DeleteTableOptions.GetHashCode() -> int
+override Supabase.Storage.DeleteTable.DeleteTableOptions.ToString() -> string!
 override Supabase.Storage.GetVectorIndex.VectorIndexDetails.Equals(object? obj) -> bool
 override Supabase.Storage.GetVectorIndex.VectorIndexDetails.GetHashCode() -> int
 override Supabase.Storage.GetVectorIndex.VectorIndexDetails.ToString() -> string!
@@ -204,6 +207,8 @@ static Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.operator !=(Supa
 static Supabase.Storage.CreateNamespace.IcebergNamespaceDetails.operator ==(Supabase.Storage.CreateNamespace.IcebergNamespaceDetails? left, Supabase.Storage.CreateNamespace.IcebergNamespaceDetails? right) -> bool
 static Supabase.Storage.CreateTable.CreateTableOptions.operator !=(Supabase.Storage.CreateTable.CreateTableOptions? left, Supabase.Storage.CreateTable.CreateTableOptions? right) -> bool
 static Supabase.Storage.CreateTable.CreateTableOptions.operator ==(Supabase.Storage.CreateTable.CreateTableOptions? left, Supabase.Storage.CreateTable.CreateTableOptions? right) -> bool
+static Supabase.Storage.DeleteTable.DeleteTableOptions.operator !=(Supabase.Storage.DeleteTable.DeleteTableOptions? left, Supabase.Storage.DeleteTable.DeleteTableOptions? right) -> bool
+static Supabase.Storage.DeleteTable.DeleteTableOptions.operator ==(Supabase.Storage.DeleteTable.DeleteTableOptions? left, Supabase.Storage.DeleteTable.DeleteTableOptions? right) -> bool
 static Supabase.Storage.GetVectorIndex.VectorIndexDetails.operator !=(Supabase.Storage.GetVectorIndex.VectorIndexDetails? left, Supabase.Storage.GetVectorIndex.VectorIndexDetails? right) -> bool
 static Supabase.Storage.GetVectorIndex.VectorIndexDetails.operator ==(Supabase.Storage.GetVectorIndex.VectorIndexDetails? left, Supabase.Storage.GetVectorIndex.VectorIndexDetails? right) -> bool
 static Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort.operator !=(Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? left, Supabase.Storage.ListAnalyticsBuckets.AnalyticsBucketSort? right) -> bool
@@ -450,6 +455,12 @@ Supabase.Storage.CreateVectorIndex.NewVectorIndex.IndexName.init -> void
 Supabase.Storage.CreateVectorIndex.NewVectorIndex.NewVectorIndex() -> void
 Supabase.Storage.CreateVectorIndex.NewVectorIndex.NonFilterableMetadataKeys.get -> System.Collections.Generic.IReadOnlyList<string!>?
 Supabase.Storage.CreateVectorIndex.NewVectorIndex.NonFilterableMetadataKeys.init -> void
+Supabase.Storage.DeleteTable.DeleteTableOptions
+Supabase.Storage.DeleteTable.DeleteTableOptions.<Clone>$() -> Supabase.Storage.DeleteTable.DeleteTableOptions!
+Supabase.Storage.DeleteTable.DeleteTableOptions.DeleteTableOptions() -> void
+Supabase.Storage.DeleteTable.DeleteTableOptions.Equals(Supabase.Storage.DeleteTable.DeleteTableOptions? other) -> bool
+Supabase.Storage.DeleteTable.DeleteTableOptions.Purge.get -> bool?
+Supabase.Storage.DeleteTable.DeleteTableOptions.Purge.init -> void
 Supabase.Storage.GetVectorIndex.VectorIndexDetails
 Supabase.Storage.GetVectorIndex.VectorIndexDetails.<Clone>$() -> Supabase.Storage.GetVectorIndex.VectorIndexDetails!
 Supabase.Storage.GetVectorIndex.VectorIndexDetails.CreatedAt.get -> System.DateTimeOffset
@@ -470,6 +481,7 @@ Supabase.Storage.Interfaces.IIcebergCatalog
 Supabase.Storage.Interfaces.IIcebergCatalog.CreateNamespaceAsync(Supabase.Storage.Common.IcebergNamespace! namespace, Supabase.Storage.CreateNamespace.CreateNamespaceOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.CreateNamespace.IcebergNamespaceDetails!>!
 Supabase.Storage.Interfaces.IIcebergCatalog.CreateTableAsync(Supabase.Storage.Common.IcebergTable! table, Supabase.Storage.Common.IcebergSchema! schema, Supabase.Storage.CreateTable.CreateTableOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.IcebergTableMetadata!>!
 Supabase.Storage.Interfaces.IIcebergCatalog.DeleteNamespaceAsync(Supabase.Storage.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Supabase.Storage.Interfaces.IIcebergCatalog.DeleteTableAsync(Supabase.Storage.Common.IcebergTable! table, Supabase.Storage.DeleteTable.DeleteTableOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IIcebergCatalog.ListNamespacesAsync(Supabase.Storage.ListNamespaces.ListNamespacesOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.ListNamespaces.IcebergNamespacePage!>!
 Supabase.Storage.Interfaces.IIcebergCatalog.NamespaceExistsAsync(Supabase.Storage.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Supabase.Storage.Interfaces.IStorageAnalyticsApi
