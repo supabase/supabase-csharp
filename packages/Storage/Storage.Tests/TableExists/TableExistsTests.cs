@@ -27,7 +27,7 @@ public class TableExistsTests
     [DataRow("")]
     [DataRow("   ")]
     public async Task TableExistsAsync_ShouldThrowArgumentException_GivenBlankName(string name) =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").TableExistsAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), name)))
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").TableExistsAsync(IcebergNamespace.Of("sales").Table(name)))
             .Should().ThrowAsync<ArgumentException>("a blank name would reach the route that lists tables")
             .WithMessage("A table name must be provided.*"))
             .Which.ParamName.Should().Be("table");
@@ -36,7 +36,7 @@ public class TableExistsTests
     [DataRow(".")]
     [DataRow("..")]
     public async Task TableExistsAsync_ShouldThrowArgumentException_GivenRelativeSegmentName(string name) =>
-        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").TableExistsAsync(IcebergTable.Of(IcebergNamespace.Of("sales"), name)))
+        (await FluentActions.Awaiting(() => this.sut.Analytics.From("analytics-data").TableExistsAsync(IcebergNamespace.Of("sales").Table(name)))
             .Should().ThrowAsync<ArgumentException>("a dot-segment name would reach another route")
             .WithMessage("A table name cannot be a relative path segment.*"))
             .Which.ParamName.Should().Be("table");
