@@ -76,7 +76,18 @@ internal sealed class IcebergCatalog : IIcebergCatalog
         return response!.ToMetadata();
     }
 
+    /// <inheritdoc />
+    public async Task<IcebergTableMetadata> LoadTableAsync(IcebergTable table, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(table, nameof(table));
+        var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Get, this.TableUrl(table), null, this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToMetadata();
+    }
+
     private string TablesUrl(IcebergNamespace @namespace) => $"{this.NamespaceUrl(@namespace)}/tables";
+
+    private string TableUrl(IcebergTable table) =>
+        $"{this.TablesUrl(table.Namespace)}/{PathSegment.Escape(table.Name, "A table name", nameof(table))}";
 
     private string NamespaceUrl(IcebergNamespace @namespace) =>
         $"{this.catalogUrl}/namespaces/{IcebergNamespacePath.For(@namespace)}";
