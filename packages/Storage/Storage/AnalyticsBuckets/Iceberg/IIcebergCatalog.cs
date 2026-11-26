@@ -28,6 +28,7 @@ public interface IIcebergCatalog
     /// analytics bucket and a service without Iceberg enabled all do: a HEAD response carries no body to tell them apart.
     /// </returns>
     /// <exception cref="System.ArgumentNullException"><paramref name="namespace"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The namespace is a relative path segment.</exception>
     /// <exception cref="Exceptions.SupabaseStorageException">The service refused the call for another reason, for example because the caller is not authorized.</exception>
     /// <example>
     /// <code>
@@ -98,6 +99,7 @@ public interface IIcebergCatalog
     /// <param name="namespace">The namespace to delete.</param>
     /// <param name="cancellationToken">Token used to cancel the request.</param>
     /// <exception cref="System.ArgumentNullException"><paramref name="namespace"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The namespace is a relative path segment.</exception>
     /// <exception cref="Exceptions.SupabaseStorageException">
     /// The service refused the call, for example because the namespace or its bucket does not exist (status 404,
     /// <c>Code</c> <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>), the namespace still holds tables (status 400,
@@ -165,7 +167,7 @@ public interface IIcebergCatalog
     /// missing analytics bucket and a service without Iceberg enabled all do: a HEAD response carries no body to tell them apart.
     /// </returns>
     /// <exception cref="System.ArgumentNullException"><paramref name="table"/> is null.</exception>
-    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="System.ArgumentException">The table name or its namespace is a relative path segment.</exception>
     /// <exception cref="Exceptions.SupabaseStorageException">The service refused the call for another reason, for example because the caller is not authorized.</exception>
     /// <example>
     /// <code>
@@ -183,7 +185,7 @@ public interface IIcebergCatalog
     /// <param name="cancellationToken">Token used to cancel the request.</param>
     /// <returns>The metadata of the table, as the catalog stores it.</returns>
     /// <exception cref="System.ArgumentNullException"><paramref name="table"/> is null.</exception>
-    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="System.ArgumentException">The table name or its namespace is a relative path segment.</exception>
     /// <exception cref="Exceptions.SupabaseStorageException">
     /// The service refused the call, for example because the table, its namespace or its bucket does not exist
     /// (status 404, <c>Code</c> <c>NoSuchTableException</c>, <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>)
@@ -207,7 +209,7 @@ public interface IIcebergCatalog
     /// <param name="options">Whether to also delete the table's files. When null, the service's default applies.</param>
     /// <param name="cancellationToken">Token used to cancel the request.</param>
     /// <exception cref="System.ArgumentNullException"><paramref name="table"/> is null.</exception>
-    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="System.ArgumentException">The table name or its namespace is a relative path segment.</exception>
     /// <exception cref="Exceptions.SupabaseStorageException">
     /// The service refused the call, for example because the table, its namespace or its bucket does not exist
     /// (status 404, <c>Code</c> <c>NoSuchTableException</c>, <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>)
@@ -262,11 +264,14 @@ public interface IIcebergCatalog
     /// Commits a new current schema, a new default partition spec, or both, to an Iceberg table.
     /// </summary>
     /// <param name="table">The table to update.</param>
-    /// <param name="changes">The schema and partition spec to make current, and optionally the metadata they were made from.</param>
+    /// <param name="changes">The schema, the partition spec or both to make current, and optionally the metadata they were made from.</param>
     /// <param name="cancellationToken">Token used to cancel the request.</param>
     /// <returns>The metadata of the table after the commit, as the catalog stored it.</returns>
     /// <exception cref="System.ArgumentNullException"><paramref name="table"/> or <paramref name="changes"/> is null.</exception>
-    /// <exception cref="System.ArgumentException">The table name is blank, or the table name or its namespace is a relative path segment.</exception>
+    /// <exception cref="System.ArgumentException">
+    /// <paramref name="changes"/> carries neither a schema nor a partition spec, or the table name or its namespace is a
+    /// relative path segment.
+    /// </exception>
     /// <exception cref="Exceptions.SupabaseStorageException">
     /// The service refused the call, for example because the table changed since <see cref="UpdateTable.IcebergTableChanges.BasedOn"/>
     /// (status 409, <c>Code</c> <c>CommitFailedException</c>), the changes are invalid (status 400), the table, its namespace
@@ -281,7 +286,7 @@ public interface IIcebergCatalog
     /// var country = new IcebergField { Id = current.LastColumnId + 1, Name = "country", Type = IcebergPrimitiveType.String, Required = false };
     /// var updated = await catalog.UpdateTableAsync(events, new IcebergTableChanges
     /// {
-    ///     Schema = new IcebergSchema { Fields = current.CurrentSchema.Fields.Append(country).ToList() },
+    ///     Schema = current.CurrentSchema with { Fields = current.CurrentSchema.Fields.Append(country).ToList() },
     ///     BasedOn = current,
     /// });
     /// </code>

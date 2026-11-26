@@ -1,0 +1,1 @@
+﻿{"requirements":[],"updates":[{"action":"add-spec","spec":{"fields":[{"source-id":2,"field-id":1000,"name":"occurred_day","transform":"day"},{"source-id":1,"name":"id_bucket","transform":"bucket[16]"}]}},{"action":"set-default-spec","spec-id":-1}]}

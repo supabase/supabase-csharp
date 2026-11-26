@@ -13,7 +13,8 @@ namespace Storage.Tests.AnalyticsBuckets.Iceberg.CreateTable;
 /// <summary>
 /// Pins the exact bytes <c>CreateTableAsync</c> puts on the wire; the approved bodies must match the Iceberg REST
 /// <c>CreateTableRequest</c> that Storage forwards from <c>POST /iceberg/v1/:prefix/namespaces/:namespace/tables</c>
-/// (<c>name</c> and <c>schema</c> required; <c>partition-spec</c> and <c>properties</c> optional).
+/// (<c>name</c> and <c>schema</c> required; <c>partition-spec</c> and <c>properties</c> optional; <c>schema-id</c> and
+/// <c>spec-id</c> read-only, so the catalog assigns them).
 /// </summary>
 [TestClass]
 [TestCategory("Contract")]
@@ -45,7 +46,6 @@ public class CreateTableApprovalTests : RequestApprovalFixture
         this.RespondWith(Created());
         await this.Client.Analytics.From("analytics-data").CreateTableAsync(Events, new IcebergSchema
         {
-            SchemaId = 0,
             Fields = new[]
             {
                 new IcebergField
@@ -83,7 +83,6 @@ public class CreateTableApprovalTests : RequestApprovalFixture
             {
                 PartitionSpec = new IcebergPartitionSpec
                 {
-                    SpecId = 0,
                     Fields = new[]
                     {
                         new IcebergPartitionField { SourceId = 1, Name = "id_identity", Transform = IcebergTransform.Identity, FieldId = 1000 },
@@ -98,6 +97,19 @@ public class CreateTableApprovalTests : RequestApprovalFixture
                 },
                 Properties = new Dictionary<string, string> { ["write.format.default"] = "parquet" },
             });
+        await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
+
+    [TestMethod]
+    public async Task CreateTableRequest_ShouldLeaveSchemaAndSpecIdsToTheCatalog_GivenLoadedSchemaAndSpec()
+    {
+        this.RespondWith(Created());
+        var loaded = await this.Client.Analytics.From("analytics-data").LoadTableAsync(Events);
+        this.ForgetEmittedRequests();
+        await this.Client.Analytics.From("analytics-data").CreateTableAsync(
+            IcebergNamespace.Of("sales").Table("events_copy"),
+            loaded.CurrentSchema,
+            new CreateTableOptions { PartitionSpec = loaded.DefaultPartitionSpec });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
 

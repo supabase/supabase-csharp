@@ -107,6 +107,7 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     {
         RequireArgument(table, nameof(table));
         RequireArgument(changes, nameof(changes));
+        changes.HasChangesOrThrow(nameof(changes));
         var response = await Helpers.MakeRequestAsync<TableMetadataResponse>(this.requestClient, this.options, HttpMethod.Post, this.ResourceUrl(table.Path), UpdateTableBody.For(changes), this.headers(), cancellationToken).ConfigureAwait(false);
         return response!.ToMetadata();
     }

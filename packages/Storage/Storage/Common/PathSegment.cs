@@ -44,7 +44,7 @@ internal static class PathSegment
 
     private static bool IsRelative(string segment) => Array.IndexOf(RelativeSegments, segment) >= 0;
 
-    private static void RejectBlank(string value, string subject, string paramName)
+    internal static void RejectBlank(string value, string subject, string paramName)
     {
         if (string.IsNullOrWhiteSpace(value))
             throw new ArgumentException($"{subject} must be provided.", paramName);

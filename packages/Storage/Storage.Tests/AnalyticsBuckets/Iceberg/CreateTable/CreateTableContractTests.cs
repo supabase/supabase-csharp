@@ -122,7 +122,7 @@ public class CreateTableContractTests
     {
         this.Respond(200, Fixture("TableCreated.json"));
         var metadata = await this.Catalog().CreateTableAsync(Events, Schema);
-        metadata.CurrentSchema.Should().BeEquivalentTo(new IcebergSchema
+        metadata.CurrentSchema.Should().BeEquivalentTo(new
         {
             SchemaId = 1,
             Fields = new[]
@@ -145,7 +145,7 @@ public class CreateTableContractTests
                     Type = new IcebergMapType { KeyId = 8, Key = IcebergPrimitiveType.String, ValueId = 9, Value = IcebergPrimitiveType.Int, ValueRequired = false },
                 },
             },
-        }, ByStructure<IcebergSchema>(), "current-schema-id picks the schema rows are written with");
+        }, ByStructure, "current-schema-id picks the schema rows are written with");
     }
 
     [TestMethod]
@@ -171,7 +171,7 @@ public class CreateTableContractTests
     {
         this.Respond(200, Fixture("TableCreated.json"));
         var metadata = await this.Catalog().CreateTableAsync(Events, Schema);
-        metadata.DefaultPartitionSpec.Should().BeEquivalentTo(new IcebergPartitionSpec
+        metadata.DefaultPartitionSpec.Should().BeEquivalentTo(new
         {
             SpecId = 1,
             Fields = new[]
@@ -179,7 +179,7 @@ public class CreateTableContractTests
                 new IcebergPartitionField { SourceId = 1, FieldId = 1000, Name = "id_bucket", Transform = IcebergTransform.Bucket(16) },
                 new IcebergPartitionField { SourceId = 2, FieldId = 1001, Name = "amount_truncate", Transform = IcebergTransform.Truncate(4) },
             },
-        }, ByStructure<IcebergPartitionSpec>(), "default-spec-id picks the spec rows are written with");
+        }, ByStructure, "default-spec-id picks the spec rows are written with");
     }
 
     [TestMethod]
@@ -200,8 +200,8 @@ public class CreateTableContractTests
         var metadata = await this.Catalog().CreateTableAsync(Events, Schema);
         using (new AssertionScope())
         {
-            metadata.CurrentSchema.Should().BeEquivalentTo(new IcebergSchema { SchemaId = 3, Fields = Array.Empty<IcebergField>() }, ByStructure<IcebergSchema>());
-            metadata.DefaultPartitionSpec.Should().BeEquivalentTo(new IcebergPartitionSpec { SpecId = 4, Fields = Array.Empty<IcebergPartitionField>() }, ByStructure<IcebergPartitionSpec>());
+            metadata.CurrentSchema.Should().BeEquivalentTo(new { SchemaId = 3, Fields = Array.Empty<IcebergField>() }, ByStructure);
+            metadata.DefaultPartitionSpec.Should().BeEquivalentTo(new { SpecId = 4, Fields = Array.Empty<IcebergPartitionField>() }, ByStructure);
         }
     }
 
@@ -322,8 +322,8 @@ public class CreateTableContractTests
             .Should().BeTrue("the SDK never resumes on the caller's synchronization context");
     }
 
-    private static Func<EquivalencyAssertionOptions<T>, EquivalencyAssertionOptions<T>> ByStructure<T>() =>
-        options => options.ComparingRecordsByMembers().RespectingRuntimeTypes().WithStrictOrdering()
+    private static EquivalencyAssertionOptions<T> ByStructure<T>(EquivalencyAssertionOptions<T> options) =>
+        options.ComparingRecordsByMembers().RespectingRuntimeTypes().WithStrictOrdering()
             .ComparingByValue<IcebergPrimitiveType>().ComparingByValue<IcebergTransform>();
 
     private static string Fixture(string name) =>

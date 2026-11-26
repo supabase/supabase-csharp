@@ -320,7 +320,6 @@ Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.Fields.get
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.Fields.init -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.IcebergPartitionSpec() -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.SpecId.get -> int?
-Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPartitionSpec.SpecId.init -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergPrimitiveType? other) -> bool
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema
@@ -330,7 +329,6 @@ Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.Fields.get -> Sys
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.Fields.init -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.IcebergSchema() -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.SchemaId.get -> int?
-Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema.SchemaId.init -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType? other) -> bool
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructType.Fields.get -> System.Collections.Generic.IReadOnlyList<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField!>!

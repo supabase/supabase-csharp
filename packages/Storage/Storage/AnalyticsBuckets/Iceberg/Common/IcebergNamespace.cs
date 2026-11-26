@@ -41,18 +41,22 @@ public sealed record IcebergNamespace
     }
 
     /// <summary>
-    /// Builds the identifier of a table held by this namespace. The service validates the name.
+    /// Builds the identifier of a table held by this namespace. Beyond refusing a blank name, the service validates it.
     /// </summary>
     /// <param name="name">The name of the table within this namespace.</param>
     /// <returns>The identifier of the table.</returns>
     /// <exception cref="ArgumentNullException"><paramref name="name"/> is null.</exception>
+    /// <exception cref="ArgumentException"><paramref name="name"/> is empty or whitespace.</exception>
     /// <example>
     /// <code>
     /// var events = IcebergNamespace.Of("sales").Table("events");
     /// </code>
     /// </example>
-    public IcebergTable Table(string name) =>
-        new(this, name ?? throw new ArgumentNullException(nameof(name)));
+    public IcebergTable Table(string name)
+    {
+        RejectMissingTableName(name);
+        return new IcebergTable(this, name);
+    }
 
     /// <inheritdoc />
     public bool Equals(IcebergNamespace? other) =>
@@ -80,10 +84,17 @@ public sealed record IcebergNamespace
             throw new ArgumentException("A namespace needs at least one level.", nameof(levels));
     }
 
+    private static void RejectMissingTableName(string? name)
+    {
+        if (name is null)
+            throw new ArgumentNullException(nameof(name));
+
+        PathSegment.RejectBlank(name, "A table name", nameof(name));
+    }
+
     private static void RejectUnusable(string level)
     {
-        if (string.IsNullOrWhiteSpace(level))
-            throw new ArgumentException("A namespace level must be provided.", "levels");
+        PathSegment.RejectBlank(level, "A namespace level", "levels");
 
         if (level.Contains(LevelSeparator))
             throw new ArgumentException("A namespace level cannot contain the unit separator (U+001F).", "levels");

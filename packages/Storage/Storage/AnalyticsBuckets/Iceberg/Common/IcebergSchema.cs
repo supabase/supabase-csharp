@@ -11,8 +11,8 @@ public sealed record IcebergSchema
     public required IReadOnlyList<IcebergField> Fields { get; init; }
 
     /// <summary>
-    /// The identifier of the schema within the table. The catalog assigns it: leave it unset when defining a schema,
-    /// and it is only sent when set.
+    /// The identifier the catalog gave the schema within the table, or null on a schema that was not loaded from the
+    /// catalog. The catalog assigns it, so it is never sent: a loaded schema can be reused as is.
     /// </summary>
-    public int? SchemaId { get; init; }
+    public int? SchemaId { get; internal init; }
 }
