@@ -7,6 +7,9 @@ override sealed Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergStructTy
 override Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.Equals(object? obj) -> bool
 override Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.GetHashCode() -> int
 override Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.ToString() -> string!
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.Equals(object? obj) -> bool
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.GetHashCode() -> int
+override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.ToString() -> string!
 override Supabase.Storage.FileBuckets.Common.BucketLifecycle.Equals(object? obj) -> bool
 override Supabase.Storage.FileBuckets.Common.BucketLifecycle.GetHashCode() -> int
 override Supabase.Storage.FileBuckets.Common.BucketLifecycle.ToString() -> string!
@@ -74,9 +77,6 @@ override Supabase.Storage.Common.Page<T>.ToString() -> string!
 override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.Equals(object? obj) -> bool
 override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.GetHashCode() -> int
 override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.ToString() -> string!
-override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Equals(object? obj) -> bool
-override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.GetHashCode() -> int
-override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.ToString() -> string!
 override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.Equals(object? obj) -> bool
 override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.GetHashCode() -> int
 override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.ToString() -> string!
@@ -136,6 +136,8 @@ override Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChang
 override Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.ToString() -> string!
 static Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.operator !=(Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? left, Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket.operator ==(Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? left, Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails? right) -> bool
+static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails? right) -> bool
 static Supabase.Storage.FileBuckets.Common.BucketLifecycle.operator !=(Supabase.Storage.FileBuckets.Common.BucketLifecycle? left, Supabase.Storage.FileBuckets.Common.BucketLifecycle? right) -> bool
 static Supabase.Storage.FileBuckets.Common.BucketLifecycle.operator ==(Supabase.Storage.FileBuckets.Common.BucketLifecycle? left, Supabase.Storage.FileBuckets.Common.BucketLifecycle? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergField? right) -> bool
@@ -205,8 +207,6 @@ static Supabase.Storage.Common.Page<T>.operator !=(Supabase.Storage.Common.Page<
 static Supabase.Storage.Common.Page<T>.operator ==(Supabase.Storage.Common.Page<T>? left, Supabase.Storage.Common.Page<T>? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? right) -> bool
-static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? right) -> bool
-static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? right) -> bool
@@ -246,6 +246,16 @@ static Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.operator !=
 static Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult.operator ==(Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult? left, Supabase.Storage.VectorBuckets.QueryVectors.VectorQueryResult? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? left, Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? left, Supabase.Storage.AnalyticsBuckets.Iceberg.UpdateTable.IcebergTableChanges? right) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails? other) -> bool
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.IcebergNamespaceDetails() -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.Namespace.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.Namespace.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.Properties.init -> void
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.CreateNamespaceAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails!>!
+Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.LoadNamespaceAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails!>!
 Supabase.Storage.Client.Analytics.get -> Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi!
 Supabase.Storage.Client.Vectors.get -> Supabase.Storage.VectorBuckets.IStorageVectorBucketApi!
 Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket
@@ -423,14 +433,6 @@ Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions
 Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? other) -> bool
 Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
 Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions.Properties.init -> void
-Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails
-Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails!
-Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails? other) -> bool
-Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.IcebergNamespaceDetails() -> void
-Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Namespace.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace!
-Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Namespace.init -> void
-Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Properties.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
-Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails.Properties.init -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions
 Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.<Clone>$() -> Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions!
 Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.CreateTableOptions() -> void
@@ -481,7 +483,6 @@ Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.NonFilterableMetadata
 Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.NonFilterableMetadataKeys.init -> void
 Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.VectorIndexDetails() -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog
-Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.CreateNamespaceAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.IcebergNamespaceDetails!>!
 Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.CreateTableAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable! table, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergSchema! schema, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTableMetadata!>!
 Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.DeleteNamespaceAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.DeleteTableAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTable! table, Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
