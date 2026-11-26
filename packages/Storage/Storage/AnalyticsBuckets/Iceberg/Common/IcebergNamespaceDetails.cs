@@ -1,7 +1,6 @@
 using System.Collections.Generic;
-using Supabase.Storage.AnalyticsBuckets.Iceberg.Common;
 
-namespace Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace;
+namespace Supabase.Storage.AnalyticsBuckets.Iceberg.Common;
 
 /// <summary>
 /// A namespace as the service stores it.

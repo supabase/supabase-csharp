@@ -40,6 +40,28 @@ public interface IIcebergCatalog
     Task<bool> NamespaceExistsAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Loads a namespace with the properties stored against it.
+    /// </summary>
+    /// <param name="namespace">The namespace to load.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The namespace as the service stored it. Its properties are empty when there are none.</returns>
+    /// <exception cref="System.ArgumentNullException"><paramref name="namespace"/> is null.</exception>
+    /// <exception cref="System.ArgumentException">The namespace is a relative path segment.</exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the namespace or its bucket does not exist (status 404,
+    /// <c>Code</c> <c>NoSuchNamespaceException</c> or <c>NoSuchCatalog</c>) or the caller is not authorized.
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var catalog = storage.Analytics.From("analytics-data");
+    /// var details = await catalog.LoadNamespaceAsync(IcebergNamespace.Of("sales"));
+    /// Console.WriteLine(details.Properties["owner"]);
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.analytics.load_namespace_metadata")]
+    Task<IcebergNamespaceDetails> LoadNamespaceAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Creates a namespace. Creating a namespace that already exists succeeds: Storage merges the given properties into
     /// the stored ones, where the Iceberg REST spec answers 409.
     /// </summary>

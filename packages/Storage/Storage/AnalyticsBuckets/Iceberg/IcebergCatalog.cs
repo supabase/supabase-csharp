@@ -40,10 +40,18 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     }
 
     /// <inheritdoc />
+    public async Task<IcebergNamespaceDetails> LoadNamespaceAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(@namespace, nameof(@namespace));
+        var response = await Helpers.MakeRequestAsync<NamespaceResponse>(this.requestClient, this.options, HttpMethod.Get, this.ResourceUrl(@namespace.Path), null, this.headers(), cancellationToken).ConfigureAwait(false);
+        return response!.ToDetails(@namespace);
+    }
+
+    /// <inheritdoc />
     public async Task<IcebergNamespaceDetails> CreateNamespaceAsync(IcebergNamespace @namespace, CreateNamespaceOptions? options = null, CancellationToken cancellationToken = default)
     {
         RequireArgument(@namespace, nameof(@namespace));
-        var response = await Helpers.MakeRequestAsync<CreateNamespaceResponse>(this.requestClient, this.options, HttpMethod.Post, $"{this.catalogUrl}/namespaces", CreateNamespaceBody.For(@namespace, options), this.headers(), cancellationToken).ConfigureAwait(false);
+        var response = await Helpers.MakeRequestAsync<NamespaceResponse>(this.requestClient, this.options, HttpMethod.Post, $"{this.catalogUrl}/namespaces", CreateNamespaceBody.For(@namespace, options), this.headers(), cancellationToken).ConfigureAwait(false);
         return response!.ToDetails(@namespace);
     }
 

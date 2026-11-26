@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using Supabase.Storage.AnalyticsBuckets.Iceberg.Common;
 
-namespace Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace;
+namespace Supabase.Storage.AnalyticsBuckets.Iceberg.Common;
 
-internal sealed class CreateNamespaceResponse
+internal sealed class NamespaceResponse
 {
     [JsonPropertyName("namespace")]
     public string[]? Namespace { get; set; }
