@@ -86,6 +86,10 @@ public class IcebergNamespaceTests
         IcebergNamespace.Of("a b", "c/d").Path.Should().Be("namespaces/a%20b%1Fc%2Fd", "the Iceberg REST spec joins levels with the 0x1F separator");
 
     [TestMethod]
+    public void TablesPath_ShouldNestTheTablesCollectionUnderTheNamespace() =>
+        IcebergNamespace.Of("sales", "europe").TablesPath.Should().Be("namespaces/sales%1Feurope/tables", "the Iceberg REST spec lists and creates tables under the namespace");
+
+    [TestMethod]
     public void Path_ShouldAcceptLevelsContainingDots() =>
         IcebergNamespace.Of("a..b").Path.Should().Be("namespaces/a..b");
 

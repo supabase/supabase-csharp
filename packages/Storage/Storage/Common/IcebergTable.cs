@@ -20,5 +20,7 @@ public sealed record IcebergTable
     /// <inheritdoc />
     public override string ToString() => $"{this.Namespace}.{this.Name}";
 
-    internal string Path => $"{this.Namespace.Path}/tables/{PathSegment.Escape(this.Name, "A table name", "table")}";
+    internal string Path => $"{this.CollectionPath}/{PathSegment.Escape(this.Name, "A table name", "table")}";
+
+    internal string CollectionPath => this.Namespace.TablesPath;
 }
