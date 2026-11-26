@@ -510,6 +510,7 @@ Supabase.Storage.Interfaces.IStorageAnalyticsApi.From(string! bucketName) -> Sup
 Supabase.Storage.Interfaces.IStorageAnalyticsApi.ListBucketsAsync(Supabase.Storage.ListAnalyticsBuckets.ListAnalyticsBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Supabase.Storage.Common.AnalyticsBucket!>!>!
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.DeleteBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
+Supabase.Storage.Interfaces.IStorageBucketApi<TBucket>.UpdateBucketLifecycleAsync(string! id, Supabase.Storage.Common.BucketLifecycle! lifecycle, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Analytics.get -> Supabase.Storage.Interfaces.IStorageAnalyticsApi!
 Supabase.Storage.Interfaces.IStorageClient<TBucket, TFileObject>.Vectors.get -> Supabase.Storage.Interfaces.IStorageVectorBucketApi!
 Supabase.Storage.Interfaces.IStorageVectorBucketApi
@@ -712,6 +713,7 @@ Supabase.Storage.Common.VectorData.Float32.get -> System.Collections.Generic.IRe
 Supabase.Storage.Common.VectorData.Float32.init -> void
 Supabase.Storage.Common.VectorData.VectorData() -> void
 Supabase.Storage.StorageBucketApi.GetBucketLifecycleAsync(string! id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
+Supabase.Storage.StorageBucketApi.UpdateBucketLifecycleAsync(string! id, Supabase.Storage.Common.BucketLifecycle! lifecycle, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.BucketLifecycle!>!
 Supabase.Storage.UpdateTable.IcebergTableChanges
 Supabase.Storage.UpdateTable.IcebergTableChanges.<Clone>$() -> Supabase.Storage.UpdateTable.IcebergTableChanges!
 Supabase.Storage.UpdateTable.IcebergTableChanges.BasedOn.get -> Supabase.Storage.Common.IcebergTableMetadata?
