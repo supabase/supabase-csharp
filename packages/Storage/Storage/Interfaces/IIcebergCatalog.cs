@@ -207,7 +207,7 @@ public interface IIcebergCatalog
     /// <code>
     /// var catalog = storage.Analytics.From("analytics-data");
     /// await catalog.DeleteTableAsync(
-    ///     IcebergTable.Of(IcebergNamespace.Of("sales"), "events"),
+    ///     IcebergNamespace.Of("sales").Table("events"),
     ///     new DeleteTableOptions { Purge = true });
     /// </code>
     /// </example>
