@@ -31,18 +31,10 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     }
 
     /// <inheritdoc />
-    public async Task<bool> NamespaceExistsAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default)
+    public Task<bool> NamespaceExistsAsync(IcebergNamespace @namespace, CancellationToken cancellationToken = default)
     {
         RequireArgument(@namespace, nameof(@namespace));
-        try
-        {
-            using var response = await Helpers.MakeRequestAsync(this.requestClient, this.options, HttpMethod.Head, this.ResourceUrl(@namespace.Path), null, this.headers(), cancellationToken).ConfigureAwait(false);
-            return true;
-        }
-        catch (SupabaseStorageException exception) when (IsNotFound(exception))
-        {
-            return false;
-        }
+        return this.ResourceExistsAsync(this.ResourceUrl(@namespace.Path), cancellationToken);
     }
 
     /// <inheritdoc />
@@ -78,6 +70,13 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     }
 
     /// <inheritdoc />
+    public Task<bool> TableExistsAsync(IcebergTable table, CancellationToken cancellationToken = default)
+    {
+        RequireArgument(table, nameof(table));
+        return this.ResourceExistsAsync(this.ResourceUrl(table.Path), cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task<IcebergTableMetadata> LoadTableAsync(IcebergTable table, CancellationToken cancellationToken = default)
     {
         RequireArgument(table, nameof(table));
@@ -93,6 +92,19 @@ internal sealed class IcebergCatalog : IIcebergCatalog
     }
 
     private string ResourceUrl(string path) => $"{this.catalogUrl}/{path}";
+
+    private async Task<bool> ResourceExistsAsync(string url, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var response = await Helpers.MakeRequestAsync(this.requestClient, this.options, HttpMethod.Head, url, null, this.headers(), cancellationToken).ConfigureAwait(false);
+            return true;
+        }
+        catch (SupabaseStorageException exception) when (IsNotFound(exception))
+        {
+            return false;
+        }
+    }
 
     private static bool IsNotFound(SupabaseStorageException exception) => exception.StatusCode == NotFoundStatus;
 
