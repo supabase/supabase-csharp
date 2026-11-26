@@ -1005,6 +1005,14 @@ features:
     status: implemented
     symbols:
       - IIcebergCatalog.NamespaceExistsAsync
+  storage.analytics.create_table:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.CreateTableAsync
+  storage.analytics.load_table:
+    status: implemented
+    symbols:
+      - IIcebergCatalog.LoadTableAsync
   storage.analytics.access_catalog:
     status: implemented
     symbols:
