@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
 using Supabase.Postgrest.Explain;
+using Supabase.Postgrest.GetGeoJson;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
 
@@ -449,6 +450,29 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     /// </code>
     /// </example>
     Task<string> GetCsvAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Executes the read and returns the matching rows as a GeoJSON <c>FeatureCollection</c>: one feature per row,
+    /// holding the row's geometry and its other selected columns as the model. Filters, ordering,
+    /// <see cref="Limit"/>, <see cref="Offset"/> and <see cref="Range(int, int)"/> apply as they do to <see cref="Get"/>.
+    /// </summary>
+    /// <remarks>
+    /// PostgREST builds the collection with PostGIS, so the database needs the <c>postgis</c> extension and the
+    /// relation a geometry column; the first geometry column becomes each feature's geometry.
+    /// The models are attached to the table, like those <see cref="Get"/> returns. <see cref="StripNulls"/> has no effect on GeoJSON.
+    /// </remarks>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The rows as GeoJSON features.</returns>
+    /// <exception cref="Exceptions.PostgrestException">PostgREST refuses the request, for example
+    /// <see cref="Exceptions.FailureHint.Reason.UndefinedFunction"/> when PostGIS is not installed.</exception>
+    /// <example>
+    /// <code><![CDATA[
+    /// var shops = await client.Table<Shop>().Select("id,address,location").GetGeoJsonAsync();
+    /// foreach (var shop in shops.Features)
+    ///     Console.WriteLine($"{shop.Properties.Address}: {shop.Geometry}");
+    /// ]]></code>
+    /// </example>
+    Task<GeoJsonFeatureCollection<TModel>> GetGeoJsonAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Returns the Postgres execution plan of the read instead of its rows, as the JSON output of

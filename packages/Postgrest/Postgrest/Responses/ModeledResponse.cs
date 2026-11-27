@@ -52,9 +52,7 @@ public class ModeledResponse<T> : BaseResponse where T : BaseModel, new()
 
                     foreach (var model in this.Models)
                     {
-                        model.BaseUrl = baseResponse.ResponseMessage!.RequestMessage.RequestUri.GetInstanceUrl().Replace(model.TableName, "").TrimEnd('/');
-                        model.RequestClientOptions = this.ClientOptions;
-                        model.GetHeaders = getHeaders;
+                        model.AttachTo(baseResponse.ResponseMessage!.RequestMessage.RequestUri.GetInstanceUrl().Replace(model.TableName, "").TrimEnd('/'), this.ClientOptions, getHeaders);
                     }
 
                     break;
@@ -68,9 +66,7 @@ public class ModeledResponse<T> : BaseResponse where T : BaseModel, new()
 
                     if (obj != null)
                     {
-                        obj.BaseUrl = baseResponse.ResponseMessage!.RequestMessage.RequestUri.GetInstanceUrl().Replace(obj.TableName, "").TrimEnd('/');
-                        obj.RequestClientOptions = this.ClientOptions;
-                        obj.GetHeaders = getHeaders;
+                        obj.AttachTo(baseResponse.ResponseMessage!.RequestMessage.RequestUri.GetInstanceUrl().Replace(obj.TableName, "").TrimEnd('/'), this.ClientOptions, getHeaders);
 
                         this.Models.Add(obj);
                     }

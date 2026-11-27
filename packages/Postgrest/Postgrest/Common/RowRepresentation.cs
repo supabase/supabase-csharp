@@ -7,6 +7,7 @@ internal sealed record RowRepresentation
     private const string ArrayType = "application/vnd.pgrst.array+json";
     private const string ObjectType = "application/vnd.pgrst.object+json";
     private const string CsvType = "text/csv";
+    private const string GeoJsonType = "application/geo+json";
     private const string NullsStripped = ";nulls=stripped";
 
     private readonly Shape shape;
@@ -22,7 +23,8 @@ internal sealed record RowRepresentation
     {
         Array,
         SingleObject,
-        Csv
+        Csv,
+        GeoJson
     }
 
     internal static RowRepresentation Default { get; } = new(Shape.Array, false);
@@ -30,6 +32,8 @@ internal sealed record RowRepresentation
     internal RowRepresentation AsSingleObject() => new(Shape.SingleObject, this.nullsStripped);
 
     internal RowRepresentation AsCsv() => new(Shape.Csv, this.nullsStripped);
+
+    internal RowRepresentation AsGeoJson() => new(Shape.GeoJson, this.nullsStripped);
 
     internal RowRepresentation WithNullsStripped() => new(this.shape, true);
 
@@ -42,6 +46,7 @@ internal sealed record RowRepresentation
     private string? MediaType => this.shape switch
     {
         Shape.Csv => CsvType,
+        Shape.GeoJson => GeoJsonType,
         Shape.SingleObject => ObjectType + this.NullsParameter,
         _ when this.nullsStripped => ArrayType + NullsStripped,
         _ => null
