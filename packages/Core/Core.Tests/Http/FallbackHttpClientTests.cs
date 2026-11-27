@@ -3,13 +3,13 @@ using System.Net.Http;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
-using Supabase.Postgrest;
+using Supabase.Core.Http;
 
-namespace Postgrest.Tests.Requests;
+namespace Core.Tests.Http;
 
 /// <summary>
-///     The shared client a request falls back to when none was injected: it is never built while a client is
-///     injected, and built once on first use otherwise.
+/// Covers <see cref="FallbackHttpClient"/>: the shared client a request falls back to when none was injected. It is
+/// never built while a client is injected, and built once on first use otherwise.
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
@@ -36,4 +36,20 @@ public class FallbackHttpClientTests
         sut.Or(null).Should().BeSameAs(sut.Or(null)).And.BeSameAs(fallback, "the fallback is one shared client, as the eager static was");
         create.Received(1).Invoke();
     }
+
+    [TestMethod]
+    public void Value_ShouldCreateTheFallbackOnceAndReuseIt()
+    {
+        using var fallback = new HttpClient();
+        var create = Substitute.For<Func<HttpClient>>();
+        create().Returns(fallback);
+        create.ClearReceivedCalls();
+        var sut = new FallbackHttpClient(create);
+        sut.Value.Should().BeSameAs(sut.Value).And.BeSameAs(fallback, "a sender with no injection seam still shares one client");
+        create.Received(1).Invoke();
+    }
+
+    [TestMethod]
+    public void Value_ShouldUseTheDefaultFactoryTimeout_GivenNoFactory() =>
+        new FallbackHttpClient().Value.Timeout.Should().Be(TimeSpan.FromSeconds(100), "the default fallback matches the BCL default client it replaces");
 }

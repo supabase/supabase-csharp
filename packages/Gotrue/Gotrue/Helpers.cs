@@ -41,7 +41,7 @@ public static class Helpers
         Converters = { new Serialization.ObjectToInferredTypesConverter() },
     };
 
-    private static readonly FallbackHttpClient Client = new(() => new HttpClient());
+    private static readonly FallbackHttpClient Client = new();
 
     // One client per proxy, freed with it.
     private static readonly ConditionalWeakTable<IWebProxy, HttpClient> ProxyClients = new();
@@ -72,7 +72,7 @@ public static class Helpers
 
     /// <summary>
     /// Generates a PKCE SHA256 code challenge given a nonce (code verifier)
-    ///
+    /// 
     /// Paired with <see cref="GenerateNonce"/>
     ///
     /// Sourced from: https://stackoverflow.com/a/65220376/3629438

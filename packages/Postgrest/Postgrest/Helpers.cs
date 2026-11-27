@@ -26,7 +26,7 @@ namespace Supabase.Postgrest;
 
 internal static class Helpers
 {
-    private static readonly FallbackHttpClient Client = new(() => new HttpClient());
+    private static readonly FallbackHttpClient Client = new();
 
     // One client per proxy object. It is freed when the proxy is.
     private static readonly ConditionalWeakTable<IWebProxy, HttpClient> ProxyClients = new();

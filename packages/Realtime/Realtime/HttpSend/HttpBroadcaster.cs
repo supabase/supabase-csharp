@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Supabase.Core.Http;
 using Supabase.Realtime.Broadcast;
 using Supabase.Realtime.Exceptions;
 
@@ -18,8 +19,7 @@ internal sealed class HttpBroadcaster
 {
     private const string TopicPrefix = "realtime:";
 
-    // Built on first use, not at type load, so a host that never sends over HTTP never constructs one.
-    private static readonly Lazy<HttpClient> Client = new(() => new HttpClient(), LazyThreadSafetyMode.ExecutionAndPublication);
+    private static readonly FallbackHttpClient Client = new();
 
     private readonly string endpoint;
     private readonly ClientOptions options;
