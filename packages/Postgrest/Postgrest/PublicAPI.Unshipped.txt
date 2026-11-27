@@ -4,12 +4,29 @@ const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "supabase.postgrest" 
 override Supabase.Postgrest.Explain.ExplainOptions.Equals(object? obj) -> bool
 override Supabase.Postgrest.Explain.ExplainOptions.GetHashCode() -> int
 override Supabase.Postgrest.Explain.ExplainOptions.ToString() -> string!
+override Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.Equals(object? obj) -> bool
+override Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.GetHashCode() -> int
+override Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.ToString() -> string!
+override Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.Equals(object? obj) -> bool
+override Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.GetHashCode() -> int
+override Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.ToString() -> string!
 static Supabase.Postgrest.Explain.ExplainOptions.operator !=(Supabase.Postgrest.Explain.ExplainOptions? left, Supabase.Postgrest.Explain.ExplainOptions? right) -> bool
 static Supabase.Postgrest.Explain.ExplainOptions.operator ==(Supabase.Postgrest.Explain.ExplainOptions? left, Supabase.Postgrest.Explain.ExplainOptions? right) -> bool
 Supabase.Postgrest.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Postgrest.ClientOptions.TimeProvider.set -> void
+Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>
+Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.GeoJsonFeature() -> void
+Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.Geometry.get -> System.Text.Json.JsonElement?
+Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.Geometry.init -> void
+Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.Properties.get -> TModel!
+Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.Properties.init -> void
+Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>
+Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.Features.get -> System.Collections.Generic.IReadOnlyList<Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel!>!>!
+Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.Features.init -> void
+Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.GeoJsonFeatureCollection() -> void
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.DryRun() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.GetGeoJsonAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel!>!>!
 Supabase.Postgrest.Table<TModel>.DryRun() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Exceptions.FailureHint.Reason.MediaTypeNotAcceptable = 11 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Explain.ExplainOptions
@@ -29,3 +46,12 @@ Supabase.Postgrest.Explain.ExplainOptions.Wal.init -> void
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.ExplainAsync(Supabase.Postgrest.Explain.ExplainOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Text.Json.JsonElement>!
 Supabase.Postgrest.Table<TModel>.ExplainAsync(Supabase.Postgrest.Explain.ExplainOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Text.Json.JsonElement>!
 Supabase.Postgrest.Table<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+Supabase.Postgrest.Table<TModel>.GetGeoJsonAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel!>!>!
+~static Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.operator !=(Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>? left, Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>? right) -> bool
+~static Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.operator ==(Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>? left, Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>? right) -> bool
+~static Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.operator !=(Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>? left, Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>? right) -> bool
+~static Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.operator ==(Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>? left, Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>? right) -> bool
+~Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.<Clone>$() -> Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>!
+~Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>.Equals(Supabase.Postgrest.GetGeoJson.GeoJsonFeature<TModel>? other) -> bool
+~Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.<Clone>$() -> Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>!
+~Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>.Equals(Supabase.Postgrest.GetGeoJson.GeoJsonFeatureCollection<TModel>? other) -> bool
