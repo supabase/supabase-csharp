@@ -468,13 +468,13 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     /// <exception cref="Exceptions.PostgrestException">PostgREST does not serve plans
     /// (<see cref="Exceptions.FailureHint.Reason.MediaTypeNotAcceptable"/>), or refuses the request.</exception>
     /// <example>
-    /// <code>
-    /// var plan = await client.Table&lt;Movie&gt;()
+    /// <code><![CDATA[
+    /// var plan = await client.Table<Movie>()
     ///     .Filter("name", Operator.Equals, "Alien")
     ///     .ExplainAsync(new ExplainOptions { Analyze = true });
     /// var root = plan[0].GetProperty("Plan");
     /// Console.WriteLine($"{root.GetProperty("Node Type")} in {plan[0].GetProperty("Execution Time")} ms");
-    /// </code>
+    /// ]]></code>
     /// </example>
     Task<JsonElement> ExplainAsync(ExplainOptions? options = null, CancellationToken cancellationToken = default);
 
