@@ -8,6 +8,9 @@ static Supabase.Postgrest.Explain.ExplainOptions.operator !=(Supabase.Postgrest.
 static Supabase.Postgrest.Explain.ExplainOptions.operator ==(Supabase.Postgrest.Explain.ExplainOptions? left, Supabase.Postgrest.Explain.ExplainOptions? right) -> bool
 Supabase.Postgrest.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Postgrest.ClientOptions.TimeProvider.set -> void
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.DryRun() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+Supabase.Postgrest.Table<TModel>.DryRun() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
 Supabase.Postgrest.Exceptions.FailureHint.Reason.MediaTypeNotAcceptable = 11 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
 Supabase.Postgrest.Explain.ExplainOptions
 Supabase.Postgrest.Explain.ExplainOptions.<Clone>$() -> Supabase.Postgrest.Explain.ExplainOptions!
@@ -24,6 +27,5 @@ Supabase.Postgrest.Explain.ExplainOptions.Verbose.init -> void
 Supabase.Postgrest.Explain.ExplainOptions.Wal.get -> bool
 Supabase.Postgrest.Explain.ExplainOptions.Wal.init -> void
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.ExplainAsync(Supabase.Postgrest.Explain.ExplainOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Text.Json.JsonElement>!
-Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
 Supabase.Postgrest.Table<TModel>.ExplainAsync(Supabase.Postgrest.Explain.ExplainOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Text.Json.JsonElement>!
 Supabase.Postgrest.Table<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!

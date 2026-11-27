@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Supabase.Postgrest.Common;
 
 namespace Supabase.Postgrest.LimitAffectedRows;
 
@@ -20,7 +21,7 @@ internal sealed record AffectedRowsLimit
     internal void ApplyTo(HttpMethod method, Dictionary<string, string> headers)
     {
         EnsureMutation(method);
-        headers["Prefer"] = $"{headers["Prefer"]},{this.Preference}";
+        PreferHeader.Append(headers, this.Preference);
     }
 
     private string Preference => $"handling=strict,max-affected={this.Rows}";

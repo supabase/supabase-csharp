@@ -535,6 +535,33 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     IPostgrestTable<TModel> MaxAffected(int rows);
 
     /// <summary>
+    /// Runs the next request as a dry run: PostgREST executes it, then rolls its transaction back instead of
+    /// committing. The response still carries what the request would have returned, after row level security,
+    /// triggers and constraints ran, but no row is inserted, updated or deleted.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Sends <c>Prefer: tx=rollback</c>. PostgREST honors it only when its <c>db-tx-end</c> setting allows an
+    /// override, for example <c>alter role authenticator set pgrst.db_tx_end to 'commit-allow-override'; notify pgrst, 'reload config';</c>.
+    /// </para>
+    /// <para>
+    /// Warning: with the default <c>db-tx-end</c> of <c>commit</c>, PostgREST ignores the preference and commits
+    /// the change silently. Nothing in the answer reports it as an error, so enable the setting before relying on a dry run.
+    /// </para>
+    /// <para>
+    /// Applies only to the next request, whatever its terminal. It does not group several requests into one
+    /// transaction: use a database function for that.
+    /// </para>
+    /// </remarks>
+    /// <example>
+    /// <code><![CDATA[
+    /// var wouldInsert = await client.Table<Movie>().DryRun().Insert(new Movie { Name = "Alien" });
+    /// Console.WriteLine(wouldInsert.Model!.Id);
+    /// ]]></code>
+    /// </example>
+    IPostgrestTable<TModel> DryRun();
+
+    /// <summary>
     /// Leaves null values out of the returned rows. Needs PostgREST 11.2 or later.
     /// </summary>
     IPostgrestTable<TModel> StripNulls();
