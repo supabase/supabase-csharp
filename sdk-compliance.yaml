@@ -911,6 +911,11 @@ features:
     status: implemented
     symbols:
       - StorageBucketApi.PurgeProjectCacheAsync
+  storage.file_buckets.bucket_versioning_status:
+    status: implemented
+    symbols:
+      - Bucket.VersioningStatus
+      - BucketUpsertOptions.VersioningStatus
   storage.file_buckets.get_bucket_lifecycle:
     status: implemented
     symbols:
