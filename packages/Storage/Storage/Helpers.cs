@@ -128,7 +128,7 @@ internal static class Helpers
             foreach (var kvp in authorizedHeaders)
                 requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
 
-            ClientInfoHeader.Inject(requestMessage.Headers, ClientInfo.Of(typeof(Client)));
+            requestMessage.Headers.AddClientInfo(typeof(Client));
             return requestMessage;
         }
 

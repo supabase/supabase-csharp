@@ -137,7 +137,7 @@ internal static class Helpers
                 requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
             }
 
-            ClientInfoHeader.Inject(requestMessage.Headers, ClientInfo.Of(typeof(Client)), call.Features);
+            requestMessage.Headers.AddClientInfo(typeof(Client), call.Features);
             return requestMessage;
         }
 

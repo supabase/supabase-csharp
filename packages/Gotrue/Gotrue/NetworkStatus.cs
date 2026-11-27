@@ -100,7 +100,7 @@ public class NetworkStatus
     private static HttpRequestMessage PingRequest(string url)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-        ClientInfoHeader.Inject(request.Headers, ClientInfo.Of(typeof(Supabase.Gotrue.Client)));
+        request.Headers.AddClientInfo(typeof(Supabase.Gotrue.Client));
         return request;
     }
 

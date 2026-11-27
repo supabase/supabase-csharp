@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.WebSockets;
 using System.Text.Json;
@@ -67,9 +68,13 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
     private static Dictionary<string, string> WithClientInfo(Dictionary<string, string> headers)
     {
-        ClientInfoHeader.Inject(headers, ClientInfo.Of(typeof(Client)));
+        if (!headers.Keys.Any(IsClientInfo))
+            headers[ClientInfoHeader.Name] = ClientInfoHeader.Of(typeof(Client));
         return headers;
     }
+
+    private static bool IsClientInfo(string headerName) =>
+        string.Equals(headerName, ClientInfoHeader.Name, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Reports each heartbeat to the owning client.

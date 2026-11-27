@@ -325,7 +325,7 @@ public partial class Client : IFunctionsClient
             }
         }
 
-        ClientInfoHeader.Inject(request.Headers, ClientInfo.Of(typeof(Client)));
+        request.Headers.AddClientInfo(typeof(Client));
         return request;
     }
 }

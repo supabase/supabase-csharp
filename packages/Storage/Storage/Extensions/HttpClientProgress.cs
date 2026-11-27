@@ -29,7 +29,6 @@ internal static class HttpClientProgress
     /// </summary>
     private const int CopyBufferSize = 81920;
 
-    private static ClientInfo StorageClientInfo => ClientInfo.Of(typeof(Client));
 
     public static async Task<MemoryStream> DownloadDataAsync(
         this HttpClient client,
@@ -52,7 +51,7 @@ internal static class HttpClientProgress
         }
 
         using var activity = StorageInstrumentation.StartHttpActivity(HttpMethod.Get, uri, StorageInstrumentation.DirectionDownload);
-        ClientInfoHeader.Inject(message.Headers, StorageClientInfo);
+        message.Headers.AddClientInfo(typeof(Client));
         TraceContext.Inject(message.Headers, tracePropagation);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
@@ -222,7 +221,7 @@ internal static class HttpClientProgress
 
         var bytes = stream.CanSeek ? stream.Length : (long?) null;
         using var activity = StorageInstrumentation.StartHttpActivity(HttpMethod.Post, uri, StorageInstrumentation.DirectionUpload);
-        ClientInfoHeader.Inject(request.Headers, StorageClientInfo);
+        request.Headers.AddClientInfo(typeof(Client));
         TraceContext.Inject(request.Headers, tracePropagation);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
@@ -460,7 +459,7 @@ internal static class HttpClientProgress
         {
             foreach (var header in uploadHeaders)
                 preSend.HttpRequestMsg.Headers.Add(header.Key, header.Value);
-            ClientInfoHeader.Inject(preSend.HttpRequestMsg.Headers, StorageClientInfo);
+            preSend.HttpRequestMsg.Headers.AddClientInfo(typeof(Client));
             TraceContext.Inject(preSend.HttpRequestMsg.Headers, tracePropagation, traceId);
 
             return Task.CompletedTask;
