@@ -977,6 +977,10 @@ features:
     status: implemented
     symbols:
       - IStorageVectorBucketApi.ListVectorBucketsAsync
+  storage.vector_buckets.get_vector_bucket:
+    status: implemented
+    symbols:
+      - IStorageVectorBucketApi.GetVectorBucketAsync
   storage.vector_buckets.delete_vector_bucket:
     status: implemented
     symbols:
