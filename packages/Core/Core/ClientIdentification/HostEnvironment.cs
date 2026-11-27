@@ -4,21 +4,23 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace Supabase.Core;
+namespace Supabase.Core.ClientIdentification;
 
 /// <summary>
-/// The process-wide ambient reads behind the <c>X-Client-Info</c> header: OS, runtime, loaded
-/// assemblies and, inside a Unity host, the engine's own view of version and platform.
+/// The process-wide ambient reads behind the <c>X-Client-Info</c> header: OS, processor architecture,
+/// runtime, loaded assemblies and, inside a Unity host, the engine's own view of version and platform.
 /// </summary>
 /// <remarks>
-/// Testability seam: a host cannot vary these at runtime, so <see cref="Util"/> takes them as a value
-/// and every platform/runtime/framework branch is reachable hermetically. Internal, not public API.
+/// Testability seam: a host cannot vary these at runtime, so <see cref="ClientEnvironment"/> takes them as a value
+/// and every platform/architecture/framework branch is reachable hermetically. Internal, not public API.
 /// </remarks>
 internal sealed record HostEnvironment(
     string OsDescription,
     Func<OSPlatform, bool> IsOsPlatform,
+    string OsVersion,
+    string OsArchitecture,
+    string RuntimeVersion,
     IReadOnlyCollection<Assembly> LoadedAssemblies,
-    string FrameworkDescription,
     Func<string?> UnityVersion,
     Func<string?> UnityPlatform)
 {
@@ -26,8 +28,10 @@ internal sealed record HostEnvironment(
     internal static HostEnvironment Current() => new(
         RuntimeInformation.OSDescription,
         RuntimeInformation.IsOSPlatform,
+        Environment.OSVersion.Version.ToString(),
+        RuntimeInformation.OSArchitecture.ToString(),
+        Environment.Version.ToString(),
         AppDomain.CurrentDomain.GetAssemblies(),
-        RuntimeInformation.FrameworkDescription,
         () => ReadUnityApplicationProperty("unityVersion") as string,
         () => ReadUnityApplicationProperty("platform")?.ToString());
 

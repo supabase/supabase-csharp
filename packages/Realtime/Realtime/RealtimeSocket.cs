@@ -7,6 +7,7 @@ using System.Net.WebSockets;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Supabase.Core.ClientIdentification;
 using Supabase.Core.Extensions;
 using Supabase.Core.Logging;
 using Supabase.Realtime.Broadcast;
@@ -57,9 +58,18 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
 
     /// <summary>
     /// Shortcut property that merges <see cref="GetHeaders"/> with <see cref="options"/>
-    /// Headers specified in <see cref="options"/> take precedence over <see cref="GetHeaders"/>
+    /// Headers specified in <see cref="options"/> take precedence over <see cref="GetHeaders"/>.
+    /// The SDK's <c>X-Client-Info</c> is added unless one of them supplies it.
     /// </summary>
-    internal Dictionary<string, string> Headers => this.GetHeaders != null ? this.GetHeaders().MergeLeft(this.options.Headers) : this.options.Headers;
+    internal Dictionary<string, string> Headers => WithClientInfo(this.GetHeaders != null
+        ? this.GetHeaders().MergeLeft(this.options.Headers)
+        : new Dictionary<string, string>(this.options.Headers));
+
+    private static Dictionary<string, string> WithClientInfo(Dictionary<string, string> headers)
+    {
+        ClientInfoHeader.Inject(headers, ClientInfo.Of(typeof(Client)));
+        return headers;
+    }
 
     /// <summary>
     /// Reports each heartbeat to the owning client.
@@ -108,9 +118,6 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     {
         this.endpoint = $"{endpoint}/{TransportWebsocket}";
         this.options = options;
-
-        if (!options.Headers.ContainsKey("X-Client-Info"))
-            options.Headers.Add("X-Client-Info", Core.Util.GetAssemblyVersion(typeof(Client)));
 
         this.connection = (options.WebSocketFactory ?? DefaultWebSocketFactory.Instance)
             .Create(new Uri(this.EndpointUrl), () => this.Headers);

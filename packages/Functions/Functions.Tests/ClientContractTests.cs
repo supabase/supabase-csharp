@@ -140,7 +140,27 @@ public class ClientContractTests
     {
         this.RespondWith(200, "ok");
         await this.client.Invoke(FunctionName);
-        this.HeaderOf("X-Client-Info").Should().StartWith("supabase.functions-csharp/");
+        this.HeaderOf("X-Client-Info").Should().Be(Supabase.Core.Util.GetAssemblyVersion(typeof(Client)));
+    }
+
+    [TestMethod]
+    public async Task Invoke_ShouldSendTheSuppliedClientInfo_GivenOptionHeaderInAnyCasing()
+    {
+        this.RespondWith(200, "ok");
+        await this.client.Invoke(FunctionName, options: new InvokeFunctionOptions
+        {
+            Headers = new Dictionary<string, string> { { "x-client-info", "my-lib/1.0" } }
+        });
+        this.HeaderOf("X-Client-Info").Should().Be("my-lib/1.0", "an application-supplied value replaces the SDK's (client_info spec)");
+    }
+
+    [TestMethod]
+    public async Task Invoke_ShouldSendTheSuppliedClientInfo_GivenDynamicHeaders()
+    {
+        this.client.GetHeaders = () => new Dictionary<string, string> { { "X-Client-Info", "supabase-csharp/8.0.0" } };
+        this.RespondWith(200, "ok");
+        await this.client.Invoke(FunctionName);
+        this.HeaderOf("X-Client-Info").Should().Be("supabase-csharp/8.0.0", "through the umbrella client, the umbrella identifies the SDK");
     }
 
     [TestMethod]

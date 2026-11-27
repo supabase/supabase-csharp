@@ -11,7 +11,7 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Supabase.Core;
+using Supabase.Core.ClientIdentification;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Extensions;
 using Supabase.Core.Http;
@@ -30,8 +30,6 @@ internal static class Helpers
 
     // One client per proxy object. It is freed when the proxy is.
     private static readonly ConditionalWeakTable<IWebProxy, HttpClient> ProxyClients = new();
-
-    private static readonly Guid AppSession = Guid.NewGuid();
 
     /// <summary>
     /// Resolves the client a request should be sent through, once per <see cref="Postgrest.Client"/>/<see cref="Table{TModel}"/>
@@ -139,6 +137,7 @@ internal static class Helpers
                 requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
             }
 
+            ClientInfoHeader.Inject(requestMessage.Headers, ClientInfo.Of(typeof(Client)), call.Features);
             return requestMessage;
         }
 
@@ -246,22 +245,6 @@ internal static class Helpers
 
             headers.Add("Range-Unit", "items");
             headers.Add("Range", $"{rangeFrom}-{formatRangeTo}");
-        }
-
-        if (!headers.ContainsKey("X-Client-Info"))
-        {
-            try
-            {
-                // Default version to match other clients
-                // https://github.com/search?q=org%3Asupabase-community+x-client-info&type=code
-                headers.Add("X-Client-Info", Util.GetAssemblyVersion(typeof(Client)));
-            }
-            catch (Exception)
-            {
-                // Fallback for when the version can't be found
-                // e.g. running in the Unity Editor, ILL2CPP builds, etc.
-                headers.Add("X-Client-Info", $"supabase.postgrest-csharp/session-{AppSession}");
-            }
         }
 
         return headers;
