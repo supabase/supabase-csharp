@@ -524,10 +524,10 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     /// </para>
     /// </remarks>
     /// <example>
-    /// <code>
-    /// var wouldInsert = await client.Table&lt;Movie&gt;().DryRun().Insert(new Movie { Name = "Alien" });
+    /// <code><![CDATA[
+    /// var wouldInsert = await client.Table<Movie>().DryRun().Insert(new Movie { Name = "Alien" });
     /// Console.WriteLine(wouldInsert.Model!.Id);
-    /// </code>
+    /// ]]></code>
     /// </example>
     IPostgrestTable<TModel> DryRun();
 
