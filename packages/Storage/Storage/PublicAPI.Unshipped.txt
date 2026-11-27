@@ -53,6 +53,9 @@ override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.ToStr
 override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.Equals(object? obj) -> bool
 override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.GetHashCode() -> int
 override Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.ToString() -> string!
+override Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.Equals(object? obj) -> bool
+override Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.GetHashCode() -> int
+override Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.ToString() -> string!
 override Supabase.Storage.FileBuckets.Common.LifecycleRule.Equals(object? obj) -> bool
 override Supabase.Storage.FileBuckets.Common.LifecycleRule.GetHashCode() -> int
 override Supabase.Storage.FileBuckets.Common.LifecycleRule.ToString() -> string!
@@ -186,6 +189,11 @@ static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Void.ge
 static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Year.get -> Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform!
 static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? left, Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType? right) -> bool
+static Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.Disabled.get -> Supabase.Storage.FileBuckets.Common.BucketVersioningStatus!
+static Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.Enabled.get -> Supabase.Storage.FileBuckets.Common.BucketVersioningStatus!
+static Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.operator !=(Supabase.Storage.FileBuckets.Common.BucketVersioningStatus? left, Supabase.Storage.FileBuckets.Common.BucketVersioningStatus? right) -> bool
+static Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.operator ==(Supabase.Storage.FileBuckets.Common.BucketVersioningStatus? left, Supabase.Storage.FileBuckets.Common.BucketVersioningStatus? right) -> bool
+static Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.Suspended.get -> Supabase.Storage.FileBuckets.Common.BucketVersioningStatus!
 static Supabase.Storage.FileBuckets.Common.LifecycleRule.operator !=(Supabase.Storage.FileBuckets.Common.LifecycleRule? left, Supabase.Storage.FileBuckets.Common.LifecycleRule? right) -> bool
 static Supabase.Storage.FileBuckets.Common.LifecycleRule.operator ==(Supabase.Storage.FileBuckets.Common.LifecycleRule? left, Supabase.Storage.FileBuckets.Common.LifecycleRule? right) -> bool
 static Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.Disabled.get -> Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus!
@@ -256,6 +264,10 @@ Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.Propert
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails.Properties.init -> void
 Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.CreateNamespaceAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateNamespace.CreateNamespaceOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails!>!
 Supabase.Storage.AnalyticsBuckets.Iceberg.IIcebergCatalog.LoadNamespaceAsync(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespace! namespace, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergNamespaceDetails!>!
+Supabase.Storage.Bucket.VersioningStatus.get -> Supabase.Storage.FileBuckets.Common.BucketVersioningStatus?
+Supabase.Storage.Bucket.VersioningStatus.set -> void
+Supabase.Storage.BucketUpsertOptions.VersioningStatus.get -> Supabase.Storage.FileBuckets.Common.BucketVersioningStatus?
+Supabase.Storage.BucketUpsertOptions.VersioningStatus.set -> void
 Supabase.Storage.Client.Analytics.get -> Supabase.Storage.AnalyticsBuckets.IStorageAnalyticsApi!
 Supabase.Storage.Client.Vectors.get -> Supabase.Storage.VectorBuckets.IStorageVectorBucketApi!
 Supabase.Storage.AnalyticsBuckets.Common.AnalyticsBucket
@@ -378,6 +390,9 @@ Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.<Clone>$() -> 
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergTransform? other) -> bool
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType
 Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType.IcebergType(Supabase.Storage.AnalyticsBuckets.Iceberg.Common.IcebergType! original) -> void
+Supabase.Storage.FileBuckets.Common.BucketVersioningStatus
+Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.<Clone>$() -> Supabase.Storage.FileBuckets.Common.BucketVersioningStatus!
+Supabase.Storage.FileBuckets.Common.BucketVersioningStatus.Equals(Supabase.Storage.FileBuckets.Common.BucketVersioningStatus? other) -> bool
 Supabase.Storage.FileBuckets.Common.LifecycleRule
 Supabase.Storage.FileBuckets.Common.LifecycleRule.<Clone>$() -> Supabase.Storage.FileBuckets.Common.LifecycleRule!
 Supabase.Storage.FileBuckets.Common.LifecycleRule.Equals(Supabase.Storage.FileBuckets.Common.LifecycleRule? other) -> bool

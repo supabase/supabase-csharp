@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json.Serialization;
+using Supabase.Core.Attributes;
+using Supabase.Storage.FileBuckets.Common;
 
 namespace Supabase.Storage;
 
@@ -57,4 +59,11 @@ public class Bucket
     [JsonPropertyName("allowed_mime_types")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? AllowedMimes { get; set; }
+
+    /// <summary>
+    /// The versioning status the service reports for the bucket, or null when it reports none.
+    /// </summary>
+    [ImplementedCapability("storage.file_buckets.bucket_versioning_status")]
+    [JsonPropertyName("versioning_status")]
+    public BucketVersioningStatus? VersioningStatus { get; set; }
 }

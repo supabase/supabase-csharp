@@ -5,6 +5,7 @@ using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Supabase.Storage;
 using Supabase.Storage.Exceptions;
+using Supabase.Storage.FileBuckets.Common;
 using WireMock;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
@@ -84,6 +85,28 @@ public class StorageBucketApiContractTests
 
         bucket.Should().NotBeNull();
         bucket!.FileSizeLimitInBytes.Should().Be(1048576L);
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(VersioningStatuses))]
+    public async Task GetBucket_ShouldReturnTheVersioningStatus_GivenOneReported(string reported, BucketVersioningStatus expected)
+    {
+        this.Respond("/storage/v1/bucket/photos", "GET", 200, $"{{\"id\":\"photos\",\"versioning_status\":\"{reported}\"}}");
+        (await this.client.GetBucket("photos"))!.VersioningStatus.Should().Be(expected);
+    }
+
+    [TestMethod]
+    public async Task GetBucket_ShouldKeepTheVersioningStatus_GivenUnknownStatus()
+    {
+        this.Respond("/storage/v1/bucket/photos", "GET", 200, "{\"id\":\"photos\",\"versioning_status\":\"ARCHIVED\"}");
+        (await this.client.GetBucket("photos"))!.VersioningStatus!.ToString().Should().Be("ARCHIVED", "the service can add a status later");
+    }
+
+    [TestMethod]
+    public async Task ListBuckets_ShouldReturnTheVersioningStatus_GivenOneReported()
+    {
+        this.Respond("/storage/v1/bucket", "GET", 200, "[{\"id\":\"a\",\"versioning_status\":\"ENABLED\"}]");
+        (await this.client.ListBuckets()).Should().ContainSingle().Which.VersioningStatus.Should().Be(BucketVersioningStatus.Enabled);
     }
 
     [TestMethod]
@@ -258,6 +281,13 @@ public class StorageBucketApiContractTests
         await this.client.PurgeProjectCacheAsync(new PurgeCacheOptions { Transformations = true });
         this.SingleRequest().Query.Should().Contain(pair => pair.Key == "transformations" && pair.Value.Contains("true"));
     }
+
+    private static IEnumerable<object[]> VersioningStatuses() => new[]
+    {
+        new object[] { "DISABLED", BucketVersioningStatus.Disabled },
+        new object[] { "ENABLED", BucketVersioningStatus.Enabled },
+        new object[] { "SUSPENDED", BucketVersioningStatus.Suspended },
+    };
 
     private void Respond(string path, string method, int statusCode, string body) =>
         this.server.Given(Request.Create().WithPath(path).UsingMethod(method))

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Supabase.Core.Attributes;
+using Supabase.Storage.FileBuckets.Common;
 
 namespace Supabase.Storage;
 
@@ -28,4 +30,10 @@ public class BucketUpsertOptions
     [JsonPropertyName("allowed_mime_types")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? AllowedMimes { get; set; }
+
+    /// <summary>
+    /// The versioning status to create the bucket with, or to move it to on an update. Not sent when null.
+    /// </summary>
+    [ImplementedCapability("storage.file_buckets.bucket_versioning_status")]
+    public BucketVersioningStatus? VersioningStatus { get; set; }
 }

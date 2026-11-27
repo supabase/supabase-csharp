@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Supabase.Storage.FileBuckets.Common;
 
 namespace Supabase.Storage;
 
@@ -33,4 +34,8 @@ internal sealed class BucketRequest
     [JsonPropertyName("allowed_mime_types")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? AllowedMimes { get; set; }
+
+    [JsonPropertyName("versioning_status")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public BucketVersioningStatus? VersioningStatus { get; set; }
 }

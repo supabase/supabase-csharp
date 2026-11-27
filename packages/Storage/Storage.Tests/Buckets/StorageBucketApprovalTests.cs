@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
 using Supabase.Storage;
+using Supabase.Storage.FileBuckets.Common;
 
 namespace Storage.Tests.Buckets;
 
@@ -42,6 +43,22 @@ public class StorageBucketApprovalTests : RequestApprovalFixture
     {
         this.RespondWith("{}");
         await this.Client.UpdateBucket("photos", new BucketUpsertOptions { Public = true, FileSizeLimit = "1mb" });
+        await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
+
+    [TestMethod]
+    public async Task CreateBucketRequest_ShouldSerializeTheVersioningStatus_GivenOptions()
+    {
+        this.RespondWith("{}");
+        await this.Client.CreateBucket("photos", new BucketUpsertOptions { VersioningStatus = BucketVersioningStatus.Enabled });
+        await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
+
+    [TestMethod]
+    public async Task UpdateBucketRequest_ShouldSerializeTheVersioningStatus_GivenOptions()
+    {
+        this.RespondWith("{}");
+        await this.Client.UpdateBucket("photos", new BucketUpsertOptions { Public = true, VersioningStatus = BucketVersioningStatus.Suspended });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
 }

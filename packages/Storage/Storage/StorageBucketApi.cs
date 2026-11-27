@@ -121,7 +121,8 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
             Name = id,
             Public = options.Public,
             FileSizeLimit = options.FileSizeLimit,
-            AllowedMimes = options.AllowedMimes
+            AllowedMimes = options.AllowedMimes,
+            VersioningStatus = options.VersioningStatus
         };
 
         var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options, HttpMethod.Post, $"{this.Url}/bucket", data, this.Headers);
@@ -145,7 +146,8 @@ public class StorageBucketApi : IStorageBucketApi<Bucket>
             Id = id,
             Public = options.Public,
             FileSizeLimit = options.FileSizeLimit,
-            AllowedMimes = options.AllowedMimes
+            AllowedMimes = options.AllowedMimes,
+            VersioningStatus = options.VersioningStatus
         };
 
         var result = await Helpers.MakeRequestAsync<Bucket>(this.requestClient, this.Options, HttpMethod.Put, $"{this.Url}/bucket/{id}", data, this.Headers);
