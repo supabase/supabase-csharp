@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Supabase.Core.ClientIdentification;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Http;
 using Supabase.Storage.Exceptions;
@@ -127,6 +128,7 @@ internal static class Helpers
             foreach (var kvp in authorizedHeaders)
                 requestMessage.Headers.TryAddWithoutValidation(kvp.Key, kvp.Value);
 
+            requestMessage.Headers.AddClientInfo(typeof(Client));
             return requestMessage;
         }
 

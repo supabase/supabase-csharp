@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Supabase.Core.ClientIdentification;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Http;
 using Supabase.Gotrue.Exceptions;
@@ -315,6 +316,7 @@ public static class Helpers
             }
         }
 
+        request.Headers.AddClientInfo(typeof(Client));
         return request;
     }
 }

@@ -11,8 +11,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Supabase.Core;
 using Supabase.Core.Attributes;
+using Supabase.Core.ClientIdentification;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Extensions;
 using Supabase.Core.Http;
@@ -203,8 +203,6 @@ public partial class Client : IFunctionsClient
             headers["Authorization"] = $"Bearer {bearerToken}";
         }
 
-        headers["X-Client-Info"] = Util.GetAssemblyVersion(typeof(Client));
-
         var region = options.FunctionRegion ?? this.region;
         if (region != FunctionRegion.Any)
         {
@@ -327,6 +325,7 @@ public partial class Client : IFunctionsClient
             }
         }
 
+        request.Headers.AddClientInfo(typeof(Client));
         return request;
     }
 }

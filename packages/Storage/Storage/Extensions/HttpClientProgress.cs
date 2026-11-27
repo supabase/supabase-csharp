@@ -10,6 +10,7 @@ using BirdMessenger;
 using BirdMessenger.Collections;
 using BirdMessenger.Events;
 using BirdMessenger.Infrastructure;
+using Supabase.Core.ClientIdentification;
 using Supabase.Core.Diagnostics;
 using Supabase.Core.Http;
 using Supabase.Storage.Exceptions;
@@ -27,6 +28,7 @@ internal static class HttpClientProgress
     /// stays on the gen-0 heap. This is set to the default expected value.
     /// </summary>
     private const int CopyBufferSize = 81920;
+
 
     public static async Task<MemoryStream> DownloadDataAsync(
         this HttpClient client,
@@ -49,6 +51,7 @@ internal static class HttpClientProgress
         }
 
         using var activity = StorageInstrumentation.StartHttpActivity(HttpMethod.Get, uri, StorageInstrumentation.DirectionDownload);
+        message.Headers.AddClientInfo(typeof(Client));
         TraceContext.Inject(message.Headers, tracePropagation);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
@@ -218,6 +221,7 @@ internal static class HttpClientProgress
 
         var bytes = stream.CanSeek ? stream.Length : (long?) null;
         using var activity = StorageInstrumentation.StartHttpActivity(HttpMethod.Post, uri, StorageInstrumentation.DirectionUpload);
+        request.Headers.AddClientInfo(typeof(Client));
         TraceContext.Inject(request.Headers, tracePropagation);
         var startTimestamp = Stopwatch.GetTimestamp();
         int? statusCode = null;
@@ -455,6 +459,7 @@ internal static class HttpClientProgress
         {
             foreach (var header in uploadHeaders)
                 preSend.HttpRequestMsg.Headers.Add(header.Key, header.Value);
+            preSend.HttpRequestMsg.Headers.AddClientInfo(typeof(Client));
             TraceContext.Inject(preSend.HttpRequestMsg.Headers, tracePropagation, traceId);
 
             return Task.CompletedTask;

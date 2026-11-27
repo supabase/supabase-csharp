@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using Supabase.Core.ClientIdentification;
 using Supabase.Core.Http;
 using Supabase.Gotrue.Interfaces;
 namespace Supabase.Gotrue;
@@ -69,7 +70,8 @@ public class NetworkStatus
     {
         try
         {
-            var reply = await this.httpClient.GetAsync(url);
+            using var ping = PingRequest(url);
+            var reply = await this.httpClient.SendAsync(ping);
             if (reply?.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 this.UpdateStatus(true);
@@ -93,6 +95,13 @@ public class NetworkStatus
             this.UpdateStatus(false);
         }
         return false;
+    }
+
+    private static HttpRequestMessage PingRequest(string url)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.AddClientInfo(typeof(Supabase.Gotrue.Client));
+        return request;
     }
 
     private void UpdateStatus(bool isNetworkAvailable)

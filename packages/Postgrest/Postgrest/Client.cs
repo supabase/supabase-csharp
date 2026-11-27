@@ -106,13 +106,16 @@ public class Client : IPostgrestClient
     /// <inheritdoc />
     public async Task<TModeledResponse?> Rpc<TModeledResponse>(string procedureName, object? parameters = null)
     {
-        var response = await this.Rpc(procedureName, parameters);
+        var response = await this.Invoke(procedureName, parameters, PostgrestCall.ToTypedFunction(procedureName));
 
         return string.IsNullOrEmpty(response.Content) ? default : Helpers.DeserializeBody<TModeledResponse>(response, SerializerSettings(this.Options));
     }
 
     /// <inheritdoc />
-    public Task<BaseResponse> Rpc(string procedureName, object? parameters = null)
+    public Task<BaseResponse> Rpc(string procedureName, object? parameters = null) =>
+        this.Invoke(procedureName, parameters, PostgrestCall.ToFunction(procedureName));
+
+    private Task<BaseResponse> Invoke(string procedureName, object? parameters, PostgrestCall call)
     {
         // Build Uri
         var builder = new UriBuilder($"{this.BaseUrl}/rpc/{procedureName}");
@@ -136,7 +139,7 @@ public class Client : IPostgrestClient
 
         // Send request
         var request =
-            Helpers.MakeRequestAsync(this.Options, this.httpClient, HttpMethod.Post, PostgrestCall.ToFunction(procedureName), canonicalUri, serializerSettings, data, headers);
+            Helpers.MakeRequestAsync(this.Options, this.httpClient, HttpMethod.Post, call, canonicalUri, serializerSettings, data, headers);
         return request;
     }
 }
