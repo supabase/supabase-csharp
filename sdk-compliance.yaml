@@ -544,6 +544,10 @@ features:
     status: implemented
     symbols:
       - Table.GetCsvAsync
+  database.using_modifiers.format_geojson:
+    status: implemented
+    symbols:
+      - Table.GetGeoJsonAsync
   database.using_modifiers.limit:
     status: implemented
     symbols:
