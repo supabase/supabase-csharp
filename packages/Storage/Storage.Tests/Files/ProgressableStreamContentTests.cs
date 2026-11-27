@@ -7,6 +7,7 @@ using FluentAssertions;
 using FluentAssertions.Execution;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NSubstitute;
+using NSubstitute.Extensions;
 using Supabase.Storage.Extensions;
 using UploadState = Supabase.Storage.Extensions.ProgressableStreamContent.UploadState;
 
@@ -70,18 +71,26 @@ public class ProgressableStreamContentTests
     public void Headers_ShouldLeaveContentLengthUnknown_GivenAnEmptySource() =>
         new ProgressableStreamContent(new MemoryStream(), 4096).Headers.ContentLength.Should().BeNull("an empty source has no length to declare");
 
-    // Each await is exercised on its own: once an asynchronous read resumes on a pool thread no context is
-    // current any more, so the write is only reachable with a context while the source reads synchronously.
     [TestMethod]
-    [DataRow(true, false, DisplayName = "asynchronous source")]
-    [DataRow(false, true, DisplayName = "asynchronous destination")]
-    [DataRow(true, true, DisplayName = "asynchronous source and destination")]
-    public async Task CopyToAsync_ShouldNeverResumeOnTheCapturedContext(bool asynchronousSource, bool asynchronousDestination)
+    [DataRow(true, false)]
+    [DataRow(false, true)]
+    [DataRow(true, true)]
+    public async Task CopyToAsync_ShouldNeverResumeOnTheCapturedContext(bool sourceCompletesLater, bool destinationCompletesLater)
     {
-        var source = new AsynchronousStream(asynchronousSource, new byte[10_000]);
-        var sut = new ProgressableStreamContent(source, 4096);
-        using var destination = new AsynchronousStream(asynchronousDestination);
-        var context = new CountingSynchronizationContext();
+        var sut = new ProgressableStreamContent(StreamOf(sourceCompletesLater, new byte[10_000]), 4096);
+        using var destination = StreamOf(destinationCompletesLater, Array.Empty<byte>());
+        var context = Substitute.ForPartsOf<SynchronizationContext>();
+        await CopyUnder(context, sut, destination).ConfigureAwait(false);
+        using (new AssertionScope())
+        {
+            destination.Length.Should().Be(10_000, "every byte was copied");
+            context.ReceivedCalls().Should().BeEmpty(
+                "library code must not resume on the caller's context: a caller blocking on the upload from that context (.Result on a UI or Unity main thread) would deadlock");
+        }
+    }
+
+    private static async Task CopyUnder(SynchronizationContext context, ProgressableStreamContent sut, Stream destination)
+    {
         var previous = SynchronizationContext.Current;
         SynchronizationContext.SetSynchronizationContext(context);
         try
@@ -92,81 +101,32 @@ public class ProgressableStreamContentTests
         {
             SynchronizationContext.SetSynchronizationContext(previous);
         }
-
-        using (new AssertionScope())
-        {
-            destination.Written.Should().Be(10_000, "every byte was copied");
-            context.Posts.Should().Be(0, "a single-threaded host (Unity WebGL) cannot hop back onto a context, so the copy must not capture one");
-        }
     }
 
-    private sealed class CountingSynchronizationContext : SynchronizationContext
+    private static MemoryStream StreamOf(bool completesLater, byte[] data)
     {
-        private int posts;
+        var stream = Substitute.ForPartsOf<MemoryStream>();
+        stream.Write(data, 0, data.Length);
+        stream.Position = 0;
+        if (!completesLater)
+            return stream;
 
-        public int Posts => Volatile.Read(ref this.posts);
-
-        public override void Post(SendOrPostCallback d, object? state)
-        {
-            Interlocked.Increment(ref this.posts);
-            ThreadPool.QueueUserWorkItem(_ => d(state));
-        }
+        stream.Configure().ReadAsync(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(call => Later(() => stream.Read(call.ArgAt<byte[]>(0), call.ArgAt<int>(1), call.ArgAt<int>(2))));
+        stream.Configure().WriteAsync(Arg.Any<byte[]>(), Arg.Any<int>(), Arg.Any<int>(), Arg.Any<CancellationToken>())
+            .Returns(call => Later(() => stream.Write(call.ArgAt<byte[]>(0), call.ArgAt<int>(1), call.ArgAt<int>(2))));
+        return stream;
     }
 
-    /// <summary>A stream whose reads and writes complete on a later turn, as a real file or socket does, or at once.</summary>
-    private sealed class AsynchronousStream : Stream
+    private static async Task<int> Later(Func<int> operation)
     {
-        private readonly bool completesLater;
-        private readonly MemoryStream inner;
+        await Task.Delay(1).ConfigureAwait(false);
+        return operation();
+    }
 
-        public AsynchronousStream(bool completesLater, byte[]? data = null)
-        {
-            this.completesLater = completesLater;
-            this.inner = data == null ? new MemoryStream() : new MemoryStream(data);
-        }
-
-        public long Written { get; private set; }
-
-        public override bool CanRead => true;
-
-        public override bool CanSeek => true;
-
-        public override bool CanWrite => true;
-
-        public override long Length => this.inner.Length;
-
-        public override long Position
-        {
-            get => this.inner.Position;
-            set => this.inner.Position = value;
-        }
-
-        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            if (this.completesLater)
-                await Task.Delay(1, cancellationToken).ConfigureAwait(false);
-
-            return this.inner.Read(buffer, offset, count);
-        }
-
-        public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-        {
-            if (this.completesLater)
-                await Task.Delay(1, cancellationToken).ConfigureAwait(false);
-
-            this.Written += count;
-        }
-
-        public override int Read(byte[] buffer, int offset, int count) => this.inner.Read(buffer, offset, count);
-
-        public override void Write(byte[] buffer, int offset, int count) => this.Written += count;
-
-        public override void Flush()
-        {
-        }
-
-        public override long Seek(long offset, SeekOrigin origin) => this.inner.Seek(offset, origin);
-
-        public override void SetLength(long value) => this.inner.SetLength(value);
+    private static async Task Later(Action operation)
+    {
+        await Task.Delay(1).ConfigureAwait(false);
+        operation();
     }
 }

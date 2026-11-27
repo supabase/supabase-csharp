@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -31,12 +31,12 @@ internal class ProgressableStreamContent : HttpContent, IProgressableStreamConte
     {
         if (content == null)
         {
-            throw new ArgumentNullException("content");
+            throw new ArgumentNullException(nameof(content));
         }
 
         if (bufferSize <= 0)
         {
-            throw new ArgumentOutOfRangeException("bufferSize");
+            throw new ArgumentOutOfRangeException(nameof(bufferSize));
         }
 
         if (progress == null)
@@ -66,7 +66,7 @@ internal class ProgressableStreamContent : HttpContent, IProgressableStreamConte
                 uploaded += length;
                 this.Progress?.Report(PercentOf(uploaded, size));
 
-                await stream!.WriteAsync(buffer, 0, length).ConfigureAwait(false);
+                await stream.WriteAsync(buffer, 0, length).ConfigureAwait(false);
 
                 this.StateChanged?.Invoke(this, UploadState.InProgress);
             }
