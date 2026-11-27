@@ -368,6 +368,10 @@ features:
     status: implemented
     symbols:
       - SupabaseOptions.LoggerFactory
+  client.observability.client_info:
+    status: implemented
+    no_public_symbols: true
+    note: "Automatic, no API to call: every request of every package carries the structured X-Client-Info header; an X-Client-Info set through the client's headers (SupabaseOptions.Headers, a package's ClientOptions.Headers or per-request headers) replaces the SDK's value."
 
   # ── Database (PostgREST) ───────────────────────────────────────────────────
 
