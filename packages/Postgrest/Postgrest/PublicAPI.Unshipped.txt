@@ -24,4 +24,6 @@ Supabase.Postgrest.Explain.ExplainOptions.Verbose.init -> void
 Supabase.Postgrest.Explain.ExplainOptions.Wal.get -> bool
 Supabase.Postgrest.Explain.ExplainOptions.Wal.init -> void
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.ExplainAsync(Supabase.Postgrest.Explain.ExplainOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Text.Json.JsonElement>!
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
 Supabase.Postgrest.Table<TModel>.ExplainAsync(Supabase.Postgrest.Explain.ExplainOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Text.Json.JsonElement>!
+Supabase.Postgrest.Table<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!

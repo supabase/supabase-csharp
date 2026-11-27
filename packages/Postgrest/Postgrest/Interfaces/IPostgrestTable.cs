@@ -431,6 +431,26 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     Task<TModel?> Single(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Executes the read and returns the matching rows as CSV text instead of models: a header line of column
+    /// names, then one line per row. Filters, ordering, <see cref="Limit"/>, <see cref="Offset"/> and
+    /// <see cref="Range(int, int)"/> apply as they do to <see cref="Get"/>.
+    /// </summary>
+    /// <remarks>
+    /// The text is returned exactly as PostgREST sends it, so a query that matches no row returns an empty
+    /// line without a header. <see cref="StripNulls"/> has no effect on CSV.
+    /// </remarks>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The rows as CSV text.</returns>
+    /// <exception cref="Exceptions.PostgrestException">PostgREST refuses the request.</exception>
+    /// <example>
+    /// <code>
+    /// var csv = await client.Table&lt;Movie&gt;().Order(x =&gt; x.Id, Ordering.Ascending).Range(0, 99).GetCsvAsync();
+    /// await File.WriteAllTextAsync("movies.csv", csv);
+    /// </code>
+    /// </example>
+    Task<string> GetCsvAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Returns the Postgres execution plan of the read instead of its rows, as the JSON output of
     /// <c>EXPLAIN (FORMAT JSON)</c>: an array holding one plan object, whose <c>Plan</c> is the root node.
     /// Filters, ordering, <see cref="Limit"/>, <see cref="Offset"/> and <see cref="Range(int, int)"/> shape the
