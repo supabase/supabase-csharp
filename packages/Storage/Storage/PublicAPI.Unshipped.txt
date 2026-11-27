@@ -86,6 +86,12 @@ override Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOption
 override Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.Equals(object? obj) -> bool
 override Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.GetHashCode() -> int
 override Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.ToString() -> string!
+override Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.ToString() -> string!
+override Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.Equals(object? obj) -> bool
+override Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.GetHashCode() -> int
+override Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.ToString() -> string!
 override Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.Equals(object? obj) -> bool
 override Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.GetHashCode() -> int
 override Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.ToString() -> string!
@@ -219,6 +225,10 @@ static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.
 static Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.CreateTable.CreateTableOptions? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.operator !=(Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.operator ==(Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? left, Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? right) -> bool
+static Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.operator !=(Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails? left, Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails? right) -> bool
+static Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.operator ==(Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails? left, Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails? right) -> bool
+static Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.operator !=(Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption? left, Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption? right) -> bool
+static Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.operator ==(Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption? left, Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption? right) -> bool
 static Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.operator !=(Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? left, Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? right) -> bool
 static Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.operator ==(Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? left, Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails? right) -> bool
 static Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort.operator !=(Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort? left, Supabase.Storage.AnalyticsBuckets.ListBuckets.AnalyticsBucketSort? right) -> bool
@@ -481,6 +491,24 @@ Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.DeleteT
 Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.Equals(Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions? other) -> bool
 Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.Purge.get -> bool?
 Supabase.Storage.AnalyticsBuckets.Iceberg.DeleteTable.DeleteTableOptions.Purge.init -> void
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.<Clone>$() -> Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails!
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.CreatedAt.get -> System.DateTimeOffset
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.CreatedAt.init -> void
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.Encryption.get -> Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption?
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.Encryption.init -> void
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.Equals(Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails? other) -> bool
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.VectorBucketDetails() -> void
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.VectorBucketName.get -> string!
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails.VectorBucketName.init -> void
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.<Clone>$() -> Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption!
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.Equals(Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption? other) -> bool
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.KmsKeyArn.get -> string?
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.KmsKeyArn.init -> void
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.SseType.get -> string?
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.SseType.init -> void
+Supabase.Storage.VectorBuckets.GetBucket.VectorBucketEncryption.VectorBucketEncryption() -> void
 Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails
 Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.<Clone>$() -> Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails!
 Supabase.Storage.VectorBuckets.GetIndex.VectorIndexDetails.CreatedAt.get -> System.DateTimeOffset
@@ -521,6 +549,7 @@ Supabase.Storage.VectorBuckets.IStorageVectorBucketApi
 Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.CreateVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.DeleteVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.From(string! vectorBucketName) -> Supabase.Storage.VectorBuckets.IVectorBucket!
+Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.GetVectorBucketAsync(string! vectorBucketName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.VectorBuckets.GetBucket.VectorBucketDetails!>!
 Supabase.Storage.VectorBuckets.IStorageVectorBucketApi.ListVectorBucketsAsync(Supabase.Storage.VectorBuckets.ListBuckets.ListVectorBucketsOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Supabase.Storage.Common.Page<Supabase.Storage.VectorBuckets.ListBuckets.VectorBucketSummary!>!>!
 Supabase.Storage.VectorBuckets.IVectorBucket
 Supabase.Storage.VectorBuckets.IVectorBucket.CreateIndexAsync(Supabase.Storage.VectorBuckets.CreateIndex.NewVectorIndex! index, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
