@@ -19,6 +19,7 @@ using Supabase.Postgrest.Common;
 using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Explain;
 using Supabase.Postgrest.Extensions;
+using Supabase.Postgrest.GetGeoJson;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Postgrest.LimitAffectedRows;
 using Supabase.Postgrest.Linq;
@@ -699,6 +700,20 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         var request = this.Send(this.method, null, null, cancellationToken);
         this.Clear();
         return (await request.ConfigureAwait(false)).Content!;
+    }
+
+    /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.format_geojson")]
+    public async Task<GeoJsonFeatureCollection<TModel>> GetGeoJsonAsync(CancellationToken cancellationToken = default)
+    {
+        this.method = HttpMethod.Get;
+        this.representation = this.representation.AsGeoJson();
+        var request = this.Send(this.method, null, null, cancellationToken);
+        this.Clear();
+        var collection = Helpers.DeserializeBody<GeoJsonFeatureCollection<TModel>>(await request.ConfigureAwait(false), this.serializerSettings)!;
+        foreach (var feature in collection.Features)
+            feature.Properties.AttachTo(this.BaseUrl, this.options, this.GetHeaders);
+        return collection;
     }
 
     /// <inheritdoc />

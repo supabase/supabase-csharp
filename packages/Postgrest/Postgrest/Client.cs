@@ -98,9 +98,7 @@ public class Client : IPostgrestClient
     /// <inheritdoc />
     public T Attach<T>(T model) where T : BaseModel
     {
-        model.BaseUrl = this.BaseUrl;
-        model.RequestClientOptions = this.Options;
-        model.GetHeaders = this.GetHeaders;
+        model.AttachTo(this.BaseUrl, this.Options, this.GetHeaders);
         return model;
     }
 

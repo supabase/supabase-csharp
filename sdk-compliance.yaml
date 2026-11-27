@@ -532,6 +532,10 @@ features:
     note: "Mutations return the affected rows by default (QueryOptions.Returning = Representation)."
     symbols:
       - QueryOptions.Returning
+  database.using_modifiers.dry_run:
+    status: implemented
+    symbols:
+      - Table.DryRun
   database.using_modifiers.explain:
     status: implemented
     symbols:
@@ -540,6 +544,10 @@ features:
     status: implemented
     symbols:
       - Table.GetCsvAsync
+  database.using_modifiers.format_geojson:
+    status: implemented
+    symbols:
+      - Table.GetGeoJsonAsync
   database.using_modifiers.limit:
     status: implemented
     symbols:

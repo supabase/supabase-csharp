@@ -26,6 +26,13 @@ public abstract class BaseModel
     [JsonIgnore]
     internal Func<Dictionary<string, string>>? GetHeaders { get; set; }
 
+    internal void AttachTo(string? baseUrl, ClientOptions? options, Func<Dictionary<string, string>>? getHeaders)
+    {
+        this.BaseUrl = baseUrl;
+        this.RequestClientOptions = options;
+        this.GetHeaders = getHeaders;
+    }
+
 
     public Task<ModeledResponse<T>> Update<T>(CancellationToken cancellationToken = default) where T : BaseModel, new()
     {
