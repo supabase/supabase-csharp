@@ -2,6 +2,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Attributes;
 using Supabase.Storage.Common;
+using Supabase.Storage.VectorBuckets.GetBucket;
 using Supabase.Storage.VectorBuckets.ListBuckets;
 
 namespace Supabase.Storage.VectorBuckets;
@@ -74,6 +75,28 @@ public interface IStorageVectorBucketApi
     /// </example>
     [ImplementedCapability("storage.vector_buckets.list_vector_buckets")]
     Task<Page<VectorBucketSummary>> ListVectorBucketsAsync(ListVectorBucketsOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves the metadata of one vector bucket: its name, creation time and encryption. Requires a service-role key.
+    /// </summary>
+    /// <param name="vectorBucketName">The name of the vector bucket.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The vector bucket as the service describes it.</returns>
+    /// <exception cref="System.ArgumentException">
+    /// <paramref name="vectorBucketName"/> is null, empty or whitespace.
+    /// </exception>
+    /// <exception cref="Exceptions.SupabaseStorageException">
+    /// The service refused the call, for example because the bucket does not exist
+    /// (<c>Code</c> <c>NotFoundException</c>, status 404).
+    /// </exception>
+    /// <example>
+    /// <code>
+    /// var bucket = await storage.Vectors.GetVectorBucketAsync("embeddings-prod");
+    /// Console.WriteLine($"{bucket.VectorBucketName} created {bucket.CreatedAt}");
+    /// </code>
+    /// </example>
+    [ImplementedCapability("storage.vector_buckets.get_vector_bucket")]
+    Task<VectorBucketDetails> GetVectorBucketAsync(string vectorBucketName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Deletes an empty vector bucket. The service rejects the call while the bucket still has

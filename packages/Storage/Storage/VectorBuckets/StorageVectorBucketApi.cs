@@ -7,6 +7,7 @@ using Supabase.Storage.Common;
 using Supabase.Storage.VectorBuckets.Common;
 using Supabase.Storage.VectorBuckets.CreateBucket;
 using Supabase.Storage.VectorBuckets.DeleteBucket;
+using Supabase.Storage.VectorBuckets.GetBucket;
 using Supabase.Storage.VectorBuckets.ListBuckets;
 
 namespace Supabase.Storage.VectorBuckets;
@@ -38,6 +39,14 @@ internal sealed class StorageVectorBucketApi : IStorageVectorBucketApi
         var body = new ListVectorBucketsBody(options ?? new ListVectorBucketsOptions());
         var response = await this.service.PostAsync<ListVectorBucketsResponse>("ListVectorBuckets", body, cancellationToken).ConfigureAwait(false);
         return response.ToPage();
+    }
+
+    /// <inheritdoc />
+    public async Task<VectorBucketDetails> GetVectorBucketAsync(string vectorBucketName, CancellationToken cancellationToken = default)
+    {
+        VectorService.RequireName(vectorBucketName, nameof(vectorBucketName));
+        var response = await this.service.PostAsync<GetVectorBucketResponse>("GetVectorBucket", new GetVectorBucketBody(vectorBucketName), cancellationToken).ConfigureAwait(false);
+        return response.ToDetails();
     }
 
     /// <inheritdoc />
