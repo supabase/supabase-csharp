@@ -1,5 +1,68 @@
 # Changelog
 
+## [8.15.0](https://github.com/supabase/supabase-csharp/compare/v8.14.0...v8.15.0) (2026-11-27)
+
+
+### Features
+
+* add an injectable TimeProvider for SDK timers, delays and timeouts ([#844](https://github.com/supabase/supabase-csharp/issues/844)) ([7741105](https://github.com/supabase/supabase-csharp/commit/77411059e27a37dc6e9cdd5b07924cb595b41119))
+* **observability:** record http.client.request.duration and log under lowercase names in every client ([#916](https://github.com/supabase/supabase-csharp/issues/916)) ([c34daa4](https://github.com/supabase/supabase-csharp/commit/c34daa4ac5ad653cd0c8426dde52db33edfc20b3))
+* **observability:** use lowercase source names for Auth, Storage and Functions ([#842](https://github.com/supabase/supabase-csharp/issues/842)) ([5a82982](https://github.com/supabase/supabase-csharp/commit/5a82982cfc360dca9f6598f467ebf49ea6ea5cbf))
+* **postgrest:** align client span and metric with the Supabase OTel contract ([#840](https://github.com/supabase/supabase-csharp/issues/840)) ([29d5281](https://github.com/supabase/supabase-csharp/commit/29d5281608e99591f7ddd1cffb329e194a23fc44))
+* **postgrest:** get the execution plan of a read with ExplainAsync ([#929](https://github.com/supabase/supabase-csharp/issues/929)) ([6dff63a](https://github.com/supabase/supabase-csharp/commit/6dff63a17d59ff565b47bc30a30b80b80cb71c52))
+* **postgrest:** read the rows of a query as CSV with GetCsvAsync ([#928](https://github.com/supabase/supabase-csharp/issues/928)) ([2e0a0f1](https://github.com/supabase/supabase-csharp/commit/2e0a0f15c0fb2e83018ea39ad3752a52153f37a9))
+* **postgrest:** read the rows of a query as GeoJSON features with GetGeoJsonAsync ([#935](https://github.com/supabase/supabase-csharp/issues/935)) ([5562daf](https://github.com/supabase/supabase-csharp/commit/5562daf21247d1f4f379281d0e1dccb6c1d2579f))
+* **postgrest:** run a request as a dry run that rolls its changes back ([#930](https://github.com/supabase/supabase-csharp/issues/930)) ([8070e80](https://github.com/supabase/supabase-csharp/commit/8070e80e06ec630108564a49c5bbc5e545673aa1))
+* **realtime:** store a broadcast for replay ([#850](https://github.com/supabase/supabase-csharp/issues/850)) ([3dfbef1](https://github.com/supabase/supabase-csharp/commit/3dfbef15177c5270631bc275498f7b5d9c70f316))
+* **storage:** check whether an Iceberg namespace exists ([#883](https://github.com/supabase/supabase-csharp/issues/883)) ([c5dca01](https://github.com/supabase/supabase-csharp/commit/c5dca016769832d13d620c1f8fc0b2862640f694))
+* **storage:** check whether an Iceberg table exists ([#899](https://github.com/supabase/supabase-csharp/issues/899)) ([425bb99](https://github.com/supabase/supabase-csharp/commit/425bb99393cb8fe125b4fb7404f2ac0fdc192c46))
+* **storage:** commit a new schema or partition spec to an Iceberg table ([#906](https://github.com/supabase/supabase-csharp/issues/906)) ([71741f6](https://github.com/supabase/supabase-csharp/commit/71741f66b4cc0e7fdbc4d506301bc264b3d0a735))
+* **storage:** create a vector bucket ([#874](https://github.com/supabase/supabase-csharp/issues/874)) ([b8073a6](https://github.com/supabase/supabase-csharp/commit/b8073a680da2fdb681ffe576d1f6049e8d5f04f3))
+* **storage:** create a vector index ([#845](https://github.com/supabase/supabase-csharp/issues/845)) ([bca2104](https://github.com/supabase/supabase-csharp/commit/bca2104382231612fc144c2ed17b0d00aa7a9442))
+* **storage:** create an analytics bucket ([#848](https://github.com/supabase/supabase-csharp/issues/848)) ([1298798](https://github.com/supabase/supabase-csharp/commit/1298798614f7b1c8be0cc672d843eaf4cd600927))
+* **storage:** create an Iceberg namespace ([#887](https://github.com/supabase/supabase-csharp/issues/887)) ([e901aad](https://github.com/supabase/supabase-csharp/commit/e901aad7643cecc68b660fb8025c06ebb333b1c2))
+* **storage:** create an Iceberg table in an analytics bucket ([#895](https://github.com/supabase/supabase-csharp/issues/895)) ([0e58c3d](https://github.com/supabase/supabase-csharp/commit/0e58c3dcd1f299cd6daae0877be8da322084c6fb))
+* **storage:** delete a bucket lifecycle policy ([#852](https://github.com/supabase/supabase-csharp/issues/852)) ([daa64be](https://github.com/supabase/supabase-csharp/commit/daa64be2325c2fc9df75747fa9415e723b426f2a))
+* **storage:** delete a vector bucket ([#830](https://github.com/supabase/supabase-csharp/issues/830)) ([6e798fb](https://github.com/supabase/supabase-csharp/commit/6e798fb0ec9b58c9b9e56a5b991e6034b8199eb1))
+* **storage:** delete a vector index ([#836](https://github.com/supabase/supabase-csharp/issues/836)) ([3308c10](https://github.com/supabase/supabase-csharp/commit/3308c1089deddb338bb25d39e73058f11949c95f))
+* **storage:** delete an analytics bucket ([#829](https://github.com/supabase/supabase-csharp/issues/829)) ([fab777e](https://github.com/supabase/supabase-csharp/commit/fab777ec8614f7deaaa063fc88225044e64d43d7))
+* **storage:** delete an Iceberg namespace ([#885](https://github.com/supabase/supabase-csharp/issues/885)) ([16ce7d4](https://github.com/supabase/supabase-csharp/commit/16ce7d442df3f50de10982b13025dce4eef3233f))
+* **storage:** delete an Iceberg table ([#900](https://github.com/supabase/supabase-csharp/issues/900)) ([8b391a8](https://github.com/supabase/supabase-csharp/commit/8b391a893c884bb44477e46174a4a6612cab70a7))
+* **storage:** delete vectors by key from a vector index ([#858](https://github.com/supabase/supabase-csharp/issues/858)) ([094e7b4](https://github.com/supabase/supabase-csharp/commit/094e7b40588842ec46b5d7e69d0bd7f803d9ffcf))
+* **storage:** expose the data type of a stored vector ([#869](https://github.com/supabase/supabase-csharp/issues/869)) ([f8e2ffa](https://github.com/supabase/supabase-csharp/commit/f8e2ffa8f98ca5f47d253287f03539d0283f324f))
+* **storage:** get a bucket lifecycle policy ([#890](https://github.com/supabase/supabase-csharp/issues/890)) ([e60dd50](https://github.com/supabase/supabase-csharp/commit/e60dd5030db21bd37d6ba89bbf11d7ea8ec4bf84))
+* **storage:** get a vector index ([#860](https://github.com/supabase/supabase-csharp/issues/860)) ([b32f380](https://github.com/supabase/supabase-csharp/commit/b32f38071ae899c9cbad2c7b74bfb7c87b0956f3))
+* **storage:** get vectors by key from a vector index ([#863](https://github.com/supabase/supabase-csharp/issues/863)) ([b2508d2](https://github.com/supabase/supabase-csharp/commit/b2508d2ad05fee1beec33acf82500d0eac96b389))
+* **storage:** list analytics buckets ([#856](https://github.com/supabase/supabase-csharp/issues/856)) ([5e648b2](https://github.com/supabase/supabase-csharp/commit/5e648b2fec3f1769efaafe392c13aee187454794))
+* **storage:** list the namespaces of an analytics bucket ([#888](https://github.com/supabase/supabase-csharp/issues/888)) ([52783f7](https://github.com/supabase/supabase-csharp/commit/52783f7992fc94a2e4f687e8685f0b88035ddb40))
+* **storage:** list the tables of an Iceberg namespace ([#905](https://github.com/supabase/supabase-csharp/issues/905)) ([2838485](https://github.com/supabase/supabase-csharp/commit/2838485dd2c273e3455298d8bd181b8b0ab78d4e))
+* **storage:** list the vector indexes of a bucket ([#862](https://github.com/supabase/supabase-csharp/issues/862)) ([f47fe08](https://github.com/supabase/supabase-csharp/commit/f47fe08a0d538c56c0d2f5dcd77cc5b31022e3b5))
+* **storage:** list the vectors of a vector index ([#866](https://github.com/supabase/supabase-csharp/issues/866)) ([26bf397](https://github.com/supabase/supabase-csharp/commit/26bf39725a9027e7109909269b5a3f002e182bae))
+* **storage:** list vector buckets ([#875](https://github.com/supabase/supabase-csharp/issues/875)) ([2364a21](https://github.com/supabase/supabase-csharp/commit/2364a215892ec6c50c6b7d69caf5e4ca5680cf97))
+* **storage:** load an Iceberg namespace with its properties ([#921](https://github.com/supabase/supabase-csharp/issues/921)) ([b269f83](https://github.com/supabase/supabase-csharp/commit/b269f83474363224449bbfc0248f85aca60cbc06))
+* **storage:** load the metadata of an Iceberg table ([#897](https://github.com/supabase/supabase-csharp/issues/897)) ([2b237c3](https://github.com/supabase/supabase-csharp/commit/2b237c32b8c1955feaa16e2f84e62a29659410a6))
+* **storage:** put vectors into a vector index ([#876](https://github.com/supabase/supabase-csharp/issues/876)) ([2eece17](https://github.com/supabase/supabase-csharp/commit/2eece174a6daed8e60700beb069856e7133a0c51))
+* **storage:** query a vector index for similar vectors ([#877](https://github.com/supabase/supabase-csharp/issues/877)) ([831cb5a](https://github.com/supabase/supabase-csharp/commit/831cb5ad10661d1ce6d34eadc9b404957d4b5e42))
+* **storage:** retrieve the metadata of a vector bucket ([#926](https://github.com/supabase/supabase-csharp/issues/926)) ([30e6152](https://github.com/supabase/supabase-csharp/commit/30e61520f4d39100a6158e57643acd500e645d2c))
+* **storage:** scan a vector index in parallel segments ([#878](https://github.com/supabase/supabase-csharp/issues/878)) ([52a474b](https://github.com/supabase/supabase-csharp/commit/52a474bc224de6d486322074c0f113c9e2ca1b46))
+* **storage:** scope vector operations to an index ([#847](https://github.com/supabase/supabase-csharp/issues/847)) ([b550435](https://github.com/supabase/supabase-csharp/commit/b550435ab0a9514b6925584af60522ac7c6fb7c5))
+* **storage:** set and read the versioning status of a bucket ([#924](https://github.com/supabase/supabase-csharp/issues/924)) ([d493346](https://github.com/supabase/supabase-csharp/commit/d4933462937b2602ac9c20f0d2a7d24f784587de))
+* **storage:** update a bucket lifecycle policy ([#904](https://github.com/supabase/supabase-csharp/issues/904)) ([1ffb83f](https://github.com/supabase/supabase-csharp/commit/1ffb83fc7cf27f665c1d248d2210db34452654b6))
+* **supabase:** identify the SDK and its environment in a structured X-Client-Info header ([#937](https://github.com/supabase/supabase-csharp/issues/937)) ([1d5715d](https://github.com/supabase/supabase-csharp/commit/1d5715dd923112766f81253006e40bcdf1918442))
+
+
+### Bug Fixes
+
+* **postgrest:** report missing functions and tables under the right failure reason ([#931](https://github.com/supabase/supabase-csharp/issues/931)) ([3186284](https://github.com/supabase/supabase-csharp/commit/318628446bb3c932453f3e61709c336e452d020e))
+* **storage:** document the error codes the vector service sends ([#870](https://github.com/supabase/supabase-csharp/issues/870)) ([d047649](https://github.com/supabase/supabase-csharp/commit/d0476498c06f90de274a6500c0a63025192d21bb))
+* **storage:** encode object keys in request URLs ([#892](https://github.com/supabase/supabase-csharp/issues/892)) ([5f60d16](https://github.com/supabase/supabase-csharp/commit/5f60d1685cd939a7074caa9473f55cf6becb2cdc))
+* **storage:** expose the Iceberg error type as the exception code ([#882](https://github.com/supabase/supabase-csharp/issues/882)) ([607f841](https://github.com/supabase/supabase-csharp/commit/607f841f31565ea5f8f8bf070102febcf4d8ea3c))
+* **storage:** keep the metadata of a resumable upload from a local file ([#891](https://github.com/supabase/supabase-csharp/issues/891)) ([6594f0c](https://github.com/supabase/supabase-csharp/commit/6594f0cf16881691fe47cabac69d64012e4e8b62))
+* **storage:** never resume on the caller's context when reading a response ([#868](https://github.com/supabase/supabase-csharp/issues/868)) ([6fba8b1](https://github.com/supabase/supabase-csharp/commit/6fba8b175422d9345de272091e9091915fc79810))
+* **storage:** replace the local file on download ([#851](https://github.com/supabase/supabase-csharp/issues/851)) ([6c6e450](https://github.com/supabase/supabase-csharp/commit/6c6e450fb416f243cb3216d17fbc5b6f35a7cc79))
+* **storage:** return no vectors when the get response omits them ([#871](https://github.com/supabase/supabase-csharp/issues/871)) ([17abfb6](https://github.com/supabase/supabase-csharp/commit/17abfb6c11e76edd9ac761495188eb7bc172ecbd))
+* **storage:** send the cache control of a resumable upload in its metadata ([#920](https://github.com/supabase/supabase-csharp/issues/920)) ([7064d0f](https://github.com/supabase/supabase-csharp/commit/7064d0fc92909f8c27d4ecf18f6023edac728bd0))
+
 ## [8.14.0](https://github.com/supabase/supabase-csharp/compare/v8.13.0...v8.14.0) (2026-11-23)
 
 
