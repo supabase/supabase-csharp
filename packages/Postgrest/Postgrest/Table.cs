@@ -15,6 +15,7 @@ using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.BulkWrite;
+using Supabase.Postgrest.Common;
 using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Extensions;
 using Supabase.Postgrest.Interfaces;
@@ -22,7 +23,6 @@ using Supabase.Postgrest.LimitAffectedRows;
 using Supabase.Postgrest.Linq;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
-using Supabase.Postgrest.SingleOrThrow;
 using static Supabase.Postgrest.Constants;
 
 namespace Supabase.Postgrest;
@@ -679,6 +679,17 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             };
 
     /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.format_csv")]
+    public async Task<string> GetCsvAsync(CancellationToken cancellationToken = default)
+    {
+        this.method = HttpMethod.Get;
+        this.representation = this.representation.AsCsv();
+        var request = this.Send(this.method, null, null, cancellationToken);
+        this.Clear();
+        return (await request.ConfigureAwait(false)).Content!;
+    }
+
+    /// <inheritdoc />
     [ImplementedCapability("database.using_modifiers.request_cancellation", "Every terminal (Get/Insert/Update/Delete/Single/Count) accepts a CancellationToken.")]
     public Task<ModeledResponse<TModel>> Get(CancellationToken cancellationToken = default, CountType type = CountType.Estimated)
     {
@@ -1015,6 +1026,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         }
 
         this.affectedRowsLimit?.ApplyTo(method, requestHeaders);
+
+        this.representation.ApplyTo(requestHeaders);
 
         var url = this.GenerateUrl();
         var preparedData = this.PrepareRequestData(data, isInsert, isUpdate, isUpsert);
