@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "2",
+  "thresholds": {
+    "high": 80,
+    "low": 60
+  },
+  "files": {
+    "/repo/packages/Sample/Calculator.cs": {
+      "language": "cs",
+      "source": "namespace Sample;\n\npublic class Calculator\n{\n    public int Add(int a, int b) => a + b;\n}\n",
+      "mutants": [
+        {
+          "id": "1",
+          "mutatorName": "Arithmetic",
+          "replacement": "a - b",
+          "location": {
+            "start": {
+              "line": 5,
+              "column": 41
+            },
+            "end": {
+              "line": 5,
+              "column": 46
+            }
+          },
+          "status": "Killed"
+        }
+      ]
+    },
+    "/repo/packages/Sample/Legacy.cs": {
+      "language": "cs",
+      "source": "namespace Sample;\n\npublic class Legacy\n{\n    public int Twice(int n) => n * 2;\n}\n",
+      "mutants": [
+        {
+          "id": "2",
+          "mutatorName": "Arithmetic",
+          "replacement": "n / 2",
+          "location": {
+            "start": {
+              "line": 5,
+              "column": 32
+            },
+            "end": {
+              "line": 5,
+              "column": 37
+            }
+          },
+          "status": "Survived"
+        }
+      ]
+    }
+  }
+}
