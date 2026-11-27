@@ -532,6 +532,10 @@ features:
     note: "Mutations return the affected rows by default (QueryOptions.Returning = Representation)."
     symbols:
       - QueryOptions.Returning
+  database.using_modifiers.explain:
+    status: implemented
+    symbols:
+      - Table.ExplainAsync
   database.using_modifiers.format_csv:
     status: implemented
     symbols:
