@@ -1,5 +1,27 @@
 #nullable enable
 *REMOVED*const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "Supabase.Postgrest" -> string!
 const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "supabase.postgrest" -> string!
+override Supabase.Postgrest.Explain.ExplainOptions.Equals(object? obj) -> bool
+override Supabase.Postgrest.Explain.ExplainOptions.GetHashCode() -> int
+override Supabase.Postgrest.Explain.ExplainOptions.ToString() -> string!
+static Supabase.Postgrest.Explain.ExplainOptions.operator !=(Supabase.Postgrest.Explain.ExplainOptions? left, Supabase.Postgrest.Explain.ExplainOptions? right) -> bool
+static Supabase.Postgrest.Explain.ExplainOptions.operator ==(Supabase.Postgrest.Explain.ExplainOptions? left, Supabase.Postgrest.Explain.ExplainOptions? right) -> bool
 Supabase.Postgrest.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Postgrest.ClientOptions.TimeProvider.set -> void
+Supabase.Postgrest.Exceptions.FailureHint.Reason.MediaTypeNotAcceptable = 11 -> Supabase.Postgrest.Exceptions.FailureHint.Reason
+Supabase.Postgrest.Explain.ExplainOptions
+Supabase.Postgrest.Explain.ExplainOptions.<Clone>$() -> Supabase.Postgrest.Explain.ExplainOptions!
+Supabase.Postgrest.Explain.ExplainOptions.Analyze.get -> bool
+Supabase.Postgrest.Explain.ExplainOptions.Analyze.init -> void
+Supabase.Postgrest.Explain.ExplainOptions.Buffers.get -> bool
+Supabase.Postgrest.Explain.ExplainOptions.Buffers.init -> void
+Supabase.Postgrest.Explain.ExplainOptions.Equals(Supabase.Postgrest.Explain.ExplainOptions? other) -> bool
+Supabase.Postgrest.Explain.ExplainOptions.ExplainOptions() -> void
+Supabase.Postgrest.Explain.ExplainOptions.Settings.get -> bool
+Supabase.Postgrest.Explain.ExplainOptions.Settings.init -> void
+Supabase.Postgrest.Explain.ExplainOptions.Verbose.get -> bool
+Supabase.Postgrest.Explain.ExplainOptions.Verbose.init -> void
+Supabase.Postgrest.Explain.ExplainOptions.Wal.get -> bool
+Supabase.Postgrest.Explain.ExplainOptions.Wal.init -> void
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.ExplainAsync(Supabase.Postgrest.Explain.ExplainOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Text.Json.JsonElement>!
+Supabase.Postgrest.Table<TModel>.ExplainAsync(Supabase.Postgrest.Explain.ExplainOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Text.Json.JsonElement>!

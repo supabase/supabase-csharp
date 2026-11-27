@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Supabase.Core.Interfaces;
+using Supabase.Postgrest.Explain;
 using Supabase.Postgrest.Models;
 using Supabase.Postgrest.Responses;
 
@@ -427,6 +429,34 @@ public interface IPostgrestTable<TModel> : IGettableHeaders where TModel : BaseM
     /// <exception cref="Exceptions.PostgrestException">The query matches more than one row.</exception>
     /// <returns></returns>
     Task<TModel?> Single(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns the Postgres execution plan of the read instead of its rows, as the JSON output of
+    /// <c>EXPLAIN (FORMAT JSON)</c>: an array holding one plan object, whose <c>Plan</c> is the root node.
+    /// Filters, ordering, <see cref="Limit"/>, <see cref="Offset"/> and <see cref="Range(int, int)"/> shape the
+    /// planned query as they do for <see cref="Get"/>.
+    /// </summary>
+    /// <remarks>
+    /// PostgREST serves plans only when its <c>db-plan-enabled</c> setting is on, which is not the default: run
+    /// <c>alter role authenticator set pgrst.db_plan_enabled to 'true'; notify pgrst, 'reload config';</c>.
+    /// A plan reveals details of the database, so enable it outside production, or restrict it with a
+    /// pre-request function. The root node is the aggregate PostgREST wraps around the query.
+    /// </remarks>
+    /// <param name="options">The extra details to include. None by default.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The plan, as Postgres reports it.</returns>
+    /// <exception cref="Exceptions.PostgrestException">PostgREST does not serve plans
+    /// (<see cref="Exceptions.FailureHint.Reason.MediaTypeNotAcceptable"/>), or refuses the request.</exception>
+    /// <example>
+    /// <code>
+    /// var plan = await client.Table&lt;Movie&gt;()
+    ///     .Filter("name", Operator.Equals, "Alien")
+    ///     .ExplainAsync(new ExplainOptions { Analyze = true });
+    /// var root = plan[0].GetProperty("Plan");
+    /// Console.WriteLine($"{root.GetProperty("Node Type")} in {plan[0].GetProperty("Execution Time")} ms");
+    /// </code>
+    /// </example>
+    Task<JsonElement> ExplainAsync(ExplainOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Executes a read that must match exactly one row, and returns that row. The server enforces the count
