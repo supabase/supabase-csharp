@@ -21,7 +21,7 @@ internal static class ClientInfoHeader
 
     internal static void Inject(HttpHeaders headers, ClientInfo sdkValue) => Inject(headers, sdkValue, SdkFeatures.None);
 
-    [ImplementedCapability("client.observability.client_info")]
+    [ImplementedCapability("client.observability.client_info", "Automatic, no API to call: every request of every package carries the structured X-Client-Info header; an X-Client-Info set through the client's headers (SupabaseOptions.Headers, a package's ClientOptions.Headers or per-request headers) replaces the SDK's value.")]
     internal static void Inject(HttpHeaders headers, ClientInfo sdkValue, SdkFeatures features)
     {
         var value = WithFeatures(ValueInEffect(headers, sdkValue), features);
