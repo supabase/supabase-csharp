@@ -15,6 +15,7 @@ using Supabase.Core.Attributes;
 using Supabase.Core.Extensions;
 using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.BulkWrite;
+using Supabase.Postgrest.Common;
 using Supabase.Postgrest.Exceptions;
 using Supabase.Postgrest.Extensions;
 using Supabase.Postgrest.Interfaces;
@@ -76,6 +77,8 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     private RowRepresentation representation = RowRepresentation.Default;
 
     private AffectedRowsLimit? affectedRowsLimit;
+
+    private bool dryRun;
 
     #endregion
 
@@ -458,6 +461,15 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
     public IPostgrestTable<TModel> MaxAffected(int rows)
     {
         this.affectedRowsLimit = AffectedRowsLimit.Of(rows);
+        return this;
+    }
+
+
+    /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.dry_run")]
+    public IPostgrestTable<TModel> DryRun()
+    {
+        this.dryRun = true;
         return this;
     }
 
@@ -978,6 +990,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         this.onConflict = null;
         this.representation = RowRepresentation.Default;
         this.affectedRowsLimit = null;
+        this.dryRun = false;
     }
 
 
@@ -1015,6 +1028,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         }
 
         this.affectedRowsLimit?.ApplyTo(method, requestHeaders);
+        this.RequestRollbackOnDryRun(requestHeaders);
 
         var url = this.GenerateUrl();
         var preparedData = this.PrepareRequestData(data, isInsert, isUpdate, isUpsert);
@@ -1043,6 +1057,7 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
             requestHeaders = this.GetHeaders().MergeLeft(requestHeaders);
 
         this.affectedRowsLimit?.ApplyTo(method, requestHeaders);
+        this.RequestRollbackOnDryRun(requestHeaders);
 
         this.representation.ApplyTo(requestHeaders);
 
@@ -1060,6 +1075,12 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
 
         var call = PostgrestCall.OnTable(PostgrestInstrumentation.ResolveOperation(method, isInsert, isUpdate, isUpsert), this.TableName);
         return Helpers.MakeRequestAsync<TU>(this.options, this.httpClient, method, call, url, this.serializerSettings, preparedData, requestHeaders, this.GetHeaders, cancellationToken);
+    }
+
+    private void RequestRollbackOnDryRun(Dictionary<string, string> headers)
+    {
+        if (this.dryRun)
+            PreferHeader.Append(headers, "tx=rollback");
     }
 
     private void SpecifyColumnsOfBulkRows(object? preparedData)

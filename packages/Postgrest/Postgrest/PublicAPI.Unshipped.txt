@@ -3,3 +3,5 @@
 const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "supabase.postgrest" -> string!
 Supabase.Postgrest.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Postgrest.ClientOptions.TimeProvider.set -> void
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.DryRun() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Table<TModel>.DryRun() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
