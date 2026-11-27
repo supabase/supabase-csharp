@@ -17,6 +17,7 @@ using Supabase.Postgrest.Attributes;
 using Supabase.Postgrest.BulkWrite;
 using Supabase.Postgrest.Common;
 using Supabase.Postgrest.Exceptions;
+using Supabase.Postgrest.Explain;
 using Supabase.Postgrest.Extensions;
 using Supabase.Postgrest.Interfaces;
 using Supabase.Postgrest.LimitAffectedRows;
@@ -688,6 +689,19 @@ public class Table<TModel> : IPostgrestTable<TModel> where TModel : BaseModel, n
         this.Clear();
         return (await request.ConfigureAwait(false)).Content!;
     }
+
+    /// <inheritdoc />
+    [ImplementedCapability("database.using_modifiers.explain")]
+    public async Task<JsonElement> ExplainAsync(ExplainOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        this.method = HttpMethod.Get;
+        var request = this.Send(this.method, null, PlanRequestHeaders(options ?? new ExplainOptions()), cancellationToken);
+        this.Clear();
+        return Helpers.DeserializeBody<JsonElement>(await request.ConfigureAwait(false), this.serializerSettings);
+    }
+
+    private static Dictionary<string, string> PlanRequestHeaders(ExplainOptions options) =>
+        new() { ["Accept"] = options.MediaType };
 
     /// <inheritdoc />
     [ImplementedCapability("database.using_modifiers.request_cancellation", "Every terminal (Get/Insert/Update/Delete/Single/Count) accepts a CancellationToken.")]

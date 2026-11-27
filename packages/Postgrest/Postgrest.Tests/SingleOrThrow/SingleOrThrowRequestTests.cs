@@ -103,7 +103,7 @@ public class SingleOrThrowRequestTests
     {
         this.RespondWith(406, """{"code":"PGRST107","message":"None of these media types are available"}""");
         var act = () => this.client.Table<Todo>().SingleOrThrowAsync();
-        (await act.Should().ThrowAsync<PostgrestException>()).Which.Reason.Should().Be(FailureHint.Reason.Unknown);
+        (await act.Should().ThrowAsync<PostgrestException>()).Which.Reason.Should().Be(FailureHint.Reason.MediaTypeNotAcceptable);
     }
 
     [TestMethod]
