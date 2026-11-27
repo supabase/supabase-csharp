@@ -12,8 +12,8 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>supabase;official;core</PackageTags>
 		<!-- x-release-please-start-version -->
-		<PackageVersion>8.14.0</PackageVersion>
-		<ReleaseVersion>8.14.0</ReleaseVersion>
+		<PackageVersion>8.15.0</PackageVersion>
+		<ReleaseVersion>8.15.0</ReleaseVersion>
 		<!-- x-release-please-end -->
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
