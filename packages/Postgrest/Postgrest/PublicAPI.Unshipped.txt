@@ -4,4 +4,6 @@ const Supabase.Postgrest.PostgrestDiagnostics.SourceName = "supabase.postgrest" 
 Supabase.Postgrest.ClientOptions.TimeProvider.get -> System.TimeProvider!
 Supabase.Postgrest.ClientOptions.TimeProvider.set -> void
 Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.DryRun() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Interfaces.IPostgrestTable<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
 Supabase.Postgrest.Table<TModel>.DryRun() -> Supabase.Postgrest.Interfaces.IPostgrestTable<TModel!>!
+Supabase.Postgrest.Table<TModel>.GetCsvAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
