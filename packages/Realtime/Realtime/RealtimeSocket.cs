@@ -89,6 +89,7 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     private readonly Stopwatch heartbeatStopwatch = new();
 
     private readonly List<Action> buffer = new();
+    private readonly object bufferLock = new();
     private bool isReconnecting;
     private bool isOpen;
     private bool disconnectRequested;
@@ -309,7 +310,23 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
         if (this.connection.IsRunning)
             Send();
         else
-            this.buffer.Add(Send);
+            this.Buffer(Send);
+    }
+
+    private void Buffer(Action send)
+    {
+        lock (this.bufferLock)
+            this.buffer.Add(send);
+    }
+
+    private List<Action> TakeBuffered()
+    {
+        lock (this.bufferLock)
+        {
+            var pending = new List<Action>(this.buffer);
+            this.buffer.Clear();
+            return pending;
+        }
     }
 
     private void EncodeAndSend(SocketRequest data)
@@ -665,15 +682,16 @@ public class RealtimeSocket : IDisposable, IRealtimeSocket
     /// </summary>
     private void FlushBuffer()
     {
-        if (!this.connection.IsRunning || this.buffer.Count == 0) return;
+        if (!this.connection.IsRunning) return;
+
+        var pending = this.TakeBuffered();
+        if (pending.Count == 0) return;
 
         Debugger.Instance.Log(this,
-            $"Socket Flushing Buffer: Connection has been reestablished and socket is sending {this.buffer.Count} messages");
-        foreach (var send in this.buffer)
+            $"Socket Flushing Buffer: Connection has been reestablished and socket is sending {pending.Count} messages");
+        foreach (var send in pending)
         {
             send();
         }
-
-        this.buffer.Clear();
     }
 }
