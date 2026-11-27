@@ -63,11 +63,11 @@ public class ClientOptions
     public TimeSpan ProbeTimeout { get; set; } = TimeSpan.FromSeconds(5);
 
     /// <summary>
-    /// When set, the socket disconnects once the last channel has been closed for this long, and the next
-    /// <c>Subscribe</c> connects again. Left null, the socket stays open.
+    /// The socket disconnects once the last channel has been closed for this long, and the next <c>Subscribe</c>
+    /// connects again. Defaults to 40 seconds, twice the default heartbeat interval. Set to null to keep the socket open.
     /// </summary>
-    [PartialCapability("realtime.configuration.deferred_disconnect", "Opt-in: null by default, so the socket stays open. Closing an idle socket by default is a breaking change planned for 9.0.0.")]
-    public TimeSpan? DisconnectOnEmptyChannelsAfter { get; set; }
+    [ImplementedCapability("realtime.configuration.deferred_disconnect")]
+    public TimeSpan? DisconnectOnEmptyChannelsAfter { get; set; } = TimeSpan.FromSeconds(40);
 
     /// <summary>
     /// The delay before the next reconnect attempt after one failed, given the attempt number starting at 1. Defaults

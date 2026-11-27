@@ -21,6 +21,13 @@ public class DeferredDisconnectTests
     private static readonly TimeSpan Patience = TimeSpan.FromSeconds(5);
 
     [TestMethod]
+    public void DisconnectOnEmptyChannelsAfter_ShouldBeTwiceTheHeartbeatInterval_GivenDefaultOptions()
+    {
+        var options = new ClientOptions();
+        options.DisconnectOnEmptyChannelsAfter.Should().Be(2 * options.HeartbeatInterval, "an idle socket must close by default");
+    }
+
+    [TestMethod]
     public async Task Unsubscribe_ShouldDisconnect_GivenTheLastChannelClosed()
     {
         var client = await Connect(TimeSpan.FromMilliseconds(50));
