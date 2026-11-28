@@ -1,4 +1,6 @@
 using System.Text.Json.Serialization;
+using Supabase.Core.Attributes;
+using Supabase.Storage.FileBuckets.Common;
 
 namespace Supabase.Storage;
 
@@ -40,4 +42,20 @@ public class SearchV2Options
     [JsonPropertyName("sortBy")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SortBy? SortBy { get; set; }
+
+    /// <summary>
+    /// Whether earlier versions of objects are listed. Not sent when null, and the service then leaves them out.
+    /// </summary>
+    [ImplementedCapability("storage.file_buckets.list_file_versions")]
+    [JsonPropertyName("noncurrentVersions")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ListingFilter? NoncurrentVersions { get; set; }
+
+    /// <summary>
+    /// Whether the markers left by deleting a versioned object are listed. Not sent when null, and the service then leaves them out.
+    /// </summary>
+    [ImplementedCapability("storage.file_buckets.list_file_versions")]
+    [JsonPropertyName("deleteMarkers")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ListingFilter? DeleteMarkers { get; set; }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Supabase.Core.Attributes;
 
 namespace Supabase.Storage;
 
@@ -35,6 +36,26 @@ public class FileObject
 
     [JsonPropertyName("last_accessed_at")]
     public DateTime? LastAccessedAt { get; set; }
+
+    /// <summary>The version of the object. Null when the service does not report one.</summary>
+    [ImplementedCapability("storage.file_buckets.list_file_versions")]
+    [JsonPropertyName("version")]
+    public string? Version { get; set; }
+
+    /// <summary>When this version stopped being the current one, or null while it is current.</summary>
+    [ImplementedCapability("storage.file_buckets.list_file_versions")]
+    [JsonPropertyName("archived_at")]
+    public DateTime? ArchivedAt { get; set; }
+
+    /// <summary>Whether this entry marks a deleted object rather than holding its contents.</summary>
+    [ImplementedCapability("storage.file_buckets.list_file_versions")]
+    [JsonPropertyName("is_delete_marker")]
+    public bool? IsDeleteMarker { get; set; }
+
+    /// <summary>Whether the object was written while the bucket kept versions.</summary>
+    [ImplementedCapability("storage.file_buckets.list_file_versions")]
+    [JsonPropertyName("is_versioned")]
+    public bool? IsVersioned { get; set; }
 
     [JsonPropertyName("metadata")]
     public Dictionary<string, object> MetaData = new Dictionary<string, object>();

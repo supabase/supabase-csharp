@@ -1,0 +1,1 @@
+﻿{"limit":100,"offset":0,"search":"","sortBy":{"column":"name","order":"asc"},"noncurrentVersions":"include","deleteMarkers":"only","prefix":"folder"}
