@@ -43,6 +43,16 @@ namespace Supabase.Storage.Interfaces
             CancellationToken cancellationToken = default,
             string? cacheNonce = null
         );
+        /// <summary>
+        /// Downloads a specific version of a file, current or not.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// var info = await storage.From("avatars").Info("folder/avatar.png");
+        /// var bytes = await storage.From("avatars").DownloadVersionAsync("folder/avatar.png", info!.Version);
+        /// </code>
+        /// </example>
+        Task<byte[]> DownloadVersionAsync(string supabasePath, string versionId, CancellationToken cancellationToken = default);
         Task<byte[]> DownloadPublicFile(
             string supabasePath,
             TransformOptions? transformOptions = null,
