@@ -60,7 +60,7 @@ public class StorageFileApiContractTests
             var request = this.SingleRequest();
             request.Method.Should().Be("POST");
             request.Path.Should().Be($"/storage/v1/object/list/{Bucket}");
-            request.Body.Should().Contain("\"prefix\":\"folder\"").And.Contain("\"limit\":100");
+            request.Body.Should().Contain("\"prefix\":\"folder\"").And.Contain("\"limit\":100").And.NotContain("noncurrentVersions").And.NotContain("deleteMarkers");
         }
     }
 
@@ -75,11 +75,26 @@ public class StorageFileApiContractTests
             var request = this.SingleRequest();
             request.Path.Should().Be($"/storage/v1/object/list-v2/{Bucket}");
             request.Body.Should().Contain("\"prefix\":\"folder/\"").And.Contain("\"with_delimiter\":true").And.Contain("\"limit\":1")
-                .And.NotContain("\"cursor\"").And.NotContain("\"sortBy\"");
+                .And.NotContain("\"cursor\"").And.NotContain("\"sortBy\"").And.NotContain("noncurrentVersions").And.NotContain("deleteMarkers");
             page!.HasNext.Should().BeTrue();
             page.NextCursor.Should().Be("abc");
             page.Objects.Should().ContainSingle().Which.Name.Should().Be("folder/a.png");
             page.Folders.Should().ContainSingle().Which.IsFolder.Should().BeTrue();
+        }
+    }
+
+    [TestMethod]
+    public async Task List_ShouldMapTheVersionFields_GivenVersionedEntry()
+    {
+        this.Respond($"/storage/v1/object/list/{Bucket}", "POST", 200,
+            "[{\"name\":\"a.png\",\"version\":\"v1\",\"archived_at\":\"2026-11-01T10:00:00Z\",\"is_delete_marker\":true,\"is_versioned\":true}]");
+        var file = (await this.client.From(Bucket).List()).Should().ContainSingle().Subject;
+        using (new AssertionScope())
+        {
+            file.Version.Should().Be("v1");
+            file.ArchivedAt.Should().Be(new DateTime(2026, 11, 1, 10, 0, 0, DateTimeKind.Utc));
+            file.IsDeleteMarker.Should().BeTrue();
+            file.IsVersioned.Should().BeTrue();
         }
     }
 

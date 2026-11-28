@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Storage.Tests.Support;
 using Supabase.Storage;
+using Supabase.Storage.FileBuckets.Common;
 
 namespace Storage.Tests.Files;
 
@@ -63,6 +64,24 @@ public class StorageFileApprovalTests : RequestApprovalFixture
     {
         this.RespondWith("[]");
         await this.Client.From("photos").Remove(new List<string> { "cat.png", "dog.png" });
+        await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
+
+    [TestMethod]
+    public async Task ListRequest_ShouldSerializeToExpectedPayload_GivenVersionFilters()
+    {
+        this.RespondWith("[]");
+        await this.Client.From("photos").List("folder",
+            new SearchOptions { NoncurrentVersions = ListingFilter.Include, DeleteMarkers = ListingFilter.Only });
+        await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
+    }
+
+    [TestMethod]
+    public async Task ListV2Request_ShouldSerializeToExpectedPayload_GivenVersionFilters()
+    {
+        this.RespondWith("{}");
+        await this.Client.From("photos").ListV2Async(
+            new SearchV2Options { NoncurrentVersions = ListingFilter.Only, DeleteMarkers = ListingFilter.Exclude });
         await this.Verify(this.EmittedRequestBody).UseDirectory("Data");
     }
 }

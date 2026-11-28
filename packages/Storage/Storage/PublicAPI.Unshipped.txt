@@ -416,6 +416,10 @@ Supabase.Storage.FileBuckets.Common.LifecycleRule.Status.init -> void
 Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus
 Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.<Clone>$() -> Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus!
 Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus.Equals(Supabase.Storage.FileBuckets.Common.LifecycleRuleStatus? other) -> bool
+Supabase.Storage.FileBuckets.Common.ListingFilter
+Supabase.Storage.FileBuckets.Common.ListingFilter.Exclude = 0 -> Supabase.Storage.FileBuckets.Common.ListingFilter
+Supabase.Storage.FileBuckets.Common.ListingFilter.Include = 1 -> Supabase.Storage.FileBuckets.Common.ListingFilter
+Supabase.Storage.FileBuckets.Common.ListingFilter.Only = 2 -> Supabase.Storage.FileBuckets.Common.ListingFilter
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.<Clone>$() -> Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration!
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.Equals(Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration? other) -> bool
@@ -424,6 +428,22 @@ Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NewerNoncurrentV
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentDays.get -> int
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentDays.init -> void
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentVersionExpiration() -> void
+Supabase.Storage.FileObject.ArchivedAt.get -> System.DateTime?
+Supabase.Storage.FileObject.ArchivedAt.set -> void
+Supabase.Storage.FileObject.IsDeleteMarker.get -> bool?
+Supabase.Storage.FileObject.IsDeleteMarker.set -> void
+Supabase.Storage.FileObject.IsVersioned.get -> bool?
+Supabase.Storage.FileObject.IsVersioned.set -> void
+Supabase.Storage.FileObject.Version.get -> string?
+Supabase.Storage.FileObject.Version.set -> void
+Supabase.Storage.SearchOptions.DeleteMarkers.get -> Supabase.Storage.FileBuckets.Common.ListingFilter?
+Supabase.Storage.SearchOptions.DeleteMarkers.set -> void
+Supabase.Storage.SearchOptions.NoncurrentVersions.get -> Supabase.Storage.FileBuckets.Common.ListingFilter?
+Supabase.Storage.SearchOptions.NoncurrentVersions.set -> void
+Supabase.Storage.SearchV2Options.DeleteMarkers.get -> Supabase.Storage.FileBuckets.Common.ListingFilter?
+Supabase.Storage.SearchV2Options.DeleteMarkers.set -> void
+Supabase.Storage.SearchV2Options.NoncurrentVersions.get -> Supabase.Storage.FileBuckets.Common.ListingFilter?
+Supabase.Storage.SearchV2Options.NoncurrentVersions.set -> void
 Supabase.Storage.VectorBuckets.Common.StoredVector
 Supabase.Storage.VectorBuckets.Common.StoredVector.<Clone>$() -> Supabase.Storage.VectorBuckets.Common.StoredVector!
 Supabase.Storage.VectorBuckets.Common.StoredVector.Data.get -> Supabase.Storage.VectorBuckets.Common.VectorData?
