@@ -761,6 +761,16 @@ public class StorageFileApi : IStorageFileApi<FileObject>
     public Task<byte[]> Download(string supabasePath, EventHandler<float>? onProgress = null, CancellationToken cancellationToken = default, string? cacheNonce = null) =>
         this.Download(supabasePath, transformOptions: null, onProgress: onProgress, cancellationToken, cacheNonce);
 
+    /// <inheritdoc />
+    [ImplementedCapability("storage.file_buckets.download_specific_version")]
+    public Task<byte[]> DownloadVersionAsync(string supabasePath, string versionId, CancellationToken cancellationToken = default)
+    {
+        if (versionId is null)
+            throw new ArgumentNullException(nameof(versionId));
+        var url = $"{this.Url}/object/{this.EscapeForRequestUrl(supabasePath, nameof(supabasePath))}";
+        return this.DownloadBytes(url, cancellationToken: cancellationToken, versionId: versionId);
+    }
+
     /// <summary>
     /// Downloads a public file to the filesystem. This method DOES NOT VERIFY that the file is actually public.
     /// </summary>
@@ -1110,7 +1120,8 @@ public class StorageFileApi : IStorageFileApi<FileObject>
         TransformOptions? transformOptions = null,
         EventHandler<float>? onProgress = null,
         CancellationToken cancellationToken = default,
-        string? cacheNonce = null
+        string? cacheNonce = null,
+        string? versionId = null
     )
     {
         var query = HttpUtility.ParseQueryString(string.Empty);
@@ -1122,6 +1133,9 @@ public class StorageFileApi : IStorageFileApi<FileObject>
 
         if (cacheNonce != null)
             query.Add("cacheNonce", cacheNonce);
+
+        if (versionId != null)
+            query.Add("versionId", versionId);
 
         builder.Query = query.ToString();
 

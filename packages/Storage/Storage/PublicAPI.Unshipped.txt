@@ -424,6 +424,8 @@ Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NewerNoncurrentV
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentDays.get -> int
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentDays.init -> void
 Supabase.Storage.FileBuckets.Common.NoncurrentVersionExpiration.NoncurrentVersionExpiration() -> void
+Supabase.Storage.Interfaces.IStorageFileApi<TFileObject>.DownloadVersionAsync(string! supabasePath, string! versionId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<byte[]!>!
+Supabase.Storage.StorageFileApi.DownloadVersionAsync(string! supabasePath, string! versionId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<byte[]!>!
 Supabase.Storage.VectorBuckets.Common.StoredVector
 Supabase.Storage.VectorBuckets.Common.StoredVector.<Clone>$() -> Supabase.Storage.VectorBuckets.Common.StoredVector!
 Supabase.Storage.VectorBuckets.Common.StoredVector.Data.get -> Supabase.Storage.VectorBuckets.Common.VectorData?
